@@ -1,0 +1,294 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="UI\Interface.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imconfig.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_dx11.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_win32.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_internal.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_rectpack.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_textedit.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_truetype.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DRenderer.hpp">
+      <Filter>Interface\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.hpp">
+      <Filter>Utility\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="CrossMap.hpp">
+      <Filter>Natives\CrossMap</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomText.hpp">
+      <Filter>Utility\Custom Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooking.hpp">
+      <Filter>Hooking</Filter>
+    </ClInclude>
+    <ClInclude Include="Signatures.hpp">
+      <Filter>Memory\Signatures</Filter>
+    </ClInclude>
+    <ClInclude Include="FiberHelper.hpp">
+      <Filter>Fiber</Filter>
+    </ClInclude>
+    <ClInclude Include="Invoker.hpp">
+      <Filter>Utility\Invoker</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\AbstractSubmenu.hpp">
+      <Filter>Interface\Submenu</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\BaseSubmenu.hpp">
+      <Filter>Interface\Submenu</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\RegularSubmenu.hpp">
+      <Filter>Interface\Submenu</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\PlayerSubmenu.hpp">
+      <Filter>Interface\Submenu</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\RegularOption.hpp">
+      <Filter>Interface\Option</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\NumberOption.hpp">
+      <Filter>Interface\Option</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\AbstractOption.hpp">
+      <Filter>Interface\Option</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\BaseOption.hpp">
+      <Filter>Interface\Option</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\BoolOption.hpp">
+      <Filter>Interface\Option</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\ChooseOption.hpp">
+      <Filter>Interface\Option</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\SubOption.hpp">
+      <Filter>Interface\Option</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\TextBox.hpp">
+      <Filter>Interface\Option</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UnclickOption.hpp">
+      <Filter>Interface\Option</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.hpp">
+      <Filter>Core\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="LogScript.hpp">
+      <Filter>Core\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="NativeHook.hpp">
+      <Filter>Hooking\Native Hooking</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptHook.hpp">
+      <Filter>Hooking\Native Hooking</Filter>
+    </ClInclude>
+    <ClInclude Include="VMTHook.hpp">
+      <Filter>Hooking</Filter>
+    </ClInclude>
+    <ClInclude Include="Util.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Types.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Translation.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Settings.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Script.hpp">
+      <Filter>Memory\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptCallback.hpp">
+      <Filter>Memory\Script\Callback</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptManager.hpp">
+      <Filter>Memory\Script\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptGlobal.hpp">
+      <Filter>Memory\Script\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Natives.hpp">
+      <Filter>Natives</Filter>
+    </ClInclude>
+    <ClInclude Include="Lists.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Script.h">
+      <Filter>Core\Script</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="UI\Interface.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_demo.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_draw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_impl_dx11.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_impl_win32.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_widgets.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_tables.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DRenderer.cpp">
+      <Filter>Interface\D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Common.cpp">
+      <Filter>Utility\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="CrossMap.cpp">
+      <Filter>Natives\CrossMap</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomText.cpp">
+      <Filter>Utility\Custom Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooking.cpp">
+      <Filter>Hooking</Filter>
+    </ClCompile>
+    <ClCompile Include="Signatures.cpp">
+      <Filter>Memory\Signatures</Filter>
+    </ClCompile>
+    <ClCompile Include="Invoker.cpp">
+      <Filter>Utility\Invoker</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Core\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="LogScript.cpp">
+      <Filter>Core\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="NativeHook.cpp">
+      <Filter>Hooking\Native Hooking</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptHook.cpp">
+      <Filter>Hooking\Native Hooking</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptCallback.cpp">
+      <Filter>Memory\Script\Callback</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptManager.cpp">
+      <Filter>Memory\Script\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Script.cpp">
+      <Filter>Core\Script</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ImGui">
+      <UniqueIdentifier>{9958264f-83ea-41ad-9181-eb12d95b31af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooking">
+      <UniqueIdentifier>{62fed53b-5889-49ad-a402-a064a52cbed4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{13318a34-d39a-4046-a1b5-2c9db8ea450d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Logger">
+      <UniqueIdentifier>{1cdd9f04-164c-477a-9a18-b5736834fab0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooking\Native Hooking">
+      <UniqueIdentifier>{45be8b8d-6eb8-4687-bd45-8a2da3ee29f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fiber">
+      <UniqueIdentifier>{16c2e343-d833-4385-8d96-6e88ba2b0d42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{67b873d4-c87a-4fe3-8af6-04eda1c4368f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{83dbf882-eb72-4bca-bd52-307d3fd04d29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\Invoker">
+      <UniqueIdentifier>{aba1df7f-1f4b-4aa0-bd68-a6c011b51606}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory\Script">
+      <UniqueIdentifier>{5b3703cc-0f04-4b4e-930e-b00dd3726138}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory\Script\Callback">
+      <UniqueIdentifier>{fab63c25-6919-4196-bac6-97d941fd1310}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory\Script\Manager">
+      <UniqueIdentifier>{ebfd8be3-ad18-4d71-ac52-4e6e1b2a4564}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory\Script\Global">
+      <UniqueIdentifier>{29d7e79d-e5ff-49c9-8449-a8d4b4f669b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{77afe01f-1408-49bd-a88b-21e856118c7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Natives">
+      <UniqueIdentifier>{160d3ce5-e40f-4b52-a35d-1b32be8833c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Natives\CrossMap">
+      <UniqueIdentifier>{12d1c62e-b9ef-4e16-8bce-0ef2f035cc66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory\Signatures">
+      <UniqueIdentifier>{2acff691-fff2-476d-93f2-c0f08715c478}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\Common">
+      <UniqueIdentifier>{61e19d42-51da-492b-904c-436ef713a743}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\Custom Text">
+      <UniqueIdentifier>{838042d7-e765-4737-8a19-a873e7b7f326}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\D3D">
+      <UniqueIdentifier>{a28c349e-2034-4f7e-adab-41eff230c8d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Script">
+      <UniqueIdentifier>{ba9ad3dd-1599-4419-9505-42f4321a5d00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Submenu">
+      <UniqueIdentifier>{30320d1e-e885-47cd-a227-b3f24758e8db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Option">
+      <UniqueIdentifier>{d913f317-5d4f-4092-b986-2c8d40071289}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="ReturnSpoofer.asm">
+      <Filter>Utility</Filter>
+    </MASM>
+  </ItemGroup>
+</Project>
