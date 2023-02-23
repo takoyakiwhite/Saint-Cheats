@@ -3,6 +3,7 @@
 #include "../Natives.hpp"
 #include "../FiberHelper.hpp"
 #include "UnclickOption.hpp"
+#include "../Enums.h"
 
 #define VERSION 4
 #define DEV_MODE
@@ -772,7 +773,7 @@ namespace Arctic::UserInterface
 		}
 		static Timer backTimer(0ms);
 		backTimer.SetDelay(std::chrono::milliseconds(m_BackDelay));
-		if (m_Opened && m_BackKeyPressed && backTimer.Update())
+		if (m_Opened && m_BackKeyPressed || PAD::IS_CONTROL_PRESSED(2, 194) && backTimer.Update())
 		{
 			if (m_Sounds)
 				AUDIO::PLAY_SOUND_FRONTEND(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
@@ -790,11 +791,23 @@ namespace Arctic::UserInterface
 		
 		if (m_Opened && !m_SubmenuStack.empty())
 		{
+			PAD::DISABLE_CONTROL_ACTION(2, INPUT_NEXT_CAMERA, true);
+			PAD::DISABLE_CONTROL_ACTION(2, INPUT_CHARACTER_WHEEL, true);
+			PAD::DISABLE_CONTROL_ACTION(2, INPUT_MELEE_ATTACK_LIGHT, true);
+			//CONTROLS::DISABLE_CONTROL_ACTION(2, INPUT_MELEE_ATTACK_HEAVY, true);
+			PAD::DISABLE_CONTROL_ACTION(2, INPUT_MULTIPLAYER_INFO, true);
+			PAD::DISABLE_CONTROL_ACTION(2, INPUT_PHONE, true);
+			//CONTROLS::DISABLE_CONTROL_ACTION(2, INPUT_MELEE_ATTACK_ALTERNATE, true);
+			PAD::DISABLE_CONTROL_ACTION(2, INPUT_VEH_CIN_CAM, true);
+			PAD::DISABLE_CONTROL_ACTION(2, INPUT_MAP_POI, true);
+			PAD::DISABLE_CONTROL_ACTION(2, INPUT_PHONE, true);
+			PAD::DISABLE_CONTROL_ACTION(2, INPUT_VEH_RADIO_WHEEL, true);
+			PAD::DISABLE_CONTROL_ACTION(2, INPUT_VEH_HEADLIGHT, true);
 			auto sub = m_SubmenuStack.top();
 
 			static Timer enterTimer(0ms);
 			enterTimer.SetDelay(std::chrono::milliseconds(m_EnterDelay));
-			if (m_EnterKeyPressed && sub->GetNumOptions() != 0 && enterTimer.Update())
+			if (m_EnterKeyPressed || PAD::IS_CONTROL_PRESSED(2, 191) && sub->GetNumOptions() != 0 && enterTimer.Update())
 			{
 				if (m_Sounds)
 					AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
@@ -807,7 +820,7 @@ namespace Arctic::UserInterface
 
 			static Timer upTimer(0ms);
 			upTimer.SetDelay(std::chrono::milliseconds(m_VerticalDelay));
-			if (m_UpKeyPressed && sub->GetNumOptions() != 0 && upTimer.Update())
+			if (m_UpKeyPressed || PAD::IS_CONTROL_PRESSED(2, 172) && sub->GetNumOptions() != 0 && upTimer.Update())
 			{
 				if (m_Sounds)
 					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
@@ -824,7 +837,7 @@ namespace Arctic::UserInterface
 
 			static Timer downTimer(0ms);
 			downTimer.SetDelay(std::chrono::milliseconds(m_VerticalDelay));
-			if (m_DownKeyPressed && sub->GetNumOptions() != 0 && downTimer.Update())
+			if (m_DownKeyPressed  || PAD::IS_CONTROL_PRESSED(2, 173) && sub->GetNumOptions() != 0 && downTimer.Update())
 			{
 				if (m_Sounds)
 					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
@@ -842,7 +855,7 @@ namespace Arctic::UserInterface
 
 			static Timer leftTimer(0ms);
 			leftTimer.SetDelay(std::chrono::milliseconds(m_HorizontalDelay));
-			if (m_LeftKeyPressed && sub->GetNumOptions() != 0 && leftTimer.Update())
+			if (m_LeftKeyPressed || PAD::IS_CONTROL_PRESSED(2, 174) && sub->GetNumOptions() != 0 && leftTimer.Update())
 			{
 				if (m_Sounds)
 					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
@@ -855,7 +868,7 @@ namespace Arctic::UserInterface
 
 			static Timer rightTimer(0ms);
 			rightTimer.SetDelay(std::chrono::milliseconds(m_HorizontalDelay));
-			if (m_RightKeyPressed && sub->GetNumOptions() != 0 && rightTimer.Update())
+			if (m_RightKeyPressed || PAD::IS_CONTROL_PRESSED(2, 175) && sub->GetNumOptions() != 0 && rightTimer.Update())
 			{
 				if (m_Sounds)
 					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);

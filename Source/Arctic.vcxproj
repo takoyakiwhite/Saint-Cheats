@@ -16,6 +16,7 @@
     <ClInclude Include="CrossMap.hpp" />
     <ClInclude Include="CustomText.hpp" />
     <ClInclude Include="D3DRenderer.hpp" />
+    <ClInclude Include="Enums.h" />
     <ClInclude Include="FiberHelper.hpp" />
     <ClInclude Include="Signatures.hpp" />
     <ClInclude Include="Hooking.hpp" />

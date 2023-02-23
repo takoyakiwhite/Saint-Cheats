@@ -145,6 +145,9 @@
     <ClInclude Include="Script.h">
       <Filter>Core\Script</Filter>
     </ClInclude>
+    <ClInclude Include="Enums.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">
