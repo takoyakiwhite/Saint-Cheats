@@ -419,23 +419,23 @@ struct GlobalPlayerBDEntry
     SCR_BITSET<eAnimationBitset>  AnimationBitset;
     SCR_INT                       NumSuccessfulHoldups; // resets every 12 minutes
     SCR_INT                       PAD_0037;
-    SCR_INT                       PersonalVehicleNetId;
-    SCR_INT                       UnkVehicleNetId;
-    SCR_INT                       UnkVehicleNetId2;
+    NETWORK_INDEX                 PersonalVehicleNetId;
+    NETWORK_INDEX                 UnkVehicleNetId;
+    NETWORK_INDEX                 UnkVehicleNetId2;
     SCR_ARRAY<uint64_t, 2>        UnkVehicleNetIds;
-    SCR_INT                       DeliveryMechanicNetId;
-    SCR_INT                       DeliveryMechanicNetId2;
+    NETWORK_INDEX                 DeliveryMechanicNetId;
+    NETWORK_INDEX                 DeliveryMechanicNetId2;
     SCR_INT                       SpawningVehicleLiveryIndex;
     SCR_INT                       SpawningVehiclePrimaryColor;
     SCR_INT                       SpawningVehicleSecondaryColor;
-    SCR_INT                       AvengerNetId;
-    SCR_INT                       DeliveryMechanicNetId3; // wtf is this?
-    SCR_INT                       TerrorbyteNetId; // or is it the MOC?
-    SCR_INT                       SubmarineNetId;
-    SCR_INT                       DinghyNetId;
-    SCR_INT                       DeliveryMechanicNetId4; // another one...
-    SCR_INT                       AcidLabNetId;
-    SCR_INT                       DeliveryBikeNetId; // this is a guess, verify
+    NETWORK_INDEX                 AvengerNetId;
+    NETWORK_INDEX                 DeliveryMechanicNetId3; // wtf is this?
+    NETWORK_INDEX                 TerrorbyteNetId; // or is it the MOC?
+    NETWORK_INDEX                 SubmarineNetId;
+    NETWORK_INDEX                 DinghyNetId;
+    NETWORK_INDEX                 DeliveryMechanicNetId4; // another one...
+    NETWORK_INDEX                 AcidLabNetId;
+    NETWORK_INDEX                 DeliveryBikeNetId; // this is a guess, verify
     SCR_BOOL                      PAD_0057;
     uint64_t                      PAD_0058[15]; // confirmed these are not used by PC scripts
     PLAYER_BLIP                   PlayerBlip;
@@ -484,7 +484,7 @@ struct GlobalPlayerBDEntry
     SCR_BOOL                      GamerTagShowArrow;
     SCR_BOOL                      CarWashInProgress;
     INTERIOR_INDEX                CurrentInteriorIndex;
-    SCR_INT                       PAD_0246; // TODO
+    SCR_INT                       CurrentShopIndex; // things like clothing and tattoo stores
     SCR_INT                       CurrentStoreIndex; // the stores in the map which can be held up
     SCR_BOOL                      ShopActive; // any shop
     SCR_BOOL                      InTaxi;
@@ -492,7 +492,7 @@ struct GlobalPlayerBDEntry
     SCR_INT                       PrimaryHairColor;
     SCR_INT                       SecondaryHairColor;
     SCR_INT                       FriendlyPlayers; // bitset of player team relgroups that obtain a Respect relationship with player
-    SCR_BOOL                      KilledByPlayer; // verify
+    SCR_BOOL                      IsInvisible;
     SCR_BOOL                      InImpromptuDeathmatch;
     SCR_VEC3                      ImpromptuDeatmatchStartPosition;
     SCR_INT                       PAD_0569; // not read by scripts, impromptu DM related
@@ -544,7 +544,7 @@ struct GlobalPlayerBDEntry
     SCR_INT                       CurrentlyUsingArenaTrapActivatedTime;
     ARCADE_GAME                   ArcadeGame;
     SCR_INT                       DancePartner;
-    SCR_INT                       PAD_0445;
+    SCR_INT                       CayoPericoFlags;
     SCR_INT                       BeachPartyFlags;
     uint64_t                      PAD_0477[10]; // I don't think we'll ever be able to figure out what this does
     SCR_INT                       ThreeCardPokerStyle;

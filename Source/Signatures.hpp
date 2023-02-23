@@ -5,7 +5,7 @@
 #include <GTAV-Classes/script/scrNativeHandler.hpp>
 #include <GTAV-Classes/script/scrNativeRegistration.hpp>
 #include <GTAV-Classes/script/scrNativeRegistrationTable.hpp>
-
+#include <GTAV-Classes/ped/CPedFactory.hpp>
 namespace Arctic
 {
 	class GameVariables
@@ -24,6 +24,7 @@ namespace Arctic
 		std::uint32_t* m_FrameCount;
 		HWND m_GameWindow;
 		IDXGISwapChain* m_Swapchain;
+		
 		rage::scrProgramTable* m_ScriptProgramTable;
 		rage::scrNativeRegistrationTable* m_NativeRegistrations;
 		void* m_NativeReturnAddress;
@@ -53,6 +54,8 @@ namespace Arctic
 
 		using FixVectors = void(rage::scrNativeCallContext*);
 		FixVectors* m_FixVectors;
+
+		CPedFactory** m_pedFactory;
 	};
 
 	inline std::unique_ptr<GameVariables> g_GameVariables;

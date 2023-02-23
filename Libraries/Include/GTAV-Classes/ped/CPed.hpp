@@ -7,7 +7,7 @@
 #include "CPedInventory.hpp"
 #include "../entities/fwEntity.hpp"
 #include "../rage/vector.hpp"
-#include "CPedOxygenInfo.hpp"
+#include "CPedIntelligence.hpp"
 #include "CPedBoneInfo.hpp"
 
 #include <cstdint>
@@ -26,7 +26,7 @@ public:
     char pad_0D18[896]; //0x0D18
     uint32_t m_ped_type; //0x1098
     char pad_109C[4]; //0x109C
-    class CPedOxygenInfo* m_oxygen_info; //0x10A0
+    class CPedIntelligence* m_ped_intelligence; //0x10A0
     class CPlayerInfo *m_player_info; //0x10A8
     class CPedInventory* m_inventory; //0x10B0
     class CPedWeaponManager *m_weapon_manager; //0x10B8
@@ -46,6 +46,11 @@ public:
     float m_hurt_health_threshold; //0x1520
     char pad_1524[240]; //0x1524
     uint16_t m_cash; //0x1614
+    char pad_1616[842]; //0x1616
+    uint8_t fired_sticky_bombs; //0x1960 reverse from 1.66 2824 function E8 ? ? ? 48 8B F8 EB 5F add(1).rip(), function string: WM_MAX_STICKY
+    uint8_t fired_unk_0; //0x1961
+    uint8_t fired_flares; //0x1962
+    uint8_t fired_unk_1; //0x1963
 
     float get_speed() { return sqrt(m_velocity.x * m_velocity.x + m_velocity.y * m_velocity.y + m_velocity.z * m_velocity.z); }
 
@@ -63,6 +68,6 @@ public:
     bool has_seatbelt() { return m_seatbelt & 0x3; }
 
     void forced_aim(bool toggle) { m_forced_aim ^= (m_forced_aim ^ -(char)toggle) & 0x20; }
-}; //Size: 0x1616
-static_assert(sizeof(CPed) == 0x1616);
+}; //Size: 0x1964
+static_assert(sizeof(CPed) == 0x1964);
 #pragma pack(pop)

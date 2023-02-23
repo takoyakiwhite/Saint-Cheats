@@ -26,7 +26,8 @@ namespace Arctic
 		m_GetLabelText(Signature("48 89 5C 24 ? 57 48 83 EC 20 48 8B DA 48 8B F9 48 85 D2 75 44 E8").Scan().As<decltype(m_GetLabelText)>()),
 		m_WndProc(Signature("44 8B E2 4C 8B E9 3B D0").Scan().Sub(52).As<decltype(m_WndProc)>()),
 		m_GetNativeHandler(Signature("48 8D 0D ? ? ? ? 48 8B 14 FA E8 ? ? ? ? 48 85 C0 75 0A").Scan().Add(12).Rip().As<decltype(m_GetNativeHandler)>()),
-		m_FixVectors(Signature("83 79 18 ? 48 8B D1 74 4A FF 4A 18").Scan().As<decltype(m_FixVectors)>())
+		m_FixVectors(Signature("83 79 18 ? 48 8B D1 74 4A FF 4A 18").Scan().As<decltype(m_FixVectors)>()),
+		m_pedFactory(Signature("48 8B 05 ? ? ? ? 48 8B 48 08 48 85 C9 74 52 8B 81").Scan().Add(3).Rip().As<decltype(m_pedFactory)>())
 	{
 	}
 	

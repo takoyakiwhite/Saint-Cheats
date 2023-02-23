@@ -15,6 +15,7 @@
 #include "UI/RegularSubmenu.hpp"
 #include "UI/PlayerSubmenu.hpp"
 #include "FiberHelper.hpp"
+#include "Features.h"
 namespace Arctic
 {
 	enum Submenu : std::uint32_t
@@ -23,7 +24,7 @@ namespace Arctic
 		SubmenuHome,
 
 		//SELF
-
+		SubmenuSelf,
 		//SESSION
 		SubmenuNetwork,
 		SubmenuPlayerList,
@@ -84,7 +85,7 @@ namespace Arctic
 
 		g_Render->AddSubmenu<RegularSubmenu>("Arctic", SubmenuHome, [](RegularSubmenu* sub)
 		{
-			sub->AddOption<SubOption>("Player", nullptr, SubmenuSettings);
+			sub->AddOption<SubOption>("Player", nullptr, SubmenuSelf);
 			sub->AddOption<SubOption>("Network", nullptr, SubmenuNetwork);
 			sub->AddOption<SubOption>("Protections", nullptr, SubmenuSettings);
 			sub->AddOption<SubOption>("Teleport", nullptr, SubmenuSettings);
@@ -94,7 +95,12 @@ namespace Arctic
 			sub->AddOption<SubOption>("Miscellaneous", nullptr, SubmenuSettings);
 			sub->AddOption<SubOption>("Settings", nullptr, SubmenuSettings);
 		});
-
+		g_Render->AddSubmenu<RegularSubmenu>(("Self"), SubmenuSelf, [](RegularSubmenu* sub)
+			{
+				sub->AddOption<BoolOption<bool>>(("Godmode"), nullptr, &godmode, BoolDisplay::OnOff);
+				sub->AddOption<BoolOption<bool>>(("Never Wanted"), nullptr, &neverWantedBool, BoolDisplay::OnOff);
+			
+			});
 		g_Render->AddSubmenu<RegularSubmenu>(("Network"), SubmenuNetwork, [](RegularSubmenu* sub)
 			{
 				sub->AddOption<SubOption>("Players", nullptr, SubmenuPlayerList);
@@ -320,6 +326,7 @@ namespace Arctic
 		Initialize();
 		while (true) {
 			g_Render->OnTick();
+			FeatureInitalize();
 			fbr::cur()->wait();
 		}
 	}
