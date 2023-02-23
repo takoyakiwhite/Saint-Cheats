@@ -48,7 +48,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				g_Logger->Debug("Scanned Fix Vectors.");
 			}
 			g_Logger->Debug("Game Functions Finished Scanning.");
-
+			//patek learning how to do github fr no cap on god 100% luna better than ozark paragon exit scam nigger menu
 			//Game Variables
 			if (*g_GameVariables->m_GameState)
 			{
