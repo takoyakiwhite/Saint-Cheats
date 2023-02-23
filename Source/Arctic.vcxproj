@@ -19,6 +19,7 @@
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Features.h" />
     <ClInclude Include="FiberHelper.hpp" />
+    <ClInclude Include="Math.h" />
     <ClInclude Include="Signatures.hpp" />
     <ClInclude Include="Hooking.hpp" />
     <ClInclude Include="ImGui\imconfig.h" />

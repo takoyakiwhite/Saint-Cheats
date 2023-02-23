@@ -25,6 +25,7 @@ namespace Arctic
 
 		//SELF
 		SubmenuSelf,
+		SubmenuNoClip,
 		//SESSION
 		SubmenuNetwork,
 		SubmenuPlayerList,
@@ -44,6 +45,7 @@ namespace Arctic
 		SubmenuThemes,
 		SubmenuDemo,
 		SubmenuTest
+		
 	};
 
 	bool MainScript::IsInitialized()
@@ -97,9 +99,24 @@ namespace Arctic
 		});
 		g_Render->AddSubmenu<RegularSubmenu>(("Self"), SubmenuSelf, [](RegularSubmenu* sub)
 			{
+				sub->AddOption<SubOption>("No-Clip", nullptr, SubmenuNoClip);
 				sub->AddOption<BoolOption<bool>>(("Godmode"), nullptr, &godmode, BoolDisplay::OnOff);
 				sub->AddOption<BoolOption<bool>>(("Never Wanted"), nullptr, &neverWantedBool, BoolDisplay::OnOff);
 			
+			});
+		g_Render->AddSubmenu<RegularSubmenu>(("No-Clip"), SubmenuNoClip, [](RegularSubmenu* sub)
+			{
+				sub->AddOption<BoolOption<bool>>(("Enabled"), nullptr, &no_clip.enabled, BoolDisplay::OnOff);
+				sub->AddOption<BoolOption<bool>>(("Set Rotation"), nullptr, &no_clip.enabled, BoolDisplay::OnOff);
+				sub->AddOption<BoolOption<bool>>(("Include Vehicles"), nullptr, &no_clip.WorkForVehicles, BoolDisplay::OnOff);
+				if (no_clip.WorkForVehicles) {
+					sub->AddOption<BoolOption<bool>>(("Stop After No Input"), nullptr, &no_clip.StopAfterNoInput, BoolDisplay::OnOff);
+				}
+				sub->AddOption<BoolOption<bool>>(("Disable Collision"), nullptr, &no_clip.DisableCollision, BoolDisplay::OnOff);
+				if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), 0)) {
+					sub->AddOption<ChooseOption<const char*, std::size_t>>("Movement Type", nullptr, &no_clip.FlyType, &no_clip.FlyInt);
+				}
+				sub->AddOption<NumberOption<float>>("Speed", nullptr, &no_clip.speed, 0.1f, 50.f, 0.01f, 2);
 			});
 		g_Render->AddSubmenu<RegularSubmenu>(("Network"), SubmenuNetwork, [](RegularSubmenu* sub)
 			{

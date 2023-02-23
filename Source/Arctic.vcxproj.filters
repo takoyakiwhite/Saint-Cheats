@@ -151,6 +151,9 @@
     <ClInclude Include="Features.h">
       <Filter>Core\Features</Filter>
     </ClInclude>
+    <ClInclude Include="Math.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">

@@ -5,6 +5,7 @@
 #include "UnclickOption.hpp"
 #include "../Enums.h"
 #include "../Features.h"
+#include "../ImGui/imgui.h"
 
 #define VERSION 4
 #define DEV_MODE
@@ -365,13 +366,14 @@ namespace Arctic::UserInterface
 	void UIManager::RenderToolTip()
 	{
 		static const char* names[] = {
-			"Get Good Get Arctic Cheats",
+			"Get Good Get Arctic",
 			"Sexy Arctic Cheats",
+			"what am i doing wrong??? - patek"
 		};
 
 		if (!g_HasSetToolTip)
 		{
-			g_ToolTip = random(0, 2);
+			g_ToolTip = random(0, IM_ARRAYSIZE(names) - 1);
 			g_HasSetToolTip = true;
 		}
 
