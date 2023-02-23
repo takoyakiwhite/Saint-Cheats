@@ -5,6 +5,19 @@
 namespace Arctic {
 	inline bool neverWantedBool = false;
 	inline bool godmode = false;
+	class NoClip {
+	public:
+		bool enabled = false;
+		bool WorkForVehicles = true;
+		bool StopAfterNoInput = true;
+		float speed = 2.5f;
+		const char* FlyType[2]
+		{
+			"Camera", "Keyboard"
+		};
+
+		std::size_t FlyInt = 0;
+	};
 	inline void FeatureInitalize() {
 		if (godmode) {
 			uint32_t last_bits = 0;
