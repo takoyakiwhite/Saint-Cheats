@@ -368,12 +368,14 @@ namespace Arctic::UserInterface
 		static const char* names[] = {
 			"Get Good Get Arctic",
 			"Sexy Arctic Cheats",
-			"what am i doing wrong??? - patek"
+			"what am i doing wrong??? - patek",
+			"Kiddions VIP On Top",
+			"Become you're inner vali."
 		};
 
 		if (!g_HasSetToolTip)
 		{
-			g_ToolTip = random(0, IM_ARRAYSIZE(names) - 1);
+			g_ToolTip = random(0, 5);
 			g_HasSetToolTip = true;
 		}
 
@@ -385,7 +387,7 @@ namespace Arctic::UserInterface
 		}
 		else {
 			sprintf_s(text, "%s\n~c~RB + RIGHT", names[g_ToolTip]);
-			RenderText(text, 0.5f, 0.09f, Font::ChaletLondon, 0.2f, m_ToolTipColor, true, false, false);
+			RenderText(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
 		}
 	}
 
@@ -413,36 +415,6 @@ namespace Arctic::UserInterface
 		base -= SYSTEM::ROUND(base - min / fVar0) * fVar0;
 		if (base < min) base += fVar0;
 		return base;
-	}
-
-	void UIManager::Welcome() {
-
-		if (m_Welcome)
-		{
-			char WelcomeText[60];
-			snprintf(WelcomeText, sizeof(WelcomeText), "Welcome ~w~%s", PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_ID()));
-			setupdraw(true);
-			HUD::SET_TEXT_FONT(6);
-			HUD::SET_TEXT_SCALE(0.5f, 0.5f);
-			HUD::SET_TEXT_COLOUR(255, 255, 255, 255);
-			HUD::SET_TEXT_CENTRE(0);
-			drawstring(WelcomeText, 0.020f, 0.010f);
-		}
-	}
-
-	void UIManager::MenuVersion() {
-
-		if (m_MenuVersion)
-		{
-			char MenuVersionText[60];
-			snprintf(MenuVersionText, sizeof(MenuVersionText), "Arctic Version: V2.5");
-			setupdraw(true);
-			HUD::SET_TEXT_FONT(6);
-			HUD::SET_TEXT_SCALE(0.5f, 0.5f);
-			HUD::SET_TEXT_COLOUR(255, 255, 255, 255);
-			HUD::SET_TEXT_CENTRE(0);
-			drawstring(MenuVersionText, 0.020f, 0.040f);
-		}
 	}
 
 	void UIManager::drawstring(char* text, float X, float Y)
@@ -686,9 +658,7 @@ namespace Arctic::UserInterface
 			//g_Logger->Theme("Salmon Pink Theme");
 		}
 
-		MenuVersion();
 		
-		Welcome();
 
 		CheckForInput();
 
@@ -761,6 +731,20 @@ namespace Arctic::UserInterface
 			if (m_Sounds)
 				AUDIO::PLAY_SOUND_FRONTEND(-1, m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
 		}
+		if (!PAD::IS_USING_KEYBOARD_AND_MOUSE(2)) {
+			if (PAD::IS_CONTROL_PRESSED(2, 227) && PAD::IS_CONTROL_PRESSED(2, INPUT_CELLPHONE_RIGHT) && openTimer.Update())
+			{
+				if (!m_Opened) {
+					MenuOpeningAnimation();
+				}
+				else {
+					MenuClosingAnimation();
+				}
+
+				if (m_Sounds)
+					AUDIO::PLAY_SOUND_FRONTEND(-1, m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+			}
+		}
 		if (m_OpenKeyPressed2 && openTimer.Update())
 		{
 			if (!m_Opened) {
@@ -819,6 +803,7 @@ namespace Arctic::UserInterface
 			PAD::DISABLE_CONTROL_ACTION(2, INPUT_PHONE, true);
 			PAD::DISABLE_CONTROL_ACTION(2, INPUT_VEH_RADIO_WHEEL, true);
 			PAD::DISABLE_CONTROL_ACTION(2, INPUT_VEH_HEADLIGHT, true);
+			PAD::DISABLE_CONTROL_ACTION(2, INPUT_THROW_GRENADE, true);
 			auto sub = m_SubmenuStack.top();
 
 			static Timer enterTimer(0ms);
@@ -939,7 +924,7 @@ namespace Arctic::UserInterface
 					opt->HandleAction(OptionAction::RightPress);
 				}
 			}
-			if (PAD::IS_CONTROL_PRESSED(2, 175) && sub->GetNumOptions() != 0 && rightTimer.Update())
+			if (PAD::IS_CONTROL_PRESSED(2, 175) && !PAD::IS_CONTROL_PRESSED(2, 227) && sub->GetNumOptions() != 0 && rightTimer.Update())
 			{
 				if (m_Sounds)
 					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);

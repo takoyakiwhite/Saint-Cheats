@@ -1,8 +1,10 @@
 #pragma once
 #include "Signatures.hpp"
 
+
 namespace Arctic
 {
+	
 	/**
 	 * \brief Checks if a key is pressed
 	 * \param key A virtual key code

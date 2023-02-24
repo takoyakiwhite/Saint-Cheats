@@ -113,8 +113,7 @@ namespace Arctic::UserInterface
 		std::int32_t m_VerticalDelay = 120;
 		std::int32_t m_HorizontalDelay = 120;
 
-		bool m_MenuVersion = true;
-		bool m_Welcome = true;
+		
 
 		//ToolTip
 		void RenderToolTip();
@@ -249,8 +248,7 @@ namespace Arctic::UserInterface
 		void DrawHeader();
 		void drawstring(char* text, float X, float Y);
 		void setupdraw(bool outline);
-		void Welcome();
-		void MenuVersion();
+		
 		void RenderText(std::string text, std::float_t x, std::float_t y, Font font, std::float_t scale, RGBA color, bool centered, bool right_justified, bool outlined);
 		void DrawOption(AbstractOption* opt, bool selected);
 		void DrawFooter();
