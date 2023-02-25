@@ -154,6 +154,9 @@
     <ClInclude Include="Math.h">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Render.h">
+      <Filter>Core\Notifications</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">
@@ -296,6 +299,9 @@
     </Filter>
     <Filter Include="Core\Features">
       <UniqueIdentifier>{7f9ff096-cc7f-4798-bedf-c83a20e20536}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Notifications">
+      <UniqueIdentifier>{fb768503-ebde-40f7-9ec1-0eaf35d1112c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

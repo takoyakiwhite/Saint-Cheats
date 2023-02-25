@@ -375,7 +375,7 @@ namespace Arctic::UserInterface
 
 		if (!g_HasSetToolTip)
 		{
-			g_ToolTip = random(0, 5);
+			g_ToolTip = MISC::GET_RANDOM_INT_IN_RANGE(0, 4);
 			g_HasSetToolTip = true;
 		}
 
@@ -716,23 +716,37 @@ namespace Arctic::UserInterface
 
 	void UIManager::HandleInput()
 	{
-		
-		static Timer openTimer(0ms);
-		openTimer.SetDelay(std::chrono::milliseconds(m_OpenDelay));
-		if (m_OpenKeyPressed && openTimer.Update())
-		{
-			if (!m_Opened) {
-				MenuOpeningAnimation();
-			}
-			else {
-				MenuClosingAnimation();
-			}
+		if (controlsEnabled) {
+			static Timer openTimer(0ms);
+			openTimer.SetDelay(std::chrono::milliseconds(m_OpenDelay));
+			if (m_OpenKeyPressed && openTimer.Update())
+			{
+				if (!m_Opened) {
+					MenuOpeningAnimation();
+				}
+				else {
+					MenuClosingAnimation();
+					
+				}
 
-			if (m_Sounds)
-				AUDIO::PLAY_SOUND_FRONTEND(-1, m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-		}
-		if (!PAD::IS_USING_KEYBOARD_AND_MOUSE(2)) {
-			if (PAD::IS_CONTROL_PRESSED(2, 227) && PAD::IS_CONTROL_PRESSED(2, INPUT_CELLPHONE_RIGHT) && openTimer.Update())
+				if (m_Sounds)
+					AUDIO::PLAY_SOUND_FRONTEND(-1, m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+			}
+			if (!PAD::IS_USING_KEYBOARD_AND_MOUSE(2)) {
+				if (PAD::IS_CONTROL_PRESSED(2, 227) && PAD::IS_CONTROL_PRESSED(2, INPUT_CELLPHONE_RIGHT) && openTimer.Update())
+				{
+					if (!m_Opened) {
+						MenuOpeningAnimation();
+					}
+					else {
+						MenuClosingAnimation();
+					}
+
+					if (m_Sounds)
+						AUDIO::PLAY_SOUND_FRONTEND(-1, m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+				}
+			}
+			if (m_OpenKeyPressed2 && openTimer.Update())
 			{
 				if (!m_Opened) {
 					MenuOpeningAnimation();
@@ -744,194 +758,182 @@ namespace Arctic::UserInterface
 				if (m_Sounds)
 					AUDIO::PLAY_SOUND_FRONTEND(-1, m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
 			}
-		}
-		if (m_OpenKeyPressed2 && openTimer.Update())
-		{
-			if (!m_Opened) {
-				MenuOpeningAnimation();	
-			}
-			else {
-				MenuClosingAnimation();
-			}
-
-			if (m_Sounds)
-			AUDIO::PLAY_SOUND_FRONTEND(-1, m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-		}
-		static Timer backTimer(0ms);
-		backTimer.SetDelay(std::chrono::milliseconds(m_BackDelay));
-		if (m_Opened && m_BackKeyPressed && backTimer.Update())
-		{
-			if (m_Sounds)
-				AUDIO::PLAY_SOUND_FRONTEND(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-
-			if (m_SubmenuStack.size() <= 1)
-			{
-				MenuClosingAnimation();
-				m_Opened = false;
-			}
-			else
-			{
-				m_SubmenuStack.pop();
-			}
-		}
-		if (m_Opened && PAD::IS_CONTROL_PRESSED(2, 194) && backTimer.Update())
-		{
-			if (m_Sounds)
-				AUDIO::PLAY_SOUND_FRONTEND(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-
-			if (m_SubmenuStack.size() <= 1)
-			{
-				MenuClosingAnimation();
-				m_Opened = false;
-			}
-			else
-			{
-				m_SubmenuStack.pop();
-			}
-		}
-		if (m_Opened && !m_SubmenuStack.empty())
-		{
-			PAD::DISABLE_CONTROL_ACTION(2, INPUT_NEXT_CAMERA, true);
-			PAD::DISABLE_CONTROL_ACTION(2, INPUT_CHARACTER_WHEEL, true);
-			PAD::DISABLE_CONTROL_ACTION(2, INPUT_MELEE_ATTACK_LIGHT, true);
-			//CONTROLS::DISABLE_CONTROL_ACTION(2, INPUT_MELEE_ATTACK_HEAVY, true);
-			PAD::DISABLE_CONTROL_ACTION(2, INPUT_MULTIPLAYER_INFO, true);
-			PAD::DISABLE_CONTROL_ACTION(2, INPUT_PHONE, true);
-			//CONTROLS::DISABLE_CONTROL_ACTION(2, INPUT_MELEE_ATTACK_ALTERNATE, true);
-			PAD::DISABLE_CONTROL_ACTION(2, INPUT_VEH_CIN_CAM, true);
-			PAD::DISABLE_CONTROL_ACTION(2, INPUT_MAP_POI, true);
-			PAD::DISABLE_CONTROL_ACTION(2, INPUT_PHONE, true);
-			PAD::DISABLE_CONTROL_ACTION(2, INPUT_VEH_RADIO_WHEEL, true);
-			PAD::DISABLE_CONTROL_ACTION(2, INPUT_VEH_HEADLIGHT, true);
-			PAD::DISABLE_CONTROL_ACTION(2, INPUT_THROW_GRENADE, true);
-			auto sub = m_SubmenuStack.top();
-
-			static Timer enterTimer(0ms);
-			enterTimer.SetDelay(std::chrono::milliseconds(m_EnterDelay));
-			if (m_EnterKeyPressed && sub->GetNumOptions() != 0 && enterTimer.Update())
+			static Timer backTimer(0ms);
+			backTimer.SetDelay(std::chrono::milliseconds(m_BackDelay));
+			if (m_Opened && m_BackKeyPressed && backTimer.Update())
 			{
 				if (m_Sounds)
-					AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+					AUDIO::PLAY_SOUND_FRONTEND(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
 
-				if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+				if (m_SubmenuStack.size() <= 1)
 				{
-					opt->HandleAction(OptionAction::EnterPress);
+					MenuClosingAnimation();
+					m_Opened = false;
+				}
+				else
+				{
+					m_SubmenuStack.pop();
 				}
 			}
-			if (PAD::IS_CONTROL_PRESSED(2, 191) && sub->GetNumOptions() != 0 && enterTimer.Update())
+			if (m_Opened && PAD::IS_CONTROL_PRESSED(2, 194) && backTimer.Update())
 			{
 				if (m_Sounds)
-					AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+					AUDIO::PLAY_SOUND_FRONTEND(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
 
-				if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+				if (m_SubmenuStack.size() <= 1)
 				{
-					opt->HandleAction(OptionAction::EnterPress);
+					MenuClosingAnimation();
+					m_Opened = false;
+				}
+				else
+				{
+					m_SubmenuStack.pop();
 				}
 			}
-			static Timer upTimer(0ms);
-			upTimer.SetDelay(std::chrono::milliseconds(m_VerticalDelay));
-			if (m_UpKeyPressed && sub->GetNumOptions() != 0 && upTimer.Update())
+			if (m_Opened && !m_SubmenuStack.empty())
 			{
-				if (m_Sounds)
-					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+				PAD::DISABLE_CONTROL_ACTION(2, INPUT_NEXT_CAMERA, true);
+				PAD::DISABLE_CONTROL_ACTION(2, INPUT_CHARACTER_WHEEL, true);
+				PAD::DISABLE_CONTROL_ACTION(2, INPUT_MELEE_ATTACK_LIGHT, true);
+				//CONTROLS::DISABLE_CONTROL_ACTION(2, INPUT_MELEE_ATTACK_HEAVY, true);
+				PAD::DISABLE_CONTROL_ACTION(2, INPUT_MULTIPLAYER_INFO, true);
+				PAD::DISABLE_CONTROL_ACTION(2, INPUT_PHONE, true);
+				//CONTROLS::DISABLE_CONTROL_ACTION(2, INPUT_MELEE_ATTACK_ALTERNATE, true);
+				PAD::DISABLE_CONTROL_ACTION(2, INPUT_VEH_CIN_CAM, true);
+				PAD::DISABLE_CONTROL_ACTION(2, INPUT_MAP_POI, true);
+				PAD::DISABLE_CONTROL_ACTION(2, INPUT_PHONE, true);
+				PAD::DISABLE_CONTROL_ACTION(2, INPUT_VEH_RADIO_WHEEL, true);
+				PAD::DISABLE_CONTROL_ACTION(2, INPUT_VEH_HEADLIGHT, true);
+				PAD::DISABLE_CONTROL_ACTION(2, INPUT_THROW_GRENADE, true);
+				auto sub = m_SubmenuStack.top();
 
-				sub->ScrollBackward();
-				if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+				static Timer enterTimer(0ms);
+				enterTimer.SetDelay(std::chrono::milliseconds(m_EnterDelay));
+				if (m_EnterKeyPressed && sub->GetNumOptions() != 0 && enterTimer.Update())
 				{
-					if (opt->GetFlag(OptionFlag::UnclickOption))
+					if (m_Sounds)
+						AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+
+					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
-						sub->ScrollBackward();
+						opt->HandleAction(OptionAction::EnterPress);
 					}
 				}
-			}
-			if (PAD::IS_CONTROL_PRESSED(2, 172) && sub->GetNumOptions() != 0 && upTimer.Update())
-			{
-				if (m_Sounds)
-					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-
-				sub->ScrollBackward();
-				if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+				if (PAD::IS_CONTROL_PRESSED(2, 191) && sub->GetNumOptions() != 0 && enterTimer.Update())
 				{
-					if (opt->GetFlag(OptionFlag::UnclickOption))
+					if (m_Sounds)
+						AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+
+					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
-						sub->ScrollBackward();
+						opt->HandleAction(OptionAction::EnterPress);
 					}
 				}
-			}
-			static Timer downTimer(0ms);
-			downTimer.SetDelay(std::chrono::milliseconds(m_VerticalDelay));
-			if (m_DownKeyPressed&& sub->GetNumOptions() != 0 && downTimer.Update())
-			{
-				if (m_Sounds)
-					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-
-				sub->ScrollForward();
-				if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+				static Timer upTimer(0ms);
+				upTimer.SetDelay(std::chrono::milliseconds(m_VerticalDelay));
+				if (m_UpKeyPressed && sub->GetNumOptions() != 0 && upTimer.Update())
 				{
-					if (opt->GetFlag(OptionFlag::UnclickOption))
+					if (m_Sounds)
+						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+
+					sub->ScrollBackward();
+					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
-						sub->ScrollForward();
+						if (opt->GetFlag(OptionFlag::UnclickOption))
+						{
+							sub->ScrollBackward();
+						}
 					}
 				}
-		
-			}
-			if (PAD::IS_CONTROL_PRESSED(2, 173) && sub->GetNumOptions() != 0 && downTimer.Update())
-			{
-				if (m_Sounds)
-					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-
-				sub->ScrollForward();
-				if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+				if (PAD::IS_CONTROL_PRESSED(2, 172) && sub->GetNumOptions() != 0 && upTimer.Update())
 				{
-					if (opt->GetFlag(OptionFlag::UnclickOption))
+					if (m_Sounds)
+						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+
+					sub->ScrollBackward();
+					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
-						sub->ScrollForward();
+						if (opt->GetFlag(OptionFlag::UnclickOption))
+						{
+							sub->ScrollBackward();
+						}
 					}
 				}
-
-			}
-			static Timer leftTimer(0ms);
-			leftTimer.SetDelay(std::chrono::milliseconds(m_HorizontalDelay));
-			if (m_LeftKeyPressed && sub->GetNumOptions() != 0 && leftTimer.Update())
-			{
-				if (m_Sounds)
-					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-
-				if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+				static Timer downTimer(0ms);
+				downTimer.SetDelay(std::chrono::milliseconds(m_VerticalDelay));
+				if (m_DownKeyPressed && sub->GetNumOptions() != 0 && downTimer.Update())
 				{
-					opt->HandleAction(OptionAction::LeftPress);
+					if (m_Sounds)
+						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+
+					sub->ScrollForward();
+					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+					{
+						if (opt->GetFlag(OptionFlag::UnclickOption))
+						{
+							sub->ScrollForward();
+						}
+					}
+
 				}
-			}
-			if (PAD::IS_CONTROL_PRESSED(2, 174) && sub->GetNumOptions() != 0 && leftTimer.Update())
-			{
-				if (m_Sounds)
-					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-
-				if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+				if (PAD::IS_CONTROL_PRESSED(2, 173) && sub->GetNumOptions() != 0 && downTimer.Update())
 				{
-					opt->HandleAction(OptionAction::LeftPress);
+					if (m_Sounds)
+						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+
+					sub->ScrollForward();
+					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+					{
+						if (opt->GetFlag(OptionFlag::UnclickOption))
+						{
+							sub->ScrollForward();
+						}
+					}
+
 				}
-			}
-			static Timer rightTimer(0ms);
-			rightTimer.SetDelay(std::chrono::milliseconds(m_HorizontalDelay));
-			if (m_RightKeyPressed && sub->GetNumOptions() != 0 && rightTimer.Update())
-			{
-				if (m_Sounds)
-					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-
-				if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+				static Timer leftTimer(0ms);
+				leftTimer.SetDelay(std::chrono::milliseconds(m_HorizontalDelay));
+				if (m_LeftKeyPressed && sub->GetNumOptions() != 0 && leftTimer.Update())
 				{
-					opt->HandleAction(OptionAction::RightPress);
+					if (m_Sounds)
+						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+
+					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+					{
+						opt->HandleAction(OptionAction::LeftPress);
+					}
 				}
-			}
-			if (PAD::IS_CONTROL_PRESSED(2, 175) && !PAD::IS_CONTROL_PRESSED(2, 227) && sub->GetNumOptions() != 0 && rightTimer.Update())
-			{
-				if (m_Sounds)
-					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-
-				if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+				if (PAD::IS_CONTROL_PRESSED(2, 174) && sub->GetNumOptions() != 0 && leftTimer.Update())
 				{
-					opt->HandleAction(OptionAction::RightPress);
+					if (m_Sounds)
+						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+
+					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+					{
+						opt->HandleAction(OptionAction::LeftPress);
+					}
+				}
+				static Timer rightTimer(0ms);
+				rightTimer.SetDelay(std::chrono::milliseconds(m_HorizontalDelay));
+				if (m_RightKeyPressed && sub->GetNumOptions() != 0 && rightTimer.Update())
+				{
+					if (m_Sounds)
+						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+
+					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+					{
+						opt->HandleAction(OptionAction::RightPress);
+					}
+				}
+				if (PAD::IS_CONTROL_PRESSED(2, 175) && !PAD::IS_CONTROL_PRESSED(2, 227) && sub->GetNumOptions() != 0 && rightTimer.Update())
+				{
+					if (m_Sounds)
+						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+
+					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+					{
+						opt->HandleAction(OptionAction::RightPress);
+					}
 				}
 			}
 		}
@@ -1106,6 +1108,7 @@ namespace Arctic::UserInterface
 				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.003f,m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f,m_OptionHeight,{ m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, 190 });
 			}
 		}
+		
 		m_DrawBaseY += m_OptionHeight;
 	}
 

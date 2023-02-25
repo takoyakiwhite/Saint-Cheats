@@ -15,7 +15,22 @@ namespace Arctic::UserInterface
 		ChaletComprimeCologne = 4,
 		Pricedown = 7
 	};
-
+	enum class Outfits : std::int32_t
+	{
+		Face = 0,
+		Head = 1,
+		Hair = 2,
+		Torso = 3,
+		Torso2 = 4,
+		Legs = 5,
+		Hands = 6,
+		Feet = 7,
+		Eyes = 8,
+		Accessories = 9,
+		Vests = 10,
+		Decals = 11,
+		HeadProps = 12,
+	};
 	enum class HeaderType : std::int32_t
 	{
 		Static = 0,
@@ -168,6 +183,18 @@ namespace Arctic::UserInterface
 		};
 		std::size_t ThemeIterator = 3;
 
+		const char* HeaderFont[6]
+		{
+			"Chalet London",
+			"House Script",
+			"Monospace",
+			"Wingdings",
+			"Chalet Comprime Cologne",
+			"Pricedown"
+		};
+		std::size_t HeaderFontIterator = 3;
+		Outfits outfits = Outfits::Face;
+		
 
 		// Options
 		float m_OptionHeight = 0.0315f;
@@ -230,7 +257,7 @@ namespace Arctic::UserInterface
 		int g_MenuAlpha = 0;
 		const char* m_CurrentSubMenuName = "Hello";
 		bool m_AnimationCheck;
-
+		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
 	private:
 		bool m_OpenKeyPressed = false;
 		bool m_OpenKeyPressed2 = false;
@@ -267,7 +294,7 @@ namespace Arctic::UserInterface
 		Vector2 GetMousePos();
 
 		std::vector<std::unique_ptr<AbstractSubmenu>> m_AllSubmenus;
-		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
+		
 	};
 }
 

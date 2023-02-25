@@ -60,7 +60,54 @@ namespace Arctic
 		std::uint32_t m_Model;
 		std::function<void()> m_Action;
 	};
+	class KeyboardCallBack : public AbstractCallback
+	{
+	public:
+		explicit KeyboardCallBack(const char* title, int input, std::function<void()> action) :
+			Title(Title),
+			m_Action(std::move(action)),
+			Input(input)
+		{
+		}
 
+		bool IsDone() override
+		{
+			int update = MISC::UPDATE_ONSCREEN_KEYBOARD();
+			switch (update) {
+			case -1:
+				return false;
+				break;
+			case 0:
+				return false;
+				break;
+			case 1:
+				if (MISC::GET_ONSCREEN_KEYBOARD_RESULT() != Title) {
+					return true;
+				}
+				break;
+			case 2:
+				return true;
+				break;
+			}
+			return false;
+
+		}
+
+		void OnSuccess() override
+		{
+			if (m_Action)
+				std::invoke(m_Action);
+		}
+
+		void OnFailure() override
+		{
+
+		}
+	private:
+		const char* Title;
+		int Input;
+		std::function<void()> m_Action;
+	};
 	class NetworkControlCallback : public AbstractCallback
 	{
 	public:

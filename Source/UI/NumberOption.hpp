@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseOption.hpp"
 #include "Interface.hpp"
+#include "../Features.h"
 
 namespace Arctic::UserInterface
 {
@@ -33,18 +34,31 @@ namespace Arctic::UserInterface
 
 		const char* GetRightText() override
 		{
-			MemoryStringStream stream(Base::m_RightText);
-			stream
-				<< std::setprecision(m_Precision)
-				<< std::fixed
-				<< m_Prefix
-				<< static_cast<DisplayType>(*m_Number)
-				<< m_Suffix;
-			return Base::GetRightText();
+			
+			
+			auto sub = g_Render->m_SubmenuStack.top();
+			bool selectedOption = sub->GetSelectedOption() == sub->GetNumOptions() ? true : false;
+			if (selectedOption) {
+				MemoryStringStream stream(Base::m_RightText);
+				stream << *m_Number << " <>" << std::fixed;
+				return Base::GetRightText();
+			}
+			else {
+				MemoryStringStream stream(Base::m_RightText);
+				stream
+					<< std::setprecision(m_Precision)
+					<< std::fixed
+					<< m_Prefix
+					<< static_cast<DisplayType>(*m_Number)
+					<< m_Suffix;
+				return Base::GetRightText();
+			}
 		}
 
 		void HandleAction(OptionAction action) override
 		{
+			
+			
 			if (action == OptionAction::LeftPress)
 			{
 				if (*m_Number - m_Step < m_Min)

@@ -6409,7 +6409,7 @@ namespace VEHICLE
 	static void SET_FORMATION_LEADER(Vehicle vehicle, float x, float y, float z, float p4) { Invoke<int>(0x428AD3E26C8D9EB0, vehicle, x, y, z, p4); } // 0x428AD3E26C8D9EB0  b877
 	static void RESET_FORMATION_LEADER() { Invoke<int>(0xE2F53F172B45EDE1); } // 0xE2F53F172B45EDE1  b877
 	static BOOL GET_IS_BOAT_CAPSIZED(Vehicle vehicle) { return Invoke<BOOL>(0xBA91D045575699AD, vehicle); } // 0xBA91D045575699AD  b877
-	static void SET_ALLOW_RAMMING_SOOP_OR_RAMP(Any p0, Any p1) { Invoke<int>(0x80E3357FDEF45C21, p0, p1); } // 0x80E3357FDEF45C21  b944
+	static void SET_ALLOW_RAMMING_SOOP_OR_RAMP(Any p0, Any p1) { Invoke<int>(0x80E3357FDEF45C21, p0, p1); } // 0x80E3357FDEF45C21  b9440xFEB2DDED3509562E
 	static void SET_SCRIPT_RAMP_IMPULSE_SCALE(Vehicle vehicle, float impulseScale) { Invoke<int>(0xEFC13B1CE30D755D, vehicle, impulseScale); } // 0xEFC13B1CE30D755D  b944
 	static BOOL GET_IS_DOOR_VALID(Vehicle vehicle, int doorId) { return Invoke<BOOL>(0x645F4B6E8499F632, vehicle, doorId); } // 0x645F4B6E8499F632  b944
 	static void SET_SCRIPT_ROCKET_BOOST_RECHARGE_TIME(Vehicle vehicle, float seconds) { Invoke<int>(0xE00F2AB100B76E89, vehicle, seconds); } // 0xE00F2AB100B76E89  b944

@@ -51,6 +51,10 @@ namespace Arctic
 		SubmenuEngineSound,
 		SubmenuNegitiveTorque,
 		SubmenuCustomize,
+		SubmenuPresets,
+		SubmenuSpeedo,
+		SubmenuAcrobatics,
+		SubmenuAutoPilot,
 		//WEAPON
 		SubmenuWeapon,
 		SubmenuExplosiveAmmo,
@@ -75,6 +79,11 @@ namespace Arctic
 		SubmenuThemes,
 		SubmenuDemo,
 		SubmenuTest,
+		SubmenuToggles,
+		SubmenuTogglesColor,
+		//WORLD
+		SubmenuWorld,
+		SubmeuWeather,
 
 		//LSC
 		LosSantosArmor,
@@ -96,6 +105,16 @@ namespace Arctic
 		LosSantosTurbo,
 		LosSantosWheels,
 		LosSantosWindows,
+
+		SubmenuAirstrike,
+		SubmenuTargetingMode,
+		SubmenuTriggerbot,
+		SubmenuSpamText,
+		SubmenuUpgrades,
+		SubmenuUpgradeLoop,
+		SubmenuOutfitEditor,
+		
+	
 		
 	};
 
@@ -124,7 +143,7 @@ namespace Arctic
 			sub->AddOption<SubOption>("Weapon", nullptr, SubmenuWeapon);
 			sub->AddOption<SubOption>("Vehicle", nullptr, SubmenuVehicle);
 			sub->AddOption<SubOption>("Spawner", nullptr, SubmenuSettings);
-			sub->AddOption<SubOption>("Miscellaneous", nullptr, SubmenuSettings);
+			sub->AddOption<SubOption>("World", nullptr, SubmenuWorld);
 			sub->AddOption<SubOption>("Settings", nullptr, SubmenuSettings);
 		});
 		g_Render->AddSubmenu<RegularSubmenu>(("Self"), SubmenuSelf, [](RegularSubmenu* sub)
@@ -133,6 +152,7 @@ namespace Arctic
 				sub->AddOption<SubOption>("Invisible", nullptr, SubmenuInvisible);
 				sub->AddOption<SubOption>("Super Jump", nullptr, SubmenuSuperjump);
 				sub->AddOption<SubOption>("Multipliers", nullptr, SubmenuMultipliers);
+				sub->AddOption<SubOption>("Outfit Editor", nullptr, SubmenuOutfitEditor);
 				sub->AddOption<BoolOption<bool>>(("Godmode"), nullptr, &godmode, BoolDisplay::OnOff, false, [] {
 					if (!godmode)
 					{
@@ -140,7 +160,11 @@ namespace Arctic
 						
 					}
 					});
-				sub->AddOption<BoolOption<bool>>(("Never Wanted"), nullptr, &neverWantedBool, BoolDisplay::OnOff);
+				sub->AddOption<BoolOption<bool>>(("Never Wanted"), nullptr, &neverWantedBool, BoolDisplay::OnOff, false, [] {
+					if (!neverWantedBool) {
+						PLAYER::SET_MAX_WANTED_LEVEL(5);
+					}
+					});
 				sub->AddOption<BoolOption<bool>>(("Auto Parachute"), "Automaticly pulls you're parachite", &features.auto_parachute, BoolDisplay::OnOff);
 				sub->AddOption<BoolOption<bool>>(("Seatbelt"), nullptr, &features.seatbelt, BoolDisplay::OnOff, false, [] {
 					if (!features.seatbelt) {
@@ -191,7 +215,61 @@ namespace Arctic
 						
 					}
 					});
+				sub->AddOption<NumberOption<std::int32_t>>("Wanted Level", nullptr, &i_hate_niggers, 0, 5, 1, 3, true, "", "", [] {
+					(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_wanted_level = i_hate_niggers;
+					});
 			
+			});
+		g_Render->AddSubmenu<RegularSubmenu>(("Outfit Editor"), SubmenuOutfitEditor, [](RegularSubmenu* sub)
+			{
+				sub->AddOption<ChooseOption<const char*, std::size_t>>("Type", nullptr, &Lists::HeaderTypesFrontend2, &Lists::HeaderTypesPosition2, true, [] {
+				g_Render->outfits = Lists::HeaderTypesBackend2[Lists::HeaderTypesPosition2];
+					});
+		switch (g_Render->outfits) {
+		case Outfits::Face:
+			sub->AddOption<NumberOption<std::int32_t>>("Prop", "Sets face variation.", &testa, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 0), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 0, testa, 0, 0); });
+			sub->AddOption<NumberOption<std::int32_t>>("Texture", "Sets face texture variation.", &facetexture, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 0, testa), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 0, testa, facetexture, 0); }); break;
+		case Outfits::Head:
+			sub->AddOption<NumberOption<std::int32_t>>("Prop", "Sets head variation.", &testb, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 1), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 1, testb, 0, 0); });
+			sub->AddOption<NumberOption<std::int32_t>>("Texture", "Sets head texture variation.", &facetexture1, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 1, testb), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 1, testb, facetexture1, 0); }); break;
+		case Outfits::Hair:
+			sub->AddOption<NumberOption<std::int32_t>>("Prop", "Sets hair variation.", &testc, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 2), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 2, testc, 0, 0); });
+			sub->AddOption<NumberOption<std::int32_t>>("Texture", "Sets hair texture variation.", &facetexture2, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 2, testc), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 2, testc, facetexture2, 0); }); break;
+		case Outfits::Torso:
+			sub->AddOption<NumberOption<std::int32_t>>("Prop", "Sets torso variation.", &testd, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 3), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 3, testd, 0, 0); });
+			sub->AddOption<NumberOption<std::int32_t>>("Texture", "Sets torso texture variation.", &facetexture3, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 3, testd), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 3, testd, facetexture3, 0); }); break;
+		case Outfits::Torso2:
+			sub->AddOption<NumberOption<std::int32_t>>("Prop", "Sets torso 2 variation.", &testl, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 11), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 11, testl, 0, 0); });
+			sub->AddOption<NumberOption<std::int32_t>>("Texture", "Sets torso 2 texture variation.", &facetexture4, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 11, testl), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 11, testl, facetexture4, 0); }); break;
+		case Outfits::Legs:
+			sub->AddOption<NumberOption<std::int32_t>>("Prop", "Sets leg variation.", &teste, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 4), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 4, teste, 0, 0); });
+			sub->AddOption<NumberOption<std::int32_t>>("Texture", "Sets leg texture variation.", &facetexture5, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 4, teste), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 4, teste, facetexture5, 0); }); break;
+		case Outfits::Hands:
+			sub->AddOption<NumberOption<std::int32_t>>("Prop", "Sets hand variation.", &testf, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 5), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 5, testf, 0, 0); });
+			sub->AddOption<NumberOption<std::int32_t>>("Texture", "Sets hand texture variation.", &facetexture6, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 5, testf), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 5, testf, facetexture6, 0); }); break;
+		case Outfits::Feet:
+			sub->AddOption<NumberOption<std::int32_t>>("Prop", "Sets feet variation.", &testg, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 6), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 6, testg, 0, 0); });
+			sub->AddOption<NumberOption<std::int32_t>>("Texture", "Sets feet texture variation.", &facetexture7, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 6, testg), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 6, testg, facetexture7, 0); }); break;
+		case Outfits::Eyes:
+			sub->AddOption<NumberOption<std::int32_t>>("Prop", "Sets eye variation.", &testh, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 7), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 7, testh, 0, 0); });
+			sub->AddOption<NumberOption<std::int32_t>>("Texture", "Sets eyes texture variation.", &facetexture8, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 7, testh), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 7, testh, facetexture8, 0); }); break;
+		case Outfits::Accessories:
+
+			sub->AddOption<NumberOption<std::int32_t>>("Prop", "Sets accessories variation.", &testi, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 8), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 8, testi, 0, 0); });
+			sub->AddOption<NumberOption<std::int32_t>>("Texture", "Sets accessories texture variation.", &facetexture9, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 8, testi), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 8, testi, facetexture9, 0); }); break;
+		case Outfits::Vests:
+
+			sub->AddOption<NumberOption<std::int32_t>>("Prop", "Sets vest variation.", &testj, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 9), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 9, testj, 0, 0); });
+			sub->AddOption<NumberOption<std::int32_t>>("Texture", "Sets vests texture variation.", &facetexture10, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 9, testj), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 9, testj, facetexture10, 0); }); break;
+		case Outfits::Decals:
+
+			sub->AddOption<NumberOption<std::int32_t>>("Prop", "Sets texture variation.", &testk, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 10), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 10, testk, 0, 0); });
+			sub->AddOption<NumberOption<std::int32_t>>("Texture", "Sets decals texture variation.", &facetexture11, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 10, testk), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 10, testk, facetexture11, 0); }); break;
+		case Outfits::HeadProps:
+
+			sub->AddOption<NumberOption<std::int32_t>>("Prop", "Sets head props", &testm, 0, 255, 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 1, testm, 0, 0); });
+			sub->AddOption<NumberOption<std::int32_t>>("Texture", "Sets head props texture variation.", &facetexture12, 0, PED::GET_PED_PROP_TEXTURE_INDEX(PLAYER::PLAYER_PED_ID(), 1), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 1, testm, facetexture12, 0); }); break;
+		}
 			});
 		g_Render->AddSubmenu<RegularSubmenu>(("Invisible"), SubmenuInvisible, [](RegularSubmenu* sub)
 			{
@@ -237,6 +315,7 @@ namespace Arctic
 				if (multipliers.run) {
 					sub->AddOption<NumberOption<float>>("Speed", nullptr, &multipliers.run_speed, 0.1f, 10.f, 0.01f, 2);
 				}
+				
 		
 			});
 		g_Render->AddSubmenu<RegularSubmenu>(("Super Jump"), SubmenuSuperjump, [](RegularSubmenu* sub)
@@ -248,12 +327,172 @@ namespace Arctic
 			{
 				sub->AddOption<SubOption>("Handling", nullptr, Submenu::SubmenuVehicleMultipliers);
 				sub->AddOption<SubOption>("Horn Boost", nullptr, Submenu::SubmenuHornBoost);
+				sub->AddOption<SubOption>("Acrobatics", nullptr, Submenu::SubmenuAcrobatics);
+				sub->AddOption<SubOption>("Auto-Pilot", nullptr, Submenu::SubmenuAutoPilot);
+				sub->AddOption<SubOption>("Speedometer", nullptr, Submenu::SubmenuSpeedo);
 				sub->AddOption<SubOption>("Engine Sound", nullptr, Submenu::SubmenuEngineSound);
 				sub->AddOption<SubOption>("Negitive Torque", nullptr, Submenu::SubmenuNegitiveTorque);
+				sub->AddOption<SubOption>("Upgrades", nullptr, Submenu::SubmenuUpgrades);
 				sub->AddOption<SubOption>("LSC", nullptr, Submenu::SubmenuCustomize);
-				sub->AddOption<BoolOption<bool>>(("Godmode"), nullptr, &features.vehicle_godmode, BoolDisplay::OnOff);
-				
+				sub->AddOption<BoolOption<bool>>(("Godmode"), nullptr, &features.vehicle_godmode, BoolDisplay::OnOff, false, [] {
+					if (!features.vehicle_godmode) {
+						if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+						{
+							Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), true);
+							ENTITY::SET_ENTITY_INVINCIBLE(playerVehicle, false);
+							ENTITY::SET_ENTITY_PROOFS(playerVehicle, false, false, false, false, false, false, false, false);
+							VEHICLE::SET_VEHICLE_DAMAGE(playerVehicle, 0.0f, 0.0f, 0.0f, 0.0f, 200.0f, false);
+							VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
+							VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, 0.0f);
+							VEHICLE::SET_DISABLE_VEHICLE_PETROL_TANK_DAMAGE(playerVehicle, false);
+							VEHICLE::SET_DISABLE_VEHICLE_PETROL_TANK_FIRES(playerVehicle, false);
+							VEHICLE::SET_VEHICLE_BODY_HEALTH(playerVehicle, 1000.0f);
+							VEHICLE::SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(playerVehicle, !false);
+							VEHICLE::SET_VEHICLE_CAN_BREAK(playerVehicle, !false);
+							VEHICLE::SET_VEHICLE_ENGINE_HEALTH(playerVehicle, 1000.0f);
+							VEHICLE::SET_VEHICLE_ENGINE_CAN_DEGRADE(playerVehicle, !false);
+							VEHICLE::SET_VEHICLE_EXPLODES_ON_HIGH_EXPLOSION_DAMAGE(playerVehicle, !false);
+							VEHICLE::SET_VEHICLE_PETROL_TANK_HEALTH(playerVehicle, 1000.0f);
+							VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVehicle, !false);
+							VEHICLE::SET_VEHICLE_WHEELS_CAN_BREAK(playerVehicle, !false);
+						}
+					}
+					});
+				sub->AddOption<BoolOption<bool>>(("Keep Engine On"), nullptr, &features.keep_engine_on, BoolDisplay::OnOff);
 				sub->AddOption<BoolOption<bool>>(("No Plane Turbulence"), nullptr, &NoPlaneTurbulance, BoolDisplay::OnOff);
+				sub->AddOption<BoolOption<bool>>(("Auto-Repair"), nullptr, &features.auto_repair, BoolDisplay::OnOff);
+				sub->AddOption<BoolOption<bool>>(("Remove Deformation"), nullptr, &features.remove_def, BoolDisplay::OnOff);
+				sub->AddOption<BoolOption<bool>>(("Stick To Ground"), nullptr, &features.stick_to_ground, BoolDisplay::OnOff);
+				sub->AddOption<BoolOption<bool>>(("Burned"), nullptr, &features.burned, BoolDisplay::OnOff, false, [] {
+					if (!features.burned) {
+						ENTITY::SET_ENTITY_RENDER_SCORCHED(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false);
+					}
+					});
+				sub->AddOption<BoolOption<bool>>(("Infinite Rocket Boost"), nullptr, &features.infiniter, BoolDisplay::OnOff);
+
+			});
+		g_Render->AddSubmenu<RegularSubmenu>(("Upgrades"), SubmenuUpgrades, [](RegularSubmenu* sub)
+			{
+				sub->AddOption<SubOption>("Max (Loop)", nullptr, Submenu::SubmenuUpgradeLoop);
+				sub->AddOption<RegularOption>(("Max (Once)"), nullptr, []
+				{
+						if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+						{
+							Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+							VEHICLE::SET_VEHICLE_FIXED(playerVehicle);
+							VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
+							VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, false);
+						}
+
+				});
+			});
+		g_Render->AddSubmenu<RegularSubmenu>(("Max (Loop)"), SubmenuUpgradeLoop, [](RegularSubmenu* sub)
+			{
+				sub->AddOption<BoolOption<bool>>(("Enabled"), nullptr, &max_loop.enabled, BoolDisplay::OnOff);
+				sub->AddOption<BoolOption<bool>>(("Ramdomize Primary"), nullptr, &max_loop.randomizeprimary, BoolDisplay::OnOff);
+				sub->AddOption<BoolOption<bool>>(("Ramdomize Secondary"), nullptr, &max_loop.randomizesecondary, BoolDisplay::OnOff);
+				sub->AddOption<NumberOption<std::int32_t>>("Delay", nullptr, &max_loop.delay, 0, 5000, 50);
+			});
+		g_Render->AddSubmenu<RegularSubmenu>(("Auto Pilot"), SubmenuAutoPilot, [](RegularSubmenu* sub)
+			{
+				sub->AddOption<BoolOption<bool>>(("Wreckless"), nullptr, &autopilot.wreckless, BoolDisplay::OnOff);
+				if (autopilot.wreckless) {
+					sub->AddOption<BoolOption<bool>>(("Avoid Roads"), nullptr, &autopilot.wreckless, BoolDisplay::OnOff);
+				}
+				sub->AddOption<ChooseOption<const char*, std::size_t>>("Destination", nullptr, &autopilot.destination, &autopilot.destination_i);
+				sub->AddOption<NumberOption<float>>("Speed", nullptr, &autopilot.speed, 1.0f, 200.f, 1.0f, 2);
+				sub->AddOption<NumberOption<float>>("Stop Range", nullptr, &autopilot.stop_range, 0.f, 1000.f, 0.50f, 2);
+				sub->AddOption<RegularOption>(("Start"), nullptr, []
+				{
+						int WaypointHandle = HUD::GET_FIRST_BLIP_INFO_ID(8);
+						NativeVector3 destination = HUD::GET_BLIP_INFO_ID_COORD(HUD::GET_FIRST_BLIP_INFO_ID(8));
+						Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						if (autopilot.destination_i == 0) {
+							TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(PLAYER::PLAYER_PED_ID(), veh, destination.x, destination.y, destination.z, autopilot.speed, autopilot.wreckless ? 516 : 387, autopilot.stop_range);
+
+						}
+						if (autopilot.destination_i == 1) {
+							NativeVector3 location;
+
+							get_objective_location(location);
+							if (autopilot.wreckless) {
+
+								TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(PLAYER::PLAYER_PED_ID(), veh, location.x, location.y, location.z, autopilot.speed, autopilot.avoid_roads ? 20972036 : 516, autopilot.stop_range);
+							}
+							else {
+								TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(PLAYER::PLAYER_PED_ID(), veh, location.x, location.y, location.z, autopilot.speed, 387, autopilot.stop_range);
+							}
+						}
+						if (autopilot.destination_i == 2) {
+
+							if (autopilot.wreckless) {
+
+								TASK::TASK_VEHICLE_DRIVE_WANDER(PLAYER::PLAYER_PED_ID(), veh, autopilot.speed, autopilot.avoid_roads ? 20972036 : 516);
+							}
+							else {
+								TASK::TASK_VEHICLE_DRIVE_WANDER(PLAYER::PLAYER_PED_ID(), veh, autopilot.speed, 387);
+							}
+						}
+				});
+				sub->AddOption<RegularOption>(("Stop"), nullptr, []
+					{
+						Vehicle oldveh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						TASK::CLEAR_PED_TASKS_IMMEDIATELY(PLAYER::PLAYER_PED_ID());
+						PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), oldveh, -1);
+				
+					});
+			});
+		g_Render->AddSubmenu<RegularSubmenu>(("Acrobatics"), SubmenuAcrobatics, [](RegularSubmenu* sub)
+			{
+
+				sub->AddOption<ChooseOption<const char*, std::size_t>>("Type", nullptr, &acrobatic_type, &acrobatic_int);
+				sub->AddOption<RegularOption>(("Start"), nullptr, []
+				{
+					if (acrobatic_int == 0) {
+						
+						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
+						ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
+						ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
+						
+					}
+					if (acrobatic_int == 1) {
+						
+						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
+						ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
+						ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
+						
+					}
+					if (acrobatic_int == 2) {
+						
+						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 10.0f, 20.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1);
+						
+					}
+					if (acrobatic_int == 3) {
+						
+						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 7.0f, 0, 0, 0, true, true, true, true, false, true);
+						
+						
+
+					}
+			});
+
+
+
+			});
+		g_Render->AddSubmenu<RegularSubmenu>(("Speedometer"), SubmenuSpeedo, [](RegularSubmenu* sub)
+			{
+				
+				sub->AddOption<BoolOption<bool>>(("Enabled"), nullptr, &speedo.enabled, BoolDisplay::OnOff);
+				sub->AddOption<ChooseOption<const char*, std::size_t>>("Type", nullptr, &speedo.type, &speedo.type_i);
+				sub->AddOption<NumberOption<float>>("X Offset", nullptr, &speedo.x_offset, -100.f, 100.f, 0.01f, 2);
+				sub->AddOption<NumberOption<float>>("Y Offset", nullptr, &speedo.y_offset, -100.f, 100.f, 0.01f, 2);
+				sub->AddOption<NumberOption<float>>("Scale", nullptr, &speedo.scale, 0.f, 100.f, 0.01f, 2);
+
+		
 
 			});
 		g_Render->AddSubmenu<RegularSubmenu>(("LSC"), SubmenuCustomize, [](RegularSubmenu* sub)
@@ -762,64 +1001,89 @@ namespace Arctic
 			});
 		g_Render->AddSubmenu<RegularSubmenu>(("Handling"), SubmenuVehicleMultipliers, [](RegularSubmenu* sub)
 			{
-				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
-				sub->AddOption<NumberOption<float>>("Mass", nullptr, &handling->m_mass, 0.f, 10000.f, 0.25f, 1);
-				sub->AddOption<NumberOption<float>>("Initial Drag Coeff", nullptr, &handling->m_initial_drag_coeff, 0.f, 10000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Downforce Multiplier", nullptr, &handling->m_downforce_multiplier, 0.f, 10000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Popup Light Rotation", nullptr, &handling->m_popup_light_rotation, 0.f, 10000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Centre Of Max X", nullptr, &handling->m_centre_of_mass.x, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Centre Of Max Y", nullptr, &handling->m_centre_of_mass.y, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Centre Of Max Z", nullptr, &handling->m_centre_of_mass.z, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Inertia Multiplier X", nullptr, &handling->m_inertia_mult.x, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Inertia Multiplier Y", nullptr, &handling->m_inertia_mult.y, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Inertia Multiplier Z", nullptr, &handling->m_inertia_mult.z, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Buoyancy", nullptr, &handling->m_buoyancy, -1000.f, 1000.f, 1.0f, 1);
-				sub->AddOption<NumberOption<float>>("Drive Bias Rear", nullptr, &handling->m_drive_bias_rear, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Drive Bias Front", nullptr, &handling->m_drive_bias_front, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Acceleration", nullptr, &handling->m_acceleration, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Upshift", nullptr, &handling->m_upshift, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Downshift", nullptr, &handling->m_downshift, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Initial Drive Force", nullptr, &handling->m_initial_drive_force, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Drive Maxx Flat Velocity", nullptr, &handling->m_drive_max_flat_velocity, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Initial Drive Max Flat Velocity", nullptr, &handling->m_initial_drive_max_flat_vel, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Brake Force", nullptr, &handling->m_brake_force, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Brake Bias Front", nullptr, &handling->m_brake_bias_front, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Brake Bias Rear", nullptr, &handling->m_brake_bias_rear, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Handbrake Force", nullptr, &handling->m_handbrake_force, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Steering Lock", nullptr, &handling->m_steering_lock, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Steering Lock Ratio", nullptr, &handling->m_steering_lock_ratio, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Traction Curve Max", nullptr, &handling->m_traction_curve_max, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Traction Curve Min", nullptr, &handling->m_traction_curve_min, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Traction Curve Lateral", nullptr, &handling->m_traction_curve_lateral, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Traction Curve Ratio", nullptr, &handling->m_traction_curve_ratio, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Curve Lateral", nullptr, &handling->m_curve_lateral, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Curve Lateral Ratio", nullptr, &handling->m_curve_lateral_ratio, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Traction Spring Delta Max", nullptr, &handling->m_traction_spring_delta_max, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Traction Spring Delta Max Ratio", nullptr, &handling->m_traction_spring_delta_max_ratio, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Low Speed Traction Loss Multiplier", nullptr, &handling->m_low_speed_traction_loss_mult, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Camber Stiffness", nullptr, &handling->m_camber_stiffness, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Traction Bias Front", nullptr, &handling->m_traction_bias_front, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Traction Bias Rear", nullptr, &handling->m_traction_bias_rear, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Traction Loss Multiplier", nullptr, &handling->m_traction_loss_mult, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Suspension Force", nullptr, &handling->m_suspension_force, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Suspension Comp Damp", nullptr, &handling->m_suspension_comp_damp, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Suspension Rebound Damp", nullptr, &handling->m_suspension_rebound_damp, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Suspsension Upper Limit", nullptr, &handling->m_suspension_upper_limit, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Suspension Lower Limit", nullptr, &handling->m_suspension_lower_limit, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Suspension Raise", nullptr, &handling->m_suspension_raise, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Suspension Bias Front", nullptr, &handling->m_suspension_bias_front, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Suspension Bias Rear", nullptr, &handling->m_suspension_bias_rear, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Anti Rollbar Force", nullptr, &handling->m_anti_rollbar_force, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Anti Rollbar Bias Front", nullptr, &handling->m_anti_rollbar_bias_front, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Anti Rollbar Bias Rear", nullptr, &handling->m_anti_rollbar_bias_rear, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Roll Centre Height Front", nullptr, &handling->m_roll_centre_height_front, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Roll Centre Height Rear", nullptr, &handling->m_roll_centre_height_rear, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Collision Damage Multiplier", nullptr, &handling->m_collision_damage_mult, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Weapon Damage Multiplier", nullptr, &handling->m_weapon_damamge_mult, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Deformation Multiplier", nullptr, &handling->m_deformation_mult, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Engine Damage Multiplier", nullptr, &handling->m_engine_damage_mult, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Petrol Tank Volume", nullptr, &handling->m_petrol_tank_volume, -1000.f, 1000.f, 0.1f, 1);
-				sub->AddOption<NumberOption<float>>("Oil Volume", nullptr, &handling->m_oil_volume, -1000.f, 1000.f, 0.1f, 1);
+				sub->AddOption<SubOption>("Presets", nullptr, SubmenuPresets);
+				sub->AddOption<UnclickOption>(("Edit"), nullptr, [] {});
+				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				{
+					auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+					sub->AddOption<NumberOption<float>>("Mass", nullptr, &handling->m_mass, 0.f, 10000.f, 0.25f, 1);
+					sub->AddOption<NumberOption<float>>("Initial Drag Coeff", nullptr, &handling->m_initial_drag_coeff, 0.f, 10000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Downforce Multiplier", nullptr, &handling->m_downforce_multiplier, 0.f, 10000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Popup Light Rotation", nullptr, &handling->m_popup_light_rotation, 0.f, 10000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Centre Of Max X", nullptr, &handling->m_centre_of_mass.x, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Centre Of Max Y", nullptr, &handling->m_centre_of_mass.y, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Centre Of Max Z", nullptr, &handling->m_centre_of_mass.z, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Inertia Multiplier X", nullptr, &handling->m_inertia_mult.x, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Inertia Multiplier Y", nullptr, &handling->m_inertia_mult.y, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Inertia Multiplier Z", nullptr, &handling->m_inertia_mult.z, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Buoyancy", nullptr, &handling->m_buoyancy, -1000.f, 1000.f, 1.0f, 1);
+					sub->AddOption<NumberOption<float>>("Drive Bias Rear", nullptr, &handling->m_drive_bias_rear, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Drive Bias Front", nullptr, &handling->m_drive_bias_front, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Acceleration", nullptr, &handling->m_acceleration, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Upshift", nullptr, &handling->m_upshift, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Downshift", nullptr, &handling->m_downshift, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Initial Drive Force", nullptr, &handling->m_initial_drive_force, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Drive Maxx Flat Velocity", nullptr, &handling->m_drive_max_flat_velocity, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Initial Drive Max Flat Velocity", nullptr, &handling->m_initial_drive_max_flat_vel, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Brake Force", nullptr, &handling->m_brake_force, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Brake Bias Front", nullptr, &handling->m_brake_bias_front, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Brake Bias Rear", nullptr, &handling->m_brake_bias_rear, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Handbrake Force", nullptr, &handling->m_handbrake_force, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Steering Lock", nullptr, &handling->m_steering_lock, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Steering Lock Ratio", nullptr, &handling->m_steering_lock_ratio, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Traction Curve Max", nullptr, &handling->m_traction_curve_max, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Traction Curve Min", nullptr, &handling->m_traction_curve_min, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Traction Curve Lateral", nullptr, &handling->m_traction_curve_lateral, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Traction Curve Ratio", nullptr, &handling->m_traction_curve_ratio, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Curve Lateral", nullptr, &handling->m_curve_lateral, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Curve Lateral Ratio", nullptr, &handling->m_curve_lateral_ratio, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Traction Spring Delta Max", nullptr, &handling->m_traction_spring_delta_max, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Traction Spring Delta Max Ratio", nullptr, &handling->m_traction_spring_delta_max_ratio, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Low Speed Traction Loss Multiplier", nullptr, &handling->m_low_speed_traction_loss_mult, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Camber Stiffness", nullptr, &handling->m_camber_stiffness, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Traction Bias Front", nullptr, &handling->m_traction_bias_front, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Traction Bias Rear", nullptr, &handling->m_traction_bias_rear, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Traction Loss Multiplier", nullptr, &handling->m_traction_loss_mult, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Suspension Force", nullptr, &handling->m_suspension_force, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Suspension Comp Damp", nullptr, &handling->m_suspension_comp_damp, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Suspension Rebound Damp", nullptr, &handling->m_suspension_rebound_damp, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Suspsension Upper Limit", nullptr, &handling->m_suspension_upper_limit, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Suspension Lower Limit", nullptr, &handling->m_suspension_lower_limit, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Suspension Raise", nullptr, &handling->m_suspension_raise, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Suspension Bias Front", nullptr, &handling->m_suspension_bias_front, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Suspension Bias Rear", nullptr, &handling->m_suspension_bias_rear, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Anti Rollbar Force", nullptr, &handling->m_anti_rollbar_force, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Anti Rollbar Bias Front", nullptr, &handling->m_anti_rollbar_bias_front, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Anti Rollbar Bias Rear", nullptr, &handling->m_anti_rollbar_bias_rear, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Roll Centre Height Front", nullptr, &handling->m_roll_centre_height_front, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Roll Centre Height Rear", nullptr, &handling->m_roll_centre_height_rear, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Collision Damage Multiplier", nullptr, &handling->m_collision_damage_mult, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Weapon Damage Multiplier", nullptr, &handling->m_weapon_damamge_mult, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Deformation Multiplier", nullptr, &handling->m_deformation_mult, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Engine Damage Multiplier", nullptr, &handling->m_engine_damage_mult, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Petrol Tank Volume", nullptr, &handling->m_petrol_tank_volume, -1000.f, 1000.f, 0.1f, 1);
+					sub->AddOption<NumberOption<float>>("Oil Volume", nullptr, &handling->m_oil_volume, -1000.f, 1000.f, 0.1f, 1);
+				}
+				
+				
+			});
+		g_Render->AddSubmenu<RegularSubmenu>(("Presets"), SubmenuPresets, [](RegularSubmenu* sub)
+			{
+
+				sub->AddOption<RegularOption>(("Save"), nullptr, []
+					{
+						
+						showKeyboard("Enter Something", "", 25, &handlingBuffer, [] {
+						
+							});
+				});
+				sub->AddOption<UnclickOption>(("Lists"), nullptr, [] {});
+				if (handlingBuffer.c_str() != "") {
+					sub->AddOption<RegularOption>(handlingBuffer.c_str(), "");
+				}
+				
+
+
 			});
 		g_Render->AddSubmenu<RegularSubmenu>(("Horn Boost"), SubmenuHornBoost, [](RegularSubmenu* sub)
 			{
@@ -838,6 +1102,9 @@ namespace Arctic
 			{
 				sub->AddOption<SubOption>("Explosive Ammo", nullptr, SubmenuExplosiveAmmo);
 				sub->AddOption<SubOption>("Rapid Fire", nullptr, SubmenuRapidFire);
+				sub->AddOption<SubOption>("Triggerbot", nullptr, SubmenuTriggerbot);
+				sub->AddOption<SubOption>("Airstrike", nullptr, SubmenuAirstrike);
+				sub->AddOption<SubOption>("Targeting Mode", nullptr, SubmenuTargetingMode);
 				sub->AddOption<SubOption>("Multipliers", nullptr, SubmenuWeaponMultipliers);
 				sub->AddOption<SubOption>("Animation", nullptr, SubmenuWeaponAnimation);
 				sub->AddOption<SubOption>("Gun Locker", nullptr, SubmenuGunLocker);
@@ -848,6 +1115,41 @@ namespace Arctic
 					});
 				sub->AddOption<BoolOption<bool>>(("Teleport"), nullptr, &features.teleport_gun, BoolDisplay::OnOff);
 				sub->AddOption<BoolOption<bool>>(("Delete"), nullptr, &features.delete_gun, BoolDisplay::OnOff);
+				sub->AddOption<BoolOption<bool>>(("Bypass C4 Limit"), nullptr, &features.bypass_c4_limit, BoolDisplay::OnOff);
+				
+				
+			});
+		g_Render->AddSubmenu<RegularSubmenu>(("Triggerbot"), SubmenuTriggerbot, [](RegularSubmenu* sub)
+			{
+				sub->AddOption<BoolOption<bool>>(("Enabled"), nullptr, &triggerbot.enabled, BoolDisplay::OnOff);
+				sub->AddOption<BoolOption<bool>>(("Disable When Ragdolling"), nullptr, &triggerbot.d1, BoolDisplay::OnOff);
+				sub->AddOption<BoolOption<bool>>(("Disable When Reloading"), nullptr, &triggerbot.d2, BoolDisplay::OnOff);
+				sub->AddOption<BoolOption<bool>>(("Exclude Friends"), nullptr, &triggerbot.exclude_friends, BoolDisplay::OnOff);
+				sub->AddOption<ChooseOption<const char*, std::size_t>>("Filter", nullptr, &triggerbot.filter, &triggerbot.filter_i);
+				sub->AddOption<ChooseOption<const char*, std::size_t>>("Bone", nullptr, &triggerbot.shoot_coords, &triggerbot.scoords_i);
+				sub->AddOption<NumberOption<std::int32_t>>("Delay", nullptr, &triggerbot.delay, 0, 5000);
+
+
+			});
+		g_Render->AddSubmenu<RegularSubmenu>(("Targeting Mode"), SubmenuTargetingMode, [](RegularSubmenu* sub)
+			{
+				sub->AddOption<ChooseOption<const char*, std::size_t>>("Type", nullptr, &t_mode.data, &t_mode.init);
+				sub->AddOption<RegularOption>(("Apply"), nullptr, []
+				{
+						PLAYER::SET_PLAYER_TARGETING_MODE(t_mode.init);
+			});
+
+
+
+			});
+		g_Render->AddSubmenu<RegularSubmenu>(("Airstrike"), SubmenuAirstrike, [](RegularSubmenu* sub)
+			{
+				sub->AddOption<BoolOption<bool>>(("Enabled"), nullptr, &airstrike.enabled, BoolDisplay::OnOff);
+				sub->AddOption<NumberOption<std::int32_t>>("Damage", nullptr, &airstrike.damage, 0, 1000);
+				sub->AddOption<NumberOption<float>>("Height", nullptr, &airstrike.height, 0.15f, 250.f, 0.05f, 2);
+		
+
+
 			});
 		g_Render->AddSubmenu<RegularSubmenu>(("Multipliers"), SubmenuWeaponMultipliers, [](RegularSubmenu* sub)
 			{
@@ -942,7 +1244,7 @@ namespace Arctic
 		g_Render->AddSubmenu<RegularSubmenu>(("Gun Locker"), SubmenuGunLocker, [](RegularSubmenu* sub)
 			{
 				sub->AddOption<SubOption>("Ammo", nullptr, SubmenuGunLockerAmmo);
-		sub->AddOption<SubOption>("Give", nullptr, SubmenuGunLockerGive);
+				sub->AddOption<SubOption>("Give", nullptr, SubmenuGunLockerGive);
 				
 		
 
@@ -960,7 +1262,7 @@ namespace Arctic
 				sub->AddOption<ChooseOption<const char*, std::size_t>>("Type", nullptr, &give_weapon.type, &give_weapon.type_int);
 				sub->AddOption<NumberOption<std::int32_t>>("Ammo", nullptr, &give_weapon.amount, 1, Maxammo);
 				sub->AddOption<RegularOption>(("Apply"), nullptr, []
-				{
+				{		
 						if (give_weapon.type_int != 0) {
 							WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), give_weapon.data[give_weapon.type_int], 9999, false);
 						}
@@ -1096,7 +1398,7 @@ namespace Arctic
 		g_Render->AddSubmenu<RegularSubmenu>("Trolling", SubmenuTrolling, [](RegularSubmenu* sub)
 			{
 				sub->AddOption<SubOption>("Fake Drops", nullptr, SubmenuFakeDrops);
-				
+				sub->AddOption<SubOption>("Text Spam", nullptr, SubmenuSpamText);
 				sub->AddOption<RegularOption>(("Cage"), nullptr, []
 					{
 						NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
@@ -1108,6 +1410,21 @@ namespace Arctic
 		sub->AddOption<BoolOption<bool>>(("RP"), nullptr, &Fake_drops.rp, BoolDisplay::OnOff);
 		sub->AddOption<NumberOption<std::int32_t>>("Height", nullptr, &Fake_drops.height, 0, 100);
 		sub->AddOption<NumberOption<std::int32_t>>("Delay", nullptr, &Fake_drops.delay, 0, 5000);
+			});
+		g_Render->AddSubmenu<RegularSubmenu>("Text Spam", SubmenuSpamText, [](RegularSubmenu* sub)
+			{
+				sub->AddOption<BoolOption<bool>>(("Enabled"), nullptr, &text_spam.enabled, BoolDisplay::OnOff);
+		sub->AddOption<NumberOption<std::int32_t>>("Delay", nullptr, &text_spam.delay, 0, 5000);
+				sub->AddOption<RegularOption>((text_spam.inputted), nullptr, []
+				{
+					showKeyboard("Enter Message", "", 50, &text_spam.text, [] {
+
+							text_spam.inputted = text_spam.text.c_str();
+
+						
+
+					});
+				});
 			});
 		g_Render->AddSubmenu<RegularSubmenu>("Teleport", SubmenuPlayerTeleport, [](RegularSubmenu* sub)
 			{
@@ -1175,6 +1492,61 @@ namespace Arctic
 			sub->AddOption<NumberOption<std::int32_t>>("Height", nullptr, &drops.height, 0, 100);
 			sub->AddOption<NumberOption<std::int32_t>>("Delay", nullptr, &drops.delay, 0, 5000);
 			});
+		g_Render->AddSubmenu<RegularSubmenu>(("World"), SubmenuWorld, [](RegularSubmenu* sub)
+			{
+				sub->AddOption<SubOption>("Weather", nullptr, SubmeuWeather);
+
+			});
+		g_Render->AddSubmenu<RegularSubmenu>(("Weather"), SubmeuWeather, [](RegularSubmenu* sub)
+			{
+				sub->AddOption<ChooseOption<const char*, std::size_t>>("Type", nullptr, &weather.data, &weather.init);
+				sub->AddOption<RegularOption>(("Apply"), nullptr, []
+				{
+						if (weather.init == 0) {
+							weather.override("ExtraSunny");
+						}
+						if (weather.init == 1) {
+							weather.override("Clouds");
+						}
+						if (weather.init == 2) {
+							weather.override("Smog");
+						}
+						if (weather.init == 3) {
+							weather.override("Foggy");
+						}
+						if (weather.init == 4) {
+							weather.override("Overcast");
+						}
+						if (weather.init == 5) {
+							weather.override("Rain");
+						}
+						if (weather.init == 6) {
+							weather.override("Clearing");
+						}
+						if (weather.init == 7) {
+							weather.override("Neutral");
+						}
+						if (weather.init == 8) {
+							weather.override("Snow");
+						}
+						if (weather.init == 9) {
+							weather.override("Blizzard");
+						}
+						if (weather.init == 10) {
+							weather.override("SnowLight");
+						}
+						if (weather.init == 11) {
+							weather.override("XMAS");
+						}
+						if (weather.init == 12) {
+							weather.override("Halloween");
+						}
+						if (weather.init == 13) {
+							weather.override("Clear");
+						}
+				});
+
+			});
 		g_Render->AddSubmenu<RegularSubmenu>(("Demo"), SubmenuTest, [](RegularSubmenu* sub)
 		{
 			sub->AddOption<SubOption>("Submenu Option", nullptr, SubmenuDemo);
@@ -1211,6 +1583,7 @@ namespace Arctic
 		sub->AddOption<SubOption>("Footer Text", nullptr, SubmenuSettingsSubmenuBar);
 		sub->AddOption<SubOption>("Options", nullptr, SubmenuSettingsOption);
 		sub->AddOption<SubOption>("Footer", nullptr, SubmenuSettingsFooter);
+		sub->AddOption<SubOption>("Toggles", nullptr, SubmenuToggles);
 		sub->AddOption<SubOption>("Description", nullptr, SubmenuSettingsDescription);
 		sub->AddOption<SubOption>("Input", nullptr, SubmenuSettingsInput);
 		sub->AddOption<SubOption>("Themes", nullptr, SubmenuThemes);
@@ -1219,7 +1592,7 @@ namespace Arctic
 		sub->AddOption<NumberOption<float>>("Y Position", nullptr, &g_Render->m_PosY, 0.f, 1.f, 0.01f, 2);
 		sub->AddOption<NumberOption<float>>("Width", nullptr, &g_Render->m_Width, 0.01f, 1.f, 0.01f, 2);
 		sub->AddOption<BoolOption<bool>>("Sounds", nullptr, &g_Render->m_Sounds, BoolDisplay::OnOff);
-		sub->AddOption<ChooseOption<const char*, std::size_t>>(("Toggles"), nullptr, &g_Render->ToggleList, &g_Render->ToggleIterator);
+		
 		sub->AddOption<ChooseOption<const char*, std::size_t>>(("Submenu Indicators"), nullptr, &g_Render->IndicatorList, &g_Render->IndicatorIterator);
 		sub->AddOption<BoolOption<bool>>("Glare", nullptr, &g_Render->m_render_glare, BoolDisplay::OnOff);
 		sub->AddOption<BoolOption<bool>>("Log Script Events", nullptr, &g_LogScriptEvents, BoolDisplay::OnOff);
@@ -1228,6 +1601,59 @@ namespace Arctic
 				g_Running = false;
 			});
 		});
+		g_Render->AddSubmenu<RegularSubmenu>(("Toggles"), SubmenuToggles, [](RegularSubmenu* sub)
+			{
+				sub->AddOption<SubOption>("Color", nullptr, SubmenuTogglesColor);
+				sub->AddOption<ChooseOption<const char*, std::size_t>>(("Icon"), nullptr, &g_Render->ToggleList, &g_Render->ToggleIterator);
+				
+			});
+		g_Render->AddSubmenu<RegularSubmenu>(("Color"), SubmenuTogglesColor, [](RegularSubmenu* sub)
+			{
+				sub->AddOption<BoolOption<bool>>("Automaticly Match", nullptr, &features.match, BoolDisplay::OnOff);
+				
+				sub->AddOption<ChooseOption<const char*, std::size_t>>("Toggled (Match)", nullptr, &g_Render->ThemeList, &Lists::MatchPos, true, []
+				{
+						switch (Lists::MatchPos) {
+							case 0:
+								g_Render->m_ToggleOnColor = { 138, 43, 226, 255 };
+								break;
+							case 1:
+								g_Render->m_ToggleOnColor = { 255, 108, 116, 255 };
+								break;
+							case 2:
+						g_Render->m_ToggleOnColor = { 15, 82, 186, 255 };
+								break;
+							case 3:
+						g_Render->m_ToggleOnColor = { 24, 26, 24, 255 };
+								break;
+							case 4:
+						g_Render->m_ToggleOnColor = { 0, 155, 119, 255 };
+								break;
+							case 5:
+						g_Render->m_ToggleOnColor = { 70, 38, 180, 255 };
+								break;
+							case 6:
+						g_Render->m_ToggleOnColor = { 255, 145, 164, 255 };
+								break;
+							case 7:
+						g_Render->m_ToggleOnColor = { 17, 17, 17, 255 };
+								break;
+						}
+
+				});
+				
+				sub->AddOption<NumberOption<std::uint8_t>>("Toggled (R)", nullptr, &g_Render->m_ToggleOnColor.r, '\0', static_cast<std::uint8_t>(255));
+				sub->AddOption<NumberOption<std::uint8_t>>("Toggled (G)", nullptr, &g_Render->m_ToggleOnColor.g, '\0', static_cast<std::uint8_t>(255));
+				sub->AddOption<NumberOption<std::uint8_t>>("Toggled (B)", nullptr, &g_Render->m_ToggleOnColor.b, '\0', static_cast<std::uint8_t>(255));
+				sub->AddOption<NumberOption<std::uint8_t>>("Toggled (A)", nullptr, &g_Render->m_ToggleOnColor.a, '\0', static_cast<std::uint8_t>(255));
+				sub->AddOption<RegularOption>("Reset", "", []
+					{
+						features.match = false;
+						g_Render->m_ToggleOnColor = { 130, 214, 157, 255 };
+					});
+
+			});
+		
 
 		g_Render->AddSubmenu<RegularSubmenu>(("Themes"), SubmenuThemes, [](RegularSubmenu* sub)
 		{
@@ -1338,6 +1764,29 @@ namespace Arctic
 		{
 			sub->AddOption<BoolOption<bool>>("DX Header Text", "Disable native text if going to use dx", &g_Render->m_HeaderText, BoolDisplay::OnOff);
 			sub->AddOption<BoolOption<bool>>("Native Header Text", "Disable dx text if going to use native ", &g_Render->m_HeaderNativeText, BoolDisplay::OnOff);
+			if (g_Render->m_HeaderNativeText) {
+				sub->AddOption<ChooseOption<const char*, std::size_t>>("Type", nullptr, &g_Render->HeaderFont, &g_Render->HeaderFontIterator, true, []
+					{
+						if (g_Render->HeaderFontIterator == 0) {
+							g_Render->m_HeaderFont = Font::ChaletLondon;
+						}
+						if (g_Render->HeaderFontIterator == 1) {
+							g_Render->m_HeaderFont = Font::HouseScript;
+						}
+						if (g_Render->HeaderFontIterator == 2) {
+							g_Render->m_HeaderFont = Font::Monospace;
+						}
+						if (g_Render->HeaderFontIterator == 3) {
+							g_Render->m_HeaderFont = Font::Wingdings;
+						}
+						if (g_Render->HeaderFontIterator == 4) {
+							g_Render->m_HeaderFont = Font::ChaletComprimeCologne;
+						}
+						if (g_Render->HeaderFontIterator == 5) {
+							g_Render->m_HeaderFont = Font::Pricedown;
+						}
+					});
+			}
 			sub->AddOption<NumberOption<float>>("Size", nullptr, &g_Render->m_HeaderTextSize, 0.1f, 2.f, 0.01f, 2);
 			sub->AddOption<UnclickOption>(("Colors"), nullptr, [] {});
 			sub->AddOption<NumberOption<std::uint8_t>>("R", nullptr, &g_Render->m_HeaderTextColor.r, '\0', static_cast<std::uint8_t>(255));

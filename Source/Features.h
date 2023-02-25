@@ -3,7 +3,15 @@
 #include "FiberHelper.hpp"
 #include <GTAV-Classes/ped/CPed.hpp>
 #include "Math.h"
+#include "ScriptCallback.hpp"
+#include "CustomText.hpp"
+#include "ImGui/imgui.h"
+#include "Enums.h"
+#include "Lists.hpp"
+#include <filesystem>
+
 namespace Arctic {
+	inline std::string handlingBuffer = "";
 	
 	inline bool raycast(NativeVector3& raycastHitCoords) {
 		bool raycastHit;
@@ -281,6 +289,70 @@ namespace Arctic {
 	inline const char* animation_type[3] = { "Gangster", "Cowboy", "Default" };
 	inline const char* animation_data[3] = { "Gang1H", "Hillbilly", "Default" };
 	inline std::size_t  animation_int = 0;
+	inline const char* acrobatic_type[4] = { "Backflip", "Frontflip", "Kickflip", "Bunny Hop" };
+	inline std::size_t acrobatic_int = 0;
+	class Weather {
+	public:
+		const char* data[14] = { "Extra Sunny", "Clouds", "Smog", "Foggy", "Overcast", "Rain", "Clearing", "Neutral", "Snow", "Blizzard", "Snow (Light)", "Christmas", "Halloween", "Clear" };
+		std::size_t init = 0;
+		void override(const char* type) {
+			MISC::SET_WEATHER_TYPE_NOW_PERSIST(type);
+		}
+	};
+	inline Weather weather;
+	class targeting_mode {
+	public:
+		const char* data[4]{ "Free Aim - Assisted",
+		"Assisted Aim - Partial",
+		"Assisted Aim - Full",
+		"Free Aim" };
+		std::size_t init = 0;
+		
+	};
+	inline targeting_mode t_mode;
+	inline bool get_blip_location(NativeVector3& location, int sprite, int color = -1)
+	{
+		Blip blip;
+		for (
+			blip = HUD::GET_FIRST_BLIP_INFO_ID(sprite);
+			HUD::DOES_BLIP_EXIST(blip) && color != -1 && HUD::GET_BLIP_COLOUR(blip) != color;
+			blip = HUD::GET_NEXT_BLIP_INFO_ID(sprite)
+			);
+
+		if (!HUD::DOES_BLIP_EXIST(blip) || (color != -1 && HUD::GET_BLIP_COLOUR(blip) != color)) return false;
+
+		location = HUD::GET_BLIP_COORDS(blip);
+
+		return true;
+	}
+	inline bool get_objective_location(NativeVector3& location)
+	{
+		if (get_blip_location(location, (int)BlipIcons::Circle, (int)BlipColors::YellowMission)) return true;
+		if (get_blip_location(location, (int)BlipIcons::Circle, (int)BlipColors::YellowMission2)) return true;
+		if (get_blip_location(location, (int)BlipIcons::Circle, (int)BlipColors::Mission)) return true;
+		if (get_blip_location(location, (int)BlipIcons::RaceFinish, (int)BlipColors::None)) return true;
+		if (get_blip_location(location, (int)BlipIcons::Circle, (int)BlipColors::Green)) return true;
+		if (get_blip_location(location, (int)BlipIcons::Circle, (int)BlipColors::Blue)) return true;
+		if (get_blip_location(location, (int)BlipIcons::CrateDrop)) return true;
+
+		static const int blips[] = { 1, 57, 128, 129, 130, 143, 144, 145, 146, 271, 286, 287, 288 };
+		for (const auto& blip : blips)
+		{
+			if (get_blip_location(location, blip, 5)) return true;
+		}
+
+		return false;
+	}
+	class Autopilot {
+	public:
+		bool wreckless = true;
+		bool avoid_roads;
+		float speed = 100.f;
+		float stop_range = 50.f;
+		const char* destination[3] = { "Waypoint", "Objective", "Wander" };
+		std::size_t destination_i = 0;
+	};
+	inline Autopilot autopilot;
 	class Give_weapon {
 	public:
 		const char* type[90]
@@ -330,7 +402,83 @@ namespace Arctic {
 		bool bound_ankles = false;
 		bool ignored = false;
 		bool no_recoil = false;
+		bool keep_engine_on = false;
+		bool auto_repair = false;
+		bool match = false;
+		bool bypass_c4_limit = false;
+		bool remove_def = false;
+		bool stick_to_ground = false;
+		bool burned = false;
+		bool infiniter = false;
 		void init() {
+			if (infiniter) {
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				if (VEHICLE::GET_HAS_ROCKET_BOOST(veh))
+				{
+					VEHICLE::SET_SCRIPT_ROCKET_BOOST_RECHARGE_TIME(veh, 0);
+
+					VEHICLE::SET_ROCKET_BOOST_FILL(veh, 100.0f);
+
+				}
+			}
+			if (burned) {
+				ENTITY::SET_ENTITY_RENDER_SCORCHED(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true);
+			}
+			if (stick_to_ground) {
+				Vehicle vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle);
+				VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(vehicle, 0);
+			}
+			if (remove_def) {
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(veh);
+				
+			}
+			if (bypass_c4_limit) {
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->fired_sticky_bombs = 0;
+			}
+			if (match) {
+				Lists::MatchPos = g_Render->ThemeIterator;
+				switch (g_Render->ThemeIterator) {
+				case 0:
+					g_Render->m_ToggleOnColor = { 138, 43, 226, 255 };
+					break;
+				case 1:
+					g_Render->m_ToggleOnColor = { 255, 108, 116, 255 };
+					break;
+				case 2:
+					g_Render->m_ToggleOnColor = { 15, 82, 186, 255 };
+					break;
+				case 3:
+					g_Render->m_ToggleOnColor = { 24, 26, 24, 255 };
+					break;
+				case 4:
+					g_Render->m_ToggleOnColor = { 0, 155, 119, 255 };
+					break;
+				case 5:
+					g_Render->m_ToggleOnColor = { 70, 38, 180, 255 };
+					break;
+				case 6:
+					g_Render->m_ToggleOnColor = { 255, 145, 164, 255 };
+					break;
+				case 7:
+					g_Render->m_ToggleOnColor = { 17, 17, 17, 255 };
+					break;
+				}
+			}
+			if (auto_repair) {
+				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				{
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					VEHICLE::SET_VEHICLE_FIXED(playerVehicle);
+					VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
+					VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, false);
+				}
+			}
+			if (keep_engine_on) {
+				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				VEHICLE::SET_VEHICLE_ENGINE_ON(playerVehicle, true, true, true);
+			}
 			if (no_recoil) {
 				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_explosion_shake_amplitude = 0.0f;
 			}
@@ -394,14 +542,10 @@ namespace Arctic {
 						if (ENTITY::IS_ENTITY_A_PED(target) && PED::IS_PED_IN_ANY_VEHICLE(target, true)) {
 							target = PED::GET_VEHICLE_PED_IS_IN(target, false);
 						}
-						while (!NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(target))
-						{
-							NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(target);
-
-						}
+						
 
 
-
+						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(target);
 
 						NativeVector3 gameplayCam = CAM::GET_GAMEPLAY_CAM_COORD();
 						NativeVector3 gameplayCamRot = CAM::GET_GAMEPLAY_CAM_ROT(0);
@@ -413,16 +557,13 @@ namespace Arctic {
 						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(target, set_position.x, set_position.y, set_position.z, false, false, false);
 
 						if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 24)) {
-							while (!NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(target))
-							{
-								NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(target);
+							
 
-							}
-							if (NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(target)) {
-								ENTITY::APPLY_FORCE_TO_ENTITY(target, 1, camera_direction.x * 10000.0f, camera_direction.y * 10000.0f, camera_direction.z * 10000.0f, 0.0f, 0.0f, 0.0f, 0, false, true, true, false, true);
-								Locked = false;
-								PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_ID(), false);
-							}
+							
+							ENTITY::APPLY_FORCE_TO_ENTITY(target, 1, camera_direction.x * 10000.0f, camera_direction.y * 10000.0f, camera_direction.z * 10000.0f, 0.0f, 0.0f, 0.0f, 0, false, true, true, false, true);
+							Locked = false;
+							PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_ID(), false);
+							
 						}
 					}
 				}
@@ -463,8 +604,8 @@ namespace Arctic {
 				}
 			}
 			if (off_the_radar) {
-				*globals(2689235).at(PLAYER::PLAYER_ID(), 453).at(208).as<bool*>() = off_the_radar;
-				*globals(2703735).at(56).as<int*>() = NETWORK::GET_NETWORK_TIME() + (off_the_radar ? 0xB8D08 : NULL);
+				*ScriptGlobal(2689235).Add(PLAYER::PLAYER_ID(), 453).Add(208).As<bool*>() = off_the_radar;
+				*ScriptGlobal(2703735).Add(56).As<int*>() = NETWORK::GET_NETWORK_TIME() + (off_the_radar ? 0xB8D08 : NULL);
 			}
 			if (seatbelt) {
 				PED::SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(PLAYER::PLAYER_PED_ID(), true);
@@ -500,28 +641,7 @@ namespace Arctic {
 					VEHICLE::SET_VEHICLE_WHEELS_CAN_BREAK(playerVehicle, !true);
 				}
 			}
-			if (!vehicle_godmode) {
-				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
-				{
-					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), true);
-					ENTITY::SET_ENTITY_INVINCIBLE(playerVehicle, false);
-					ENTITY::SET_ENTITY_PROOFS(playerVehicle, false, false, false, false, false, false, false, false);
-					VEHICLE::SET_VEHICLE_DAMAGE(playerVehicle, 0.0f, 0.0f, 0.0f, 0.0f, 200.0f, false);
-					VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
-					VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, 0.0f);
-					VEHICLE::SET_DISABLE_VEHICLE_PETROL_TANK_DAMAGE(playerVehicle, false);
-					VEHICLE::SET_DISABLE_VEHICLE_PETROL_TANK_FIRES(playerVehicle, false);
-					VEHICLE::SET_VEHICLE_BODY_HEALTH(playerVehicle, 1000.0f);
-					VEHICLE::SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(playerVehicle, !false);
-					VEHICLE::SET_VEHICLE_CAN_BREAK(playerVehicle, !false);
-					VEHICLE::SET_VEHICLE_ENGINE_HEALTH(playerVehicle, 1000.0f);
-					VEHICLE::SET_VEHICLE_ENGINE_CAN_DEGRADE(playerVehicle, !false);
-					VEHICLE::SET_VEHICLE_EXPLODES_ON_HIGH_EXPLOSION_DAMAGE(playerVehicle, !false);
-					VEHICLE::SET_VEHICLE_PETROL_TANK_HEALTH(playerVehicle, 1000.0f);
-					VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVehicle, !false);
-					VEHICLE::SET_VEHICLE_WHEELS_CAN_BREAK(playerVehicle, !false);
-				}
-			}
+			
 		}
 	};
 	
@@ -987,6 +1107,265 @@ namespace Arctic {
 	};
 	inline multis multi;
 	inline Multipliers multipliers;
+	
+	inline bool controlsEnabled = true;
+	
+	inline void showKeyboard(const char* title, const char* defaultText, int length, std::string* buffer, std::function<void()> action) {
+		g_CustomText->AddText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"), title);
+		controlsEnabled = false;
+		MISC::DISPLAY_ONSCREEN_KEYBOARD(0, "FMMC_KEY_TIP8", "", defaultText, "", "", "", length);
+		g_CallbackScript->AddCallback<KeyboardCallBack>(title, length, [=] {
+			if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT()) {
+				*buffer = "";
+			}
+			else {
+				*buffer = MISC::GET_ONSCREEN_KEYBOARD_RESULT();
+			}
+
+		std::invoke(std::move(action));
+		controlsEnabled = true;
+			});
+		buffer = buffer;
+		g_CustomText->RemoveText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"));
+	}
+	class Speedo {
+	public:
+		bool enabled = false;
+		const char* type[3] = { "MPH", "KPH", "Game"};
+		std::size_t type_i = 0;
+		float x_offset = 0.00f;
+		float y_offset = 0.00f;
+		float scale = 0.25f;
+		void drawText(const char* text, float x, float y, float size, int font, bool center, bool right) {
+			HUD::SET_TEXT_SCALE(size, size);
+			HUD::SET_TEXT_FONT(font);
+			HUD::SET_TEXT_COLOUR(255, 255, 255, 255);
+			HUD::SET_TEXT_CENTRE(center);
+			if (right) {
+				HUD::SET_TEXT_WRAP(0.0f, x);
+				HUD::SET_TEXT_RIGHT_JUSTIFY(true);
+			}
+			HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
+			HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text);
+			HUD::END_TEXT_COMMAND_DISPLAY_TEXT(x, y, 0);
+		}
+		void init() {
+			if (enabled) {
+				char buffer[32];
+				if (type_i == 0) {
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					float vehicleSpeed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
+					snprintf(buffer, sizeof(buffer), "%.0f MPH", vehicleSpeed * 2.236936);
+					drawText(buffer, 0.01f + x_offset, 0.01f + y_offset, scale, 0, false, false);
+				}
+				if (type_i == 1) {
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					float vehicleSpeed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
+					snprintf(buffer, sizeof(buffer), "%.0f KPH", vehicleSpeed * 3.6);
+					drawText(buffer, 0.01f + x_offset, 0.01f + y_offset, scale, 0, false, false);
+				}
+				if (type_i == 2) {
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					float vehicleSpeed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
+					snprintf(buffer, sizeof(buffer), "%i", (int)vehicleSpeed);
+					drawText(buffer, 0.01f + x_offset, 0.01f + y_offset, scale, 0, false, false);
+				}
+			}
+		}
+	};
+	inline Speedo speedo;
+	class aitstrike {
+	public:
+		bool enabled = false;
+		float scale = false;
+		float height = 100.f;
+		int damage = 250;
+		void init() {
+			if (enabled) {
+				
+				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+				{
+					NativeVector3 hitCoords;
+					if (raycast(hitCoords)) {
+						Hash airStrike = MISC::GET_HASH_KEY("WEAPON_AIRSTRIKE_ROCKET");
+						if (!WEAPON::HAS_WEAPON_ASSET_LOADED(airStrike))
+						{
+							WEAPON::REQUEST_WEAPON_ASSET(airStrike, 31, 0);
+						}
+						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(hitCoords.x, hitCoords.y, height, hitCoords.x, hitCoords.y, 0, damage, 1, airStrike, PLAYER::PLAYER_PED_ID(), 1, 0, -1.0);
+					}
+				}
+			}
+		}
+	};
+	inline aitstrike airstrike;
+	class Triggerbot {
+	public:
+		bool enabled = false;
+		bool exclude_friends = false;
+		bool d1 = true;
+		bool d2 = true;
+		int delay = 0;
+		const char* filter[3] = {"Player", "Ped", "Both"};
+		const char* shoot_coords[2] = { "None", "Mouth"};
+		std::size_t filter_i = 0;
+		std::size_t scoords_i = 0;
+		Entity AimedAtEntity;
+		void shoot() {
+			if (!ENTITY::IS_ENTITY_DEAD(AimedAtEntity, 0) && ENTITY::GET_ENTITY_ALPHA(AimedAtEntity) == 255)
+			{
+				NativeVector3 Mouth = PED::GET_PED_BONE_COORDS(AimedAtEntity, 31086, 0.1f, 0.0f, 0.0f);
+				NativeVector3 hitCoords;
+				if (raycast(hitCoords)) {
+					static int delay2 = 0;
+					if (delay2 == 0 || (int)(GetTickCount64() - delay2) > delay) {
+						if (scoords_i == 0) {
+							PED::SET_PED_SHOOTS_AT_COORD(PLAYER::PLAYER_PED_ID(), hitCoords.x, hitCoords.y, hitCoords.z, true);
+						}
+						if (scoords_i == 1) {
+							PED::SET_PED_SHOOTS_AT_COORD(PLAYER::PLAYER_PED_ID(), Mouth.x, Mouth.y, Mouth.z, true);
+						}
+						delay2 = GetTickCount64();
+					}
+
+				}
+			}
+		}
+		void init() {
+			if (enabled) {
+				
+				if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &AimedAtEntity))
+				{
+					if (PED::IS_PED_RELOADING(PLAYER::PLAYER_PED_ID())) {
+						if (d2) {
+							return;
+						}
+					}
+					if (PED::IS_PED_RAGDOLL(PLAYER::PLAYER_PED_ID())) {
+						if (d1) {
+							return;
+						}
+					}
+					if (filter_i == 0) {
+						if (PED::IS_PED_A_PLAYER(AimedAtEntity)) {
+							int netHandle[13];
+							NETWORK::NETWORK_HANDLE_FROM_PLAYER(AimedAtEntity, netHandle, 13);
+							if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
+
+							}
+							else {
+								shoot();
+							}
+							
+						}
+						
+					}
+					else if (filter_i == 1) {
+						if (ENTITY::IS_ENTITY_A_PED(AimedAtEntity)) {
+							shoot();
+						}
+						
+					}
+					else if (filter_i == 2) {
+						shoot();
+					}
+					
+				}
+			}
+		}
+	};
+	inline Triggerbot triggerbot;
+	
+	class Text_spam {
+	public:
+		bool enabled = false;
+		std::string text;
+		int delay = 50;
+		const char* inputted = "Click here to set the text.";
+		void init() {
+			if (enabled) {
+				static int delay2 = 0;
+				if (delay2 == 0 || (int)(GetTickCount64() - delay2) > delay) {
+					int m_handle[13];
+					NETWORK::NETWORK_HANDLE_FROM_PLAYER(g_SelectedPlayer, &m_handle[0], 13);
+					if (NETWORK::NETWORK_IS_HANDLE_VALID(&m_handle[0], 13))
+						NETWORK::NETWORK_SEND_TEXT_MESSAGE(text.c_str(), &m_handle[0]);
+					delay2 = GetTickCount64();
+				}
+				
+			}
+		}
+	};
+	inline Text_spam text_spam;
+	inline int i_hate_niggers = 0;
+	class Max_loop {
+	public:
+		bool enabled = false;
+		bool randomizeprimary = false;
+		bool randomizesecondary = false;
+		int delay = 550;
+		int upgradedelay = 0;
+		void init() {
+			if (enabled) {
+				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				{
+					
+					if (upgradedelay == 0 || (int)(GetTickCount64() - upgradedelay) > delay)
+					{
+						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
+						for (int i = 0; i < 50; i++)
+						{
+							VEHICLE::SET_VEHICLE_MOD(playerVehicle, i, MISC::GET_RANDOM_INT_IN_RANGE(0, VEHICLE::GET_NUM_VEHICLE_MODS(playerVehicle, i) - 1), false);
+
+						}
+						VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 2));
+						if (randomizeprimary) {
+							VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+						}
+						if (randomizesecondary) {
+							VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+						}
+						VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+						upgradedelay = GetTickCount64();
+					}
+
+				}
+			}
+		}
+	};
+	inline Max_loop max_loop;
+	inline int facetexture = 0;
+	inline int facetexture1 = 0;
+	inline int facetexture2 = 0;
+	inline int facetexture3 = 0;
+	inline int facetexture4 = 0;
+	inline int facetexture5 = 0;
+	inline int facetexture6 = 0;
+	inline int facetexture7 = 0;
+	inline int facetexture8 = 0;
+	inline int facetexture9 = 0;
+	inline int facetexture10 = 0;
+	inline int facetexture11 = 0;
+	inline int facetexture12 = 0;
+	inline int testa = 0;
+	inline int testb = 0;
+	inline int testc = 0;
+	inline int testd = 0;
+	inline int testdtexture = 0;
+	inline int torso2texture = 0;
+	inline int teste = 0;
+	inline int testf = 0;
+	inline int testg = 0;
+	inline int testh = 0;
+	inline int testi = 0;
+	inline int testj = 0;
+	inline int testk = 0;
+	inline int testl = 0;
+	inline int testm = 0;
+	inline int testn = 0;
+	inline int testo = 0;
+	
 	inline void FeatureInitalize() {
 		invisible.init();
 		no_clip.init();
@@ -1001,6 +1380,11 @@ namespace Arctic {
 		Fake_drops.init();
 		antiCheat.init();
 		multipliers.init();
+		speedo.init();
+		airstrike.init();
+		triggerbot.init();
+		text_spam.init();
+		max_loop.init();
 		if (NoPlaneTurbulance) {
 			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 
