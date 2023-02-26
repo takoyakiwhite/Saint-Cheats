@@ -25,7 +25,45 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 			g_FiberPool.registerFbrPool();
 			g_TranslationManager = std::make_unique<TranslationManager>();
-			g_TranslationManager->LoadTranslations("English");
+			switch (LOCALIZATION::GET_CURRENT_LANGUAGE()) {
+			case 0:
+				g_TranslationManager->LoadTranslations("English");
+				break;
+			case 1:
+				g_TranslationManager->LoadTranslations("French");
+				break;
+			case 2:
+				g_TranslationManager->LoadTranslations("German");
+				break;
+			case 3:
+				g_TranslationManager->LoadTranslations("Italian");
+				break;
+			case 4:
+				g_TranslationManager->LoadTranslations("Spanish");
+				break;
+			case 5:
+				g_TranslationManager->LoadTranslations("Brazilian");
+				break;
+			case 6:
+				g_TranslationManager->LoadTranslations("Polish");
+				break;
+			case 7:
+				g_TranslationManager->LoadTranslations("Russian");
+				break;
+			case 8:
+				g_TranslationManager->LoadTranslations("Korean");
+				break;
+			case 9:
+				g_TranslationManager->LoadTranslations("Chinese");
+				break;
+			case 10:
+				g_TranslationManager->LoadTranslations("Japanese");
+				break;
+			case 12:
+				g_TranslationManager->LoadTranslations("Chinse_Simplified");
+				break;
+			}
+			
 
 			g_GameFunctions = std::make_unique<GameFunctions>();
 			g_GameVariables = std::make_unique<GameVariables>();

@@ -219,6 +219,15 @@ namespace Arctic
 						
 					}
 					});
+				sub->AddOption<BoolOption<bool>>(("Drugs"), nullptr, &features.drugs, BoolDisplay::OnOff, false, [] {
+					if (!features.drugs)
+					{
+						GRAPHICS::ENABLE_ALIEN_BLOOD_VFX(false);
+						GRAPHICS::ANIMPOSTFX_STOP("DrugsMichaelAliensFight");
+						
+
+					}
+					});
 				sub->AddOption<NumberOption<std::int32_t>>("Wanted Level", nullptr, &i_hate_niggers, 0, 5, 1, 3, true, "", "", [] {
 					(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_wanted_level = i_hate_niggers;
 					});

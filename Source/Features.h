@@ -410,7 +410,14 @@ namespace Arctic {
 		bool stick_to_ground = false;
 		bool burned = false;
 		bool infiniter = false;
+		bool drugs = false;
 		void init() {
+			if (drugs) {
+				GRAPHICS::ENABLE_ALIEN_BLOOD_VFX(true);
+				GRAPHICS::ANIMPOSTFX_PLAY("DrugsMichaelAliensFight", 9999999, false);
+				//stop
+				//GRAPHICS::ANIMPOSTFX_STOP("DrugsMichaelAliensFight");
+			}
 			if (infiniter) {
 				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 				if (VEHICLE::GET_HAS_ROCKET_BOOST(veh))
