@@ -6,9 +6,24 @@
 #include <GTAV-Classes/script/scrNativeRegistration.hpp>
 #include <GTAV-Classes/script/scrNativeRegistrationTable.hpp>
 #include <GTAV-Classes/ped/CPedFactory.hpp>
+#include <GTAV-Classes/network/CMsgTextMessage.hpp>
 namespace Arctic
 {
 	
+	class netConnectionManager;
+	class netConnectionPeer
+	{
+	public:
+			uint32_t m_internal_ip; //0x0000
+			uint16_t m_internal_port; //0x0004
+			uint32_t m_external_ip; //0x0008
+			uint16_t m_external_port; //0x000C
+			uint64_t m_peer_id; //0x0010
+			uint32_t unk_0018; //0x0018
+			uint16_t unk_001C; //0x001C
+			uint8_t m_platform; //0x001E
+	};
+	static_assert(sizeof(netConnectionPeer) == 0x20);
 	
 	class GameVariables
 	{
@@ -59,7 +74,9 @@ namespace Arctic
 
 		CPedFactory** m_pedFactory;
 
-		intptr_t** m_globalPtr;
+		
+		PVOID m_owned_explosion;
+
 
 		bool* should_sync_money_rewards;
 	};
@@ -67,28 +84,5 @@ namespace Arctic
 	inline std::unique_ptr<GameVariables> g_GameVariables;
 	inline std::unique_ptr<GameFunctions> g_GameFunctions;
 
-	class globals {
-	private:
-		uint64_t m_index;
-		static void* getScriptGlobal(uint64_t index) { return g_GameFunctions->m_globalPtr[index >> 18 & 0x3F] + (index & 0x3FFFF); }
-		static void* getLocalGlobal(PVOID stack, uint64_t index) { return reinterpret_cast<uintptr_t*>(uintptr_t(stack) + (index * sizeof(uintptr_t))); }
-	public:
-		globals(uint64_t index) {
-			m_index = index;
-		}
-		globals at(uint64_t index) {
-			return globals(m_index + index);
-		}
-		globals at(uint64_t index, uint64_t size) {
-			return at(1 + (index * size));
-		}
-		//Script Globals
-		template <typename T> std::enable_if_t<std::is_pointer<T>::value, T> as() {
-			return (T)getScriptGlobal(m_index);
-		}
-		//Local Globals
-		template <typename T> std::enable_if_t<std::is_pointer<T>::value, T> asLocal(PVOID stack) {
-			return (T)getLocalGlobal(stack, m_index);
-		}
-	};
+	
 }

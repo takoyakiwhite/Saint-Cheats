@@ -181,7 +181,7 @@ namespace Arctic::UserInterface
 			"Salmon Pink",
 			"Stash Skid Menu"
 		};
-		std::size_t ThemeIterator = 3;
+		std::size_t ThemeIterator = 1;
 
 		const char* HeaderFont[6]
 		{

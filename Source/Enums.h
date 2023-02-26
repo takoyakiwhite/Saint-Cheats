@@ -1,4 +1,7 @@
 #pragma once
+enum class option_data {
+	delay = 50
+};
 enum class BlipColors
 {
 	None,

@@ -604,8 +604,10 @@ namespace Arctic {
 				}
 			}
 			if (off_the_radar) {
-				*ScriptGlobal(2689235).Add(PLAYER::PLAYER_ID(), 453).Add(208).As<bool*>() = off_the_radar;
-				*ScriptGlobal(2703735).Add(56).As<int*>() = NETWORK::GET_NETWORK_TIME() + (off_the_radar ? 0xB8D08 : NULL);
+				*ScriptGlobal(2657589).Add(PLAYER::GET_PLAYER_INDEX(), 466).Add(210).As<int*>() = true;
+				*ScriptGlobal(2657589).Add(56).As<int*>() = NETWORK::GET_NETWORK_TIME() + 1;
+
+				
 			}
 			if (seatbelt) {
 				PED::SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(PLAYER::PLAYER_PED_ID(), true);
@@ -1279,9 +1281,10 @@ namespace Arctic {
 	class Text_spam {
 	public:
 		bool enabled = false;
-		std::string text;
+		std::string text = "Click here to set the text.";
 		int delay = 50;
-		const char* inputted = "Click here to set the text.";
+		std::size_t data = 0;
+		char bufferf[64];
 		void init() {
 			if (enabled) {
 				static int delay2 = 0;
@@ -1365,7 +1368,226 @@ namespace Arctic {
 	inline int testm = 0;
 	inline int testn = 0;
 	inline int testo = 0;
-	
+	class Owned_explosion {
+	public:
+		bool blame_enabled = false;
+		bool blame = true;
+		int blamed_person = 0;
+		bool looped = false;
+		bool sound = true;
+		bool invisible = false;
+		float cameraShake = 0.0f;
+		float damage_scale = 100.0f;
+		const char* data[81] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare",
+			"Unkown", "Extinguisher", "Unkown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
+			"Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
+			"Bomb (Wide)", "Explosive Ammo (Shotgun)", "Oppressor MK II", "Kinetic Mortar", "Kinetic Vehicle Mine", "EMP Vehicle Mine", "Spike Vehicle Mine", "Slick Vehicle Mine", "Tar Vehicle Mine", "Script Drone", "Up-n-Atomizer", "Burried Mine", "Script Missle", "RC Tank Rocket",
+			"Bomb (Water)", "Bomb (Water 2)", "Flash Grenade", "Stun Grenade", "Script Missle (Large)", "Submarine (Big)", "EMP Launcher" };
+		std::size_t data_i = 0;
+		void add(Ped ped, NativeVector3 vec, int explosionType, float damageScale, BOOL isAudible, BOOL isInvisible, float cameraShake) {
+			*(unsigned short*)g_GameFunctions->m_owned_explosion = 0xE990;
+			FIRE::ADD_OWNED_EXPLOSION(ped, vec.x, vec.y, vec.z, explosionType, damageScale, isAudible, isInvisible, cameraShake);
+			*(unsigned short*)g_GameFunctions->m_owned_explosion = 0x850F;
+		}
+		void init() {
+			if (looped) {
+				if (blame) {
+					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+					add(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(blamed_person), c, data_i, damage_scale, sound, invisible, cameraShake);
+				}
+				else {
+					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+					FIRE::ADD_EXPLOSION(c.x, c.y, c.z, data_i, damage_scale, sound, invisible, cameraShake, false);
+				}
+			}
+		}
+	};
+	inline Owned_explosion owned_explosion;
+	class P_filter {
+	public:
+		const char* data[4] = { "None", "Vehicle", "Interior", "On Foot"};
+		std::size_t data_i = 0;
+	};
+	inline P_filter p_filter;
+	class Attackers {
+	public:
+		const char* mode[3] = { "None", "Police", "Jet" };
+		std::size_t mode_i = 1;
+		bool godmode = false;
+		const char* data[89]
+		{ "Antique Cavalry Dagger", "Baseball Bat", "Broken Bottle", "Crowbar", "Unarmed", "Flashlight", "Golf Club", "Hammer", "Hatchet", "Brass Knucles", "Knife", "Machete", "Switchblade", "Nightstick", "Pipe Wrench",
+			"Battle Axe", "Pool Cue", "Stone Hatchet", "Pistol", "Pistol Mk II", "Combat Pistol", "AP Pistol", "Stun Gun", "Pistol .50", "SNS Pistol", "SNS Pistol Mk II", "Heavy Pistol", "Vintage Pistol", "Flare Gun", "Marksman Pistol",
+			"Heavy Revolver", "Heavy Revolver Mk II", "Double Action Revolver", "Up-n-Atomizer", "Ceramic Pistol", "Navy Revolver", "Perico Pistol", "Stun Gun",
+			"Micro SMG", "SMG", "SMG Mk II", "Assault SMG", "Combat PDW", "Machine Pistol", "Mini SMG", "Unholy Hellbringer",
+			"Pump Shotgun", "Pump Shotgun Mk II", "Sawed-Off Shotgun", "Assault Shotgun", "Bullpup Shotgun", "Musket", "Heavy Shotgun", "Double Barrel Shotgun", "Sweeper Shotgun", "Combat Shotgun",
+			"Assault Rifle", "Assault Rifle Mk II", "Carbine Rifle", "Carbine Rifle Mk II", "Advanced Rifle", "Special Carbine", "Special Carbine Mk II", "Bullpup Rifle", "Bullpup Rifle Mk II", "Compact Rifle", "Military Rifle", "Heavy Rifle", "Service Carbine",
+			"MG", "Combat MG", "Combat MG Mk II", "Gusenberg Sweeper",
+			"Sniper Rifle", "Heavy Sniper", "Heavy Sniper Mk II", "Marksman Rifle", "Marksman Rifle Mk II", "Precision Rifle",
+			"RPG", "Grenade Launcher", "Grenade Launcher Smoke", "Minigun", "Firework Launcher", "Railgun", "Homing Launcher", "Compact Grenade Launcher","Widowmaker","Compact EMP Launcher" };
+		std::uint32_t data2[89]
+		{ 0x92A27487, 0x958A4A8F, 0xF9E6AA4B, 0x84BD7BFD, 0xA2719263, 0x8BB05FD7, 0x440E4788, 0x4E875F73, 0xF9DCBF2D, 0xD8DF3C3C, 0x99B507EA, 0xDD5DF8D9, 0xDFE37640, 0x678B81B1, 0x19044EE0, 0xCD274149, 0x94117305, 0x3813FC08,
+		0x1B06D571, 0xBFE256D4, 0x5EF9FEC4, 0x22D8FE39, 0x3656C8C1, 0x99AEEB3B, 0xBFD21232, 0x88374054, 0xD205520E, 0x83839C4, 0x47757124, 0xDC4DB296, 0xC1B3C3D1, 0xCB96392F, 0x97EA20B8, 0xAF3696A1, 0x2B5EF5EC, 0x917F6C8C, 0x57A4368C,
+		0x45CD9CF3, 0x13532244, 0x2BE6766B, 0x78A97CD0, 0xEFE7E2DF, 0x0A3D4D34, 0xDB1AA450, 0xBD248B55, 0x476BF155, 0x1D073A89, 0x555AF99A, 0x7846A318, 0xE284C527, 0x9D61E50F, 0xA89CB99E, 0x3AABBBAA, 0xEF951FBB, 0x12E82D3D, 0x5A96BA4,
+		0xBFEFFF6D, 0x394F415C, 0x83BF0278, 0xFAD1F1C9, 0xAF113F99, 0xC0A3098D, 0x969C3D67, 0x7F229F94, 0x84D6FAFD, 0x624FE830, 0x9D1F17E6, 0xC78D71B4, 0xD1D5F52B, 0x9D07F764, 0x7FD62962, 0xDBBD7280, 0x61012683, 0x05FC3C11, 0x0C472FE2,
+		0xA914799, 0xC734385A, 0x6A6C02E0, 0x6E7DDDEC, 0xB1CA77B1, 0xA284510B, 0x4DD2DC56, 0x42BF8A85, 0x7F7497E5, 0x6D544C99, 0x63AB0442, 0x0781FE4A, 0xB62D1F67, 0xDB26713A };
+		std::size_t data_i = 0;
+		const char* cop_models[2]
+		{ "Normal", "FIB" };
+		const char* cop_hashes[2]
+		{ "s_m_y_cop_01", "mp_m_fibsec_01" };
+		std::size_t cop_int = 0;
+		const char* veh[1]
+		{ "Lazar"};
+		const char* veh_hash[1]
+		{ "lazer"};
+		std::size_t veh_int = 0;
+		Vehicle angryPlanesPlane;
+		Ped angryPlanesPed;
+		Object asteroidObject;
+		int how_many_planes = 1;
+		void add() {
+			if (mode_i == 1) {
+				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+				STREAMING::REQUEST_MODEL(MISC::GET_HASH_KEY(cop_hashes[cop_int]));
+				if (!STREAMING::HAS_MODEL_LOADED(MISC::GET_HASH_KEY(cop_hashes[cop_int]))) {
+					fbr::cur()->wait();
+				}
+				else {
+					Ped ped;
+					ped = PED::CREATE_PED(26, MISC::GET_HASH_KEY(cop_hashes[cop_int]), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
+					WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, data2[data_i], 9998, true);
+					TASK::TASK_COMBAT_PED(ped, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
+					if (godmode)
+					{
+						ENTITY::SET_ENTITY_INVINCIBLE(ped, godmode);
+					}
+					STREAMING::REQUEST_MODEL(MISC::GET_HASH_KEY("police3"));
+					if (!STREAMING::HAS_MODEL_LOADED(MISC::GET_HASH_KEY("police3"))) {
+						fbr::cur()->wait();
+						
+					}
+					else {
+						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+						Vehicle vehicle = VEHICLE::CREATE_VEHICLE(MISC::GET_HASH_KEY("police3"), c.x + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.y + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, false, false);
+						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+						DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+						auto networkId = NETWORK::VEH_TO_NET(vehicle);
+						if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
+							NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+						VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+						TASK::TASK_COMBAT_PED(ped, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
+						PED::SET_PED_INTO_VEHICLE(ped, vehicle, -1);
+
+					}
+					
+				}
+			}
+			if (mode_i == 2) {
+				Entity playerEntity = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
+				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(playerEntity, true);
+				const char* modelName = "TITAN";
+				float spawnX = MISC::GET_RANDOM_FLOAT_IN_RANGE(playerCoords.x - 10.0f, playerCoords.x + 10.0f);
+				float spawnY = MISC::GET_RANDOM_FLOAT_IN_RANGE(playerCoords.y - 10.0f, playerCoords.y + 10.0f);
+				float spawnZ = MISC::GET_RANDOM_FLOAT_IN_RANGE(300.0f, 500.0f);
+				float spawnHeading = 360.0f;
+				modelName = veh_hash[veh_int];
+
+
+				Hash modelHash = MISC::GET_HASH_KEY(modelName);
+				Hash pedModelHash = MISC::GET_HASH_KEY("A_F_Y_Golfer_01");
+				for (std::uint32_t i = 0; i < how_many_planes; ++i) {
+					STREAMING::REQUEST_MODEL(modelHash);
+					if (!STREAMING::HAS_MODEL_LOADED(modelHash)) {
+						fbr::cur()->wait();
+
+					}
+					else {
+						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+						angryPlanesPlane = VEHICLE::CREATE_VEHICLE(modelHash, spawnX + MISC::GET_RANDOM_INT_IN_RANGE(50, 550), spawnY + MISC::GET_RANDOM_INT_IN_RANGE(50, 550), spawnZ, spawnHeading, true, false, false);
+						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+						DECORATOR::DECOR_SET_INT(angryPlanesPlane, "MPBitset", 0);
+						auto networkId = NETWORK::VEH_TO_NET(angryPlanesPlane);
+						if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(angryPlanesPlane))
+							NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+						VEHICLE::SET_VEHICLE_IS_STOLEN(angryPlanesPlane, FALSE);
+						VEHICLE::SET_VEHICLE_ENGINE_ON(angryPlanesPlane, true, true, true);
+						VEHICLE::SET_VEHICLE_FORWARD_SPEED(angryPlanesPlane, MISC::GET_RANDOM_INT_IN_RANGE(50, 350));
+						ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPlane, 1);
+						ENTITY::SET_ENTITY_PROOFS(angryPlanesPlane, true, true, true, true, true, true, true, true);
+						VEHICLE::SET_VEHICLE_DAMAGE(angryPlanesPlane, 0.f, 0.f, 0.f, 0.f, 200.f, false);
+					}
+					STREAMING::REQUEST_MODEL(pedModelHash);
+					if (!STREAMING::HAS_MODEL_LOADED(pedModelHash)) {
+						fbr::cur()->wait();
+
+					}
+					else {
+						angryPlanesPed = PED::CREATE_PED(26, pedModelHash, spawnX, spawnY, spawnZ + 100.0f, spawnHeading, true, true);
+						PED::SET_PED_INTO_VEHICLE(angryPlanesPed, angryPlanesPlane, -1);
+						PED::SET_DRIVER_ABILITY(angryPlanesPed, 0.99f);
+						ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPed, 1);
+						TASK::TASK_COMBAT_PED(angryPlanesPed, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
+					}
+				}
+			}
+		}
+	};
+	inline Attackers attackers;
+	class All_players {
+	public:
+		Vehicle angryPlanesPlane;
+		Ped angryPlanesPed;
+		void add_jet() {
+			
+			for (std::uint32_t i = 0; i < PLAYER::GET_NUMBER_OF_PLAYERS(); ++i) {
+				Entity playerEntity = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i);
+				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(playerEntity, true);
+				const char* modelName = "TITAN";
+				float spawnX = MISC::GET_RANDOM_FLOAT_IN_RANGE(playerCoords.x - 10.0f, playerCoords.x + 10.0f);
+				float spawnY = MISC::GET_RANDOM_FLOAT_IN_RANGE(playerCoords.y - 10.0f, playerCoords.y + 10.0f);
+				float spawnZ = MISC::GET_RANDOM_FLOAT_IN_RANGE(300.0f, 500.0f);
+				float spawnHeading = 360.0f;
+				modelName = "lazer";
+
+
+				Hash modelHash = MISC::GET_HASH_KEY(modelName);
+				Hash pedModelHash = MISC::GET_HASH_KEY("A_F_Y_Golfer_01");
+				STREAMING::REQUEST_MODEL(modelHash);
+				if (!STREAMING::HAS_MODEL_LOADED(modelHash)) {
+					fbr::cur()->wait();
+
+				}
+				else {
+					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+					angryPlanesPlane = VEHICLE::CREATE_VEHICLE(modelHash, spawnX + MISC::GET_RANDOM_INT_IN_RANGE(50, 550), spawnY + MISC::GET_RANDOM_INT_IN_RANGE(50, 550), spawnZ, spawnHeading, true, false, false);
+					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+					DECORATOR::DECOR_SET_INT(angryPlanesPlane, "MPBitset", 0);
+					auto networkId = NETWORK::VEH_TO_NET(angryPlanesPlane);
+					if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(angryPlanesPlane))
+						NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+					VEHICLE::SET_VEHICLE_IS_STOLEN(angryPlanesPlane, FALSE);
+					VEHICLE::SET_VEHICLE_ENGINE_ON(angryPlanesPlane, true, true, true);
+					VEHICLE::SET_VEHICLE_FORWARD_SPEED(angryPlanesPlane, MISC::GET_RANDOM_INT_IN_RANGE(50, 350));
+					ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPlane, 1);
+					ENTITY::SET_ENTITY_PROOFS(angryPlanesPlane, true, true, true, true, true, true, true, true);
+					VEHICLE::SET_VEHICLE_DAMAGE(angryPlanesPlane, 0.f, 0.f, 0.f, 0.f, 200.f, false);
+				}
+				STREAMING::REQUEST_MODEL(pedModelHash);
+				if (!STREAMING::HAS_MODEL_LOADED(pedModelHash)) {
+					fbr::cur()->wait();
+
+				}
+				else {
+					angryPlanesPed = PED::CREATE_PED(26, pedModelHash, spawnX, spawnY, spawnZ + 100.0f, spawnHeading, true, true);
+					PED::SET_PED_INTO_VEHICLE(angryPlanesPed, angryPlanesPlane, -1);
+					PED::SET_DRIVER_ABILITY(angryPlanesPed, 0.99f);
+					ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPed, 1);
+					TASK::TASK_COMBAT_PED(angryPlanesPed, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), 0, 16);
+				}
+			}
+		}
+	};
+	inline All_players all_players;
 	inline void FeatureInitalize() {
 		invisible.init();
 		no_clip.init();
@@ -1385,6 +1607,7 @@ namespace Arctic {
 		triggerbot.init();
 		text_spam.init();
 		max_loop.init();
+		owned_explosion.init();
 		if (NoPlaneTurbulance) {
 			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 
