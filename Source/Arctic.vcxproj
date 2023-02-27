@@ -12,13 +12,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="All Players.h" />
+    <ClInclude Include="Classes.h" />
     <ClInclude Include="Common.hpp" />
     <ClInclude Include="CrossMap.hpp" />
     <ClInclude Include="CustomText.hpp" />
     <ClInclude Include="D3DRenderer.hpp" />
     <ClInclude Include="Enums.h" />
+    <ClInclude Include="Explode.h" />
     <ClInclude Include="Features.h" />
     <ClInclude Include="FiberHelper.hpp" />
+    <ClInclude Include="Jets.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="Signatures.hpp" />
@@ -73,6 +77,7 @@
     <ClCompile Include="CrossMap.cpp" />
     <ClCompile Include="CustomText.cpp" />
     <ClCompile Include="D3DRenderer.cpp" />
+    <ClCompile Include="ScriptGlobal.cpp" />
     <ClCompile Include="Signatures.cpp" />
     <ClCompile Include="Hooking.cpp" />
     <ClCompile Include="ImGui\imgui.cpp">

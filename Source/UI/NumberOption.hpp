@@ -6,11 +6,11 @@
 namespace Arctic::UserInterface
 {
 	template <typename NumberType>
-	class NumberOption : public BaseOption<NumberOption<NumberType>>
+	class number : public BaseOption<number<NumberType>>
 	{
 	public:
-		explicit NumberOption() = default;
-		explicit NumberOption(const char* text, const char* description, NumberType* number, NumberType min, NumberType max, NumberType step = 1, std::size_t precision = 3, bool actionOnHorizontal = true, const char* prefix = "", const char* suffix = "", std::function<void()> action = [] {}):
+		explicit number() = default;
+		explicit number(const char* text, const char* description, NumberType* number, NumberType min, NumberType max, NumberType step = 1, std::size_t precision = 3, bool actionOnHorizontal = true, const char* prefix = "", const char* suffix = "", std::function<void()> action = [] {}):
 			m_ActionOnHorizontal(actionOnHorizontal),
 			m_Number(number),
 			m_Min(min),
@@ -26,11 +26,11 @@ namespace Arctic::UserInterface
 			std::strncpy(&m_Suffix[0], suffix, sizeof(m_Suffix) - 1);
 		}
 
-		~NumberOption() noexcept = default;
-		NumberOption(NumberOption const&) = default;
-		NumberOption& operator=(NumberOption const&) = default;
-		NumberOption(NumberOption&&) = default;
-		NumberOption& operator=(NumberOption&&) = default;
+		~number() noexcept = default;
+		number(number const&) = default;
+		number& operator=(number const&) = default;
+		number(number&&) = default;
+		number& operator=(number&&) = default;
 
 		const char* GetRightText() override
 		{
@@ -94,7 +94,7 @@ namespace Arctic::UserInterface
 		std::size_t m_Precision{};
 
 
-		using Base = BaseOption<NumberOption<NumberType>>;
+		using Base = BaseOption<number<NumberType>>;
 		using DisplayType = std::conditional_t<sizeof(NumberType) == 1, std::uint32_t, NumberType>;
 	};
 }

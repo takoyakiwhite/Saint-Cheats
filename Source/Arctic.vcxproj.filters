@@ -157,6 +157,18 @@
     <ClInclude Include="Render.h">
       <Filter>Core\Notifications</Filter>
     </ClInclude>
+    <ClInclude Include="Classes.h">
+      <Filter>Utility\MoreRage</Filter>
+    </ClInclude>
+    <ClInclude Include="All Players.h">
+      <Filter>Core\Features\Network\All Players</Filter>
+    </ClInclude>
+    <ClInclude Include="Jets.h">
+      <Filter>Core\Features\Network\All Players\Features</Filter>
+    </ClInclude>
+    <ClInclude Include="Explode.h">
+      <Filter>Core\Features\Network\All Players\Features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">
@@ -225,6 +237,9 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Script.cpp">
       <Filter>Core\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptGlobal.cpp">
+      <Filter>Memory\Script\Global</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -302,6 +317,18 @@
     </Filter>
     <Filter Include="Core\Notifications">
       <UniqueIdentifier>{fb768503-ebde-40f7-9ec1-0eaf35d1112c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\MoreRage">
+      <UniqueIdentifier>{afd9e889-4c5c-412f-bbc9-59dc96aa47e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Features\Network">
+      <UniqueIdentifier>{44562f6f-be0d-4848-82df-1433f6a27972}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Features\Network\All Players">
+      <UniqueIdentifier>{ee35b6b8-05ed-41ab-b559-d000a812e138}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Features\Network\All Players\Features">
+      <UniqueIdentifier>{8c35a404-ebab-4ef5-9db3-d27fa7067f39}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

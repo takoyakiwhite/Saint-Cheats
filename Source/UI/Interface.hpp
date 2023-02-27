@@ -79,7 +79,7 @@ namespace Arctic::UserInterface
 		UIManager& operator=(UIManager&&) = delete;
 	
 		template <typename SubmenuType, typename ...TArgs>
-		void AddSubmenu(TArgs&&... args)
+		void draw_submenu(TArgs&&... args)
 		{
 			auto sub = std::make_unique<SubmenuType>(std::forward<TArgs>(args)...);
 			if (m_SubmenuStack.empty())

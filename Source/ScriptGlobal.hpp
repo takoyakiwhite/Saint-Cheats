@@ -3,46 +3,27 @@
 
 namespace Arctic
 {
-	class ScriptGlobal
+	class global
 	{
 	public:
-		constexpr explicit ScriptGlobal(std::size_t index):
-			m_Index(index)
-		{}
+		explicit global(std::size_t index);
 
-		constexpr ScriptGlobal Add(std::size_t index)
-		{
-			return ScriptGlobal(m_Index + index);
-		}
+		global at(std::ptrdiff_t index);
+		global at(std::ptrdiff_t index, std::size_t size);
 
-		constexpr ScriptGlobal Add(std::size_t index, std::size_t x)
+		template <typename T>
+		std::enable_if_t<std::is_pointer_v<T>, T> as()
 		{
-			return Add(1 + (index * x));
+			return static_cast<T>(get());
 		}
 
 		template <typename T>
-		std::enable_if_t<std::is_pointer<T>::value, T> As() const
+		std::enable_if_t<std::is_lvalue_reference_v<T>, T> as()
 		{
-			return reinterpret_cast<T>(IndexToPtr(m_Index));
-		}
-
-		template <typename T>
-		std::enable_if_t<std::is_lvalue_reference<T>::value, T> As() const
-		{
-			return *reinterpret_cast<std::add_pointer_t<std::remove_reference_t<T>>>(IndexToPtr(m_Index));
-		}
-
-		template <typename T>
-		std::enable_if_t<std::is_same<T, std::uintptr_t>::value, T> As() const
-		{
-			return reinterpret_cast<std::uintptr_t>(As<void*>());
+			return *static_cast<std::add_pointer_t<std::remove_reference_t<T>>>(get());
 		}
 	private:
-		static void* IndexToPtr(std::size_t index)
-		{
-			return (g_GameVariables->m_GlobalBase[index >> 0x12 & 0x3F]) + (index & 0x3FFFF);
-		}
-
-		std::uintptr_t m_Index;
+		void* get();
+		std::size_t m_index;
 	};
 }

@@ -7,6 +7,7 @@
 #include <GTAV-Classes/script/scrNativeRegistrationTable.hpp>
 #include <GTAV-Classes/ped/CPedFactory.hpp>
 #include <GTAV-Classes/network/CMsgTextMessage.hpp>
+#include "Classes.h"
 namespace Arctic
 {
 	
@@ -48,6 +49,7 @@ namespace Arctic
 		std::uint64_t** m_GlobalBase;
 		PVOID m_ModelSpawnBypass;
 		char* m_GameBuild;
+		uint32_t* m_region_code;
 	};
 
 	class GameFunctions
@@ -76,7 +78,7 @@ namespace Arctic
 
 		
 		PVOID m_owned_explosion;
-
+		rage::hash_list* m_vehicle_hash_pool;
 
 		bool* should_sync_money_rewards;
 	};

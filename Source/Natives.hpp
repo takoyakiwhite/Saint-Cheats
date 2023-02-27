@@ -811,6 +811,7 @@ namespace ENTITY
 	static Hash GET_ENTITY_MODEL(Entity entity) { return Invoke<Hash>(0x9F47B058362C84B5, entity); } // 0x9F47B058362C84B5 0xDAFCB3EC b323
 	static Vector3 GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(Entity entity, float posX, float posY, float posZ) { return Invoke<Vector3>(0x2274BC1C4885E333, entity, posX, posY, posZ); } // 0x2274BC1C4885E333 0x6477EC9E b323
 	static Vector3 GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(Entity entity, float offsetX, float offsetY, float offsetZ) { return Invoke<Vector3>(0x1899F328B0E12848, entity, offsetX, offsetY, offsetZ); } // 0x1899F328B0E12848 0xABCF043A b323
+	static Vector3 GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(Entity entity, Vector3 offset_) { return Invoke<Vector3>(0x1899F328B0E12848, entity, offset_.x, offset_.y, offset_.z); } // 0x1899F328B0E12848 0xABCF043A b323
 	static float GET_ENTITY_PITCH(Entity entity) { return Invoke<float>(0xD45DC2893621E1FE, entity); } // 0xD45DC2893621E1FE 0xFCE6ECE5 b323
 	static void GET_ENTITY_QUATERNION(Entity entity, float* x, float* y, float* z, float* w) { Invoke<int>(0x7B3703D2D32DFA18, entity, x, y, z, w); } // 0x7B3703D2D32DFA18 0x5154EC90 b323
 	static float GET_ENTITY_ROLL(Entity entity) { return Invoke<float>(0x831E0242595560DF, entity); } // 0x831E0242595560DF 0x36610842 b323

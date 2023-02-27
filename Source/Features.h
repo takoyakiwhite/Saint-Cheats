@@ -481,6 +481,7 @@ namespace Arctic {
 					VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
 					VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, false);
 				}
+				
 			}
 			if (keep_engine_on) {
 				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
@@ -611,8 +612,8 @@ namespace Arctic {
 				}
 			}
 			if (off_the_radar) {
-				*ScriptGlobal(2657589).Add(PLAYER::GET_PLAYER_INDEX(), 466).Add(210).As<int*>() = true;
-				*ScriptGlobal(2657589).Add(56).As<int*>() = NETWORK::GET_NETWORK_TIME() + 1;
+				*global(2657589).at(PLAYER::GET_PLAYER_INDEX(), 466).at(210).as<int*>() = true;
+				*global(2657589).at(56).as<int*>() = NETWORK::GET_NETWORK_TIME() + 1;
 
 				
 			}
@@ -766,41 +767,34 @@ namespace Arctic {
 				if (rp) {
 					float dz = c.z;
 					c.z = dz + height;
-					STREAMING::REQUEST_MODEL(MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"));
-						if (!STREAMING::HAS_MODEL_LOADED(MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"))) {
-						fbr::cur()->wait();
-						}
-						else {
-
-							*g_GameFunctions->should_sync_money_rewards = true;
-								OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, c.x, c.y, c.z, 0, 10, MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), false, true);
-								*g_GameFunctions->should_sync_money_rewards = false;
-							
+					
+					g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), [=] {
+						*g_GameFunctions->should_sync_money_rewards = true;
+					OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, c.x, c.y, c.z, 0, 10, MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), false, true);
+					*g_GameFunctions->should_sync_money_rewards = false;
 
 
-							STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"));
-							delayfr3 = GetTickCount64();
 
-						}
+					
+					delayfr3 = GetTickCount64();
+
+						});
+
 					
 				}
 				if(money) {
 					float dz = c.z;
 					c.z = dz + height;
-					STREAMING::REQUEST_MODEL(-1666779307);
-					if (!STREAMING::HAS_MODEL_LOADED(-1666779307)) {
-						fbr::cur()->wait();
-					}
-					else {
+					g_CallbackScript->AddCallback<ModelCallback>(-1666779307, [=] {
 						*g_GameFunctions->should_sync_money_rewards = true;
-							OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 2500, -1666779307, false, true);
-							*g_GameFunctions->should_sync_money_rewards = false;
-						
+					OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 2500, -1666779307, false, true);
+					*g_GameFunctions->should_sync_money_rewards = false;
 
-						STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(-1666779307);
 
-						delayfr3 = GetTickCount64();
-					}
+					//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(-1666779307);
+
+					delayfr3 = GetTickCount64();
+						});
 
 				}
 			}
@@ -822,41 +816,33 @@ namespace Arctic {
 				if (rp) {
 					float dz = c.z;
 					c.z = dz + height;
-					STREAMING::REQUEST_MODEL(MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"));
-					if (!STREAMING::HAS_MODEL_LOADED(MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"))) {
-						fbr::cur()->wait();
-					}
-					else {
+					g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), [=] {
 
 						*g_GameFunctions->should_sync_money_rewards = true;
-						OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 0, MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), false, true);
-						*g_GameFunctions->should_sync_money_rewards = false;
+					OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 0, MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), false, true);
+					*g_GameFunctions->should_sync_money_rewards = false;
 
 
 
-						STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"));
-						delayfr3 = GetTickCount64();
 
-					}
+					delayfr3 = GetTickCount64();
+
+						});
 
 				}
 				if (money) {
 					float dz = c.z;
 					c.z = dz + height;
-					STREAMING::REQUEST_MODEL(-1666779307);
-					if (!STREAMING::HAS_MODEL_LOADED(-1666779307)) {
-						fbr::cur()->wait();
-					}
-					else {
+					g_CallbackScript->AddCallback<ModelCallback>(-1666779307, [=] {
 						*g_GameFunctions->should_sync_money_rewards = true;
-						OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 0, -1666779307, false, true);
-						*g_GameFunctions->should_sync_money_rewards = false;
+					OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 0, -1666779307, false, true);
+					*g_GameFunctions->should_sync_money_rewards = false;
 
 
-						STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(-1666779307);
+					
 
-						delayfr3 = GetTickCount64();
-					}
+					delayfr3 = GetTickCount64();
+						});
 
 				}
 			}
@@ -1375,6 +1361,7 @@ namespace Arctic {
 	inline int testm = 0;
 	inline int testn = 0;
 	inline int testo = 0;
+	inline std::string ModelInput;
 	class Owned_explosion {
 	public:
 		bool blame_enabled = false;
@@ -1409,6 +1396,7 @@ namespace Arctic {
 			}
 		}
 	};
+	inline bool search_completed = false;
 	inline Owned_explosion owned_explosion;
 	class P_filter {
 	public:
@@ -1452,42 +1440,37 @@ namespace Arctic {
 		Ped angryPlanesPed;
 		Object asteroidObject;
 		int how_many_planes = 1;
+		Ped ped;
 		void add() {
+
 			if (mode_i == 1) {
 				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
-				STREAMING::REQUEST_MODEL(MISC::GET_HASH_KEY(cop_hashes[cop_int]));
-				if (!STREAMING::HAS_MODEL_LOADED(MISC::GET_HASH_KEY(cop_hashes[cop_int]))) {
-					fbr::cur()->wait();
-				}
-				else {
-					Ped ped;
-					ped = PED::CREATE_PED(26, MISC::GET_HASH_KEY(cop_hashes[cop_int]), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
-					WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, data2[data_i], 9998, true);
-					TASK::TASK_COMBAT_PED(ped, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
-					if (godmode)
-					{
-						ENTITY::SET_ENTITY_INVINCIBLE(ped, godmode);
-					}
-					STREAMING::REQUEST_MODEL(MISC::GET_HASH_KEY("police3"));
-					if (!STREAMING::HAS_MODEL_LOADED(MISC::GET_HASH_KEY("police3"))) {
-						fbr::cur()->wait();
-						
-					}
-					else {
-						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-						Vehicle vehicle = VEHICLE::CREATE_VEHICLE(MISC::GET_HASH_KEY("police3"), c.x + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.y + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, false, false);
-						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-						DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
-						auto networkId = NETWORK::VEH_TO_NET(vehicle);
-						if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
-							NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
-						VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
-						TASK::TASK_COMBAT_PED(ped, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
-						PED::SET_PED_INTO_VEHICLE(ped, vehicle, -1);
-
-					}
+				
+				g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(cop_hashes[cop_int]), [=] {
 					
+				ped = PED::CREATE_PED(26, MISC::GET_HASH_KEY(cop_hashes[cop_int]), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
+				WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, data2[data_i], 9998, true);
+				TASK::TASK_COMBAT_PED(ped, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
+				if (godmode)
+				{
+					ENTITY::SET_ENTITY_INVINCIBLE(ped, godmode);
 				}
+				
+
+				});
+				g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY("police3"), [=] {
+					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+				Vehicle vehicle = VEHICLE::CREATE_VEHICLE(MISC::GET_HASH_KEY("police3"), c.x + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.y + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, false, false);
+				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+				DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+				auto networkId = NETWORK::VEH_TO_NET(vehicle);
+				if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
+					NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+				VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+				TASK::TASK_COMBAT_PED(ped, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
+				PED::SET_PED_INTO_VEHICLE(ped, vehicle, -1);
+
+					});
 			}
 			if (mode_i == 2) {
 				Entity playerEntity = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
@@ -1503,69 +1486,8 @@ namespace Arctic {
 				Hash modelHash = MISC::GET_HASH_KEY(modelName);
 				Hash pedModelHash = MISC::GET_HASH_KEY("A_F_Y_Golfer_01");
 				for (std::uint32_t i = 0; i < how_many_planes; ++i) {
-					STREAMING::REQUEST_MODEL(modelHash);
-					if (!STREAMING::HAS_MODEL_LOADED(modelHash)) {
-						fbr::cur()->wait();
-
-					}
-					else {
+					g_CallbackScript->AddCallback<ModelCallback>(modelHash, [=] {
 						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-						angryPlanesPlane = VEHICLE::CREATE_VEHICLE(modelHash, spawnX + MISC::GET_RANDOM_INT_IN_RANGE(50, 550), spawnY + MISC::GET_RANDOM_INT_IN_RANGE(50, 550), spawnZ, spawnHeading, true, false, false);
-						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-						DECORATOR::DECOR_SET_INT(angryPlanesPlane, "MPBitset", 0);
-						auto networkId = NETWORK::VEH_TO_NET(angryPlanesPlane);
-						if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(angryPlanesPlane))
-							NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
-						VEHICLE::SET_VEHICLE_IS_STOLEN(angryPlanesPlane, FALSE);
-						VEHICLE::SET_VEHICLE_ENGINE_ON(angryPlanesPlane, true, true, true);
-						VEHICLE::SET_VEHICLE_FORWARD_SPEED(angryPlanesPlane, MISC::GET_RANDOM_INT_IN_RANGE(50, 350));
-						ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPlane, 1);
-						ENTITY::SET_ENTITY_PROOFS(angryPlanesPlane, true, true, true, true, true, true, true, true);
-						VEHICLE::SET_VEHICLE_DAMAGE(angryPlanesPlane, 0.f, 0.f, 0.f, 0.f, 200.f, false);
-					}
-					STREAMING::REQUEST_MODEL(pedModelHash);
-					if (!STREAMING::HAS_MODEL_LOADED(pedModelHash)) {
-						fbr::cur()->wait();
-
-					}
-					else {
-						angryPlanesPed = PED::CREATE_PED(26, pedModelHash, spawnX, spawnY, spawnZ + 100.0f, spawnHeading, true, true);
-						PED::SET_PED_INTO_VEHICLE(angryPlanesPed, angryPlanesPlane, -1);
-						PED::SET_DRIVER_ABILITY(angryPlanesPed, 0.99f);
-						ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPed, 1);
-						TASK::TASK_COMBAT_PED(angryPlanesPed, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
-					}
-				}
-			}
-		}
-	};
-	inline Attackers attackers;
-	class All_players {
-	public:
-		Vehicle angryPlanesPlane;
-		Ped angryPlanesPed;
-		void add_jet() {
-			
-			for (std::uint32_t i = 0; i < PLAYER::GET_NUMBER_OF_PLAYERS(); ++i) {
-				Entity playerEntity = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i);
-				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(playerEntity, true);
-				const char* modelName = "TITAN";
-				float spawnX = MISC::GET_RANDOM_FLOAT_IN_RANGE(playerCoords.x - 10.0f, playerCoords.x + 10.0f);
-				float spawnY = MISC::GET_RANDOM_FLOAT_IN_RANGE(playerCoords.y - 10.0f, playerCoords.y + 10.0f);
-				float spawnZ = MISC::GET_RANDOM_FLOAT_IN_RANGE(300.0f, 500.0f);
-				float spawnHeading = 360.0f;
-				modelName = "lazer";
-
-
-				Hash modelHash = MISC::GET_HASH_KEY(modelName);
-				Hash pedModelHash = MISC::GET_HASH_KEY("A_F_Y_Golfer_01");
-				STREAMING::REQUEST_MODEL(modelHash);
-				if (!STREAMING::HAS_MODEL_LOADED(modelHash)) {
-					fbr::cur()->wait();
-
-				}
-				else {
-					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 					angryPlanesPlane = VEHICLE::CREATE_VEHICLE(modelHash, spawnX + MISC::GET_RANDOM_INT_IN_RANGE(50, 550), spawnY + MISC::GET_RANDOM_INT_IN_RANGE(50, 550), spawnZ, spawnHeading, true, false, false);
 					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 					DECORATOR::DECOR_SET_INT(angryPlanesPlane, "MPBitset", 0);
@@ -1578,23 +1500,111 @@ namespace Arctic {
 					ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPlane, 1);
 					ENTITY::SET_ENTITY_PROOFS(angryPlanesPlane, true, true, true, true, true, true, true, true);
 					VEHICLE::SET_VEHICLE_DAMAGE(angryPlanesPlane, 0.f, 0.f, 0.f, 0.f, 200.f, false);
-				}
-				STREAMING::REQUEST_MODEL(pedModelHash);
-				if (!STREAMING::HAS_MODEL_LOADED(pedModelHash)) {
-					fbr::cur()->wait();
-
-				}
-				else {
-					angryPlanesPed = PED::CREATE_PED(26, pedModelHash, spawnX, spawnY, spawnZ + 100.0f, spawnHeading, true, true);
+						});
+					
+					g_CallbackScript->AddCallback<ModelCallback>(pedModelHash, [=] 
+						{
+							angryPlanesPed = PED::CREATE_PED(26, pedModelHash, spawnX, spawnY, spawnZ + 100.0f, spawnHeading, true, true);
 					PED::SET_PED_INTO_VEHICLE(angryPlanesPed, angryPlanesPlane, -1);
 					PED::SET_DRIVER_ABILITY(angryPlanesPed, 0.99f);
 					ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPed, 1);
-					TASK::TASK_COMBAT_PED(angryPlanesPed, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), 0, 16);
+					TASK::TASK_COMBAT_PED(angryPlanesPed, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
+						});
 				}
 			}
 		}
 	};
-	inline All_players all_players;
+	inline Attackers attackers;
+	inline const char* get_vehicle_class_name(int id) {
+		std::stringstream ss; ss << "VEH_CLASS_" << id;
+		return HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(ss.str().c_str()) == "NULL" ? "Unknown Class" : HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(ss.str().c_str());
+	}
+	inline int m_selected_vehicle_class;
+	
+	
+	class Veh_spawner {
+	public:
+		bool spawn_in_air = true;
+		bool spawninair = true;
+		bool fade_in = true;
+		bool spawn_in = true;
+		bool setengineon = true;
+		bool forward_speed = true;
+		int forwardspeedmutli = 150;
+		int heightmulti = 100;
+		bool dellast = false;
+		bool spawnwithcolor = false;
+		int spawnr = 0;
+		int spawng = 0;
+		int spawnb = 0;
+		int spawnr2 = 0;
+		int spawng2 = 0;
+		int spawnb2 = 0;
+		void spawn(Hash hash) {
+			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
+				{
+					if (dellast) {
+						Vehicle lastVehicle = PLAYER::GET_PLAYERS_LAST_VEHICLE();
+						VEHICLE::DELETE_VEHICLE(&lastVehicle);
+					}
+			Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+			float veh_speed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
+			NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::PLAYER_PED_ID(), { 0.f, dellast ? 0.f : 8.0f, (VEHICLE::IS_THIS_MODEL_A_PLANE(hash) && spawninair || VEHICLE::IS_THIS_MODEL_A_HELI(hash) && spawninair) ? 1.0f + heightmulti : 1.0f });
+			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+			Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
+			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+			DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+			auto networkId = NETWORK::VEH_TO_NET(vehicle);
+			if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
+				NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+			VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+			PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
+			VEHICLE::SET_VEHICLE_FORWARD_SPEED(vehicle, veh_speed);
+			if (setengineon) {
+				VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
+			}
+			if (forward_speed) {
+				if (VEHICLE::IS_THIS_MODEL_A_PLANE(hash)) {
+					VEHICLE::SET_VEHICLE_FORWARD_SPEED(vehicle, forwardspeedmutli);
+				}
+			}
+			if (spawn_in) {
+				PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
+			}
+			if (fade_in) {
+				NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, false);
+			}
+			if (spawnwithcolor) {
+				VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, spawnr, spawng, spawnb);
+				VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(vehicle, spawnr2, spawng2, spawnb2);
+			}
+				});
+		}
+	};
+	inline Veh_spawner veh_spawner;
+	class Region {
+	public:
+		
+		const char* type[9]
+		{
+			"CIS",
+			"Africa",
+			"East" ,
+			"Europe" ,
+			"China",
+			"Australia",
+			"West",
+			"Japan",
+			"Unknown",
+		};
+		std::size_t region_id = 0;
+		
+		void override (uint32_t id) {
+			
+			*g_GameVariables->m_region_code = id;
+		}
+	};
+	inline Region region;
 	inline void FeatureInitalize() {
 		invisible.init();
 		no_clip.init();

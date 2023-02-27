@@ -11,10 +11,10 @@ namespace Arctic::UserInterface
 	};
 
 	template <typename BoolType = bool>
-	class BoolOption : public BaseOption<BoolOption<BoolType>>
+	class toggle : public BaseOption<toggle<BoolType>>
 	{
 	public:
-		explicit BoolOption(const char* text, const char* description, BoolType* b00l, BoolDisplay displayType, bool displayInverted = false, std::function<void()> action = [] {}) :
+		explicit toggle(const char* text, const char* description, BoolType* b00l, BoolDisplay displayType, bool displayInverted = false, std::function<void()> action = [] {}) :
 			m_Bool(b00l),
 			m_DisplayInverted(displayInverted),
 			m_DisplayType(displayType)
@@ -25,11 +25,11 @@ namespace Arctic::UserInterface
 			Base::SetAction(std::move(action));
 		}
 
-		~BoolOption() noexcept = default;
-		BoolOption(BoolOption const&) = default;
-		BoolOption& operator=(BoolOption const&) = default;
-		BoolOption(BoolOption&&) = default;
-		BoolOption& operator=(BoolOption&&) = default;
+		~toggle() noexcept = default;
+		toggle(toggle const&) = default;
+		toggle& operator=(toggle const&) = default;
+		toggle(toggle&&) = default;
+		toggle& operator=(toggle&&) = default;
 
 		const char* GetRightText() override
 		{
@@ -71,6 +71,6 @@ namespace Arctic::UserInterface
 		BoolDisplay m_DisplayType;
 		BoolType m_DisplayInverted = false;
 
-		using Base = BaseOption<BoolOption<BoolType>>;
+		using Base = BaseOption<toggle<BoolType>>;
 	};
 }

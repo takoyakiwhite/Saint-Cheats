@@ -4,11 +4,11 @@
 #include "../FiberHelper.hpp"
 namespace Arctic::UserInterface
 {
-	class SubOption : public BaseOption<SubOption>
+	class submenu : public BaseOption<submenu>
 	{
 	public:
-		explicit SubOption() = default;
-		explicit SubOption(const char* text, const char* description, std::uint32_t subId, std::function<void()> action = [] {}) :
+		explicit submenu() = default;
+		explicit submenu(const char* text, const char* description, std::uint32_t subId, std::function<void()> action = [] {}) :
 			m_SubId(subId)
 		{
 			SetLeftText(text);
@@ -17,11 +17,11 @@ namespace Arctic::UserInterface
 			SetAction(std::move(action));
 		}
 
-		~SubOption() noexcept = default;
-		SubOption(SubOption const&) = default;
-		SubOption& operator=(SubOption const&) = default;
-		SubOption(SubOption&&) = default;
-		SubOption& operator=(SubOption&&) = default;
+		~submenu() noexcept = default;
+		submenu(submenu const&) = default;
+		submenu& operator=(submenu const&) = default;
+		submenu(submenu&&) = default;
+		submenu& operator=(submenu&&) = default;
 
 		void HandleAction(OptionAction action) override
 		{

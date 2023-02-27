@@ -805,6 +805,7 @@ namespace Arctic::UserInterface
 				PAD::DISABLE_CONTROL_ACTION(2, INPUT_VEH_RADIO_WHEEL, true);
 				PAD::DISABLE_CONTROL_ACTION(2, INPUT_VEH_HEADLIGHT, true);
 				PAD::DISABLE_CONTROL_ACTION(2, INPUT_THROW_GRENADE, true);
+				PAD::DISABLE_CONTROL_ACTION(2, INPUT_VEH_ATTACK2, true);
 				auto sub = m_SubmenuStack.top();
 
 				static Timer enterTimer(0ms);

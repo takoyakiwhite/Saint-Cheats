@@ -54,7 +54,7 @@ namespace Arctic::UserInterface
 		}
 
 		template <typename OptionType, typename ...TArgs>
-		void AddOption(TArgs&&... args)
+		void draw_option(TArgs&&... args)
 		{
 			m_Options.push_back(std::make_unique<OptionType>(std::forward<TArgs>(args)...));
 		}
