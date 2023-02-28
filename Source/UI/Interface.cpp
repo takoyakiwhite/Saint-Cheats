@@ -657,7 +657,26 @@ namespace Arctic::UserInterface
 			//Logger
 			//g_Logger->Theme("Salmon Pink Theme");
 		}
+		if (ThemeIterator == 8)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 234, 90, 81, 255 };
 
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 234, 90, 81, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 187, 64, 71, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 234, 90, 81, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Default Theme");
+		}
 		
 
 		CheckForInput();

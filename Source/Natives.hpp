@@ -380,8 +380,8 @@ namespace CAM
 	static float GET_CAM_FAR_DOF(Cam cam) { return Invoke<float>(0x255F8DAFD540D397, cam); } // 0x255F8DAFD540D397 0x98C5CCE9 b323
 	static float GET_CAM_DOF_STRENGTH(Cam cam) { return Invoke<float>(0x06D153C0B99B6128, cam); } // 0x06D153C0B99B6128  b2699
 	static void SET_CAM_PARAMS(Cam cam, float posX, float posY, float posZ, float rotX, float rotY, float rotZ, float fieldOfView, Any p8, int p9, int p10, int p11) { Invoke<int>(0xBFD8727AEA3CCEBA, cam, posX, posY, posZ, rotX, rotY, rotZ, fieldOfView, p8, p9, p10, p11); } // 0xBFD8727AEA3CCEBA 0x2167CEBF b323
-	static void SET_CAM_COORD(Cam cam, float posX, float posY, float posZ) { Invoke<int>(0x4D41783FB745E42E, cam, posX, posY, posZ); } // 0x4D41783FB745E42E 0x7A8053AF b323
-	static void SET_CAM_ROT(Cam cam, float rotX, float rotY, float rotZ, int rotationOrder) { Invoke<int>(0x85973643155D0B07, cam, rotX, rotY, rotZ, rotationOrder); } // 0x85973643155D0B07 0xEE38B3C1 b323
+	static void SET_CAM_COORD(Cam cam, Vector3 pos_) { Invoke<void>(0x4D41783FB745E42E, cam, pos_.x, pos_.y, pos_.z); } // 0x4D41783FB745E42E 0x7A8053AF b323
+	static void SET_CAM_ROT(Cam cam, Vector3 rot_, int rotationOrder) { Invoke<void>(0x85973643155D0B07, cam, rot_.x, rot_.y, rot_.z, rotationOrder); } // 0x85973643155D0B07 0xEE38B3C1 b323
 	static void SET_CAM_FOV(Cam cam, float fieldOfView) { Invoke<int>(0xB13C14F66A00D047, cam, fieldOfView); } // 0xB13C14F66A00D047 0xD3D5D74F b323
 	static void SET_CAM_NEAR_CLIP(Cam cam, float nearClip) { Invoke<int>(0xC7848EFCCC545182, cam, nearClip); } // 0xC7848EFCCC545182 0x46DB13B1 b323
 	static void SET_CAM_FAR_CLIP(Cam cam, float farClip) { Invoke<int>(0xAE306F2A904BF86E, cam, farClip); } // 0xAE306F2A904BF86E 0x0D23E381 b323

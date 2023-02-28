@@ -170,7 +170,7 @@ namespace Arctic::UserInterface
 		float m_CurrentCoord = m_PosY;
 
 		//Themes
-		const char* ThemeList[8]
+		const char* ThemeList[9]
 		{
 			"Light Purple",
 			"Red Salmon",
@@ -179,7 +179,8 @@ namespace Arctic::UserInterface
 			"Emerald Green",
 			"Violet Purple",
 			"Salmon Pink",
-			"Stash Skid Menu"
+			"Stash Skid Menu",
+			"Ozark"
 		};
 		std::size_t ThemeIterator = 1;
 

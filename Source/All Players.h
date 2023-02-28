@@ -8,6 +8,9 @@ namespace Arctic {
 	public:
 		m_Jets jet;
 		Explode m_explode;
+		void get(std::uint32_t buffer) {
+			buffer = PLAYER::GET_NUMBER_OF_PLAYERS();
+		}
 	};
 	inline All_players all_players;
 }

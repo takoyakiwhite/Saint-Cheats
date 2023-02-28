@@ -50,6 +50,9 @@ namespace Arctic
 		PVOID m_ModelSpawnBypass;
 		char* m_GameBuild;
 		uint32_t* m_region_code;
+
+		using GetNetPed = CPed * (int playerID);
+		GetNetPed* m_GetNetPed;
 	};
 
 	class GameFunctions

@@ -169,6 +169,15 @@
     <ClInclude Include="Explode.h">
       <Filter>Core\Features\Network\All Players\Features</Filter>
     </ClInclude>
+    <ClInclude Include="Players.h">
+      <Filter>Core\Features\Network\Players</Filter>
+    </ClInclude>
+    <ClInclude Include="Vehicle.h">
+      <Filter>Core\Features\Vehicle</Filter>
+    </ClInclude>
+    <ClInclude Include="Bypass Max Speed.h">
+      <Filter>Core\Features\Vehicle\Features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">
@@ -329,6 +338,18 @@
     </Filter>
     <Filter Include="Core\Features\Network\All Players\Features">
       <UniqueIdentifier>{8c35a404-ebab-4ef5-9db3-d27fa7067f39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Features\Network\Players">
+      <UniqueIdentifier>{2d929b39-6015-4405-be10-922e03f24764}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Features\Vehicle">
+      <UniqueIdentifier>{49511aed-7a7d-4596-ad44-d6ff8c0b3530}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Features\Vehicle\Features">
+      <UniqueIdentifier>{b4838539-62f3-4513-ba36-38be3fa82764}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Features\Network\Misc">
+      <UniqueIdentifier>{1887d23a-f515-4a76-a1d9-a20a1fd88fa1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

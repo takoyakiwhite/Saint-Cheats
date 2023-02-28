@@ -13,6 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="All Players.h" />
+    <ClInclude Include="Bypass Max Speed.h" />
     <ClInclude Include="Classes.h" />
     <ClInclude Include="Common.hpp" />
     <ClInclude Include="CrossMap.hpp" />
@@ -24,6 +25,7 @@
     <ClInclude Include="FiberHelper.hpp" />
     <ClInclude Include="Jets.h" />
     <ClInclude Include="Math.h" />
+    <ClInclude Include="Players.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="Signatures.hpp" />
     <ClInclude Include="Hooking.hpp" />
@@ -67,6 +69,7 @@
     <ClInclude Include="UI\Interface.hpp" />
     <ClInclude Include="UI\UnclickOption.hpp" />
     <ClInclude Include="Util.hpp" />
+    <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VMTHook.hpp" />
   </ItemGroup>
   <ItemGroup>

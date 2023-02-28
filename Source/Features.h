@@ -9,9 +9,14 @@
 #include "Enums.h"
 #include "Lists.hpp"
 #include <filesystem>
-
+#include "Vehicle.h"
 namespace Arctic {
 	inline std::string handlingBuffer = "";
+
+	inline std::string replaceTextBuffer = "";
+	inline std::string replaceTextBuffer2 = "";
+	inline bool replaced = false;
+	inline bool replaced2 = false;
 	
 	inline bool raycast(NativeVector3& raycastHitCoords) {
 		bool raycastHit;
@@ -1543,12 +1548,14 @@ namespace Arctic {
 		void spawn(Hash hash) {
 			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
 				{
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					float veh_speed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
 					if (dellast) {
 						Vehicle lastVehicle = PLAYER::GET_PLAYERS_LAST_VEHICLE();
 						VEHICLE::DELETE_VEHICLE(&lastVehicle);
 					}
-			Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-			float veh_speed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
+			
+			
 			NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::PLAYER_PED_ID(), { 0.f, dellast ? 0.f : 8.0f, (VEHICLE::IS_THIS_MODEL_A_PLANE(hash) && spawninair || VEHICLE::IS_THIS_MODEL_A_HELI(hash) && spawninair) ? 1.0f + heightmulti : 1.0f });
 			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 			Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
@@ -1566,6 +1573,7 @@ namespace Arctic {
 			if (forward_speed) {
 				if (VEHICLE::IS_THIS_MODEL_A_PLANE(hash)) {
 					VEHICLE::SET_VEHICLE_FORWARD_SPEED(vehicle, forwardspeedmutli);
+
 				}
 			}
 			if (spawn_in) {
@@ -1605,6 +1613,104 @@ namespace Arctic {
 		}
 	};
 	inline Region region;
+	class c_FOV {
+	public:
+		Cam freecamCamera;
+		bool enabled = false;
+		float value = 90.0f;
+		void init() {
+			if (enabled) {
+				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+
+				if (!CAM::DOES_CAM_EXIST(freecamCamera)) {
+					freecamCamera = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", true);
+					CAM::SET_CAM_ROT(freecamCamera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+					CAM::SET_CAM_COORD(freecamCamera, CAM::GET_GAMEPLAY_CAM_COORD());
+					value = CAM::GET_GAMEPLAY_CAM_FOV();
+				}
+
+				CAM::RENDER_SCRIPT_CAMS(true, true, 700, true, true, true);
+				CAM::SET_CAM_ACTIVE(freecamCamera, true);
+				CAM::SET_CAM_ROT(freecamCamera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+				CAM::SET_CAM_COORD(freecamCamera, CAM::GET_GAMEPLAY_CAM_COORD());
+				CAM::SET_CAM_FOV(freecamCamera, value);
+				if (PAD::IS_CONTROL_PRESSED(2, 25)) {
+					HUD::DISPLAY_SNIPER_SCOPE_THIS_FRAME();
+				}
+			}
+
+			
+		}
+	};
+	inline c_FOV m_fov;
+	class Blink {
+	public:
+		Cam freecamCamera;
+		bool enabled = false;
+		void init() {
+			if (enabled) {
+				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+
+				if (!CAM::DOES_CAM_EXIST(freecamCamera)) {
+					freecamCamera = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", true);
+					CAM::SET_CAM_ROT(freecamCamera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+					CAM::SET_CAM_COORD(freecamCamera, CAM::GET_GAMEPLAY_CAM_COORD());
+				}
+
+				CAM::RENDER_SCRIPT_CAMS(true, true, 700, true, true, true);
+				CAM::SET_CAM_ACTIVE(freecamCamera, true);
+				CAM::SET_CAM_ROT(freecamCamera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+
+				PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), true);
+				//HUD::HIDE_HUD_AND_RADAR_THIS_FRAME();
+				PAD::DISABLE_CONTROL_ACTION(2, 8, true);
+				PAD::DISABLE_CONTROL_ACTION(2, 32, true);
+				PAD::DISABLE_CONTROL_ACTION(2, 34, true);
+				
+				NativeVector3 freecamCoords = CAM::GET_CAM_COORD(freecamCamera);
+				NativeVector3 cameraDirection = RotationToDirection(CAM::GET_GAMEPLAY_CAM_ROT(0));
+				NativeVector3 accelerateCoords = multiply(&cameraDirection, 0.1f);
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 8)) {
+				
+					NativeVector3 newCoords = addn(&freecamCoords, &accelerateCoords);
+					CAM::SET_CAM_COORD(freecamCamera, newCoords);
+				}
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 32)) {
+					NativeVector3 newCoords = addn(&freecamCoords, &accelerateCoords);
+					CAM::SET_CAM_COORD(freecamCamera, newCoords);
+				}
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 34)) {
+					CAM::SET_CAM_ROT(freecamCamera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+				}
+			}
+		}
+	};
+	inline Blink blink;
+	class Aimbot {
+	public:
+		bool enabled = false;
+		float distance = 50.0f;
+		Ped aimbot_ped;
+		Cam freecamCamera;
+		void init() {
+			if (enabled) {
+				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+				PED::GET_CLOSEST_PED(c.x, c.y, c.z, distance, 0, 0, &aimbot_ped, 0, 0, -1);
+				NativeVector3 rot = ENTITY::GET_ENTITY_ROTATION(aimbot_ped, 0);
+				if (!CAM::DOES_CAM_EXIST(freecamCamera)) {
+					freecamCamera = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", true);
+					CAM::SET_CAM_ROT(freecamCamera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+					CAM::SET_CAM_COORD(freecamCamera, CAM::GET_GAMEPLAY_CAM_COORD());
+				}
+
+				CAM::RENDER_SCRIPT_CAMS(true, true, 700, true, true, true);
+				CAM::SET_CAM_ACTIVE(freecamCamera, true);
+				CAM::SET_CAM_ROT(freecamCamera, rot, 0);
+				CAM::SET_CAM_COORD(freecamCamera, CAM::GET_GAMEPLAY_CAM_COORD());
+			}
+		}
+	};
+	inline Aimbot aimbot;
 	inline void FeatureInitalize() {
 		invisible.init();
 		no_clip.init();
@@ -1625,6 +1731,10 @@ namespace Arctic {
 		text_spam.init();
 		max_loop.init();
 		owned_explosion.init();
+		m_vehicle.bypass_max_speed.init();
+		m_fov.init();
+		blink.init();
+		aimbot.init();
 		if (NoPlaneTurbulance) {
 			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 

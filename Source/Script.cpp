@@ -18,6 +18,7 @@
 #include "Features.h"
 #include "Enums.h"
 #include "All Players.h"
+#include "Players.h"
 namespace Arctic
 {
 	enum Submenu : std::uint32_t
@@ -90,17 +91,23 @@ namespace Arctic
 		//LSC
 		LosSantosArmor,
 		LosSantosBrakes,
+		LosSantosRightFender,
+		LosSantosFender,
 		LosSantosBumpers,
 		LosSantosEngine,
 		LosSantosExhaust,
+		LosSantosLivery,
 		LosSantosGrille,
 		LosSantosHood,
 		LosSantosHorn,
 		LosSantosLights,
 		LosSantosPlate,
+		LosSantosFront,
+		LosSantosRear,
 		LosSantosRespray,
 		LosSantosRoof,
 		LosSantosSkirts,
+		LosSantosChassis,
 		LosSantosSpoiler,
 		LosSantosSuspension,
 		LosSantosTransmission,
@@ -127,6 +134,7 @@ namespace Arctic
 		SpawnerSettingsColor,
 			SpawnerSettingsSpawnInAir,
 			SpawnerSettingsSetForwardSpeed,
+			SubmenuVehicleAll,
 		
 		SubmenuAllSettings,
 		SubmenuAllJets,
@@ -135,6 +143,32 @@ namespace Arctic
 		SubmenuAllExplode,
 		SubmenuAllExplodeBlame,
 		SubmenuAllExplodeExcludes,
+		PLATEHOLDER25,
+		VANITY_PLATES26,
+		TRIM27,
+		ORNAMENTS28,
+		DASHBOARD29,
+		DIAL30,
+		DOOR_SPEAKER31,
+		SEATS32,
+		STEERINGWHEEL33,
+		SHIFTER_LEAVERS34,
+		PLAQUES35,
+		SPEAKERS36,
+		TRUNK37,
+		HYDRAULICS38,
+		ENGINE_BLOCK39,
+		AIR_FILTER,
+		STRUTS,
+		ARCH_COVER,
+		AERIALS,
+		TRIM_2,
+		TANK ,
+		WINDOWS,
+		UNK47,
+		SubmenuMisc,
+			SubmenuReplaceText,
+			SubmenuFOV,
 		
 	};
 
@@ -153,6 +187,7 @@ namespace Arctic
 		m_Initialized = true;
 		using namespace UserInterface;
 		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_JOINING"), "Loading GTA Online with " BIGBASE_NAME "...");
+		
 
 		g_Render->draw_submenu<sub>("Arctic", SubmenuHome, [](sub* sub)
 		{
@@ -162,7 +197,7 @@ namespace Arctic
 			sub->draw_option<submenu>("Teleport", nullptr, SubmenuSettings);
 			sub->draw_option<submenu>("Weapon", nullptr, SubmenuWeapon);
 			sub->draw_option<submenu>("Vehicle", nullptr, SubmenuVehicle);
-			sub->draw_option<submenu>("Spawner", nullptr, SubmenuSettings);
+			sub->draw_option<submenu>("Misc", nullptr, SubmenuMisc);
 			sub->draw_option<submenu>("World", nullptr, SubmenuWorld);
 			sub->draw_option<submenu>("Settings", nullptr, SubmenuSettings);
 		});
@@ -244,6 +279,21 @@ namespace Arctic
 
 					}
 					});
+				sub->draw_option<toggle<bool>>(("Blink"), nullptr, &blink.enabled , BoolDisplay::OnOff, false, [] {
+					if (!blink.enabled)
+					{
+						NativeVector3 c = CAM::GET_CAM_COORD(blink.freecamCamera);
+						NativeVector3 rot = CAM::GET_CAM_ROT(blink.freecamCamera, 2);
+						ENTITY::SET_ENTITY_ROTATION(PLAYER::PLAYER_PED_ID(), rot.x, rot.y, rot.z, 2, 1);
+						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(PLAYER::PLAYER_PED_ID(), c.x, c.y, c.z, true, true, true);
+						CAM::RENDER_SCRIPT_CAMS(false, true, 700, true, true, true);
+						CAM::SET_CAM_ACTIVE(blink.freecamCamera, false);
+						CAM::DESTROY_CAM(blink.freecamCamera, true);
+						PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), true);
+
+					}
+				});
+				
 				sub->draw_option<number<std::int32_t>>("Wanted Level", nullptr, &i_hate_niggers, 0, 5, 1, 3, true, "", "", [] {
 					(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_wanted_level = i_hate_niggers;
 					});
@@ -399,6 +449,9 @@ namespace Arctic
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Infinite Rocket Boost"), nullptr, &features.infiniter, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Bypass Max Speed"), nullptr, &m_vehicle.bypass_max_speed.enabled, BoolDisplay::OnOff, false, [] {
+					m_vehicle.bypass_max_speed.disable(); //trying something new
+					});
 
 			});
 		g_Render->draw_submenu<sub>(("Spawner"), SubmenuVehicleSpawner, [](sub* sub)
@@ -406,6 +459,7 @@ namespace Arctic
 				sub->draw_option<submenu>("Settings", nullptr, Submenu::SpawnerSettings);
 				sub->draw_option<submenu>("Search", nullptr, Submenu::SubmenuVehicleSearch);
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				sub->draw_option<submenu>("All", nullptr, SubmenuVehicleAll);
 				for (std::int32_t i = 0; i < 23; i++) {
 					sub->draw_option<submenu>(get_vehicle_class_name(i), nullptr, SubmenuGetClass, [=]
 						{
@@ -415,6 +469,44 @@ namespace Arctic
 				}
 				
 		
+			});
+		g_Render->draw_submenu<sub>(("All"), SubmenuVehicleAll, [](sub* sub)
+			{
+				if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {
+					for (std::int32_t i = 0; i < g_GameFunctions->m_vehicle_hash_pool->capacity; i++) {
+						std::uint64_t info = g_GameFunctions->m_vehicle_hash_pool->get(i);
+						if (info != NULL) {
+							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
+								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
+								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
+								std::stringstream ss;
+									std::string make(make_ptr);
+									std::string model(model_ptr);
+									if (make[0] || model[0]) {
+										make = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(make.c_str());
+										model = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(model.c_str());
+										if (make != "NULL" && model != "NULL") {
+											ss << make << " " << model;
+										}
+										else if (model != "NULL") {
+											ss << model;
+										}
+										else {
+											ss << "Unknown";
+										}
+									}
+
+									sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(*(std::uint32_t*)(info + 0x18)))), nullptr, [=]
+										{
+											veh_spawner.spawn(*(std::uint32_t*)(info + 0x18));
+
+										});
+								
+							}
+						}
+					}
+				}
+
 			});
 		g_Render->draw_submenu<sub>(("Settings"), SpawnerSettings, [](sub* sub)
 			{
@@ -430,12 +522,12 @@ namespace Arctic
 		g_Render->draw_submenu<sub>(("Color"), SpawnerSettingsColor, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &veh_spawner.spawnwithcolor, BoolDisplay::OnOff);
-		sub->draw_option<number<std::int32_t>>("R (Primary)", nullptr, &veh_spawner.spawnr, 0, 1000);
-		sub->draw_option<number<std::int32_t>>("G (Primary) ", nullptr, &veh_spawner.spawng, 0, 1000);
-		sub->draw_option<number<std::int32_t>>("B (Primary)", nullptr, &veh_spawner.spawnb, 0, 1000);
-		sub->draw_option<number<std::int32_t>>("R (Secondary)", nullptr, &veh_spawner.spawnr2, 0, 1000);
-		sub->draw_option<number<std::int32_t>>("G (Secondary)", nullptr, &veh_spawner.spawng2, 0, 1000);
-		sub->draw_option<number<std::int32_t>>("B (Secondary)", nullptr, &veh_spawner.spawnb2, 0, 1000);
+		sub->draw_option<number<std::int32_t>>("R (Primary)", nullptr, &veh_spawner.spawnr, 0, 255);
+		sub->draw_option<number<std::int32_t>>("G (Primary) ", nullptr, &veh_spawner.spawng, 0, 255);
+		sub->draw_option<number<std::int32_t>>("B (Primary)", nullptr, &veh_spawner.spawnb, 0, 255);
+		sub->draw_option<number<std::int32_t>>("R (Secondary)", nullptr, &veh_spawner.spawnr2, 0, 255);
+		sub->draw_option<number<std::int32_t>>("G (Secondary)", nullptr, &veh_spawner.spawng2, 0, 255);
+		sub->draw_option<number<std::int32_t>>("B (Secondary)", nullptr, &veh_spawner.spawnb2, 0, 255);
 
 			});
 		g_Render->draw_submenu<sub>(("Forward Speed"), SpawnerSettingsSetForwardSpeed, [](sub* sub)
@@ -671,17 +763,37 @@ namespace Arctic
 				{
 					Vehicle veh; veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
 					VEHICLE::SET_VEHICLE_MOD_KIT(veh, 0);
-					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_XENONLIGHTS) > 0)
-					{
-						sub->draw_option<submenu>("Lights", "", LosSantosLights);
-					}
 					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_ARMOR) > 0)
 					{
 						sub->draw_option<submenu>("Armor", "", LosSantosArmor);
 					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_BRAKES) > 0)
+					{
+						sub->draw_option<submenu>("Brakes", "", LosSantosBrakes);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_XENONLIGHTS) > 0)
+					{
+						sub->draw_option<submenu>("Lights", "", LosSantosLights);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_FRONTBUMPER) > 0)
+					{
+						sub->draw_option<submenu>("Front Bumper", "", LosSantosFront);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_REARBUMPER) > 0)
+					{
+						sub->draw_option<submenu>("Rear Bumper", "", LosSantosRear);
+					}
 					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_ARMOR) > 0)
 					{
 						sub->draw_option<submenu>("Plates", "", LosSantosPlate);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_PLATEHOLDER) > 0)
+					{
+						sub->draw_option<submenu>("Plateholder", "", Submenu::PLATEHOLDER25);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_VANITY_PLATES) > 0)
+					{
+						sub->draw_option<submenu>("Vanity Plates", "", VANITY_PLATES26);
 					}
 					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_ENGINE) > 0)
 					{
@@ -691,9 +803,94 @@ namespace Arctic
 					{
 						sub->draw_option<submenu>("Exhaust", "", LosSantosExhaust);
 					}
-					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_BRAKES) > 0)
+					
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_TRIM) > 0)
 					{
-						sub->draw_option<submenu>("Brakes", "", LosSantosBrakes);
+						sub->draw_option<submenu>("Trim", "", TRIM27);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_ORNAMENTS) > 0)
+					{
+						sub->draw_option<submenu>("Ornaments", "", ORNAMENTS28);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_DASHBOARD) > 0)
+					{
+						sub->draw_option<submenu>("Dashboard", "", Submenu::DASHBOARD29);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_DIAL) > 0)
+					{
+						sub->draw_option<submenu>("Dial", "", Submenu::DIAL30);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_DOOR_SPEAKER) > 0)
+					{
+						sub->draw_option<submenu>("Door Seaker", "", Submenu::DOOR_SPEAKER31);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_SEATS) > 0)
+					{
+						sub->draw_option<submenu>("Seats", "", Submenu::SEATS32);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_STEERINGWHEEL) > 0)
+					{
+						sub->draw_option<submenu>("Steering Wheel", "", Submenu::STEERINGWHEEL33);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_SHIFTER_LEAVERS) > 0)
+					{
+						sub->draw_option<submenu>("Shifter Leavers", "", Submenu::SHIFTER_LEAVERS34);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_PLAQUES) > 0)
+					{
+						sub->draw_option<submenu>("Plaques", "", Submenu::PLAQUES35);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_SPEAKERS) > 0)
+					{
+						sub->draw_option<submenu>("Speakers", "", Submenu::SPEAKERS36);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_TRUNK) > 0)
+					{
+						sub->draw_option<submenu>("Trunk", "", Submenu::TRUNK37);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_HYDRAULICS) > 0)
+					{
+						sub->draw_option<submenu>("Hydraulics", "", Submenu::HYDRAULICS38);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_ENGINE_BLOCK) > 0)
+					{
+						sub->draw_option<submenu>("Engine Block", "", Submenu::ENGINE_BLOCK39);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_AIR_FILTER) > 0)
+					{
+						sub->draw_option<submenu>("Air Filter", "", Submenu::AIR_FILTER);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_STRUTS) > 0)
+					{
+						sub->draw_option<submenu>("Struts", "", Submenu::STRUTS);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_ARCH_COVER) > 0)
+					{
+						sub->draw_option<submenu>("Arch Cover", "", Submenu::ARCH_COVER);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_AERIALS) > 0)
+					{
+						sub->draw_option<submenu>("Aerials", "", Submenu::AERIALS);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_TRIM_2) > 0)
+					{
+						sub->draw_option<submenu>("Trim 2", "", Submenu::TRIM_2);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_TANK) > 0)
+					{
+						sub->draw_option<submenu>("Tank", "", Submenu::TANK);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_WINDOWS) > 0)
+					{
+						sub->draw_option<submenu>("Windows", "", Submenu::WINDOWS);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_FENDER) > 0)
+					{
+						sub->draw_option<submenu>("Fender", "", LosSantosFender);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_RIGHTFENDER) > 0)
+					{
+						sub->draw_option<submenu>("Right Fender", "", LosSantosRightFender);
 					}
 					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_GRILLE) > 0)
 					{
@@ -707,7 +904,10 @@ namespace Arctic
 					{
 						sub->draw_option<submenu>("Horn", "", LosSantosHorn);
 					}
-					
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_LIVERY) > 0)
+					{
+						sub->draw_option<submenu>("Livery", "", LosSantosLivery);
+					}
 					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_ROOF) > 0)
 					{
 						sub->draw_option<submenu>("Roof", "", LosSantosRoof);
@@ -715,6 +915,10 @@ namespace Arctic
 					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_SIDESKIRT) > 0)
 					{
 						sub->draw_option<submenu>("Skirts", "", LosSantosSkirts);
+					}
+					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_CHASSIS) > 0)
+					{
+						sub->draw_option<submenu>("Chassis", "", LosSantosChassis);
 					}
 					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_SPOILER) > 0)
 					{
@@ -736,6 +940,8 @@ namespace Arctic
 					{
 						sub->draw_option<submenu>("Windows", "", LosSantosWindows);
 					}
+					
+					
 				}
 				else
 				{
@@ -769,23 +975,23 @@ namespace Arctic
 					{
 						VehicleModifier(MOD_ARMOR, -1);
 					});
-		sub->draw_option<RegularOption>("20%", "", []
+		sub->draw_option<RegularOption>("Armor Upgrade 20%", "", []
 			{
 				VehicleModifier(MOD_ARMOR, 0);
 			});
-		sub->draw_option<RegularOption>("40%", "", []
+		sub->draw_option<RegularOption>("Armor Upgrade 40%", "", []
 			{
 				VehicleModifier(MOD_ARMOR, 1);
 			});
-		sub->draw_option<RegularOption>("60%", "", []
+		sub->draw_option<RegularOption>("Armor Upgrade 60%", "", []
 			{
 				VehicleModifier(MOD_ARMOR, 2);
 			});
-		sub->draw_option<RegularOption>("80%", "", []
+		sub->draw_option<RegularOption>("Armor Upgrade 80%", "", []
 			{
 				VehicleModifier(MOD_ARMOR, 3);
 			});
-		sub->draw_option<RegularOption>("100%", "", []
+		sub->draw_option<RegularOption>("Armor Upgrade 100%", "", []
 			{
 				VehicleModifier(MOD_ARMOR, 4);
 			});
@@ -1014,6 +1220,87 @@ namespace Arctic
 				});
 		}
 			});
+		g_Render->draw_submenu<sub>("Front Bumper", LosSantosFront, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>("None", "", []
+					{
+						VehicleModifier(MOD_FRONTBUMPER, -1);
+					});
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		for (int i = 0; i < VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_FRONTBUMPER); i++)
+		{
+			sub->draw_option<RegularOption>(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_MOD_TEXT_LABEL(veh, MOD_FRONTBUMPER, i)), "", [i]
+				{
+					VehicleModifier(MOD_FRONTBUMPER, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Rear Bumper", LosSantosRear, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>("None", "", []
+					{
+						VehicleModifier(MOD_REARBUMPER, -1);
+					});
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		for (int i = 0; i < VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_REARBUMPER); i++)
+		{
+			sub->draw_option<RegularOption>(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_MOD_TEXT_LABEL(veh, MOD_REARBUMPER, i)), "", [i]
+				{
+					VehicleModifier(MOD_REARBUMPER, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Livery", LosSantosLivery, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>("None", "", []
+					{
+						VehicleModifier(MOD_LIVERY, -1);
+					});
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		for (int i = 0; i < VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_LIVERY); i++)
+		{
+			sub->draw_option<RegularOption>(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_MOD_TEXT_LABEL(veh, MOD_LIVERY, i)), "", [i]
+				{
+					VehicleModifier(MOD_LIVERY, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Fender", LosSantosFender, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>("None", "", []
+					{
+						VehicleModifier(MOD_FENDER, -1);
+					});
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_FENDER);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* GrilleTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, MOD_FENDER, i);
+			const char* GrilleName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(GrilleTextLabel);
+			sub->draw_option<RegularOption>(GrilleName, "", [i]
+				{
+					VehicleModifier(MOD_FENDER, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Right Fender", LosSantosRightFender, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>("None", "", []
+					{
+						VehicleModifier(MOD_RIGHTFENDER, -1);
+					});
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_RIGHTFENDER);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* GrilleTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, MOD_RIGHTFENDER, i);
+			const char* GrilleName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(GrilleTextLabel);
+			sub->draw_option<RegularOption>(GrilleName, "", [i]
+				{
+					VehicleModifier(MOD_RIGHTFENDER, i);
+				});
+		}
+			});
 		g_Render->draw_submenu<sub>("Grille", LosSantosGrille, [](sub* sub)
 			{
 				sub->draw_option<RegularOption>("None", "", []
@@ -1050,6 +1337,24 @@ namespace Arctic
 				});
 		}
 			});
+		g_Render->draw_submenu<sub>("Spoiler", LosSantosSpoiler, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>("None", "", []
+					{
+						VehicleModifier(0, -1);
+					});
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, 0);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* RoofTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, 0, i);
+			const char* RoofName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(RoofTextLabel);
+			sub->draw_option<RegularOption>(RoofName, "", [i]
+				{
+					VehicleModifier(0, i);
+				});
+		}
+			});
 		g_Render->draw_submenu<sub>("Roof", LosSantosRoof, [](sub* sub)
 			{
 				sub->draw_option<RegularOption>("None", "", []
@@ -1065,6 +1370,24 @@ namespace Arctic
 			sub->draw_option<RegularOption>(RoofName, "", [i]
 				{
 					VehicleModifier(MOD_ROOF, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Chassis", LosSantosChassis, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>("None", "", []
+					{
+						VehicleModifier(MOD_CHASSIS, -1);
+					});
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_CHASSIS);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SkirtsTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, MOD_CHASSIS, i);
+			const char* SkirtsName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SkirtsTextLabel);
+			sub->draw_option<RegularOption>(SkirtsName, "", [i]
+				{
+					VehicleModifier(MOD_CHASSIS, i);
 				});
 		}
 			});
@@ -1128,17 +1451,362 @@ namespace Arctic
 				VehicleModifier(MOD_TRANSMISSION, 2);
 			});
 			});
-		g_Render->draw_submenu<sub>("Spoiler", LosSantosSpoiler, [](sub* sub)
+		g_Render->draw_submenu<sub>("Plate Holder", PLATEHOLDER25, [](sub* sub)
 			{
 				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
-		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_PLATEHOLDER);
 		for (int i = 0; i < AmountOfVehicleMods; i++)
 		{
-			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, 0, i);
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, MOD_PLATEHOLDER, i);
 			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
 			sub->draw_option<RegularOption>(SpoilerName, "", [i]
 				{
-					VehicleModifier(0, i);
+					VehicleModifier(MOD_PLATEHOLDER, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Vanity Plates", VANITY_PLATES26, [](sub* sub)
+			{
+				int buffer = MOD_VANITY_PLATES;
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Trim", TRIM27, [](sub* sub)
+			{
+				int buffer = MOD_TRIM;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Ornaments", ORNAMENTS28, [](sub* sub)
+			{
+				int buffer = MOD_ORNAMENTS;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Dashboard", DASHBOARD29, [](sub* sub)
+			{
+				int buffer = MOD_DASHBOARD;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Dial", DIAL30, [](sub* sub)
+			{
+				int buffer = MOD_DIAL;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Door Speaker", DOOR_SPEAKER31, [](sub* sub)
+			{
+				int buffer = MOD_DASHBOARD;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Seats", SEATS32, [](sub* sub)
+			{
+				int buffer = MOD_SEATS;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Steering Wheel", STEERINGWHEEL33, [](sub* sub)
+			{
+				int buffer = MOD_STEERINGWHEEL;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Shifter Leavers", SHIFTER_LEAVERS34, [](sub* sub)
+			{
+				int buffer = MOD_SHIFTER_LEAVERS;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Plaques", PLAQUES35, [](sub* sub)
+			{
+				int buffer = MOD_PLAQUES;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Speakers", SPEAKERS36, [](sub* sub)
+			{
+				int buffer = MOD_SPEAKERS;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Trunk", TRUNK37, [](sub* sub)
+			{
+				int buffer = MOD_TRUNK;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Hydrualics", HYDRAULICS38, [](sub* sub)
+			{
+				int buffer = MOD_HYDRAULICS;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Hydrualics", HYDRAULICS38, [](sub* sub)
+			{
+				int buffer = MOD_HYDRAULICS;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Engine Block", ENGINE_BLOCK39, [](sub* sub)
+			{
+				int buffer = MOD_ENGINE_BLOCK;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Air Filter", AIR_FILTER, [](sub* sub)
+			{
+				int buffer = MOD_AIR_FILTER;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Struts", STRUTS, [](sub* sub)
+			{
+				int buffer = MOD_STRUTS;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Arch Cover", ARCH_COVER, [](sub* sub)
+			{
+				int buffer = MOD_ARCH_COVER;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Arials", AERIALS, [](sub* sub)
+			{
+				int buffer = MOD_AERIALS;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Trim 2", TRIM_2, [](sub* sub)
+			{
+				int buffer = MOD_TRIM_2;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Tank", TANK, [](sub* sub)
+			{
+				int buffer = MOD_TANK;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Windows", WINDOWS, [](sub* sub)
+			{
+				int buffer = MOD_WINDOWS;
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
+		for (int i = 0; i < AmountOfVehicleMods; i++)
+		{
+			const char* SpoilerTextLabel = VEHICLE::GET_MOD_TEXT_LABEL(veh, buffer, i);
+			const char* SpoilerName = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(SpoilerTextLabel);
+			sub->draw_option<RegularOption>(SpoilerName, "", [=]
+				{
+					VehicleModifier(buffer, i);
+				});
+		}
+			});
+		g_Render->draw_submenu<sub>("Exhaust", LosSantosExhaust, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>("None", "", []
+					{
+						VehicleModifier(MOD_EXHAUST, -1);
+					});
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+		for (int i = 0; i < VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_EXHAUST); i++)
+		{
+			sub->draw_option<RegularOption>(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_MOD_TEXT_LABEL(veh, MOD_EXHAUST, i)), "", [i]
+				{
+					VehicleModifier(MOD_EXHAUST, i);
 				});
 		}
 			});
@@ -1523,8 +2191,13 @@ namespace Arctic
 				sub->draw_option<submenu>("All", nullptr, SubmenuAllPlayers);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Filter", nullptr, &p_filter.data, &p_filter.data_i);
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				
 				for (std::uint32_t i = 0; i < 32; ++i)
 				{
+					if (sub->GetSelectedOption() == sub->GetNumOptions()) {
+						g_players.draw_info(i);
+					}
+					
 					if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))
 					{
 
@@ -1875,6 +2548,54 @@ namespace Arctic
 						}
 				});
 
+			});
+		g_Render->draw_submenu<sub>("Misc", SubmenuMisc, [](sub* sub)
+			{
+				
+		sub->draw_option<submenu>("Replace Text", nullptr, SubmenuReplaceText);
+		sub->draw_option<submenu>("FOV", nullptr, SubmenuFOV);
+			});
+		g_Render->draw_submenu<sub>("FOV", SubmenuFOV, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &m_fov.enabled, BoolDisplay::OnOff, false, [] {
+				if (!m_fov.enabled) {
+					CAM::RENDER_SCRIPT_CAMS(false, true, 700, true, true, true);
+					CAM::SET_CAM_ACTIVE(m_fov.freecamCamera, false);
+					CAM::DESTROY_CAM(m_fov.freecamCamera, true);
+				}
+					});
+			sub->draw_option<number<float>>("Value", nullptr, &m_fov.value, 1.0f, 130.0f, 1.0f, 2);
+			});
+		g_Render->draw_submenu<sub>("Replace Text", SubmenuReplaceText, [](sub* sub)
+			{
+
+				sub->draw_option<RegularOption>(("Enter Text"), nullptr, []
+					{
+
+						showKeyboard("Enter Something", "", 25, &replaceTextBuffer, [] {
+						replaced = true;
+							});
+					});
+		sub->draw_option<RegularOption>(("Enter Second Text"), nullptr, []
+			{
+
+				showKeyboard("Enter Something", "", 25, &replaceTextBuffer2, [] {
+				replaced2 = true;
+					});
+			});
+		sub->draw_option<RegularOption>(("Replace"), nullptr, []
+			{
+				if (replaced || replaced2) {
+					g_CustomText->AddText(MISC::GET_HASH_KEY(replaceTextBuffer.c_str()), replaceTextBuffer2.c_str());
+				}
+				
+			});
+		if (replaced || replaced2) {
+			sub->draw_option<UnclickOption>(("Input"), nullptr, [] {});
+			char inputfr[64];
+			sprintf(inputfr, "%s>%s", replaceTextBuffer.c_str(), replaceTextBuffer2.c_str());
+			sub->draw_option<RegularOption>(inputfr, "");
+		}
 			});
 		g_Render->draw_submenu<sub>(("Demo"), SubmenuTest, [](sub* sub)
 		{
