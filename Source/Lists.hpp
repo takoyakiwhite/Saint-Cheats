@@ -65,4 +65,25 @@ namespace Arctic::Lists
 	};
 
 	inline std::size_t DemoListPos = 0;
+	inline const char* DamageList[16]
+	{
+		"Unkown",
+		"None",
+		"Melee",
+		"Bullet",
+		"Rubber",
+		"Explosive",
+		"Fire",
+		"Collision",
+		"Fall",
+		"Drown",
+		"Electric",
+		"Barbed Wire",
+		"Fire Extinguisher",
+		"Smoke",
+		"Water Cannon",
+		"Tranquilizer"
+	};
+
+	inline std::size_t DamagePos = 0;
 }

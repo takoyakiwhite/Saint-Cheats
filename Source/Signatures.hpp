@@ -51,8 +51,7 @@ namespace Arctic
 		char* m_GameBuild;
 		uint32_t* m_region_code;
 
-		using GetNetPed = CPed * (int playerID);
-		GetNetPed* m_GetNetPed;
+		
 	};
 
 	class GameFunctions
@@ -79,11 +78,26 @@ namespace Arctic
 
 		CPedFactory** m_pedFactory;
 
+		using CPlayerListMenuConstructor = __int64(__int64 a1, __int64 a2, __int64 a3);
+		CPlayerListMenuConstructor* m_PlayerListMenuConstructor;
+
 		
 		PVOID m_owned_explosion;
 		rage::hash_list* m_vehicle_hash_pool;
 
 		bool* should_sync_money_rewards;
+
+		using trigger_script_event = void(*)(int event_group, int64_t* args, int arg_count, int player_bits);
+		trigger_script_event m_trigger_script_event{};
+
+		using CPlayerActionsMenu = void(__int64 a1, unsigned int* a2);
+		CPlayerActionsMenu* m_PlayerGUIOptions;
+
+		using CPlayerWildCard = __int64* (std::int32_t friendindex);
+		CPlayerWildCard* m_PlayerWildcard;
+
+		using GetEventData = bool(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount);
+		GetEventData* m_GetEventData;
 	};
 
 	inline std::unique_ptr<GameVariables> g_GameVariables;

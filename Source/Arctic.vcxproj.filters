@@ -178,6 +178,21 @@
     <ClInclude Include="Bypass Max Speed.h">
       <Filter>Core\Features\Vehicle\Features</Filter>
     </ClInclude>
+    <ClInclude Include="Flash Blip.h">
+      <Filter>Core\Features\Network\Players\Selected</Filter>
+    </ClInclude>
+    <ClInclude Include="Selected.h">
+      <Filter>Core\Features\Network\Players\Selected</Filter>
+    </ClInclude>
+    <ClInclude Include="Kick.h">
+      <Filter>Core\Features\Network\Players\Selected\Removals</Filter>
+    </ClInclude>
+    <ClInclude Include="OTR.h">
+      <Filter>Core\Features\Network\Players\Selected</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections.h">
+      <Filter>Core\Features\Protections</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">
@@ -350,6 +365,15 @@
     </Filter>
     <Filter Include="Core\Features\Network\Misc">
       <UniqueIdentifier>{1887d23a-f515-4a76-a1d9-a20a1fd88fa1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Features\Network\Players\Selected">
+      <UniqueIdentifier>{477d9f85-3384-4f45-890f-255531cd5c98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Features\Network\Players\Selected\Removals">
+      <UniqueIdentifier>{8502863a-0cd9-4578-93bb-fb0e901204d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Features\Protections">
+      <UniqueIdentifier>{f64f7b3f-666b-40ea-be2a-6b8c87521cf6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

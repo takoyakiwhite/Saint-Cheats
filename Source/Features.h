@@ -10,8 +10,11 @@
 #include "Lists.hpp"
 #include <filesystem>
 #include "Vehicle.h"
+#include "Players.h"
 namespace Arctic {
 	inline std::string handlingBuffer = "";
+	inline std::string ridBuffer = "";
+	inline int selected_rid = 0;
 
 	inline std::string replaceTextBuffer = "";
 	inline std::string replaceTextBuffer2 = "";
@@ -117,7 +120,7 @@ namespace Arctic {
 							}
 						}
 						Player play(PLAYER::PLAYER_ID());
-						if (PAD::IS_CONTROL_PRESSED(2, 32))
+						if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 32))
 						{
 							!StopAfterNoInput ? ENTITY::APPLY_FORCE_TO_ENTITY(veh, 1, 0.0f, 150.f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1) : VEHICLE::SET_VEHICLE_FORWARD_SPEED(veh, !IsKeyPressed(VK_SHIFT) ? speed * 200 : speed * 200 * 2);
 						}
@@ -307,9 +310,9 @@ namespace Arctic {
 	inline Weather weather;
 	class targeting_mode {
 	public:
-		const char* data[4]{ "Free Aim - Assisted",
+		const char* data[4]{ "Assisted Aim - Full",
 		"Assisted Aim - Partial",
-		"Assisted Aim - Full",
+		"Free Aim - Assisted",
 		"Free Aim" };
 		std::size_t init = 0;
 		
@@ -329,6 +332,30 @@ namespace Arctic {
 		location = HUD::GET_BLIP_COORDS(blip);
 
 		return true;
+	}
+	inline NativeVector3 GetBlipIcon()
+	{
+		static NativeVector3 zero;
+		NativeVector3 coords;
+
+		bool blipFound = false;
+		// search for marker blip
+		int blipIterator = HUD::GET_WAYPOINT_BLIP_ENUM_ID();
+		for (Blip i = HUD::GET_FIRST_BLIP_INFO_ID(blipIterator); HUD::DOES_BLIP_EXIST(i) != 0; i = HUD::GET_NEXT_BLIP_INFO_ID(blipIterator))
+		{
+			if (HUD::GET_BLIP_INFO_ID_TYPE(i) == 4)
+			{
+				coords = HUD::GET_BLIP_INFO_ID_COORD(i);
+				blipFound = true;
+				break;
+			}
+		}
+		if (blipFound)
+		{
+			return coords;
+		}
+
+		return zero;
 	}
 	inline bool get_objective_location(NativeVector3& location)
 	{
@@ -351,7 +378,13 @@ namespace Arctic {
 	class Autopilot {
 	public:
 		bool wreckless = true;
-		bool avoid_roads;
+		bool avoid_roads = false;
+		int avoid_roads_flag = 20972036;
+		std::string avoid_roads_buffer;
+		int wreckless_flag = 786972;
+		std::string wreckless_buffer;
+		int nonwreckless_flag = 387;
+		std::string nonwreckless_flag_buffer;
 		float speed = 100.f;
 		float stop_range = 50.f;
 		const char* destination[3] = { "Waypoint", "Objective", "Wander" };
@@ -616,12 +649,7 @@ namespace Arctic {
 					}
 				}
 			}
-			if (off_the_radar) {
-				*global(2657589).at(PLAYER::GET_PLAYER_INDEX(), 466).at(210).as<int*>() = true;
-				*global(2657589).at(56).as<int*>() = NETWORK::GET_NETWORK_TIME() + 1;
-
-				
-			}
+			
 			if (seatbelt) {
 				PED::SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(PLAYER::PLAYER_PED_ID(), true);
 				PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 32, false);
@@ -1546,6 +1574,7 @@ namespace Arctic {
 		int spawng2 = 0;
 		int spawnb2 = 0;
 		void spawn(Hash hash) {
+			*script_global(4540726).as<bool*>() = true;
 			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
 				{
 					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
@@ -1711,7 +1740,265 @@ namespace Arctic {
 		}
 	};
 	inline Aimbot aimbot;
+	class DamageC {
+	public:
+		void change(int size) {
+			
+
+			
+			switch (size) {
+			case 0:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Unknown;
+				Lists::DamagePos = (std::size_t)eDamageType::Unknown;
+				break;
+			case 1:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::None;
+				Lists::DamagePos = (std::size_t)eDamageType::None;
+				break;
+			case 2:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Melee;
+				Lists::DamagePos = (std::size_t)eDamageType::Melee;
+				break;
+			case 3:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Bullet;
+				Lists::DamagePos = (std::size_t)eDamageType::Bullet;
+				break;
+			case 4:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::BulletRubber;
+				Lists::DamagePos = (std::size_t)eDamageType::BulletRubber;
+				break;
+			case 5:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Explosive;
+				Lists::DamagePos = (std::size_t)eDamageType::Explosive;
+				break;
+			case 6:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Fire;
+				Lists::DamagePos = (std::size_t)eDamageType::Fire;
+				break;
+			case 7:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Collision;
+				Lists::DamagePos = (std::size_t)eDamageType::Collision;
+				break;
+			case 8:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Fall;
+				Lists::DamagePos = (std::size_t)eDamageType::Fall;
+				break;
+			case 9:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Drown;
+				Lists::DamagePos = (std::size_t)eDamageType::Drown;
+				break;
+			case 10:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Electric;
+				Lists::DamagePos = (std::size_t)eDamageType::Electric;
+				break;
+			case 11:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::BarbedWire;
+				Lists::DamagePos = (std::size_t)eDamageType::BarbedWire;
+				break;
+			case 12:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::FireExtinguisher;
+				Lists::DamagePos = (std::size_t)eDamageType::FireExtinguisher;
+				break;
+			case 13:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Smoke;
+				Lists::DamagePos = (std::size_t)eDamageType::Smoke;
+				break;
+			case 14:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::WaterCannon;
+				Lists::DamagePos = (std::size_t)eDamageType::WaterCannon;
+				break;
+			case 15:
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Tranquilizer;
+				Lists::DamagePos = (std::size_t)eDamageType::Tranquilizer;
+				break;
+			}
+
+
+			g_Render->m_SubmenuStack.pop();
+		}
+	};
+	inline DamageC damage_type;
+	class TargetingMode {
+	public:
+		void change(int size) {
+			
+			//PLAYER::SET_PLAYER_TARGETING_MODE(size);
+			t_mode.init = size;
+			g_Render->m_SubmenuStack.pop();
+		}
+	};
+	inline TargetingMode target_c;
+	class Globals {
+	public:
+		int mobile = 2793046;
+		int radar = 2657589;
+		int time = 2672505;
+		template <typename T>
+		void add(int base, int at, int value, Any type) {
+			*script_global(base).at(at).as<int*>() = value;
+		}
+	};
+	inline Globals global;
+	class Requests {
+	public:
+		const char* data[7] = { "Helicopter Pickup", "Boat Pickup", "Backup Helicopter", "Airstrike", "Ammo Drop", "BST", "Ballistic Armor"};
+		std::size_t data_i = 0;
+		void add(int type) {
+			*script_global(global.mobile).at(type).as<int*>() = 1;
+		}
+	};
+	inline Requests requests;
+	class Load {
+	public:
+		
+		void add(std::string text) {
+			HUD::BEGIN_TEXT_COMMAND_BUSYSPINNER_ON("STRING");
+				HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());
+				HUD::END_TEXT_COMMAND_BUSYSPINNER_ON(3);
+
+				
+
+				
+			
+		}
+		void remove() {
+			HUD::BUSYSPINNER_OFF();
+		}
+	};
+	inline Load m_load;
+	class off_the_radar {
+	public:
+		bool enabled = false;
+		const char* time[4] = { "Normal", "13:37", "69:69", "99:99"};
+		std::size_t data = 0;
+		void init() {
+			if (enabled) {
+				script_global globalplayer_bd(2657589);
+				switch (data) {
+				case 0:
+					
+					*globalplayer_bd.at(PLAYER::GET_PLAYER_INDEX(), 466).at(210).as<int*>() = true;
+					*script_global(2672505).at(57).as<int*>() = NETWORK::GET_NETWORK_TIME() + 1;
+					break;
+				case 1:
+					
+					*globalplayer_bd.at(PLAYER::GET_PLAYER_INDEX(), 466).at(210).as<int*>() = true;
+					*script_global(2672505).at(57).as<int*>() = 1337;
+					break;
+				case 2:
+					
+					*globalplayer_bd.at(PLAYER::GET_PLAYER_INDEX(), 466).at(210).as<int*>() = true;
+					*script_global(2672505).at(57).as<int*>() = 6969;
+					break;
+				case 3:
+					
+					*globalplayer_bd.at(PLAYER::GET_PLAYER_INDEX(), 466).at(210).as<int*>() = true;
+					*script_global(2672505).at(57).as<int*>() = 9999;
+					break;
+				}
+			}
+		}
+	};
+	inline off_the_radar m_radar;
+	class join_ses {
+	public:
+		const char* name[10] = { "Populated Public", "New Public", "Closed Crew", "Crew", "Closed Friend", "Find Friend", "Solo", "Invite Only", "Social-Club TV", "Story Mode"};
+		std::size_t data = 0;
+		void join(eSessionType session) {
+			*script_global(2695915).as<int*>() = (session == eSessionType::SC_TV ? 1 : 0);
+
+			if (session == eSessionType::LEAVE_ONLINE)
+				*script_global(1574589).at(2).as<int*>() = -1;
+			else
+				*script_global(1575017).as<int*>() = (int)session;
+
+			*script_global(1574589).as<int*>() = 1;
+			fbr::cur()->wait(200ms);
+			*script_global(1574589).as<int*>() = 0;
+		}
+	};
+	inline join_ses session;
+	class Flag_creator {
+	public:
+		const char* direction[3] = { "Reckless", "Non-Reckless", "Avoid Roads" };
+		std::size_t data = 0;
+		bool auto_save = false;
+		bool stop_before_vehicles = false;
+		bool stop_before_peds = false;
+		bool avoid_vehicles = false;
+		bool avoid_empty_vehicles = false;
+		bool avoid_peds = false;
+		bool avoid_objects = false;
+		bool stop_at_traffic_lights = false;
+		bool use_blinkers = false;
+		bool allow_going_wrong_way = false;
+		bool drive_in_reverse = false;
+		bool take_shortest_path = false;
+		bool wreckless = false;
+		bool ignore_roads = false;
+		bool ignore_all_pathing = false;
+		bool avoid_highways = false;
+		int current = 0;
+		void init() {
+			if (auto_save) {
+				switch (data) {
+				case 0:
+					autopilot.wreckless_flag = current;
+					break;
+				case 1:
+					autopilot.nonwreckless_flag = current;
+					break;
+				case 2:
+					autopilot.avoid_roads_flag = current;
+					break;
+				}
+			}
+		}
+
+	};
+	inline Flag_creator flag_creator;
+	class teleport {
+	public:
+		bool automatic = false;
+		void waypoint() {
+			NativeVector3 coords = GetBlipIcon();
+			Ped ped = PLAYER::PLAYER_PED_ID();
+
+			if (coords.x == 0 && coords.y == 0) { return; }
+
+			if (PED::IS_PED_IN_ANY_VEHICLE(ped, 0))
+				ped = PED::GET_VEHICLE_PED_IS_USING(ped);
+
+			bool isGroundAvailable = false;
+			std::vector<float> GROUND_HEIGHT{ 100.0f, 150.0f, 50.0f, 0.0f, 200.0f, 250.0f, 300.0f, 350.0f, 400.0f, 450.0f, 500.0f, 550.0f, 600.0f, 650.0f, 700.0f, 750.0f, 800.0f };
+			m_load.add("Getting coordinates...");
+			for (int i = 0; i < GROUND_HEIGHT.size(); i++)
+			{
+				ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ped, coords.x, coords.y, GROUND_HEIGHT[i], true, true, true);
+
+
+				fbr::cur()->wait(100ms);
+
+
+				if (MISC::GET_GROUND_Z_FOR_3D_COORD(coords.x, coords.y, GROUND_HEIGHT[i], &coords.z, 0, false))
+				{
+					isGroundAvailable = true;
+					coords.z += 3.0;
+					break;
+				}
+			}
+			m_load.remove();
+			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ped, coords.x, coords.y, coords.z, true, true, true);
+		}
+		void init() {
+			if (automatic) {
+				waypoint();
+			}
+		}
+	};
+	inline teleport m_teleport;
 	inline void FeatureInitalize() {
+		flag_creator.init();
 		invisible.init();
 		no_clip.init();
 		acceleration.init();
@@ -1735,6 +2022,9 @@ namespace Arctic {
 		m_fov.init();
 		blink.init();
 		aimbot.init();
+		g_players.get_selected.init();
+		m_radar.init();
+		m_teleport.init();
 		if (NoPlaneTurbulance) {
 			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 

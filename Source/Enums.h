@@ -480,6 +480,20 @@ enum class BlipIcons
 	Slamvan,
 	ZR380
 };
+enum class eSessionType
+{
+	JOIN_PUBLIC,
+	NEW_PUBLIC,
+	CLOSED_CREW,
+	CREW,
+	CLOSED_FRIENDS = 6,
+	FIND_FRIEND = 9,
+	SOLO,
+	INVITE_ONLY,
+	JOIN_CREW,
+	SC_TV,
+	LEAVE_ONLINE = -1
+};
 enum VehicleModTypes
 {
 	MOD_SPOILER = 0,

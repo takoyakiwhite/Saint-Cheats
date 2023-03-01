@@ -3,13 +3,13 @@
 
 namespace Arctic
 {
-	class global
+	class script_global
 	{
 	public:
-		explicit global(std::size_t index);
+		explicit script_global(std::size_t index);
 
-		global at(std::ptrdiff_t index);
-		global at(std::ptrdiff_t index, std::size_t size);
+		script_global at(std::ptrdiff_t index);
+		script_global at(std::ptrdiff_t index, std::size_t size);
 
 		template <typename T>
 		std::enable_if_t<std::is_pointer_v<T>, T> as()

@@ -10,11 +10,12 @@ namespace Arctic::UserInterface
 		explicit ChooseOption() = default;
 
 		template <PositionType N>
-		explicit ChooseOption(const char* text, const char* description, DataType(*array)[N], PositionType* position, bool actionOnHorizontal = false, std::function<void()> action = [] {}):
+		explicit ChooseOption(const char* text, const char* description, DataType(*array)[N], PositionType* position, bool actionOnHorizontal = false, std::uint32_t subId2 = -1, std::function<void()> action = [] {}):
 			m_Data(&(*array)[0]),
 			m_DataSize(N),
 			m_Position(position),
-			m_ActionOnHorizontal(actionOnHorizontal)
+			m_ActionOnHorizontal(actionOnHorizontal),
+			m_SubId2(subId2)
 		{
 			Base::SetLeftText(text);
 			if (description)
@@ -23,11 +24,12 @@ namespace Arctic::UserInterface
 		}
 
 		template <typename VectorType>
-		explicit ChooseOption(const char* text, const char* description, const VectorType* v, PositionType* position, bool actionOnHorizontal = false, std::function<void()> action = [] {}) :
+		explicit ChooseOption(const char* text, const char* description, const VectorType* v, PositionType* position, bool actionOnHorizontal = false, std::uint32_t subId2 = -1, std::function<void()> action = [] {}) :
 			m_Data(v->data()),
 			m_DataSize(v->size()),
 			m_Position(position),
-			m_ActionOnHorizontal(actionOnHorizontal)
+			m_ActionOnHorizontal(actionOnHorizontal),
+			m_SubId2(subId2)
 		{
 			Base::SetLeftText(text);
 			if (description)
@@ -54,6 +56,14 @@ namespace Arctic::UserInterface
 
 		void HandleAction(OptionAction action) override
 		{
+			if (action == OptionAction::EnterPress) {
+				if (m_SubId2 == -1) {
+
+				}
+				else {
+					g_Render->SwitchToSubmenu(m_SubId2);
+				}
+			}
 			if (action == OptionAction::LeftPress)
 			{
 				if (m_Data)
@@ -95,6 +105,7 @@ namespace Arctic::UserInterface
 		PositionType m_DataSize{};
 		PositionType* m_Position{};
 		bool m_ActionOnHorizontal{};
+		std::uint32_t m_SubId2{};
 
 		using Base = BaseOption<ChooseOption<DataType, PositionType>>;
 	};

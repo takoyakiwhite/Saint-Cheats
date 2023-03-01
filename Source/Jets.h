@@ -56,16 +56,18 @@ namespace Arctic {
 				if (excludes.friends) {
 					int netHandle[13];
 					NETWORK::NETWORK_HANDLE_FROM_PLAYER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), netHandle, 13);
-					if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
-						return;
+					if (!NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
+						add_jet(i);
 					}
 				}
 				if (excludes.self) {
-					if (i == PLAYER::PLAYER_ID()) {
-						return;
+					if (i != PLAYER::PLAYER_ID()) {
+						add_jet(i);
 					}
 				}
-				add_jet(i);
+				if (!excludes.self && !excludes.friends) {
+					add_jet(i);
+				}
 
 
 

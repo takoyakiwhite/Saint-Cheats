@@ -5,6 +5,7 @@
 
 namespace Arctic::UserInterface
 {
+	std::string sliderKeyboardBuffer;
 	template <typename NumberType>
 	class number : public BaseOption<number<NumberType>>
 	{
@@ -38,7 +39,7 @@ namespace Arctic::UserInterface
 			
 			auto sub = g_Render->m_SubmenuStack.top();
 			bool selectedOption = sub->GetSelectedOption() == sub->GetNumOptions() ? true : false;
-			if (selectedOption) {
+			if (sub->GetSelectedOption() == sub->GetNumOptions()) {
 				MemoryStringStream stream(Base::m_RightText);
 				stream << *m_Number << " <>" << std::fixed;
 				return Base::GetRightText();

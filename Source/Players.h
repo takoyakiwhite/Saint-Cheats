@@ -1,9 +1,11 @@
 #pragma once
 #include "Natives.hpp" 
 #include "UI/Interface.hpp"
+#include "Selected.h"
 namespace Arctic {
 	class PlayersData {
 	public:
+		GetSelected get_selected;
 		void get_theme(Color col) {
 			switch (g_Render->ThemeIterator) {
 			case 0:

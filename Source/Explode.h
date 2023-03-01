@@ -37,22 +37,38 @@ namespace Arctic {
 				if (excludes.friends) {
 					int netHandle[13];
 					NETWORK::NETWORK_HANDLE_FROM_PLAYER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), netHandle, 13);
-					if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
-						return;
+					if (!NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
+						if (settings.blame) {
+							NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
+							add(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(settings.blamed_person), c, settings.data, settings.damage_scale, settings.sound, settings.invisible, settings.camera_shake);
+						}
+						else {
+							NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
+							FIRE::ADD_EXPLOSION(c.x, c.y, c.z, settings.data, settings.damage_scale, settings.sound, settings.invisible, settings.camera_shake, false);
+						}
 					}
 				}
 				if (excludes.self) {
-					if (i == PLAYER::PLAYER_ID()) {
-						return;
+					if (i != PLAYER::PLAYER_ID()) {
+						if (settings.blame) {
+							NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
+							add(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(settings.blamed_person), c, settings.data, settings.damage_scale, settings.sound, settings.invisible, settings.camera_shake);
+						}
+						else {
+							NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
+							FIRE::ADD_EXPLOSION(c.x, c.y, c.z, settings.data, settings.damage_scale, settings.sound, settings.invisible, settings.camera_shake, false);
+						}
 					}
 				}
-				if (settings.blame) {
-					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
-					add(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(settings.blamed_person), c, settings.data, settings.damage_scale, settings.sound, settings.invisible, settings.camera_shake);
-				}
-				else {
-					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
-					FIRE::ADD_EXPLOSION(c.x, c.y, c.z, settings.data, settings.damage_scale, settings.sound, settings.invisible, settings.camera_shake, false);
+				if (!excludes.self && !excludes.friends) {
+					if (settings.blame) {
+						NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
+						add(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(settings.blamed_person), c, settings.data, settings.damage_scale, settings.sound, settings.invisible, settings.camera_shake);
+					}
+					else {
+						NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
+						FIRE::ADD_EXPLOSION(c.x, c.y, c.z, settings.data, settings.damage_scale, settings.sound, settings.invisible, settings.camera_shake, false);
+					}
 				}
 			}
 		}
@@ -62,17 +78,21 @@ namespace Arctic {
 					if (excludes.friends) {
 						int netHandle[13];
 						NETWORK::NETWORK_HANDLE_FROM_PLAYER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), netHandle, 13);
-						if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
-							return;
+						if (!NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
+							NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
+							add(settings.blame ? settings.blamed_person : PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), c, settings.data, settings.damage_scale, settings.sound, settings.invisible, settings.camera_shake);
 						}
 					}
 					if (excludes.self) {
-						if (i == PLAYER::PLAYER_ID()) {
-							return;
+						if (i != PLAYER::PLAYER_ID()) {
+							NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
+							add(settings.blame ? settings.blamed_person : PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), c, settings.data, settings.damage_scale, settings.sound, settings.invisible, settings.camera_shake);
 						}
 					}
-					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
-					add(settings.blame ? settings.blamed_person : PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), c, settings.data, settings.damage_scale, settings.sound, settings.invisible, settings.camera_shake);
+					if (!excludes.self && !excludes.friends) {
+						NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
+						add(settings.blame ? settings.blamed_person : PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), c, settings.data, settings.damage_scale, settings.sound, settings.invisible, settings.camera_shake);
+					}
 				}
 			}
 		}

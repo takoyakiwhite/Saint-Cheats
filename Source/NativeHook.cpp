@@ -9,7 +9,7 @@ namespace Arctic
 	NativeHooks::NativeHooks()
 	{
 		AddNativeDetour("SGI", Joaat("main_persistent"), 0x767FBC2AC802EF3D, Hooks::GetStatInt);
-		AddNativeDetour("GED", 0x2902843FCD2B2D79, Hooks::GetEventData);
+		AddNativeDetour("GED", 0x2902843FCD2B2D79, Hooks::GetEventData2);
 
 		for (auto& entry : *g_GameVariables->m_ScriptProgramTable)
 			if (entry.m_program)
@@ -41,6 +41,7 @@ namespace Arctic
 
 		g_Logger->Debug("Scanned Native %s.", name);
 	}
+	
 
 	void NativeHooks::HookProgram(rage::scrProgram* program)
 	{

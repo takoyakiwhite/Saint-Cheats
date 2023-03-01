@@ -23,10 +23,15 @@
     <ClInclude Include="Explode.h" />
     <ClInclude Include="Features.h" />
     <ClInclude Include="FiberHelper.hpp" />
+    <ClInclude Include="Flash Blip.h" />
     <ClInclude Include="Jets.h" />
+    <ClInclude Include="Kick.h" />
     <ClInclude Include="Math.h" />
+    <ClInclude Include="OTR.h" />
     <ClInclude Include="Players.h" />
+    <ClInclude Include="Protections.h" />
     <ClInclude Include="Render.h" />
+    <ClInclude Include="Selected.h" />
     <ClInclude Include="Signatures.hpp" />
     <ClInclude Include="Hooking.hpp" />
     <ClInclude Include="ImGui\imconfig.h" />

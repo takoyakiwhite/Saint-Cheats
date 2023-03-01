@@ -77,7 +77,7 @@ namespace Arctic::UserInterface
 		UIManager(UIManager&&) = delete;
 		UIManager& operator=(UIManager const&) = delete;
 		UIManager& operator=(UIManager&&) = delete;
-	
+		
 		template <typename SubmenuType, typename ...TArgs>
 		void draw_submenu(TArgs&&... args)
 		{
@@ -89,7 +89,7 @@ namespace Arctic::UserInterface
 
 			m_AllSubmenus.push_back(std::move(sub));
 		}
-
+		
 		void SwitchToSubmenu(std::uint32_t id)
 		{
 			for (auto&& sub : m_AllSubmenus)
@@ -258,6 +258,7 @@ namespace Arctic::UserInterface
 		int g_MenuAlpha = 0;
 		const char* m_CurrentSubMenuName = "Hello";
 		bool m_AnimationCheck;
+		
 		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
 	private:
 		bool m_OpenKeyPressed = false;

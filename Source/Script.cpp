@@ -19,10 +19,13 @@
 #include "Enums.h"
 #include "All Players.h"
 #include "Players.h"
+#include "Hooking.hpp"
+#include "Protections.h"
 namespace Arctic
 {
 	enum Submenu : std::uint32_t
 	{
+		SubmenuCustomFlags,
 		//HOME
 		SubmenuHome,
 
@@ -67,6 +70,7 @@ namespace Arctic
 		SubmenuGunLockerGive,
 		SubmenuGunLockerAmmo,
 		SubmenuWeaponMultipliers,
+		SubmenuDamageTest,
 		
 		//SETTINGS
 		SubmenuSettings,
@@ -117,6 +121,7 @@ namespace Arctic
 
 		SubmenuAirstrike,
 		SubmenuTargetingMode,
+		SubmenuTargetMode,
 		SubmenuTriggerbot,
 		SubmenuSpamText,
 		SubmenuUpgrades,
@@ -169,7 +174,18 @@ namespace Arctic
 		SubmenuMisc,
 			SubmenuReplaceText,
 			SubmenuFOV,
-		
+			SubmenuRemoval,
+			SubmenuCrashes,
+			SubmenuKicks,
+			SubmenuRequests,
+			SubmenuSesStart,
+			SubmenuFriendly,
+			SubmenuOffRadar,
+		SubmenuFlagCreator,
+		SubmenuTeleport,
+		SubmenuRIDJoiner,
+		SubmenuProtections,
+		SubmenuScriptEvents,
 	};
 
 	bool MainScript::IsInitialized()
@@ -182,19 +198,20 @@ namespace Arctic
 		return ScriptType::Game;
 	}
 
-	void MainScript::Initialize()
+	
+ 	void MainScript::Initialize()
 	{
 		m_Initialized = true;
 		using namespace UserInterface;
 		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_JOINING"), "Loading GTA Online with " BIGBASE_NAME "...");
 		
-
+		
 		g_Render->draw_submenu<sub>("Arctic", SubmenuHome, [](sub* sub)
 		{
 			sub->draw_option<submenu>("Player", nullptr, SubmenuSelf);
 			sub->draw_option<submenu>("Network", nullptr, SubmenuNetwork);
-			sub->draw_option<submenu>("Protections", nullptr, SubmenuSettings);
-			sub->draw_option<submenu>("Teleport", nullptr, SubmenuSettings);
+			sub->draw_option<submenu>("Protections", nullptr, SubmenuProtections);
+			sub->draw_option<submenu>("Teleport", nullptr, SubmenuTeleport);
 			sub->draw_option<submenu>("Weapon", nullptr, SubmenuWeapon);
 			sub->draw_option<submenu>("Vehicle", nullptr, SubmenuVehicle);
 			sub->draw_option<submenu>("Misc", nullptr, SubmenuMisc);
@@ -301,7 +318,7 @@ namespace Arctic
 			});
 		g_Render->draw_submenu<sub>(("Outfit Editor"), SubmenuOutfitEditor, [](sub* sub)
 			{
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &Lists::HeaderTypesFrontend2, &Lists::HeaderTypesPosition2, true, [] {
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &Lists::HeaderTypesFrontend2, &Lists::HeaderTypesPosition2, true, -1, [] {
 				g_Render->outfits = Lists::HeaderTypesBackend2[Lists::HeaderTypesPosition2];
 					});
 		switch (g_Render->outfits) {
@@ -653,9 +670,10 @@ namespace Arctic
 				sub->draw_option<toggle<bool>>(("Randomize Secondary"), nullptr, &max_loop.randomizesecondary, BoolDisplay::OnOff);
 				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &max_loop.delay, 0, 5000, 50);
 			});
-		g_Render->draw_submenu<sub>(("Auto Pilot"), SubmenuAutoPilot, [](sub* sub)
+		g_Render->draw_submenu<sub>(("Auto-Pilot"), SubmenuAutoPilot, [](sub* sub)
 			{
-				sub->draw_option<toggle<bool>>(("Wreckless"), nullptr, &autopilot.wreckless, BoolDisplay::OnOff);
+				sub->draw_option<submenu>("Flag Creator", nullptr, SubmenuFlagCreator);
+				sub->draw_option<toggle<bool>>(("Reckless"), nullptr, &autopilot.wreckless, BoolDisplay::OnOff);
 				if (autopilot.wreckless) {
 					sub->draw_option<toggle<bool>>(("Avoid Roads"), nullptr, &autopilot.wreckless, BoolDisplay::OnOff);
 				}
@@ -668,7 +686,8 @@ namespace Arctic
 						NativeVector3 destination = HUD::GET_BLIP_INFO_ID_COORD(HUD::GET_FIRST_BLIP_INFO_ID(8));
 						Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 						if (autopilot.destination_i == 0) {
-							TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(PLAYER::PLAYER_PED_ID(), veh, destination.x, destination.y, destination.z, autopilot.speed, autopilot.wreckless ? 516 : 387, autopilot.stop_range);
+							PED::SET_DRIVER_ABILITY(PLAYER::PLAYER_PED_ID(), 100.f);
+							TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(PLAYER::PLAYER_PED_ID(), veh, destination.x, destination.y, destination.z, autopilot.speed, autopilot.wreckless ? autopilot.wreckless_flag : autopilot.nonwreckless_flag, autopilot.stop_range);
 
 						}
 						if (autopilot.destination_i == 1) {
@@ -676,21 +695,25 @@ namespace Arctic
 
 							get_objective_location(location);
 							if (autopilot.wreckless) {
-
-								TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(PLAYER::PLAYER_PED_ID(), veh, location.x, location.y, location.z, autopilot.speed, autopilot.avoid_roads ? 20972036 : 516, autopilot.stop_range);
+								PED::SET_DRIVER_ABILITY(PLAYER::PLAYER_PED_ID(), 100.f);
+								TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(PLAYER::PLAYER_PED_ID(), veh, location.x, location.y, location.z, autopilot.speed, autopilot.avoid_roads ? autopilot.avoid_roads_flag : autopilot.wreckless_flag, autopilot.stop_range);
+								
 							}
 							else {
-								TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(PLAYER::PLAYER_PED_ID(), veh, location.x, location.y, location.z, autopilot.speed, 387, autopilot.stop_range);
+								TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(PLAYER::PLAYER_PED_ID(), veh, location.x, location.y, location.z, autopilot.speed, autopilot.nonwreckless_flag, autopilot.stop_range);
 							}
 						}
 						if (autopilot.destination_i == 2) {
 
 							if (autopilot.wreckless) {
 
-								TASK::TASK_VEHICLE_DRIVE_WANDER(PLAYER::PLAYER_PED_ID(), veh, autopilot.speed, autopilot.avoid_roads ? 20972036 : 516);
+								PED::SET_DRIVER_ABILITY(PLAYER::PLAYER_PED_ID(), 100.f);
+								TASK::TASK_VEHICLE_DRIVE_WANDER(PLAYER::PLAYER_PED_ID(), veh, autopilot.speed, autopilot.avoid_roads ? autopilot.avoid_roads_flag : autopilot.wreckless_flag);
+								
 							}
 							else {
-								TASK::TASK_VEHICLE_DRIVE_WANDER(PLAYER::PLAYER_PED_ID(), veh, autopilot.speed, 387);
+								TASK::TASK_VEHICLE_DRIVE_WANDER(PLAYER::PLAYER_PED_ID(), veh, autopilot.speed, autopilot.nonwreckless_flag);
+
 							}
 						}
 				});
@@ -701,6 +724,226 @@ namespace Arctic
 						PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), oldveh, -1);
 				
 					});
+				sub->draw_option<UnclickOption>(("Current Flags"), nullptr, [] {});
+				char wreckless[64];
+				sprintf(wreckless, "Reckless: %i", autopilot.wreckless_flag);
+				sub->draw_option<RegularOption>((wreckless), "https://vespura.com/fivem/drivingstyle/", []
+					{
+						if (flag_creator.auto_save) {
+							if (flag_creator.data == 0) {
+								return;
+							}
+						}
+						showKeyboard("Enter Something", "", 10, &autopilot.wreckless_buffer, [] {
+								autopilot.wreckless_flag = atoi(autopilot.wreckless_buffer.c_str());
+								});
+						
+
+					});
+				char nonwreckless[64];
+				sprintf(nonwreckless, "Non-Reckless: %i", autopilot.nonwreckless_flag);
+				sub->draw_option<RegularOption>((nonwreckless), "https://vespura.com/fivem/drivingstyle/", []
+					{
+						if (flag_creator.auto_save) {
+							if (flag_creator.data == 1) {
+								return;
+							}
+						}
+						showKeyboard("Enter Something", "", 10, &autopilot.nonwreckless_flag_buffer, [] {
+								autopilot.nonwreckless_flag = atoi(autopilot.nonwreckless_flag_buffer.c_str());
+								});
+						
+
+					});
+				char avoid[64];
+				sprintf(avoid, "Avoid Roads: %i", autopilot.avoid_roads_flag);
+				sub->draw_option<RegularOption>((avoid), "https://vespura.com/fivem/drivingstyle/", []
+					{
+						if (flag_creator.auto_save) {
+							if (flag_creator.data == 2) {
+								return;
+							}
+						}
+						showKeyboard("Enter Something", "", 10, &autopilot.avoid_roads_buffer, [] {
+								autopilot.avoid_roads_flag = atoi(autopilot.avoid_roads_buffer.c_str());
+								});
+						
+
+					});
+				
+			});
+		
+		g_Render->draw_submenu<sub>(("Flag Creator"), SubmenuFlagCreator, [](sub* sub)
+			{
+				sub->draw_option<submenu>("Flags", nullptr, SubmenuCustomFlags);
+				
+				
+
+				sub->draw_option<toggle<bool>>(("Automaticly Save"), nullptr, &flag_creator.auto_save, BoolDisplay::OnOff);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Save", nullptr, &flag_creator.direction, &flag_creator.data, false, -1, []
+					{
+						
+						switch (flag_creator.data) {
+						case 0:
+							autopilot.wreckless_flag = flag_creator.current;
+							break;
+						case 1:
+							autopilot.nonwreckless_flag = flag_creator.current;
+							break;
+						case 2:
+							autopilot.avoid_roads_flag = flag_creator.current;
+							break;
+						}
+
+					});
+				sub->draw_option<UnclickOption>(("Current"), nullptr, [] {});
+				char current[64];
+				sprintf(current, "%i", flag_creator.current);
+				sub->draw_option<RegularOption>((current), "", []
+				{
+				
+
+				});
+
+
+			});
+		g_Render->draw_submenu<sub>(("Flags"), SubmenuCustomFlags, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Stop Before Vehicles"), nullptr, &flag_creator.stop_before_vehicles, BoolDisplay::OnOff, false, [] {
+				if (flag_creator.stop_before_vehicles) {
+					flag_creator.current += 1;
+				}
+		if (!flag_creator.stop_before_vehicles) {
+			flag_creator.current -= 1;
+		}
+					});
+		sub->draw_option<toggle<bool>>(("Stop Before Peds"), nullptr, &flag_creator.stop_before_peds, BoolDisplay::OnOff, false, [] {
+			if (flag_creator.stop_before_peds) {
+				flag_creator.current += 2;
+			}
+		if (!flag_creator.stop_before_peds) {
+			flag_creator.current -= 2;
+		}
+			});
+		sub->draw_option<toggle<bool>>(("Avoid Vehicles"), nullptr, &flag_creator.avoid_vehicles, BoolDisplay::OnOff, false, [] {
+			bool buffer = flag_creator.avoid_vehicles;
+		if (buffer) {
+			flag_creator.current += 4;
+		}
+		if (!buffer) {
+			flag_creator.current -= 4;
+		}
+			});
+		sub->draw_option<toggle<bool>>(("Avoid Empty Vehicles"), nullptr, &flag_creator.avoid_empty_vehicles, BoolDisplay::OnOff, false, [] {
+			bool buffer = flag_creator.avoid_empty_vehicles;
+		if (buffer) {
+			flag_creator.current += 8;
+		}
+		if (!buffer) {
+			flag_creator.current -= 8;
+		}
+
+			});
+		sub->draw_option<toggle<bool>>(("Avoid Peds"), nullptr, &flag_creator.avoid_peds, BoolDisplay::OnOff, false, [] {
+			bool buffer = flag_creator.avoid_peds;
+		if (buffer) {
+			flag_creator.current += 16;
+		}
+		if (!buffer) {
+			flag_creator.current -= 16;
+		}
+
+			});
+		sub->draw_option<toggle<bool>>(("Avoid Objects"), nullptr, &flag_creator.avoid_objects, BoolDisplay::OnOff, false, [] {
+			bool buffer = flag_creator.avoid_objects;
+		if (buffer) {
+			flag_creator.current += 16 * 2;
+		}
+		if (!buffer) {
+			flag_creator.current -= 16 * 2;
+		}
+
+			});
+		sub->draw_option<toggle<bool>>(("Stop At Trafic Lights"), nullptr, &flag_creator.stop_at_traffic_lights, BoolDisplay::OnOff, false, [] {
+			bool buffer = flag_creator.stop_at_traffic_lights;
+		if (buffer) {
+			flag_creator.current += 128;
+		}
+		if (!buffer) {
+			flag_creator.current -= 128;
+		}
+
+			});
+		sub->draw_option<toggle<bool>>(("Use Blinkers"), nullptr, &flag_creator.use_blinkers, BoolDisplay::OnOff, false, [] {
+			bool buffer = flag_creator.use_blinkers;
+		if (buffer) {
+			flag_creator.current += 256;
+		}
+		if (!buffer) {
+			flag_creator.current -= 256;
+		}
+
+			});
+		sub->draw_option<toggle<bool>>(("Drive In Reverse"), nullptr, &flag_creator.drive_in_reverse, BoolDisplay::OnOff, false, [] {
+			bool buffer = flag_creator.drive_in_reverse;
+		if (buffer) {
+			flag_creator.current += 1024;
+		}
+		if (!buffer) {
+			flag_creator.current -= 1024;
+		}
+
+			});
+		sub->draw_option<toggle<bool>>(("Take Shortest Path"), nullptr, &flag_creator.take_shortest_path, BoolDisplay::OnOff, false, [] {
+			bool buffer = flag_creator.take_shortest_path;
+		if (buffer) {
+			flag_creator.current += 262144;
+		}
+		if (!buffer) {
+			flag_creator.current -= 262144;
+		}
+
+			});
+		sub->draw_option<toggle<bool>>(("Reckless"), nullptr, &flag_creator.wreckless, BoolDisplay::OnOff, false, [] {
+			bool buffer = flag_creator.wreckless;
+		if (buffer) {
+			flag_creator.current += 524288;
+		}
+		if (!buffer) {
+			flag_creator.current -= 524288;
+		}
+
+			});
+		sub->draw_option<toggle<bool>>(("Ignore Roads"), nullptr, &flag_creator.ignore_roads, BoolDisplay::OnOff, false, [] {
+			bool buffer = flag_creator.ignore_roads;
+		if (buffer) {
+			flag_creator.current += 4194304;
+		}
+		if (!buffer) {
+			flag_creator.current -= 4194304;
+		}
+
+			});
+		sub->draw_option<toggle<bool>>(("Ignore All Pathing"), nullptr, &flag_creator.ignore_all_pathing, BoolDisplay::OnOff, false, [] {
+			bool buffer = flag_creator.ignore_all_pathing;
+		if (buffer) {
+			flag_creator.current += 16777216;
+		}
+		if (!buffer) {
+			flag_creator.current -= 16777216;
+		}
+
+			});
+		sub->draw_option<toggle<bool>>(("Avoid Highways"), nullptr, &flag_creator.avoid_highways, BoolDisplay::OnOff, false, [] {
+			bool buffer = flag_creator.avoid_highways;
+		if (buffer) {
+			flag_creator.current += 536870912;
+		}
+		if (!buffer) {
+			flag_creator.current -= 536870912;
+		}
+
+			});
 			});
 		g_Render->draw_submenu<sub>(("Acrobatics"), SubmenuAcrobatics, [](sub* sub)
 			{
@@ -1955,6 +2198,7 @@ namespace Arctic
 				
 				
 			});
+
 		g_Render->draw_submenu<sub>(("Triggerbot"), SubmenuTriggerbot, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &triggerbot.enabled, BoolDisplay::OnOff);
@@ -1967,9 +2211,27 @@ namespace Arctic
 
 
 			});
+		g_Render->draw_submenu<sub>(("Type"), SubmenuTargetMode, [](sub* sub)
+			{
+
+				for (std::uint32_t i = 0; i < 4; ++i) {
+					sub->draw_option<RegularOption>((t_mode.data[i]), nullptr, [=]
+						{
+
+							target_c.change(i);
+
+
+						});
+				}
+
+
+
+
+			});
+		
 		g_Render->draw_submenu<sub>(("Targeting Mode"), SubmenuTargetingMode, [](sub* sub)
 			{
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &t_mode.data, &t_mode.init);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &t_mode.data, &t_mode.init, false, SubmenuTargetMode);
 				sub->draw_option<RegularOption>(("Apply"), nullptr, []
 				{
 						PLAYER::SET_PLAYER_TARGETING_MODE(t_mode.init);
@@ -1983,6 +2245,24 @@ namespace Arctic
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &airstrike.enabled, BoolDisplay::OnOff);
 				sub->draw_option<number<std::int32_t>>("Damage", nullptr, &airstrike.damage, 0, 1000);
 				sub->draw_option<number<float>>("Height", nullptr, &airstrike.height, 0.15f, 250.f, 0.05f, 2);
+				
+		
+
+
+			});
+		g_Render->draw_submenu<sub>(("Damage Type"), SubmenuDamageTest, [](sub* sub)
+			{
+				
+		for (std::uint32_t i = 0; i < 16; ++i) {
+			sub->draw_option<RegularOption>((Lists::DamageList[i]), nullptr, [=]
+				{
+
+					damage_type.change(i);
+
+
+				});
+		}
+		
 		
 
 
@@ -1992,6 +2272,65 @@ namespace Arctic
 				auto weapon = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info;
 				
 				sub->draw_option<toggle<bool>>(("No Recoil"), nullptr, &features.no_recoil, BoolDisplay::OnOff);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Damage Type", nullptr, &Lists::DamageList, &Lists::DamagePos, true, SubmenuDamageTest, []
+					{
+						eDamageType type;
+						switch (Lists::DamagePos) {
+							case 0:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Unknown;
+								break;
+							case 1:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::None;
+								break;
+							case 2:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Melee;
+								break;
+							case 3:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Bullet;
+								break;
+							case 4:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::BulletRubber;
+								break;
+							case 5:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Explosive;
+								break;
+							case 6:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Fire;
+								break;
+							case 7:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Collision;
+								break;
+							case 8:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Fall;
+								break;
+							case 9:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Drown;
+								break;
+							case 10:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Electric;
+								break;
+							case 11:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::BarbedWire;
+								break;
+							case 12:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::FireExtinguisher;
+								break;
+							case 13:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Smoke;
+								break;
+							case 14:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::WaterCannon;
+								break;
+							case 15:
+								(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Tranquilizer;
+								break;
+							
+
+						}
+						
+						
+
+					});
 				sub->draw_option<number<float>>("Accuracy Spread", nullptr, &weapon->m_accuracy_spread, -1000.f, 1000.f, 0.1f, 1);
 				sub->draw_option<number<float>>("Accurate Mode Acuracy Modifier", nullptr, &weapon->m_accurate_mode_accuracy_modifier, -1000.f, 1000.f, 0.1f, 1);
 				sub->draw_option<number<float>>("RNG Accuracy", nullptr, &weapon->m_run_and_gun_accuracy, -1000.f, 1000.f, 0.1f, 1);
@@ -2183,9 +2522,124 @@ namespace Arctic
 			{
 				sub->draw_option<submenu>("Players", nullptr, SubmenuPlayerList);
 				sub->draw_option<submenu>("Modder Detection", nullptr, SubmenuAntiCheat);
-				sub->draw_option<toggle<bool>>(("Off The Radar"), nullptr, &features.off_the_radar, BoolDisplay::OnOff);
+				sub->draw_option<submenu>("Requests", nullptr, SubmenuRequests);
+				sub->draw_option<submenu>("Session Starter", nullptr, SubmenuSesStart);
+				sub->draw_option<submenu>("RID Joiner", nullptr, SubmenuRIDJoiner);
+				sub->draw_option<submenu>("Off The Radar", nullptr, SubmenuOffRadar);
+				
 			});
+		g_Render->draw_submenu<sub>(("Off The Radar"), SubmenuOffRadar, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &m_radar.enabled, BoolDisplay::OnOff);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Time", nullptr, &m_radar.time, &m_radar.data);
+
+			});
+		g_Render->draw_submenu<sub>(("RID Joiner"), SubmenuRIDJoiner, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>(("Join"), nullptr, []
+					{
+						std::uint32_t g_RIDHash{ 0xDA4858C1 };
+						m_EnableSCIDJoiner = true;
+						HUD::ACTIVATE_FRONTEND_MENU(0XD528C7E2, 0, 2);
+						fbr::cur()->wait(250ms);
+						if (m_PlayerListPointer)
+						{
+							g_GameFunctions->m_PlayerGUIOptions(m_PlayerListPointer, &g_RIDHash);
+							m_PlayerListPointer = 0;
+							fbr::cur()->wait(300ms);
+						}
+						m_EnableSCIDJoiner = false;
+						
+					});
 		
+		sub->draw_option<UnclickOption>(("RID"), nullptr, [] {});
+		if (ridBuffer.c_str() != "") {
+			sub->draw_option<RegularOption>((ridBuffer.c_str()), nullptr, []
+				{
+
+					showKeyboard("Enter Something", "", 25, &ridBuffer, [] {
+					selected_rid = atoi(ridBuffer.c_str());
+						});
+				});
+		}
+		
+
+			});
+		g_Render->draw_submenu<sub>(("Requests"), SubmenuRequests, [](sub* sub)
+			{
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &requests.data, &requests.data_i);
+		sub->draw_option<RegularOption>(("Apply"), nullptr, []
+			{
+				switch (requests.data_i) {
+				case 0:
+					requests.add(888);
+					break;
+				case 1:
+					requests.add(887);
+					break;
+				case 2:
+					requests.add(4484);
+					break;
+				case 3:
+					requests.add(4485);
+					break;
+				case 4:
+					requests.add(886);
+					break;
+				case 5:
+					*script_global(2672505).at(3689).as<int*>() = 1;
+					break;
+				case 6:
+					requests.add(896);
+					break;
+				}
+			});
+
+			});
+		g_Render->draw_submenu<sub>(("Session Starter"), SubmenuSesStart, [](sub* sub)
+			{
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &session.name, &session.data);
+		sub->draw_option<RegularOption>(("Join"), nullptr, []
+			{
+				switch (session.data) {
+				case 0:
+					session.join(eSessionType::JOIN_PUBLIC);
+					break;
+				case 1:
+					session.join(eSessionType::NEW_PUBLIC);
+					break;
+				case 2:
+					session.join(eSessionType::CLOSED_CREW);
+					break;
+				case 3:
+					session.join(eSessionType::CREW);
+					break;
+				case 4:
+					session.join(eSessionType::CLOSED_FRIENDS);
+					break;
+				case 5:
+					session.join(eSessionType::FIND_FRIEND);
+					break;
+				case 6:
+					session.join(eSessionType::SOLO);
+					break;
+				case 7:
+					session.join(eSessionType::INVITE_ONLY);
+					break;
+				case 8:
+					session.join(eSessionType::JOIN_CREW);
+					break;
+				case 9:
+					session.join(eSessionType::SC_TV);
+					break;
+				case 10:
+					session.join(eSessionType::LEAVE_ONLINE);
+					break;
+					
+				}
+			});
+
+			});
 		g_Render->draw_submenu<sub>("Players List", SubmenuPlayerList, [](sub* sub)
 			{
 				sub->draw_option<submenu>("All", nullptr, SubmenuAllPlayers);
@@ -2245,8 +2699,9 @@ namespace Arctic
 				sub->draw_option<submenu>("Trolling", nullptr, SubmenuTrolling);
 				sub->draw_option<submenu>("Bodygaurds", nullptr, SubmenuBodyguards);
 				sub->draw_option<submenu>("Drops", nullptr, SubmenuDrops);
+				sub->draw_option<submenu>("Friendly", nullptr, SubmenuFriendly);
 				sub->draw_option<submenu>("Teleport", nullptr, SubmenuPlayerTeleport);
-				
+				//sub->draw_option<submenu>("Removals", nullptr, SubmenuRemoval);
 				if (g_SelectedPlayer != PLAYER::PLAYER_ID()) {
 					sub->draw_option<toggle<bool>>(("Spectate"), nullptr, &features.spectate, BoolDisplay::OnOff, false, [] {
 						if (!features.spectate) {
@@ -2254,7 +2709,40 @@ namespace Arctic
 						}
 						});
 				}
+				
 	
+			});
+		g_Render->draw_submenu<sub>("Friendly", SubmenuFriendly, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Flash Blip"), nullptr, &g_players.get_selected.flash_blip.enabled, BoolDisplay::OnOff, false, [] {
+				if (!g_players.get_selected.flash_blip.enabled) {
+					Blip b = HUD::GET_BLIP_FROM_ENTITY(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
+					HUD::SET_BLIP_FLASHES(b, false);
+				}
+					});
+
+				sub->draw_option<toggle<bool>>(("Off The Radar"), nullptr, &g_players.get_selected.otr.enabled, BoolDisplay::OnOff, false, [] {
+					
+				});
+
+			});
+		g_Render->draw_submenu<sub>("Removals", SubmenuRemoval, [](sub* sub)
+			{
+				sub->draw_option<submenu>("Kick", nullptr, SubmenuKicks);
+				sub->draw_option<submenu>("Crash", nullptr, SubmenuCrashes);
+
+			});
+		g_Render->draw_submenu<sub>("Kick", SubmenuKicks, [](sub* sub)
+			{
+				sub->draw_option<submenu>("Kick", nullptr, SubmenuKicks);
+		sub->draw_option<submenu>("Crash", nullptr, SubmenuCrashes);
+
+			});
+		g_Render->draw_submenu<sub>("Crash", SubmenuCrashes, [](sub* sub)
+			{
+				sub->draw_option<submenu>("Kick", nullptr, SubmenuKicks);
+		sub->draw_option<submenu>("Crash", nullptr, SubmenuCrashes);
+
 			});
 		g_Render->draw_submenu<sub>("All", SubmenuAllPlayers, [](sub* sub)
 			{
@@ -2333,14 +2821,18 @@ namespace Arctic
 				sub->draw_option<submenu>("Attackers", nullptr, SubmenuAttackers);
 				sub->draw_option<RegularOption>(("Cage"), nullptr, []
 					{
+						
 						NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+						
+						m_load.add("Adding cage..");
+						fbr::cur()->wait(5s);
 						OBJECT::CREATE_OBJECT(MISC::GET_HASH_KEY("prop_gold_cont_01"), c.x, c.y, c.z - 1.f, true, false, false);
+						m_load.remove();
+						
 						
 					});
-				sub->draw_option<RegularOption>(("Send Gooch"), nullptr, []
-					{
-						*global(1890140).at(244).at(1).as<Player*>() = g_SelectedPlayer;
-					});
+				
+				
 			});
 		g_Render->draw_submenu<sub>(("Attackers"), SubmenuAttackers, [](sub* sub) {
 			sub->draw_option<ChooseOption<const char*, std::size_t>>("Mode", nullptr, &attackers.mode, &attackers.mode_i);
@@ -2494,6 +2986,29 @@ namespace Arctic
 			sub->draw_option<number<std::int32_t>>("Height", nullptr, &drops.height, 0, 100);
 			sub->draw_option<number<std::int32_t>>("Delay", nullptr, &drops.delay, 0, 5000, 50);
 			});
+		g_Render->draw_submenu<sub>(("Protection"), SubmenuProtections, [](sub* sub)
+			{
+				sub->draw_option<submenu>("Script Events", nullptr, SubmenuScriptEvents);
+
+			});
+		g_Render->draw_submenu<sub>(("Script Events"), SubmenuTeleport, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Send To Location"), nullptr, &protections.send_to_location, BoolDisplay::OnOff);
+		
+			});
+		g_Render->draw_submenu<sub>(("Teleport"), SubmenuTeleport, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Automatic"), nullptr, &m_teleport.automatic, BoolDisplay::OnOff);
+				sub->draw_option<RegularOption>(("Waypoint"), nullptr, []
+					{
+
+
+
+						m_teleport.waypoint();
+						
+				});
+		});
+			
 		g_Render->draw_submenu<sub>(("World"), SubmenuWorld, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Weather", nullptr, SubmeuWeather);
@@ -2661,7 +3176,7 @@ namespace Arctic
 			{
 				sub->draw_option<toggle<bool>>("Automaticly Match", nullptr, &features.match, BoolDisplay::OnOff);
 				
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Toggled (Match)", nullptr, &g_Render->ThemeList, &Lists::MatchPos, true, []
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Toggled (Match)", nullptr, &g_Render->ThemeList, &Lists::MatchPos, true, -1, []
 				{
 						switch (Lists::MatchPos) {
 							case 0:
@@ -2768,7 +3283,7 @@ namespace Arctic
 
 		g_Render->draw_submenu<sub>("Header", SubmenuSettingsHeader, [](sub* sub)
 		{
-			sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &Lists::HeaderTypesFrontend, &Lists::HeaderTypesPosition, true, []
+			sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &Lists::HeaderTypesFrontend, &Lists::HeaderTypesPosition, true, -1, []
 			{
 				g_Render->m_HeaderType = Lists::HeaderTypesBackend[Lists::HeaderTypesPosition];
 			});
@@ -2815,7 +3330,7 @@ namespace Arctic
 			sub->draw_option<toggle<bool>>("DX Header Text", "Disable native text if going to use dx", &g_Render->m_HeaderText, BoolDisplay::OnOff);
 			sub->draw_option<toggle<bool>>("Native Header Text", "Disable dx text if going to use native ", &g_Render->m_HeaderNativeText, BoolDisplay::OnOff);
 			if (g_Render->m_HeaderNativeText) {
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &g_Render->HeaderFont, &g_Render->HeaderFontIterator, true, []
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &g_Render->HeaderFont, &g_Render->HeaderFontIterator, true, -1, []
 					{
 						if (g_Render->HeaderFontIterator == 0) {
 							g_Render->m_HeaderFont = Font::ChaletLondon;
