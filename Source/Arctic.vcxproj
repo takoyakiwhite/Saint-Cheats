@@ -14,6 +14,7 @@
   <ItemGroup>
     <ClInclude Include="All Players.h" />
     <ClInclude Include="Bypass Max Speed.h" />
+    <ClInclude Include="Chat Commands.h" />
     <ClInclude Include="Classes.h" />
     <ClInclude Include="Common.hpp" />
     <ClInclude Include="CrossMap.hpp" />
@@ -30,6 +31,7 @@
     <ClInclude Include="OTR.h" />
     <ClInclude Include="Players.h" />
     <ClInclude Include="Protections.h" />
+    <ClInclude Include="Queue.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="Selected.h" />
     <ClInclude Include="Signatures.hpp" />

@@ -17,6 +17,7 @@ namespace Arctic {
 		}
 		bool send_to_location = false;
 		bool sound_spam = false;
+		bool block_reports;
 	};
 	inline Protections protections;
 }

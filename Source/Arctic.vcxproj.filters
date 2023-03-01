@@ -148,9 +148,6 @@
     <ClInclude Include="Enums.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Features.h">
-      <Filter>Core\Features</Filter>
-    </ClInclude>
     <ClInclude Include="Math.h">
       <Filter>Utility</Filter>
     </ClInclude>
@@ -192,6 +189,15 @@
     </ClInclude>
     <ClInclude Include="Protections.h">
       <Filter>Core\Features\Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Queue.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Chat Commands.h">
+      <Filter>Core\Features\Network\All Players</Filter>
+    </ClInclude>
+    <ClInclude Include="Features.h">
+      <Filter>Core\Logger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -25,6 +25,14 @@ namespace Arctic
 
 		static bool GetEventData(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount);
 		static void GetEventData2(rage::scrNativeCallContext* src);
+
+		static int IncrementStatEvent(__int64 neteventclass, CNetGamePlayers* Source);
+
+		static void ChatMessage(void* thisptr, __int64 unk1, __int64 unk2, const char* message);
+
+		
+
+		
 	};
 
 	class Hooking
@@ -50,6 +58,9 @@ namespace Arctic
 		void* m_OriginalRIDFunction{};
 		void* m_OriginalJoinSessionHook{};
 		void* m_OriginalGetEventData{};
+		void* m_OriginalIncrementStatEvent{};
+		void* m_OriginalChatMessage{};
+		
 	};
 
 	inline std::unique_ptr<Hooking> g_Hooking;

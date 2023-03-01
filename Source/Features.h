@@ -1534,15 +1534,15 @@ namespace Arctic {
 					ENTITY::SET_ENTITY_PROOFS(angryPlanesPlane, true, true, true, true, true, true, true, true);
 					VEHICLE::SET_VEHICLE_DAMAGE(angryPlanesPlane, 0.f, 0.f, 0.f, 0.f, 200.f, false);
 						});
-					
-					g_CallbackScript->AddCallback<ModelCallback>(pedModelHash, [=] 
-						{
-							angryPlanesPed = PED::CREATE_PED(26, pedModelHash, spawnX, spawnY, spawnZ + 100.0f, spawnHeading, true, true);
+				g_CallbackScript->AddCallback<ModelCallback>(pedModelHash, [=]
+							{
+								angryPlanesPed = PED::CREATE_PED(26, pedModelHash, spawnX, spawnY, spawnZ + 100.0f, spawnHeading, true, true);
 					PED::SET_PED_INTO_VEHICLE(angryPlanesPed, angryPlanesPlane, -1);
 					PED::SET_DRIVER_ABILITY(angryPlanesPed, 0.99f);
 					ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPed, 1);
 					TASK::TASK_COMBAT_PED(angryPlanesPed, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
-						});
+							});
+						
 				}
 			}
 		}
@@ -1615,6 +1615,32 @@ namespace Arctic {
 				VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, spawnr, spawng, spawnb);
 				VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(vehicle, spawnr2, spawng2, spawnb2);
 			}
+				});
+		}
+		void spawn_for_ped(Hash hash, Player player) {
+			*script_global(4540726).as<bool*>() = true;
+			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
+				{
+					
+
+
+			NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(player, { 0.f, dellast ? 0.f : 8.0f, 1.0f });
+			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+			Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(player), true, false, false);
+			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+			DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+			auto networkId = NETWORK::VEH_TO_NET(vehicle);
+			if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
+				NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+			VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
+			
+			
+			
+			if (fade_in) {
+				NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, false);
+			}
+			
 				});
 		}
 	};
@@ -1715,27 +1741,306 @@ namespace Arctic {
 		}
 	};
 	inline Blink blink;
+	class Excludes466 {
+	public:
+		bool friends = false;
+		bool players = false;
+		bool peds = false;
+	};
 	class Aimbot {
 	public:
+		Excludes466 excludes;
 		bool enabled = false;
 		float distance = 50.0f;
+		const char* bone[2] = {"Head", "Lower Chest"};
+		std::size_t data = 0;
+		
 		Ped aimbot_ped;
-		Cam freecamCamera;
+		Cam aimcam;
+		int SKEL_Head = 0x796e;
+		
+		std::uint32_t BoneHashes[2]
+		{ 0x796e, 0xdd1c};
+		std::size_t WeaponInt = 0;
+		void aim() {
+			NativeVector3 aimpos = CAM::GET_GAMEPLAY_CAM_COORD();
+			CAM::DESTROY_ALL_CAMS(true);
+			aimcam = CAM::CREATE_CAM_WITH_PARAMS("DEFAULT_SCRIPTED_CAMERA", aimpos.x, aimpos.y, aimpos.z, 0, 0, 0, 50, 1, 2);
+			CAM::RENDER_SCRIPT_CAMS(1, true, 700, 1, 1, 0);
+			CAM::SET_CAM_ACTIVE(aimcam, 1);
+			CAM::SET_CAM_ROT(aimcam, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+
+			for (int i = 0; i < 32; i++)
+			{
+				NativeVector3 target_coords = PED::GET_PED_BONE_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), BoneHashes[data], 0, 0, 0);
+				NativeVector3 ped_coords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), 1);
+				NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), TRUE);
+
+				Ped PlayerPed = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i);
+				NativeVector3 PedCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+				NativeVector3 Coords = ENTITY::GET_ENTITY_COORDS(PlayerPed, false);
+				float distance = GetDistanceFloat(PedCoords, Coords);
+
+				if (PLAYER::IS_PLAYER_FREE_AIMING(PLAYER::PLAYER_ID()))
+				{
+					GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT("ps_menu", 0);
+					GRAPHICS::DRAW_SPRITE("ps_menu", "common_medal", .5, .5, .003, .005, 0, 255, 255, 255, 255, 0, 0);
+					if (ENTITY::DOES_ENTITY_EXIST(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i)))
+					{
+						if (i == PLAYER::PLAYER_ID())
+							continue;
+
+
+						const int numElements = 10;
+						const int arrSize = numElements * 2 + 2;
+						int veh[arrSize];
+						veh[0] = numElements;
+						int count = PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), veh, -1);
+						Ped closest = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i);
+						if (excludes.peds) {
+							if (PED::IS_PED_A_PLAYER(closest)) {
+								if (veh != NULL) {
+									for (int i = 0; i < count; i++)
+									{
+										int offsettedID = i * 2 + 2;
+										if (veh[offsettedID] != NULL && ENTITY::DOES_ENTITY_EXIST(veh[offsettedID]))
+										{
+											for (int j = -1; j <= 2; ++j)
+											{
+												Any ped = veh[offsettedID];
+
+												if (closest == 0) closest = ped;
+												else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
+												Hash weaponhash;
+												WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+												float screenX, screenY;
+												BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
+												if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
+												{
+													CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+						if (excludes.friends) {
+							int netHandle[13];
+							NETWORK::NETWORK_HANDLE_FROM_PLAYER(closest, netHandle, 13);
+							if (!NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
+								if (veh != NULL) {
+									for (int i = 0; i < count; i++)
+									{
+										int offsettedID = i * 2 + 2;
+										if (veh[offsettedID] != NULL && ENTITY::DOES_ENTITY_EXIST(veh[offsettedID]))
+										{
+											for (int j = -1; j <= 2; ++j)
+											{
+												Any ped = veh[offsettedID];
+
+												if (closest == 0) closest = ped;
+												else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
+												Hash weaponhash;
+												WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+												float screenX, screenY;
+												BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
+												if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
+												{
+													CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+						if (excludes.players) {
+							if (!PED::IS_PED_A_PLAYER(closest)) {
+								if (veh != NULL) {
+									for (int i = 0; i < count; i++)
+									{
+										int offsettedID = i * 2 + 2;
+										if (veh[offsettedID] != NULL && ENTITY::DOES_ENTITY_EXIST(veh[offsettedID]))
+										{
+											for (int j = -1; j <= 2; ++j)
+											{
+												Any ped = veh[offsettedID];
+
+												if (closest == 0) closest = ped;
+												else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
+												Hash weaponhash;
+												WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+												float screenX, screenY;
+												BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
+												if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
+												{
+													CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+						if (!excludes.friends && !excludes.peds && !excludes.players) {
+							if (veh != NULL) {
+								for (int i = 0; i < count; i++)
+								{
+									int offsettedID = i * 2 + 2;
+									if (veh[offsettedID] != NULL && ENTITY::DOES_ENTITY_EXIST(veh[offsettedID]))
+									{
+										for (int j = -1; j <= 2; ++j)
+										{
+											Any ped = veh[offsettedID];
+
+											if (closest == 0) closest = ped;
+											else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
+											Hash weaponhash;
+											WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+											float screenX, screenY;
+											BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
+											if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
+											{
+												CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
+											}
+										}
+									}
+								}
+							}
+						}
+						
+					}
+				}
+			}
+			if (PLAYER::IS_PLAYER_FREE_AIMING(PLAYER::PLAYER_ID()))
+			{
+				const int numElements = 10;
+				const int arrSize = numElements * 2 + 2;
+				int veh[arrSize];
+				veh[0] = numElements;
+				int count = PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), veh, -1);
+				Ped closest = 0;
+				NativeVector3 target_coords = PED::GET_PED_BONE_COORDS(closest, SKEL_Head, 0, 0, 0);
+				NativeVector3 ped_coords = ENTITY::GET_ENTITY_COORDS(closest, 1);
+				NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), TRUE);
+				if (excludes.peds) {
+					if (PED::IS_PED_A_PLAYER(closest)) {
+						if (veh != NULL) {
+							for (int i = 0; i < count; i++)
+							{
+								int offsettedID = i * 2 + 2;
+								if (veh[offsettedID] != NULL && ENTITY::DOES_ENTITY_EXIST(veh[offsettedID]))
+								{
+									for (int j = -1; j <= 2; ++j)
+									{
+										Any ped = veh[offsettedID];
+
+										if (closest == 0) closest = ped;
+										else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
+										Hash weaponhash;
+										WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+										float screenX, screenY;
+										BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
+										if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
+										{
+											CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				if (excludes.friends) {
+					int netHandle[13];
+					NETWORK::NETWORK_HANDLE_FROM_PLAYER(closest, netHandle, 13);
+					if (!NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
+						if (veh != NULL) {
+							for (int i = 0; i < count; i++)
+							{
+								int offsettedID = i * 2 + 2;
+								if (veh[offsettedID] != NULL && ENTITY::DOES_ENTITY_EXIST(veh[offsettedID]))
+								{
+									for (int j = -1; j <= 2; ++j)
+									{
+										Any ped = veh[offsettedID];
+
+										if (closest == 0) closest = ped;
+										else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
+										Hash weaponhash;
+										WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+										float screenX, screenY;
+										BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
+										if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
+										{
+											CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				if (excludes.players) {
+					if (!PED::IS_PED_A_PLAYER(closest)) {
+						if (veh != NULL) {
+							for (int i = 0; i < count; i++)
+							{
+								int offsettedID = i * 2 + 2;
+								if (veh[offsettedID] != NULL && ENTITY::DOES_ENTITY_EXIST(veh[offsettedID]))
+								{
+									for (int j = -1; j <= 2; ++j)
+									{
+										Any ped = veh[offsettedID];
+
+										if (closest == 0) closest = ped;
+										else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
+										Hash weaponhash;
+										WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+										float screenX, screenY;
+										BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
+										if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
+										{
+											CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				if (!excludes.friends && !excludes.peds && !excludes.players) {
+					if (veh != NULL) {
+						for (int i = 0; i < count; i++)
+						{
+							int offsettedID = i * 2 + 2;
+							if (veh[offsettedID] != NULL && ENTITY::DOES_ENTITY_EXIST(veh[offsettedID]))
+							{
+								for (int j = -1; j <= 2; ++j)
+								{
+									Any ped = veh[offsettedID];
+
+									if (closest == 0) closest = ped;
+									else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;                                                                                                                          
+									Hash weaponhash;
+									WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+									float screenX, screenY;
+									BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
+									if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
+									{
+										CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 		void init() {
 			if (enabled) {
-				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
-				PED::GET_CLOSEST_PED(c.x, c.y, c.z, distance, 0, 0, &aimbot_ped, 0, 0, -1);
-				NativeVector3 rot = ENTITY::GET_ENTITY_ROTATION(aimbot_ped, 0);
-				if (!CAM::DOES_CAM_EXIST(freecamCamera)) {
-					freecamCamera = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", true);
-					CAM::SET_CAM_ROT(freecamCamera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
-					CAM::SET_CAM_COORD(freecamCamera, CAM::GET_GAMEPLAY_CAM_COORD());
-				}
-
-				CAM::RENDER_SCRIPT_CAMS(true, true, 700, true, true, true);
-				CAM::SET_CAM_ACTIVE(freecamCamera, true);
-				CAM::SET_CAM_ROT(freecamCamera, rot, 0);
-				CAM::SET_CAM_COORD(freecamCamera, CAM::GET_GAMEPLAY_CAM_COORD());
+				aim();
 			}
 		}
 	};
@@ -1997,6 +2302,45 @@ namespace Arctic {
 		}
 	};
 	inline teleport m_teleport;
+	class CWaterDataItem
+	{
+	public:
+		__int16 iMinX; //0x0000 X Coord 1
+		__int16 iMinY; //0x0002  Y Coord 1
+		__int16 iMaxX; //0x0004 X Coord 2
+		__int16 iMaxY; //0x0006 Y Coord 2
+		__int8 iAlphaSW; //0x0008  (South West, default 26)
+		__int8 iAlphaSE; //0x0009  (South East, default 26)
+		__int8 iAlphaNW; //0x000A  (North West, default 26)
+		__int8 iAlphaNE; //0x000B  (North East, default 26)
+		char _0x000C[8]; // (Unknown, appear to be two floats?)
+		float fHeight; //0x0014 (Z-Height, default 0.0)
+		BYTE bHasLimitedDepth; //0x0018  (Second bit [binary 10] = On, gives the water quad an effective range of 6 z-points)
+		char _0x0019[3]; // (Unknown)
+	};//Size=0x001C
+	class CWaterTune
+	{
+	public:
+		DWORD dwWaterColor; //0x0000  Default: 0x1A00191C
+		float fRippleScale; //0x0004  Default: 0.040000f
+		float fOceanFoamScale; //0x0008  Default: 0.050000f
+		float fSpecularFalloff; //0x000C  Default: 1118.000000f
+		float fFodPierceIntensity; //0x0010  Default: 1.100000f
+		float fRefractionBlend; //0x0014  Default: 0.700000f
+		float fRefractionExponent; //0x0018  Default: 0.250000f
+		float fWaterCycleDepth; //0x001C  Default: 10.000000f
+		float fWaterCycleFade; //0x0020  Default: 50.000000f
+		float fWaterLightningDepth; //0x0024  Default: 0.000000f
+		float fWaterLightningFade; //0x0028  Default: 10.000000f
+		float fDeepWaterModDepth; //0x002C  Default: 90.000000f
+		float fDeepWaterModFade; //0x0030  Default: 80.000000f
+		float fGodRaysLerpStart; //0x0034  Default: 0.000000f
+		float fGodRaysLerpEnd; //0x0038  Default: 200.000000f
+		float fDisturbFoamScale; //0x003C  Default: 0.050000f
+		void* vec2FogMin; //0x0040  Default: x = -4000.000000 y = -4000.000000
+		void* vec2FogMax; //0x0048  Default: x = 4500.000000 y= 8000.000000
+	};
+	inline uintptr_t ModuleBaseAdress = (uintptr_t)GetModuleHandle(NULL);
 	inline void FeatureInitalize() {
 		flag_creator.init();
 		invisible.init();

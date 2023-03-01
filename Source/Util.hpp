@@ -4,7 +4,24 @@
 
 namespace Arctic
 {
-	
+	inline bool has_string(std::string& str, std::string check)
+	{
+		std::size_t found = str.find_first_of(' ');
+		if (found != std::string::npos)
+		{
+			if (str.substr(0, found) == check)
+			{
+				str = str.substr(found + 1, str.size());
+				return true;
+			}
+		}
+		else
+		{
+			if (str == check)
+				return true;
+		}
+		return false;
+	}
 	/**
 	 * \brief Checks if a key is pressed
 	 * \param key A virtual key code

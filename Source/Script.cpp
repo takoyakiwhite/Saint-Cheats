@@ -21,6 +21,7 @@
 #include "Players.h"
 #include "Hooking.hpp"
 #include "Protections.h"
+#include "Queue.h"
 namespace Arctic
 {
 	enum Submenu : std::uint32_t
@@ -186,6 +187,9 @@ namespace Arctic
 		SubmenuRIDJoiner,
 		SubmenuProtections,
 		SubmenuScriptEvents,
+		SubmenuWater,
+		SubmenuAimbot,
+			SubmenuAimbotExcludes,
 	};
 
 	bool MainScript::IsInitialized()
@@ -782,18 +786,20 @@ namespace Arctic
 				sub->draw_option<toggle<bool>>(("Automaticly Save"), nullptr, &flag_creator.auto_save, BoolDisplay::OnOff);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Save", nullptr, &flag_creator.direction, &flag_creator.data, false, -1, []
 					{
+						m_queue.add(2s, "Saving...", [] {
+							switch (flag_creator.data) {
+							case 0:
+								autopilot.wreckless_flag = flag_creator.current;
+								break;
+							case 1:
+								autopilot.nonwreckless_flag = flag_creator.current;
+								break;
+							case 2:
+								autopilot.avoid_roads_flag = flag_creator.current;
+								break;
+							}
+						});
 						
-						switch (flag_creator.data) {
-						case 0:
-							autopilot.wreckless_flag = flag_creator.current;
-							break;
-						case 1:
-							autopilot.nonwreckless_flag = flag_creator.current;
-							break;
-						case 2:
-							autopilot.avoid_roads_flag = flag_creator.current;
-							break;
-						}
 
 					});
 				sub->draw_option<UnclickOption>(("Current"), nullptr, [] {});
@@ -2182,6 +2188,7 @@ namespace Arctic
 				sub->draw_option<submenu>("Explosive Ammo", nullptr, SubmenuExplosiveAmmo);
 				sub->draw_option<submenu>("Rapid Fire", nullptr, SubmenuRapidFire);
 				sub->draw_option<submenu>("Triggerbot", nullptr, SubmenuTriggerbot);
+				sub->draw_option<submenu>("Aimbot", nullptr, SubmenuAimbot);
 				sub->draw_option<submenu>("Airstrike", nullptr, SubmenuAirstrike);
 				sub->draw_option<submenu>("Targeting Mode", nullptr, SubmenuTargetingMode);
 				sub->draw_option<submenu>("Multipliers", nullptr, SubmenuWeaponMultipliers);
@@ -2198,7 +2205,28 @@ namespace Arctic
 				
 				
 			});
+		g_Render->draw_submenu<sub>(("Aimbot"), SubmenuAimbot, [](sub* sub)
+			{
+				sub->draw_option<submenu>("Excludes", nullptr, SubmenuAimbotExcludes);
+		sub->draw_option<ChooseOption<const char*, std::size_t>>("Bone", nullptr, &aimbot.bone, &aimbot.data);
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &aimbot.enabled, BoolDisplay::OnOff, false, [] {
+						if (!aimbot.enabled) {
+							CAM::RENDER_SCRIPT_CAMS(false, true, 700, true, true, true);
+							CAM::SET_CAM_ACTIVE(aimbot.aimcam, false);
+							CAM::DESTROY_CAM(aimbot.aimcam, true);
+						}
+					});
+		
 
+
+			});
+		g_Render->draw_submenu<sub>("Exclude", SubmenuAimbotExcludes, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Friends"), nullptr, &aimbot.excludes.friends, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>(("Players"), nullptr, &aimbot.excludes.players, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>(("Peds"), nullptr, &aimbot.excludes.peds, BoolDisplay::OnOff);
+		
+			});
 		g_Render->draw_submenu<sub>(("Triggerbot"), SubmenuTriggerbot, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &triggerbot.enabled, BoolDisplay::OnOff);
@@ -2701,7 +2729,7 @@ namespace Arctic
 				sub->draw_option<submenu>("Drops", nullptr, SubmenuDrops);
 				sub->draw_option<submenu>("Friendly", nullptr, SubmenuFriendly);
 				sub->draw_option<submenu>("Teleport", nullptr, SubmenuPlayerTeleport);
-				//sub->draw_option<submenu>("Removals", nullptr, SubmenuRemoval);
+				sub->draw_option<submenu>("Removals", nullptr, SubmenuRemoval);
 				if (g_SelectedPlayer != PLAYER::PLAYER_ID()) {
 					sub->draw_option<toggle<bool>>(("Spectate"), nullptr, &features.spectate, BoolDisplay::OnOff, false, [] {
 						if (!features.spectate) {
@@ -2734,14 +2762,23 @@ namespace Arctic
 			});
 		g_Render->draw_submenu<sub>("Kick", SubmenuKicks, [](sub* sub)
 			{
-				sub->draw_option<submenu>("Kick", nullptr, SubmenuKicks);
-		sub->draw_option<submenu>("Crash", nullptr, SubmenuCrashes);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Menu", nullptr, &g_players.get_selected.events.Menu, &g_players.get_selected.events.Menu_Data);
+				sub->draw_option<RegularOption>(("Start"), nullptr, []
+				{
+
+						g_players.get_selected.events.remove();
+				});
+				
 
 			});
 		g_Render->draw_submenu<sub>("Crash", SubmenuCrashes, [](sub* sub)
 			{
-				sub->draw_option<submenu>("Kick", nullptr, SubmenuKicks);
-		sub->draw_option<submenu>("Crash", nullptr, SubmenuCrashes);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Menu", nullptr, &g_players.get_selected.events.CrashMenu, &g_players.get_selected.events.Menu_DataCrash);
+		sub->draw_option<RegularOption>(("Start"), nullptr, []
+			{
+
+				g_players.get_selected.events.crash();
+			});
 
 			});
 		g_Render->draw_submenu<sub>("All", SubmenuAllPlayers, [](sub* sub)
@@ -2821,13 +2858,13 @@ namespace Arctic
 				sub->draw_option<submenu>("Attackers", nullptr, SubmenuAttackers);
 				sub->draw_option<RegularOption>(("Cage"), nullptr, []
 					{
+
+						m_queue.add(10ms, "Adding Cage", [] {
+								NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+								OBJECT::CREATE_OBJECT(MISC::GET_HASH_KEY("prop_gold_cont_01"), c.x, c.y, c.z - 1.f, true, false, false);
+							});
 						
-						NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
 						
-						m_load.add("Adding cage..");
-						fbr::cur()->wait(5s);
-						OBJECT::CREATE_OBJECT(MISC::GET_HASH_KEY("prop_gold_cont_01"), c.x, c.y, c.z - 1.f, true, false, false);
-						m_load.remove();
 						
 						
 					});
@@ -2989,9 +3026,10 @@ namespace Arctic
 		g_Render->draw_submenu<sub>(("Protection"), SubmenuProtections, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Script Events", nullptr, SubmenuScriptEvents);
+				sub->draw_option<toggle<bool>>(("Reports"), nullptr, &protections.block_reports, BoolDisplay::OnOff);
 
 			});
-		g_Render->draw_submenu<sub>(("Script Events"), SubmenuTeleport, [](sub* sub)
+		g_Render->draw_submenu<sub>(("Script Events"), SubmenuScriptEvents, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Send To Location"), nullptr, &protections.send_to_location, BoolDisplay::OnOff);
 		
@@ -3012,6 +3050,38 @@ namespace Arctic
 		g_Render->draw_submenu<sub>(("World"), SubmenuWorld, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Weather", nullptr, SubmeuWeather);
+				sub->draw_option<submenu>("Water", nullptr, SubmenuWater);
+
+			});
+		g_Render->draw_submenu<sub>(("World"), SubmenuWater, [](sub* sub)
+			{
+				//static CWaterDataItem* Water2 = (CWaterDataItem*)(*(std::uintptr_t*)(0x22B6DD0 + ModuleBaseAdress) + (1 * 0x1C));
+				static CWaterTune* WaterTune = reinterpret_cast<CWaterTune*>(0x1D20874 + ModuleBaseAdress);
+		sub->draw_option<number<float>>("Ocean Foam Scale", nullptr, &WaterTune->fOceanFoamScale, -10.0f, 10.0f, 0.1f);
+		sub->draw_option<number<float>>("Specular Falloff", nullptr, &WaterTune->fSpecularFalloff, 800.0f, 1200.0f, 0.5f);
+		sub->draw_option<number<float>>("FOD Pierce Intensity", nullptr, &WaterTune->fFodPierceIntensity, -100.0f, 100.0f, 0.25f);
+		sub->draw_option<number<float>>("Refraction Blend", nullptr, &WaterTune->fRefractionBlend, -10.0f, 10.0f, 0.1f);
+		sub->draw_option<number<float>>("Refraction Exponent", nullptr, &WaterTune->fRefractionExponent, -10.0f, 10.0f, 0.1f);
+		sub->draw_option<number<float>>("Cycle Depth", nullptr, &WaterTune->fWaterCycleDepth, -1000.0f, 1000.0f, 1.0f);
+		sub->draw_option<number<float>>("Cycle Fade", nullptr, &WaterTune->fWaterCycleFade, -1000.0f, 1000.0f, 1.0f);
+		sub->draw_option<number<float>>("Ripple Scale", nullptr, &WaterTune->fRippleScale, -10.0f, 10.0f, 0.1f);
+		sub->draw_option<number<float>>("Deep Water Mod Depth", nullptr, &WaterTune->fDeepWaterModDepth, -1000.0f, 1000.0f, 1.0f);
+		sub->draw_option<number<float>>("Deep Water Mod Fade", nullptr, &WaterTune->fDeepWaterModFade, -1000.0f, 1000.0f, 1.0f);
+		sub->draw_option<number<float>>("God Rays Lerp Start", nullptr, &WaterTune->fGodRaysLerpStart, -1000.0f, 1000.0f, 1.0f);
+		sub->draw_option<number<float>>("God Rays Lerp End", nullptr, &WaterTune->fGodRaysLerpEnd, -1000.0f, 1000.0f, 1.0f);
+		sub->draw_option<number<float>>("Disturb Foam Scale", nullptr, &WaterTune->fDisturbFoamScale, -10.0f, 10.0f, 0.1f);
+		sub->draw_option<number<float>>(("Lightning Fade"), nullptr, &WaterTune->fWaterLightningFade, -1000.0f, 1000.0f, 1.0f);
+		sub->draw_option<number<float>>(("Lightning Depth"), nullptr, &WaterTune->fWaterLightningDepth, -1000.0f, 1000.0f, 1.0f);
+		/*
+		static float fHeight{ Water2->fHeight }; //0x0014 (Z-Height, default 0.0)
+		sub->draw_option<number<float>>(("Height"), nullptr, &fHeight, -1000.f, 10000.f, 250.f, 3, true, "", "", [] {
+			for (int i = 0; i < 821; i++) {
+				CWaterDataItem* Water = (CWaterDataItem*)(*(std::uintptr_t*)(0x22B6DD0 + ModuleBaseAdress) + (i * 0x1C));
+				
+				Water->fHeight = fHeight;
+			}
+			});
+			*/
 
 			});
 		g_Render->draw_submenu<sub>(("Weather"), SubmeuWeather, [](sub* sub)

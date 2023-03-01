@@ -81,6 +81,11 @@ namespace Arctic
 		using CPlayerListMenuConstructor = __int64(__int64 a1, __int64 a2, __int64 a3);
 		CPlayerListMenuConstructor* m_PlayerListMenuConstructor;
 
+		using ChatSender = CNetGamePlayers * (__int64 player);
+		ChatSender* get_chat_sender;
+
+		using ChatMessage = void(void* thisptr, __int64  unk1, __int64 unk2, const char* message);
+		ChatMessage* m_ChatMessage;
 		
 		PVOID m_owned_explosion;
 		rage::hash_list* m_vehicle_hash_pool;
@@ -98,6 +103,9 @@ namespace Arctic
 
 		using GetEventData = bool(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount);
 		GetEventData* m_GetEventData;
+
+		using IncrementStatEvent = int(__int64 neteventsclass, CNetGamePlayers* targetPlayer);
+		IncrementStatEvent* m_IncrementStatEvent;
 	};
 
 	inline std::unique_ptr<GameVariables> g_GameVariables;
