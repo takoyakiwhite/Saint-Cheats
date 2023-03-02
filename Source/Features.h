@@ -291,6 +291,66 @@ namespace Arctic {
 		}
 	};
 	inline superJump superjump;
+	class Upgrades {
+	public:
+		const char* types[3] = { "All", "Visual", "Performance"};
+		std::size_t data = 0;
+		void apply(int type) {
+
+			switch (type) {
+			case 0:
+				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				{
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
+					for (int i = 0; i < 50; i++)
+					{
+						VEHICLE::SET_VEHICLE_MOD(playerVehicle, i, MISC::GET_RANDOM_INT_IN_RANGE(0, VEHICLE::GET_NUM_VEHICLE_MODS(playerVehicle, i) - 1), false);
+
+					}
+					VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 2));
+					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+					VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+				}
+			case 1:
+				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				{
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
+					for (int i = 0; i < 10; i++)
+					{
+						VEHICLE::SET_VEHICLE_MOD(playerVehicle, i, MISC::GET_RANDOM_INT_IN_RANGE(0, VEHICLE::GET_NUM_VEHICLE_MODS(playerVehicle, i) - 1), false);
+
+					}
+					for (int i = 19; i < 49; i++)
+					{
+						VEHICLE::SET_VEHICLE_MOD(playerVehicle, i, MISC::GET_RANDOM_INT_IN_RANGE(0, VEHICLE::GET_NUM_VEHICLE_MODS(playerVehicle, i) - 1), false);
+
+					}
+					
+					//VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+					VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+				}
+			case 2:
+				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				{
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
+					for (int i = 11; i < 18; i++)
+					{
+						VEHICLE::SET_VEHICLE_MOD(playerVehicle, i, VEHICLE::GET_NUM_VEHICLE_MODS(playerVehicle, i), false);
+
+					}
+					VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 2));
+
+					
+				}
+			}
+			data = type;
+			g_Render->m_SubmenuStack.pop();
+		}
+	};
+	inline Upgrades m_upgrades;
 	inline const char* sound_type[9] = { "Schafter V12", "Coquette", "Banshee", "Tempesta", "Casco", "Tyrus", "Carbonizzare", "I-Wagen (Eletric)", "Space Docker" };
 	inline const char* sound_data[9] = { "schafter3", "coquette", "banshee2", "tempesta", "casco", "tyrus", "carbonizzare", "iwagen", "dune2" };
 	inline std::size_t sound_int = 0;
@@ -460,7 +520,7 @@ namespace Arctic {
 				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 				if (VEHICLE::GET_HAS_ROCKET_BOOST(veh))
 				{
-					VEHICLE::SET_SCRIPT_ROCKET_BOOST_RECHARGE_TIME(veh, 0);
+					//VEHICLE::SET_SCRIPT_ROCKET_BOOST_RECHARGE_TIME(veh, 0);
 
 					VEHICLE::SET_ROCKET_BOOST_FILL(veh, 100.0f);
 
@@ -669,8 +729,8 @@ namespace Arctic {
 					ENTITY::SET_ENTITY_INVINCIBLE(playerVehicle, true);
 					ENTITY::SET_ENTITY_PROOFS(playerVehicle, true, true, true, true, true, true, true, true);
 					VEHICLE::SET_VEHICLE_DAMAGE(playerVehicle, 0.0f, 0.0f, 0.0f, 0.0f, 200.0f, false);
-					VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
-					VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, 0.0f);
+					//VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
+					//VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, 0.0f);
 					VEHICLE::SET_DISABLE_VEHICLE_PETROL_TANK_DAMAGE(playerVehicle, true);
 					VEHICLE::SET_DISABLE_VEHICLE_PETROL_TANK_FIRES(playerVehicle, true);
 					VEHICLE::SET_VEHICLE_BODY_HEALTH(playerVehicle, 1000.0f);
@@ -1746,6 +1806,7 @@ namespace Arctic {
 		bool friends = false;
 		bool players = false;
 		bool peds = false;
+		bool team = false;
 	};
 	class Aimbot {
 	public:
@@ -1783,8 +1844,7 @@ namespace Arctic {
 
 				if (PLAYER::IS_PLAYER_FREE_AIMING(PLAYER::PLAYER_ID()))
 				{
-					GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT("ps_menu", 0);
-					GRAPHICS::DRAW_SPRITE("ps_menu", "common_medal", .5, .5, .003, .005, 0, 255, 255, 255, 255, 0, 0);
+					HUD::DISPLAY_SNIPER_SCOPE_THIS_FRAME();
 					if (ENTITY::DOES_ENTITY_EXIST(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i)))
 					{
 						if (i == PLAYER::PLAYER_ID())
@@ -1797,6 +1857,34 @@ namespace Arctic {
 						veh[0] = numElements;
 						int count = PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), veh, -1);
 						Ped closest = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i);
+						if (excludes.team) {
+							if (PLAYER::GET_PLAYER_TEAM(closest) != PLAYER::GET_PLAYER_TEAM(PLAYER::PLAYER_PED_ID())) {
+								if (veh != NULL) {
+									for (int i = 0; i < count; i++)
+									{
+										int offsettedID = i * 2 + 2;
+										if (veh[offsettedID] != NULL && ENTITY::DOES_ENTITY_EXIST(veh[offsettedID]))
+										{
+											for (int j = -1; j <= 2; ++j)
+											{
+												Any ped = veh[offsettedID];
+
+												if (closest == 0) closest = ped;
+												else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
+												Hash weaponhash;
+												WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+												float screenX, screenY;
+												BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
+												if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
+												{
+													CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
+												}
+											}
+										}
+									}
+								}
+							}
+						}
 						if (excludes.peds) {
 							if (PED::IS_PED_A_PLAYER(closest)) {
 								if (veh != NULL) {
@@ -1924,6 +2012,34 @@ namespace Arctic {
 				NativeVector3 target_coords = PED::GET_PED_BONE_COORDS(closest, SKEL_Head, 0, 0, 0);
 				NativeVector3 ped_coords = ENTITY::GET_ENTITY_COORDS(closest, 1);
 				NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), TRUE);
+				if (excludes.team) {
+					if (PLAYER::GET_PLAYER_TEAM(closest) != PLAYER::GET_PLAYER_TEAM(PLAYER::PLAYER_PED_ID())) {
+						if (veh != NULL) {
+							for (int i = 0; i < count; i++)
+							{
+								int offsettedID = i * 2 + 2;
+								if (veh[offsettedID] != NULL && ENTITY::DOES_ENTITY_EXIST(veh[offsettedID]))
+								{
+									for (int j = -1; j <= 2; ++j)
+									{
+										Any ped = veh[offsettedID];
+
+										if (closest == 0) closest = ped;
+										else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
+										Hash weaponhash;
+										WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+										float screenX, screenY;
+										BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
+										if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
+										{
+											CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 				if (excludes.peds) {
 					if (PED::IS_PED_A_PLAYER(closest)) {
 						if (veh != NULL) {
@@ -2281,9 +2397,10 @@ namespace Arctic {
 			{
 				ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ped, coords.x, coords.y, GROUND_HEIGHT[i], true, true, true);
 
-
 				fbr::cur()->wait(100ms);
-
+				
+				
+				
 
 				if (MISC::GET_GROUND_Z_FOR_3D_COORD(coords.x, coords.y, GROUND_HEIGHT[i], &coords.z, 0, false))
 				{
@@ -2341,6 +2458,78 @@ namespace Arctic {
 		void* vec2FogMax; //0x0048  Default: x = 4500.000000 y= 8000.000000
 	};
 	inline uintptr_t ModuleBaseAdress = (uintptr_t)GetModuleHandle(NULL);
+	class RainbowColor {
+	public:
+		bool enabled = false;
+		bool change_secondary = false;
+		int delay = 0;
+		
+		
+	};
+	class ChangeVehicleColor {
+	public:
+		int r = 0;
+		int g = 0;
+		int b = 0;
+		RainbowColor rainbow;
+		void override() {
+			
+		}
+		void init() {
+			if (rainbow.enabled) {
+				
+				static int timer;
+				if (timer == 0 || (int)(GetTickCount64() - timer) > rainbow.delay) {
+					if (r > 0 && b == 0) {
+						r--;
+						g++;
+					}
+					if (g > 0 && r == 0) {
+						g--;
+						b++;
+					}
+					if (b > 0 && g == 0) {
+						r++;
+						b--;
+					}
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					
+					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVehicle, r, g, b);
+					if (rainbow.change_secondary) {
+						VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(playerVehicle, r, g, b);
+					}
+					timer = GetTickCount64();
+				}
+			}
+		}
+	};
+	inline ChangeVehicleColor changeVehicleColor;
+	class Chat {
+	public:
+		bool team_only = false;
+		void init() {
+			if (team_only) {
+				NETWORK::NETWORK_SET_TEAM_ONLY_CHAT(true);
+			}
+		}
+	};
+	inline Chat chat;
+	class Team {
+	public:
+		bool override_restrictions = false;
+		bool use_player_colour_instead_of_team = false;
+		const char* type[2] = {"Red", "Blue"};
+		std::size_t data;
+		void init() {
+			if (use_player_colour_instead_of_team) {
+				NETWORK::USE_PLAYER_COLOUR_INSTEAD_OF_TEAM_COLOUR(true);
+			}
+			if (override_restrictions) {
+				NETWORK::NETWORK_OVERRIDE_TEAM_RESTRICTIONS(PLAYER::GET_PLAYER_TEAM(PLAYER::PLAYER_PED_ID()), true);
+			}
+		}
+	};
+	inline Team team;
 	inline void FeatureInitalize() {
 		flag_creator.init();
 		invisible.init();
@@ -2369,6 +2558,9 @@ namespace Arctic {
 		g_players.get_selected.init();
 		m_radar.init();
 		m_teleport.init();
+		changeVehicleColor.init();
+		chat.init();
+		team.init();
 		if (NoPlaneTurbulance) {
 			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 

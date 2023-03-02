@@ -22,7 +22,75 @@ using ScrHandle = Entity;
 		float y{};
 	};
 #pragma pack(pop)
+#pragma pack(push, 1)
+    class PostInt
+    {
+    public:
 
+       
+        PostInt() = default;
+
+        PostInt(int original, int changed, int min, int max) :
+            original(original), changed(changed), min(min), max(max)
+        {}
+
+        PostInt operator+(const PostInt& other)
+        {
+            PostInt vec;
+            vec.original = this->original + other.original;
+            vec.changed = this->changed + other.changed;
+            vec.min = this->min + other.min;
+            vec.max = this->max + other.max;
+            return vec;
+        }
+
+        PostInt operator-(const PostInt& other)
+        {
+            PostInt vec;
+            vec.original = this->original - other.original;
+            vec.changed = this->changed - other.changed;
+            vec.min = this->min - other.min;
+            vec.max = this->max - other.max;
+            return vec;
+        }
+
+        PostInt operator*(const PostInt& other)
+        {
+            PostInt vec;
+            vec.original = this->original * other.original;
+            vec.changed = this->changed * other.changed;
+            vec.min = this->min * other.min;
+            vec.max = this->max * other.max;
+            return vec;
+        }
+
+        PostInt operator*(const float& other)
+        {
+            PostInt vec;
+            vec.original = this->original * other;
+            vec.changed = this->changed * other;
+            vec.min = this->min * other;
+            vec.max = this->max * other;
+            return vec;
+        }
+    public:
+        float original{};
+    private:
+        char m_padding1[0x04];
+    public:
+        float changed{};
+    private:
+        char m_padding2[0x04];
+    public:
+        float min{};
+    private:
+        char m_padding3[0x04];
+    public:
+        float max{};
+    private:
+        char m_padding4[0x04];
+    };
+#pragma pack(pop)
 #pragma pack(push, 1)
     class NativeVector3
     {

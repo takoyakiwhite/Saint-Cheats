@@ -1285,7 +1285,7 @@ namespace Arctic::UserInterface
 			m_Width,
 			m_DescriptionHeight,
 			m_DescriptionBackgroundColor);
-
+		//HUD::SET_TEXT_WRAP(0.0f, 0.9f);
 		DrawLeftText(
 			description,
 			m_PosX - (m_Width / m_DescriptionPadding),
@@ -1293,7 +1293,7 @@ namespace Arctic::UserInterface
 			m_DescriptionTextSize,
 			m_DescriptionFont,
 			m_DescriptionTextColor,
-			false, false
+			false, false, true
 		);
 
 		m_DrawBaseY += m_DescriptionHeight;
@@ -1326,7 +1326,7 @@ namespace Arctic::UserInterface
 		}
 	}
 
-	void UIManager::DrawLeftText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow)
+	void UIManager::DrawLeftText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow, bool wrap)
 	{
 		HUD::SET_TEXT_SCALE(size, size);
 		HUD::SET_TEXT_FONT(static_cast<int>(font));
@@ -1337,7 +1337,9 @@ namespace Arctic::UserInterface
 			HUD::SET_TEXT_OUTLINE();
 		if (shadow)
 			HUD::SET_TEXT_DROP_SHADOW();
-
+		if (wrap) {
+			
+		}
 		HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
 		HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text);
 		HUD::END_TEXT_COMMAND_DISPLAY_TEXT(x, y, 0);

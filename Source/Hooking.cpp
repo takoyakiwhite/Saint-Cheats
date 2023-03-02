@@ -74,82 +74,7 @@ namespace Arctic
 			for (std::uint32_t i = 0; i < argCount; ++i)
 				g_Logger->Info("Script event args[%u] : %" PRIi64, i, args[i]);
 		}
-		switch (args[0])
-		{
-		case 330622597:
-			if (protections.send_to_location)
-			{
-				char name[64];
-				sprintf(name, "Player: %s\nReason: Send To Location", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-				protections.push_notification(name);
-
-
-				args[0] = 1234;
-				//return false;
-			}
-			break;
-		case -702866045:
-			if (protections.send_to_location)
-			{
-				char name[64];
-				sprintf(name, "Player: %s\nReason: Send To Location", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-				protections.push_notification(name);
-
-
-				args[0] = 1234;
-				//return false;
-			}
-			break;
-		case -1796714618:
-			if (protections.send_to_location)
-			{
-				char name[64];
-				sprintf(name, "Player: %s\nReason: Send To Location", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-				protections.push_notification(name);
-
-
-				args[0] = 1234;
-				//return false;
-			}
-			break;
-		case 891653640:
-			if (protections.send_to_location)
-			{
-				char name[64];
-				sprintf(name, "Player: %s\nReason: Send To Location", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-				protections.push_notification(name);
-
-
-				args[0] = 1234;
-				//return false;
-			}
-			break;
-		case -369672308:
-			if (protections.send_to_location)
-			{
-				char name[64];
-				sprintf(name, "Player: %s\nReason: Send To Location", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-				protections.push_notification(name);
-
-
-				args[0] = 1234;
-				//return false;
-			}
-			break;
-		case 1727896103:
-			if (protections.send_to_location)
-			{
-				char name[64];
-				sprintf(name, "Player: %s\nReason: Send To Location", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-				protections.push_notification(name);
-
-
-				args[0] = 1234;
-				//return false;
-			}
-			break;
 		
-		}
 		src->set_return_value(SCRIPT::GET_EVENT_DATA(eventGroup, eventIndex, args, argCount));
 	}
 	HRESULT Hooks::Present(IDXGISwapChain* dis, UINT syncInterval, UINT flags)
@@ -332,7 +257,7 @@ namespace Arctic
 		MH_CreateHook(g_GameFunctions->m_PlayerListMenuConstructor, &Hooks::CPlayerListMenuConstructor, &m_OriginalJoinSessionHook);
 		MH_CreateHook(g_GameFunctions->m_PlayerWildcard, &Hooks::PlayerWildCardHandler, &m_OriginalRIDFunction);
 		MH_CreateHook(g_GameFunctions->m_IncrementStatEvent, &Hooks::IncrementStatEvent, &m_OriginalIncrementStatEvent);
-		MH_CreateHook(g_GameFunctions->m_ChatMessage, &Hooks::ChatMessage, &m_OriginalChatMessage);
+		//MH_CreateHook(g_GameFunctions->m_ChatMessage, &Hooks::ChatMessage, &m_OriginalChatMessage);
 		
 		m_D3DHook.Hook(&Hooks::Present, Hooks::PresentIndex);
 		m_D3DHook.Hook(&Hooks::ResizeBuffers, Hooks::ResizeBuffersIndex);
@@ -344,7 +269,7 @@ namespace Arctic
 		MH_RemoveHook(g_GameFunctions->m_GetLabelText);
 		MH_RemoveHook(g_GameFunctions->m_PlayerListMenuConstructor);
 		MH_RemoveHook(g_GameFunctions->m_PlayerWildcard);
-		MH_RemoveHook(g_GameFunctions->m_ChatMessage);
+		//MH_RemoveHook(g_GameFunctions->m_ChatMessage);
 		MH_RemoveHook(g_GameFunctions->m_IncrementStatEvent);
 		//MH_RemoveHook(g_GameFunctions->m_GetEventData);
 		MH_Uninitialize();

@@ -72,6 +72,8 @@ namespace Arctic
 		SubmenuGunLockerAmmo,
 		SubmenuWeaponMultipliers,
 		SubmenuDamageTest,
+
+		SubmenuMaxThatFucker,
 		
 		//SETTINGS
 		SubmenuSettings,
@@ -158,9 +160,11 @@ namespace Arctic
 		DOOR_SPEAKER31,
 		SEATS32,
 		STEERINGWHEEL33,
+		SubmenuRaimbow,
 		SHIFTER_LEAVERS34,
 		PLAQUES35,
 		SPEAKERS36,
+		SubmenuTeam,
 		TRUNK37,
 		HYDRAULICS38,
 		ENGINE_BLOCK39,
@@ -190,6 +194,8 @@ namespace Arctic
 		SubmenuWater,
 		SubmenuAimbot,
 			SubmenuAimbotExcludes,
+			SubmenuChangeVehicleColor,
+			SubmenuChat,
 	};
 
 	bool MainScript::IsInitialized()
@@ -256,7 +262,7 @@ namespace Arctic
 						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 65, false);
 					}
 					});
-				sub->draw_option<toggle<bool>>(("Tiny Ped"), nullptr, &features.tiny_ped, BoolDisplay::OnOff, false, [] {
+				sub->draw_option<toggle<bool>>(("Tiny Ped"), "We can turn into ron height", &features.tiny_ped, BoolDisplay::OnOff, false, [] {
 					if (!features.tiny_ped)
 					{
 						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 223, false);
@@ -425,7 +431,7 @@ namespace Arctic
 			});
 		g_Render->draw_submenu<sub>(("Vehicle"), SubmenuVehicle, [](sub* sub)
 			{
-				sub->draw_option<submenu>("Handling", nullptr, Submenu::SubmenuVehicleMultipliers);
+				sub->draw_option<submenu>("Handling", "", Submenu::SubmenuVehicleMultipliers);
 				sub->draw_option<submenu>("Horn Boost", nullptr, Submenu::SubmenuHornBoost);
 				sub->draw_option<submenu>("Acrobatics", nullptr, Submenu::SubmenuAcrobatics);
 				sub->draw_option<submenu>("Auto-Pilot", nullptr, Submenu::SubmenuAutoPilot);
@@ -435,7 +441,8 @@ namespace Arctic
 				sub->draw_option<submenu>("Spawner", nullptr, Submenu::SubmenuVehicleSpawner);
 				sub->draw_option<submenu>("Upgrades", nullptr, Submenu::SubmenuUpgrades);
 				sub->draw_option<submenu>("LSC", nullptr, Submenu::SubmenuCustomize);
-				sub->draw_option<toggle<bool>>(("Godmode"), nullptr, &features.vehicle_godmode, BoolDisplay::OnOff, false, [] {
+				sub->draw_option<submenu>("Color", nullptr, Submenu::SubmenuChangeVehicleColor);
+				sub->draw_option<toggle<bool>>(("Godmode"), "Prevents your vehicle from taking damage.", &features.vehicle_godmode, BoolDisplay::OnOff, false, [] {
 					if (!features.vehicle_godmode) {
 						if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
 						{
@@ -443,8 +450,8 @@ namespace Arctic
 							ENTITY::SET_ENTITY_INVINCIBLE(playerVehicle, false);
 							ENTITY::SET_ENTITY_PROOFS(playerVehicle, false, false, false, false, false, false, false, false);
 							VEHICLE::SET_VEHICLE_DAMAGE(playerVehicle, 0.0f, 0.0f, 0.0f, 0.0f, 200.0f, false);
-							VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
-							VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, 0.0f);
+							//VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
+							//VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, 0.0f);
 							VEHICLE::SET_DISABLE_VEHICLE_PETROL_TANK_DAMAGE(playerVehicle, false);
 							VEHICLE::SET_DISABLE_VEHICLE_PETROL_TANK_FIRES(playerVehicle, false);
 							VEHICLE::SET_VEHICLE_BODY_HEALTH(playerVehicle, 1000.0f);
@@ -459,8 +466,8 @@ namespace Arctic
 						}
 					}
 					});
-				sub->draw_option<toggle<bool>>(("Keep Engine On"), nullptr, &features.keep_engine_on, BoolDisplay::OnOff);
-				sub->draw_option<toggle<bool>>(("No Plane Turbulence"), nullptr, &NoPlaneTurbulance, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Keep Engine On"), "Prevents your vehicle's engine from being turned off when exiting.", &features.keep_engine_on, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("No Plane Turbulence"), "Removes your plane's turbulance. When turning off, it can make turbulance levels a little messed up.", &NoPlaneTurbulance, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Auto-Repair"), nullptr, &features.auto_repair, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Remove Deformation"), nullptr, &features.remove_def, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Stick To Ground"), nullptr, &features.stick_to_ground, BoolDisplay::OnOff);
@@ -469,10 +476,41 @@ namespace Arctic
 						ENTITY::SET_ENTITY_RENDER_SCORCHED(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false);
 					}
 					});
-				sub->draw_option<toggle<bool>>(("Infinite Rocket Boost"), nullptr, &features.infiniter, BoolDisplay::OnOff);
-				sub->draw_option<toggle<bool>>(("Bypass Max Speed"), nullptr, &m_vehicle.bypass_max_speed.enabled, BoolDisplay::OnOff, false, [] {
+				sub->draw_option<toggle<bool>>(("Infinite Rocket Boost"), "Instantly refills your vehicle's rocket boost.", &features.infiniter, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Bypass Max Speed"), "Removes the speed cap of your vehicle.", &m_vehicle.bypass_max_speed.enabled, BoolDisplay::OnOff, false, [] {
 					m_vehicle.bypass_max_speed.disable(); //trying something new
 					});
+
+			});
+		g_Render->draw_submenu<sub>(("Color"), SubmenuChangeVehicleColor, [](sub* sub)
+			{
+				sub->draw_option<submenu>("Rainbow", nullptr, Submenu::SubmenuRaimbow);
+				sub->draw_option<number<std::int32_t>>("R", nullptr, &changeVehicleColor.r, 0, 255, 1, 3, true, "", "", [] {
+					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), changeVehicleColor.r, changeVehicleColor.g, changeVehicleColor.b);
+					});
+				sub->draw_option<number<std::int32_t>>("G", nullptr, &changeVehicleColor.g, 0, 255, 1, 3, true, "", "", [] {
+					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), changeVehicleColor.r, changeVehicleColor.g, changeVehicleColor.b);
+					});
+				sub->draw_option<number<std::int32_t>>("B", nullptr, &changeVehicleColor.b, 0, 255, 1, 3, true, "", "", [] {
+					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), changeVehicleColor.r, changeVehicleColor.g, changeVehicleColor.b);
+					});
+
+				
+		
+
+
+			});
+		g_Render->draw_submenu<sub>(("Rainbow"), SubmenuRaimbow, [](sub* sub)
+			{
+
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &changeVehicleColor.rainbow.enabled, BoolDisplay::OnOff, false, [] {
+						changeVehicleColor.r = 255;
+						
+					});
+				sub->draw_option<toggle<bool>>(("Include Secondary"), nullptr, &changeVehicleColor.rainbow.change_secondary, BoolDisplay::OnOff);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &changeVehicleColor.rainbow.delay, 0, 5000, 50);
+
+
 
 			});
 		g_Render->draw_submenu<sub>(("Spawner"), SubmenuVehicleSpawner, [](sub* sub)
@@ -652,20 +690,30 @@ namespace Arctic
 				}
 
 			});
+		g_Render->draw_submenu<sub>(("Max (Once)"), SubmenuMaxThatFucker, [](sub* sub)
+			{
+
+				for (std::uint32_t i = 0; i < 3; ++i) {
+					sub->draw_option<RegularOption>((m_upgrades.types[i]), nullptr, [=]
+						{
+
+							m_upgrades.apply(i);
+
+
+						});
+				}
+
+
+
+
+			});
 		g_Render->draw_submenu<sub>(("Upgrades"), SubmenuUpgrades, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Max (Loop)", nullptr, Submenu::SubmenuUpgradeLoop);
-				sub->draw_option<RegularOption>(("Max (Once)"), nullptr, []
-				{
-						if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
-						{
-							Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-							VEHICLE::SET_VEHICLE_FIXED(playerVehicle);
-							VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
-							VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, false);
-						}
-
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Max (Once)", nullptr, &m_upgrades.types, &m_upgrades.data, false, SubmenuMaxThatFucker, [] {
+					m_upgrades.apply(m_upgrades.data);
 				});
+				
 			});
 		g_Render->draw_submenu<sub>(("Max (Loop)"), SubmenuUpgradeLoop, [](sub* sub)
 			{
@@ -679,7 +727,7 @@ namespace Arctic
 				sub->draw_option<submenu>("Flag Creator", nullptr, SubmenuFlagCreator);
 				sub->draw_option<toggle<bool>>(("Reckless"), nullptr, &autopilot.wreckless, BoolDisplay::OnOff);
 				if (autopilot.wreckless) {
-					sub->draw_option<toggle<bool>>(("Avoid Roads"), nullptr, &autopilot.wreckless, BoolDisplay::OnOff);
+					sub->draw_option<toggle<bool>>(("Avoid Roads"), nullptr, &autopilot.avoid_roads, BoolDisplay::OnOff);
 				}
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Destination", nullptr, &autopilot.destination, &autopilot.destination_i);
 				sub->draw_option<number<float>>("Speed", nullptr, &autopilot.speed, 1.0f, 200.f, 1.0f, 2);
@@ -870,7 +918,7 @@ namespace Arctic
 		}
 
 			});
-		sub->draw_option<toggle<bool>>(("Stop At Trafic Lights"), nullptr, &flag_creator.stop_at_traffic_lights, BoolDisplay::OnOff, false, [] {
+		sub->draw_option<toggle<bool>>(("Stop At Traffic Lights"), nullptr, &flag_creator.stop_at_traffic_lights, BoolDisplay::OnOff, false, [] {
 			bool buffer = flag_creator.stop_at_traffic_lights;
 		if (buffer) {
 			flag_creator.current += 128;
@@ -887,6 +935,16 @@ namespace Arctic
 		}
 		if (!buffer) {
 			flag_creator.current -= 256;
+		}
+
+			});
+		sub->draw_option<toggle<bool>>(("Allow Going Wrong Way"), nullptr, &flag_creator.allow_going_wrong_way, BoolDisplay::OnOff, false, [] {
+			bool buffer = flag_creator.allow_going_wrong_way;
+		if (buffer) {
+			flag_creator.current += 512;
+		}
+		if (!buffer) {
+			flag_creator.current -= 512;
 		}
 
 			});
@@ -2225,7 +2283,7 @@ namespace Arctic
 				sub->draw_option<toggle<bool>>(("Friends"), nullptr, &aimbot.excludes.friends, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Players"), nullptr, &aimbot.excludes.players, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Peds"), nullptr, &aimbot.excludes.peds, BoolDisplay::OnOff);
-		
+		sub->draw_option<toggle<bool>>(("Teammates"), nullptr, &aimbot.excludes.team, BoolDisplay::OnOff);
 			});
 		g_Render->draw_submenu<sub>(("Triggerbot"), SubmenuTriggerbot, [](sub* sub)
 			{
@@ -2553,8 +2611,69 @@ namespace Arctic
 				sub->draw_option<submenu>("Requests", nullptr, SubmenuRequests);
 				sub->draw_option<submenu>("Session Starter", nullptr, SubmenuSesStart);
 				sub->draw_option<submenu>("RID Joiner", nullptr, SubmenuRIDJoiner);
+				sub->draw_option<submenu>("Chat", nullptr, SubmenuChat);
+				sub->draw_option<submenu>("Team", nullptr, SubmenuTeam);
 				sub->draw_option<submenu>("Off The Radar", nullptr, SubmenuOffRadar);
 				
+			});
+		g_Render->draw_submenu<sub>(("Team"), SubmenuTeam, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Override Restrictions"), nullptr, &team.override_restrictions, BoolDisplay::OnOff, false, [] {
+				if (!team.override_restrictions) {
+					NETWORK::NETWORK_OVERRIDE_TEAM_RESTRICTIONS(PLAYER::GET_PLAYER_TEAM(PLAYER::PLAYER_PED_ID()), false);
+				}
+					});
+				sub->draw_option<toggle<bool>>(("Use Freemode Colour Instead Of Team"), nullptr, &team.use_player_colour_instead_of_team, BoolDisplay::OnOff, false, [] {
+					if (!team.use_player_colour_instead_of_team) {
+						NETWORK::USE_PLAYER_COLOUR_INSTEAD_OF_TEAM_COLOUR(false);
+					}
+				});
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Team", nullptr, &team.type, &team.data, true, -1, [] {
+					PLAYER::SET_PLAYER_TEAM(PLAYER::PLAYER_PED_ID(), team.data);
+				});
+				sub->draw_option<UnclickOption>(("Players"), nullptr, [] {});
+				for (std::uint32_t i = 0; i < 32; ++i)
+				{
+					if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))
+					{
+						if (PLAYER::GET_PLAYER_TEAM(ped) == 0) {
+							std::string name = PLAYER::GET_PLAYER_NAME(i);
+							name = "~r~" + name;
+								if (i == PLAYER::PLAYER_ID())
+									name.append(" ~p~[Self]");
+
+
+								sub->draw_option<RegularOption>((name.c_str()), nullptr, [=]
+									{
+
+									});
+						}
+						if (PLAYER::GET_PLAYER_TEAM(ped) == 1) {
+							std::string name = PLAYER::GET_PLAYER_NAME(i);
+							name = "~b~" + name;
+							if (i == PLAYER::PLAYER_ID())
+								name.append(" ~p~[Self]");
+
+
+							sub->draw_option<RegularOption>((name.c_str()), nullptr, [=]
+								{
+
+								});
+						}
+					}
+				}
+
+
+			});
+		g_Render->draw_submenu<sub>(("Chat"), SubmenuChat, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Team Only"), nullptr, &chat.team_only, BoolDisplay::OnOff, false, [] {
+						if (!chat.team_only) {
+							NETWORK::NETWORK_SET_TEAM_ONLY_CHAT(false);
+						}
+				});
+		
+
 			});
 		g_Render->draw_submenu<sub>(("Off The Radar"), SubmenuOffRadar, [](sub* sub)
 			{
@@ -2749,9 +2868,7 @@ namespace Arctic
 				}
 					});
 
-				sub->draw_option<toggle<bool>>(("Off The Radar"), nullptr, &g_players.get_selected.otr.enabled, BoolDisplay::OnOff, false, [] {
-					
-				});
+				sub->draw_option<toggle<bool>>(("Off The Radar"), nullptr, &g_players.get_selected.otr.enabled, BoolDisplay::OnOff);
 
 			});
 		g_Render->draw_submenu<sub>("Removals", SubmenuRemoval, [](sub* sub)

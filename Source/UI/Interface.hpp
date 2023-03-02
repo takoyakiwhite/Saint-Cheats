@@ -285,7 +285,7 @@ namespace Arctic::UserInterface
 		void DrawSprite1(const char* textureDict, const char* textureName, float screenX, float screenY, float width, float height, float heading, int red, int green, int blue, int alpha);
 		void DrawRect(float x, float y, float width, float height, Color color);
 		void DrawSprite(const char* dict, const char* texture, float x, float y, float width, float height, Color color, float rotation);
-		void DrawLeftText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow);
+		void DrawLeftText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow, bool wrap = false);
 		void DrawCenteredText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow);
 		void DrawRightText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow);
 		float GetTextHeight(Font font, float size);
