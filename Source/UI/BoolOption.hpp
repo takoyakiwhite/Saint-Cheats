@@ -31,6 +31,7 @@ namespace Arctic::UserInterface
 		toggle(toggle&&) = default;
 		toggle& operator=(toggle&&) = default;
 
+		
 		const char* GetRightText() override
 		{
 			switch (m_DisplayType)

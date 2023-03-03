@@ -77,9 +77,12 @@ namespace Arctic {
 			char run_speed[64];
 			int infos = 2;
 			NETWORK::NETWORK_HANDLE_FROM_PLAYER(player, netHandle, 13);
+			
 			sprintf(name, "RID: %s", NETWORK::NETWORK_MEMBER_ID_FROM_GAMER_HANDLE(&netHandle[0]));
 			draw_info_text("Coords", "ALL TALK", 1, 0, true);
 			draw_info_text("RID", NETWORK::NETWORK_MEMBER_ID_FROM_GAMER_HANDLE(&netHandle[0]), 1, 0);
+			//draw_info_text("Clan Name", g_GameVariables->m_net_game_player(player)->m_clan_data.m_clan_name, 2, 0);
+			
 			
 			switch (g_Render->ThemeIterator) {
 			case 0:

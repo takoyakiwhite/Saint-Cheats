@@ -14,7 +14,10 @@ namespace Arctic::UserInterface
 		Horizontal = (1 << 0),
 		Enterable = (1 << 1),
 		BoolOption = (1 << 2),
-		UnclickOption = (1 << 3)
+		UnclickOption = (1 << 3),
+		BoolWithNumber = (1 << 4),
+		ChooseBool = (1 << 5),
+		Choose = (1 << 6),
 	};
 
 	class AbstractOption

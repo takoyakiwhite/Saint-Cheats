@@ -8,6 +8,8 @@
 #include <GTAV-Classes/ped/CPedFactory.hpp>
 #include <GTAV-Classes/network/CMsgTextMessage.hpp>
 #include "Classes.h"
+#include "Types.hpp"
+#include <GTAV-Classes/netsync/nodes/player/CPlayerGameStateDataNode.hpp>
 namespace Arctic
 {
 	
@@ -51,6 +53,17 @@ namespace Arctic
 		char* m_GameBuild;
 		uint32_t* m_region_code;
 
+		using get_net_game_player = CNetGamePlayer * (*) (uint32_t player);
+		get_net_game_player m_net_game_player;
+
+		using handle_to_ptr = rage::CDynamicEntity* (*)(Entity);
+		handle_to_ptr m_handle_to_ptr{};
+
+		bool* m_is_session_started{};
+
+		using request_control = void (*)(rage::netObject* net_object);
+		request_control m_request_control;
+
 		
 	};
 
@@ -63,6 +76,10 @@ namespace Arctic
 		GameFunctions(GameFunctions&&) = delete;
 		GameFunctions& operator=(GameFunctions const&) = delete;
 		GameFunctions& operator=(GameFunctions&&) = delete;
+
+		int64_t** m_send_chat_ptr{};
+		using chat_message = bool(*)(int64_t* send_chat_ptr, rage::rlGamerInfo* gamer_info, char* message, bool is_team);
+		chat_message m_send_chat_message{};
 
 		using WndProc = LRESULT(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		WndProc* m_WndProc;
@@ -106,6 +123,16 @@ namespace Arctic
 
 		using IncrementStatEvent = int(__int64 neteventsclass, CNetGamePlayers* targetPlayer);
 		IncrementStatEvent* m_IncrementStatEvent;
+
+		using increment_Stat = void (*) (Hash hash, unsigned int value, CNetGamePlayer* player);
+		increment_Stat m_remote_increment;
+		PVOID m_write_player_gamer_data_node{};
+		
+		using write_player_game_state_data_node2 = bool(*)(rage::netObject* plr, CPlayerGameStateDataNode* node);
+		write_player_game_state_data_node2 m_write_player_game_state_data_node;
+
+		using SendNetInfoo = bool(netPlayerData* player, __int64 a2, __int64 a3, DWORD* a4);
+		SendNetInfoo* m_SendNetInfo;
 	};
 
 	inline std::unique_ptr<GameVariables> g_GameVariables;

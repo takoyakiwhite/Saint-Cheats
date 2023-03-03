@@ -36,6 +36,22 @@ namespace Arctic {
 				
 				m_queue.add(18s, "Removing player..", [] {});
 			}
+			if (Menu_Data == 1) {
+				g_FiberPool.queue([]
+					{
+						const size_t arg_count = 3;
+					int64_t args[arg_count] =
+					{
+						(int64_t)1674887089,
+						(int64_t)PLAYER::PLAYER_ID(),
+						*script_global(1892703).at(g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id, 599).at(510).as<int64_t*>()
+					};
+
+					g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id);
+				});
+
+				m_queue.add(18s, "Removing player..", [] {});
+			}
 		}
 	};
 }

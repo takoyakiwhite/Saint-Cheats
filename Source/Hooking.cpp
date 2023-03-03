@@ -11,6 +11,8 @@
 #include "Protections.h"
 #include "Chat Commands.h"
 #include "Features.h"
+#include "Spoofing.h"
+#include "../Libraries/Include/GTAV-Classes/netsync/nodes/player/CPlayerGameStateDataNode.hpp"
 
 #ifdef BIGBASE_DEBUG
 #  pragma comment(lib, "MinHook-Debug.lib")
@@ -226,26 +228,71 @@ namespace Arctic
 		
 		return static_cast<decltype(&IncrementStatEvent)>(g_Hooking->m_OriginalIncrementStatEvent)(neteventclass, Source);
 	}
-	void Hooks::ChatMessage(void* thisptr, __int64  unk1, __int64  unk2, const char* message)
-	{
-		if (message == nullptr) { return static_cast<decltype(&ChatMessage)>(g_Hooking->m_OriginalChatMessage)(thisptr, unk1, unk2, message); }
-
-		g_Logger->Info("[CHAT] Name: %s | %s", g_GameFunctions->get_chat_sender(unk2)->PlayerInfo->m_net_player_data.m_name, message);
-		std::string strmsg = message;
-		
-		if (m_chat_commands.m_enabled)
-		{
-			if (m_chat_commands.m_commands.m_spawn) {
-				if (has_string(strmsg, "/spawn"))
-				{
-					veh_spawner.spawn_for_ped(MISC::GET_HASH_KEY(strmsg.c_str()), PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_GameFunctions->get_chat_sender(unk2)->m_player_id));
-				}
-			}
+	
+	bool Hooks::write_player_game_state_data_node(rage::netObject* player, CPlayerGameStateDataNode* node) {
+		if (spoofing.m_godmode) {
+			node->m_is_invincible = false;
+			node->m_bullet_proof = false;
+			node->m_collision_proof = false;
+			node->m_explosion_proof = false;
+			node->m_fire_proof = false;
+			node->m_melee_proof = false;
+			node->m_steam_proof = false;
+			node->m_water_proof = false;
+		}
+		if (spoofing.m_superjump) {
+			node->m_super_jump = false;
 			
+		}
+		if (spoofing.spectating)
+		{
+			node->m_is_spectating = false;
+			node->m_spectating_net_id = 0;
+		}
+		if (spoofing.respawning) {
+			node->m_respawning = false;
+			
+		}
+		if (spoofing.seatbelt) {
+			node->m_seatbelt = false;
+		}
+		return static_cast<decltype(&write_player_game_state_data_node)>(g_Hooking->m_Original_write_player_game_state_data_node)(player, node);
+	}
+	bool Hooks::SendNetInfo(netPlayerData* player, __int64 a2, __int64 a3, DWORD* a4)
+	{
+		
 
+		if (spoofing.ip.enabled)
+		{
+			player->m_online_ip.m_field1 = spoofing.ip.field1;
+			player->m_online_ip.m_field2 = spoofing.ip.field2;
+			player->m_online_ip.m_field3 = spoofing.ip.field3;
+			player->m_online_ip.m_field4 = spoofing.ip.field4;
+			
 		}
 
-		return static_cast<decltype(&ChatMessage)>(g_Hooking->m_OriginalChatMessage)(thisptr, unk1, unk2, message);
+		return static_cast<decltype(&SendNetInfo)>(g_Hooking->m_OriginalSendNetInfo)(player, a2, a3, a4);
+	}
+	void Hooks::write_player_gamer_data_node(rage::netObject* player, CPlayerGamerDataNode* node) {
+		if (spoofing.qa_tester) {
+			//node->m_is_rockstar_qa = true;
+		}
+		if (spoofing.m_crew.enabled) {
+			node->m_clan_data.m_clan_member_id = 1;
+			node->m_clan_data.m_clan_id = 41564112;
+			node->m_clan_data.m_clan_id_2 = 41564112;
+			node->m_clan_data.m_is_system_clan = true;
+			strcpy(node->m_clan_data.m_clan_name, spoofing.m_crew.name);
+			strcpy(node->m_clan_data.m_clan_tag, spoofing.m_crew.tag.c_str());
+			
+		}
+		
+		return static_cast<decltype(&write_player_gamer_data_node)>(g_Hooking->m_Original_write_player_gamer_data_node)(player, node);
+	}
+	bool Hooks::send_chat_message(void* team_mgr, rage::rlGamerInfo* local_gamer_info, const char* message, bool is_team)
+	{
+		
+		return static_cast<decltype(&send_chat_message)>(g_Hooking->m_OriginalChatSend)(team_mgr, local_gamer_info, message, is_team);
 	}
 	Hooking::Hooking():
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
@@ -257,7 +304,10 @@ namespace Arctic
 		MH_CreateHook(g_GameFunctions->m_PlayerListMenuConstructor, &Hooks::CPlayerListMenuConstructor, &m_OriginalJoinSessionHook);
 		MH_CreateHook(g_GameFunctions->m_PlayerWildcard, &Hooks::PlayerWildCardHandler, &m_OriginalRIDFunction);
 		MH_CreateHook(g_GameFunctions->m_IncrementStatEvent, &Hooks::IncrementStatEvent, &m_OriginalIncrementStatEvent);
-		//MH_CreateHook(g_GameFunctions->m_ChatMessage, &Hooks::ChatMessage, &m_OriginalChatMessage);
+		MH_CreateHook(g_GameFunctions->m_write_player_game_state_data_node, &Hooks::write_player_game_state_data_node, &m_Original_write_player_game_state_data_node);
+		MH_CreateHook(g_GameFunctions->m_write_player_gamer_data_node, &Hooks::write_player_gamer_data_node, &m_Original_write_player_gamer_data_node);
+		MH_CreateHook(g_GameFunctions->m_SendNetInfo, &Hooks::SendNetInfo, &m_OriginalSendNetInfo);
+		MH_CreateHook(g_GameFunctions->m_send_chat_message, &Hooks::send_chat_message, &m_OriginalChatSend);
 		
 		m_D3DHook.Hook(&Hooks::Present, Hooks::PresentIndex);
 		m_D3DHook.Hook(&Hooks::ResizeBuffers, Hooks::ResizeBuffersIndex);
@@ -265,12 +315,18 @@ namespace Arctic
 
 	Hooking::~Hooking() noexcept
 	{
-		MH_RemoveHook(g_GameFunctions->m_WndProc);
+		
 		MH_RemoveHook(g_GameFunctions->m_GetLabelText);
+		MH_RemoveHook(g_GameFunctions->m_WndProc);
 		MH_RemoveHook(g_GameFunctions->m_PlayerListMenuConstructor);
 		MH_RemoveHook(g_GameFunctions->m_PlayerWildcard);
 		//MH_RemoveHook(g_GameFunctions->m_ChatMessage);
 		MH_RemoveHook(g_GameFunctions->m_IncrementStatEvent);
+		MH_RemoveHook(g_GameFunctions->m_write_player_game_state_data_node);
+		MH_RemoveHook(g_GameFunctions->m_write_player_gamer_data_node);
+		MH_RemoveHook(g_GameFunctions->m_SendNetInfo);
+		MH_RemoveHook(g_GameFunctions->m_send_chat_message);
+
 		//MH_RemoveHook(g_GameFunctions->m_GetEventData);
 		MH_Uninitialize();
 	}

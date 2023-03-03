@@ -1,5 +1,8 @@
 #pragma once
-
+#include "../Libraries/Include/GTAV-Classes/network/netPlayer.hpp"
+#include "../Libraries/Include/GTAV-Classes/network/ClanData.hpp"
+#include "../Libraries/Include/GTAV-Classes/rage/rlSessionInfo.hpp"
+#include "../Libraries/Include/GTAV-Classes/network/CNetGamePlayer.hpp"
 namespace rage {
 #pragma pack(push, 1)
 	class hash_list
@@ -55,20 +58,10 @@ namespace Arctic {
 		char pad_0078[12]; //0x0078
 		const char* m_name; //0x0084
 	}; //Size: 0x0098
-	class netPlayer
-	{
-	public:
-		virtual ~netPlayer() = default;            // 0 (0x00)
-		virtual void reset() = 0;                  // 1 (0x08)
-		virtual bool is_valid() const = 0;         // 2 (0x10)
-		virtual const char* get_name() const = 0;  // 3 (0x18)
-		virtual void _0x20() = 0;                  // 4 (0x20)
-		virtual bool is_host() = 0;                // 5 (0x28)
-		virtual netPlayerData* get_net_data() = 0; // 6 (0x30)
-		virtual void _0x38() = 0;                  // 7 (0x38)
-	};
+	
 
-	class CNetGamePlayers : public netPlayer
+
+	class CNetGamePlayers : public rage::netPlayer
 	{
 	public:
 		char pad_0x0008[0x10]; //0x0008

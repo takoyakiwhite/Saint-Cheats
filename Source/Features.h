@@ -11,6 +11,8 @@
 #include <filesystem>
 #include "Vehicle.h"
 #include "Players.h"
+#include "All Players.h"
+#include "Hooking.hpp"
 namespace Arctic {
 	inline std::string handlingBuffer = "";
 	inline std::string ridBuffer = "";
@@ -509,7 +511,9 @@ namespace Arctic {
 		bool burned = false;
 		bool infiniter = false;
 		bool drugs = false;
+		
 		void init() {
+			
 			if (drugs) {
 				GRAPHICS::ENABLE_ALIEN_BLOOD_VFX(true);
 				GRAPHICS::ANIMPOSTFX_PLAY("DrugsMichaelAliensFight", 9999999, false);
@@ -962,6 +966,23 @@ namespace Arctic {
 		bool speed = true;
 		bool wantedlevel = true;
 		bool godmode = true;
+		Interior get_interior_from_player(Player player)
+		{
+			script_global globalplayer_bd(2657589);
+			return *globalplayer_bd.at(player, 466).at(245).as<Interior*>();
+		}
+		bool is_in_cutscene(int i)
+		{
+			if (g_GameVariables->m_net_game_player(i) && g_GameVariables->m_net_game_player(i)->m_player_info)
+				return g_GameVariables->m_net_game_player(i)->m_player_info->m_game_state == eGameState::InMPCutscene;
+			return false;
+		}
+
+		bool is_in_interior(int i)
+		{
+			
+			return get_interior_from_player(g_GameVariables->m_net_game_player(i)->m_player_id) != 0;
+		}
 		void mapNotification(const char* body, const char* who) {
 
 			char messageBuffer[256];
@@ -974,6 +995,54 @@ namespace Arctic {
 
 
 
+		}
+		bool infinite_ammo = true;
+		bool infinite_ammo2 = true;
+		bool scenario = true;
+		bool tiny_ped = true;
+		bool UnobtainableVehicle = true;
+		bool scenarios = true;
+		bool fly = true;
+		bool no_ragdoll = false;
+		bool ready_for_godmode(int i, Ped ped) {
+			if (g_GameVariables->m_net_game_player(i)->m_player_info->m_ped->m_player_info->m_game_state != eGameState::InMPCutscene && !is_in_interior(i) && !ENTITY::IS_ENTITY_DEAD(ped, 0)) {
+				return true;
+			}
+		}
+		bool is_modding(int i) {
+			auto player = g_GameVariables->m_net_game_player(i)->m_player_info->m_ped;
+			
+			uint32_t ped_damage_bits = 0;
+			uint32_t ped_task_flag = 0;
+			if (CPed* ped = g_GameVariables->m_net_game_player(i)->m_player_info->m_ped; ped != nullptr)
+			{
+				ped_task_flag = ped->m_ped_task_flag;
+				ped_damage_bits = ped->m_damage_bits;
+
+			}
+			if (player->m_weapon_manager->m_weapon_info->m_wheel_slot != eWeaponWheelSlot::UnarmedMelee) {
+				if (ped_task_flag & (uint8_t)1 << 6) {
+					
+				}
+				else {
+					if (player->m_inventory->m_infinite_ammo) {
+						return true;
+					}
+					if (player->m_inventory->m_infinite_clip) {
+						return true;
+					}
+				}
+			}
+			if (ped_damage_bits & (uint32_t)1 << 8) {
+				if (ready_for_godmode(i, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))) {
+					return true;
+				}
+			}
+			
+			if (player->m_player_info->m_run_speed > 1.80f) {
+
+				return true;
+			}
 		}
 		void init() {
 			if (enabled) {
@@ -988,39 +1057,81 @@ namespace Arctic {
 								invalidModel = true;
 							}
 						}
-						bool godmodec = false;
-						if (PLAYER::GET_PLAYER_INVINCIBLE(ped) == true) {
-							godmodec = true;
-						}
-						
+
+
+
 						if (invalidmodel) {
 							mapNotification("Invalid Model", PLAYER::GET_PLAYER_NAME(i));
 
 
 						}
 						//anti-cheat
+						if (tiny_ped) {
+							if (PED::GET_PED_CONFIG_FLAG(ped, 223, true)) {
 
-						if (PED::GET_PED_CONFIG_FLAG(ped, 223, true) && configflag) {
-
-							mapNotification("Tiny Ped", PLAYER::GET_PLAYER_NAME(i));
+								mapNotification("Tiny Ped", PLAYER::GET_PLAYER_NAME(i));
+							}
 						}
-						if (ENTITY::GET_ENTITY_SPEED(ped) > 11.0f) {
-							if (TASK::IS_PED_RUNNING(ped) && INTERIOR::GET_ROOM_KEY_FROM_ENTITY(ped) == 0) {
+						bool godmodec = false;
+						
+							uint32_t ped_damage_bits = 0;
+							uint32_t ped_task_flag = 0;
+							if (CPed* ped = g_GameVariables->m_net_game_player(i)->m_player_info->m_ped; ped != nullptr)
+							{
+								ped_damage_bits = ped->m_damage_bits;
+								ped_task_flag = ped->m_ped_task_flag;
+							}
 
-								if (!PED::IS_PED_IN_ANY_VEHICLE(ped, false) && !ENTITY::IS_ENTITY_IN_AIR(ped)) {
-									mapNotification("Run Speed", PLAYER::GET_PLAYER_NAME(i));
+							if (ped_damage_bits & (uint32_t)1 << 8) {
+								if (ready_for_godmode(i, ped)) {
+									godmodec = true;
 								}
-
 							}
-						}
-						if (ENTITY::GET_ENTITY_SPEED(ped) > 77.0f) {
-							if (!PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
-								mapNotification("Fly", PLAYER::GET_PLAYER_NAME(i));
-							}
-						}
-						if (PED::GET_PED_CONFIG_FLAG(ped, 194, true) && configflag) {
+							auto player = g_GameVariables->m_net_game_player(i)->m_player_info->m_ped;
+							if (g_GameVariables->m_net_game_player(i)->m_player_info->m_ped->m_player_info->m_run_speed > 1.80f) {
 
-							mapNotification("Scenario", PLAYER::GET_PLAYER_NAME(i));
+								mapNotification("Run Speed", PLAYER::GET_PLAYER_NAME(i));
+							}
+							if (player->m_weapon_manager->m_weapon_info->m_wheel_slot != eWeaponWheelSlot::UnarmedMelee) {
+								if (ped_task_flag & (uint8_t)1 << 6) {
+									
+								}
+								else {
+									if (infinite_ammo) {
+										if (player->m_inventory->m_infinite_ammo) {
+											mapNotification("Infinite Ammo", PLAYER::GET_PLAYER_NAME(i));
+										}
+									}
+									if (infinite_ammo2) {
+										if (player->m_inventory->m_infinite_clip) {
+											mapNotification("Infinite Ammo", PLAYER::GET_PLAYER_NAME(i));
+										}
+									}
+								}
+							}
+							if (no_ragdoll) {
+								if (player->can_be_ragdolled() == false) {
+
+									mapNotification("No Ragdoll", PLAYER::GET_PLAYER_NAME(i));
+								}
+							}
+						
+							
+							
+						
+						
+								if (fly) {
+									if (ENTITY::GET_ENTITY_SPEED(ped) > 77.0f) {
+										if (!PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
+											mapNotification("Fly", PLAYER::GET_PLAYER_NAME(i));
+										}
+									}
+								}
+						if (scenarios) {
+							if (PED::GET_PED_CONFIG_FLAG(ped, 194, true)) {
+
+								mapNotification("Scenario", PLAYER::GET_PLAYER_NAME(i));
+							}
 						}
 						Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(ped, false);
 						Hash cutter = MISC::GET_HASH_KEY("cutter");
@@ -1032,32 +1143,34 @@ namespace Arctic {
 						Hash cutter7 = MISC::GET_HASH_KEY("asea2");
 						Hash cutter8 = MISC::GET_HASH_KEY("burrito5");
 
-						if (PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
-							if (ENTITY::GET_ENTITY_MODEL(veh) == cutter) {
-								mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
-							}
-							if (ENTITY::GET_ENTITY_MODEL(veh) == cutter2) {
-								mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
-							}
-							if (ENTITY::GET_ENTITY_MODEL(veh) == cutter3) {
-								mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
-							}
-							if (ENTITY::GET_ENTITY_MODEL(veh) == cutter4) {
-								mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
-							}
-							if (ENTITY::GET_ENTITY_MODEL(veh) == cutter5) {
-								mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
-							}
-							if (ENTITY::GET_ENTITY_MODEL(veh) == cutter6) {
-								mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
-							}
-							if (ENTITY::GET_ENTITY_MODEL(veh) == cutter7) {
-								mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
+						if (UnobtainableVehicle) {
+							if (PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
+								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter) {
+									mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
+								}
+								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter2) {
+									mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
+								}
+								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter3) {
+									mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
+								}
+								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter4) {
+									mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
+								}
+								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter5) {
+									mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
+								}
+								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter6) {
+									mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
+								}
+								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter7) {
+									mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
 
-							}
-							if (ENTITY::GET_ENTITY_MODEL(veh) == cutter8) {
-								mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
+								}
+								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter8) {
+									mapNotification("Unobtainable Vehicle", PLAYER::GET_PLAYER_NAME(i));
 
+								}
 							}
 						}
 						if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(veh, -1, 1) == ped) {
@@ -1176,11 +1289,14 @@ namespace Arctic {
 	public:
 		bool run = false;
 		float run_speed = 1.0f;
+		bool swim_run = false;
+		float swim_speed = 1.0f;
 		void init() {
 			if (run) {
 				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_run_speed = run_speed;
-				
-				
+			}
+			if (swim_run) {
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_swim_speed = run_speed;
 			}
 		}
 	};
@@ -1370,16 +1486,12 @@ namespace Arctic {
 		std::string text = "Click here to set the text.";
 		int delay = 50;
 		std::size_t data = 0;
-		char bufferf[64];
 		void init() {
 			if (enabled) {
-				static int delay2 = 0;
-				if (delay2 == 0 || (int)(GetTickCount64() - delay2) > delay) {
-					int m_handle[13];
-					NETWORK::NETWORK_HANDLE_FROM_PLAYER(g_SelectedPlayer, &m_handle[0], 13);
-					if (NETWORK::NETWORK_IS_HANDLE_VALID(&m_handle[0], 13))
-						NETWORK::NETWORK_SEND_TEXT_MESSAGE(text.c_str(), &m_handle[0]);
-					delay2 = GetTickCount64();
+				int handle[26];
+				NETWORK::NETWORK_HANDLE_FROM_PLAYER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), &handle[0], 13);
+				if (NETWORK::NETWORK_IS_HANDLE_VALID(&handle[0], 13)) {
+					NETWORK::NETWORK_SEND_TEXT_MESSAGE(text.c_str(), &handle[0]);
 				}
 				
 			}
@@ -1534,6 +1646,14 @@ namespace Arctic {
 		Object asteroidObject;
 		int how_many_planes = 1;
 		Ped ped;
+		void remove() {
+			if (ENTITY::DOES_ENTITY_EXIST(angryPlanesPed)) {
+				ENTITY::DELETE_ENTITY(&angryPlanesPed);
+			}
+			if (ENTITY::DOES_ENTITY_EXIST(angryPlanesPlane)) {
+				ENTITY::DELETE_ENTITY(&angryPlanesPlane);
+			}
+		}
 		void add() {
 
 			if (mode_i == 1) {
@@ -1590,7 +1710,7 @@ namespace Arctic {
 					VEHICLE::SET_VEHICLE_IS_STOLEN(angryPlanesPlane, FALSE);
 					VEHICLE::SET_VEHICLE_ENGINE_ON(angryPlanesPlane, true, true, true);
 					VEHICLE::SET_VEHICLE_FORWARD_SPEED(angryPlanesPlane, MISC::GET_RANDOM_INT_IN_RANGE(50, 350));
-					ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPlane, 1);
+					//ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPlane, 1);
 					ENTITY::SET_ENTITY_PROOFS(angryPlanesPlane, true, true, true, true, true, true, true, true);
 					VEHICLE::SET_VEHICLE_DAMAGE(angryPlanesPlane, 0.f, 0.f, 0.f, 0.f, 200.f, false);
 						});
@@ -2304,17 +2424,17 @@ namespace Arctic {
 				case 1:
 					
 					*globalplayer_bd.at(PLAYER::GET_PLAYER_INDEX(), 466).at(210).as<int*>() = true;
-					*script_global(2672505).at(57).as<int*>() = 1337;
+					*script_global(2672505).at(57).as<int*>() = NETWORK::GET_NETWORK_TIME() + 1337;
 					break;
 				case 2:
 					
 					*globalplayer_bd.at(PLAYER::GET_PLAYER_INDEX(), 466).at(210).as<int*>() = true;
-					*script_global(2672505).at(57).as<int*>() = 6969;
+					*script_global(2672505).at(57).as<int*>() = NETWORK::GET_NETWORK_TIME() + 6969;
 					break;
 				case 3:
 					
 					*globalplayer_bd.at(PLAYER::GET_PLAYER_INDEX(), 466).at(210).as<int*>() = true;
-					*script_global(2672505).at(57).as<int*>() = 9999;
+					*script_global(2672505).at(57).as<int*>() = NETWORK::GET_NETWORK_TIME() + 9999;
 					break;
 				}
 			}
@@ -2506,11 +2626,49 @@ namespace Arctic {
 	inline ChangeVehicleColor changeVehicleColor;
 	class Chat {
 	public:
+		std::string text;
 		bool team_only = false;
+		bool spammer = false;
+		int delay = 300;
+		int spoofed_sender = 0;
+		bool spoof_sender = false;
+		void add_message(const char* msg, const char* player_name, bool is_team)
+		{
+			if (Hooks::send_chat_message(*g_GameFunctions->m_send_chat_ptr, g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_net_data(), msg, false)) {
+				g_GameFunctions->m_send_chat_ptr, g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_net_data(), msg, false;
+				int scaleform = GRAPHICS::REQUEST_SCALEFORM_MOVIE("MULTIPLAYER_CHAT");
+				GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(scaleform, "ADD_MESSAGE");
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING(player_name); // player name
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_LITERAL_STRING(msg); // content
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(is_team ? "MP_CHAT_TEAM" : "MP_CHAT_ALL")); // scope
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_BOOL(false); // teamOnly
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0); // eHudColour
+				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+				GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(scaleform, "SET_FOCUS");
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(1); // VISIBLE_STATE_DEFAULT
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0); // scopeType (unused)
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0); // scope (unused)
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING(player_name); // player
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0); // eHudColour
+				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+				GRAPHICS::DRAW_SCALEFORM_MOVIE_FULLSCREEN(scaleform, 255, 255, 255, 255, 0);
+			}
+			
+		}
 		void init() {
+			if (spammer) {
+				static int timer;
+				if (timer == 0 || (int)(GetTickCount64() - timer) > delay) {
+					add_message(text.c_str(), g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_name(), false);
+					timer = GetTickCount64();
+				}
+			}
 			if (team_only) {
 				NETWORK::NETWORK_SET_TEAM_ONLY_CHAT(true);
 			}
+		}
+		void send_once() {
+			add_message(text.c_str(), g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_name(), false);
 		}
 	};
 	inline Chat chat;
@@ -2530,7 +2688,107 @@ namespace Arctic {
 		}
 	};
 	inline Team team;
+	inline Ped selected_ped_i = 0;
+	
+	class Scenarios {
+	public:
+		const char* name[2] = {
+			"Showering", 
+			"Stripper Dance"};
+		const char* dict[2] = {
+			"mp_safehouseshower@male@", 
+			"mini@strip_club@private_dance@part1"};
+		const char* id[2] = { 
+			"male_shower_idle_b", 
+			"priv_dance_p1"};
+		std::size_t size = 2;
+	};
+	class Animations {
+	public:
+		const char* suc[2] = { "Pistol", "Pill" };
+		std::size_t suc_data;
+		std::string dictInput;
+		std::string idInput;
+		bool does_exist = false;
+		Scenarios scenarios;
+		bool contort = false;
+		bool controllable = false;
+		void start(const char* anim, const char* animid)
+		{
+			g_CallbackScript->AddCallback<AnimationCallback>(anim, [=]
+				{
+					if (controllable) {
+						TASK::TASK_PLAY_ANIM(PLAYER::PLAYER_PED_ID(), (char*)anim, (char*)animid, 9.0f, 0.0f, -1, 120, 0, false, false, false);
+					}
+					else
+					{
+						TASK::TASK_PLAY_ANIM(PLAYER::PLAYER_PED_ID(), (char*)anim, (char*)animid, 8.0f, 0.0f, -1, 9, 0, 0, 0, 0);
+					}
+				});
+		}
+	};
+	inline Animations animation;
+	inline bool mark_as_arctic = true;
+	class WantedLev {
+	public:
+		bool always = false;
+		void init() {
+			if (always) {
+				g_players.get_selected.set_wanted_level(3);
+			}
+		}
+	};
+	inline WantedLev wanted_lev;
+	class Cage {
+	public:
+		bool is_invisible = false;
+		const char* type[2] = { "Stunt Tube", "Normal" };
+		std::size_t data;
+		void add() {
+			switch (data) {
+			case 0:
+				m_queue.add(10ms, "Adding Cage", [=] {
+						Player ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
+					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(ped, true);
+					Hash hash = MISC::GET_HASH_KEY("stt_prop_stunt_tube_l");
+					
+
+					Object cage = OBJECT::CREATE_OBJECT_NO_OFFSET(hash, c.x, c.y, c.z, true, false, false);
+					if (is_invisible) {
+						ENTITY::SET_ENTITY_VISIBLE(cage, false, 0);
+					}
+					ENTITY::SET_ENTITY_ROTATION(cage, 0.0, 90.0, 0.0, 1, true);
+					});
+				break;
+			case 1:
+				m_queue.add(10ms, "Adding Cage", [=] {
+					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+
+				Object cage = OBJECT::CREATE_OBJECT(MISC::GET_HASH_KEY("prop_gold_cont_01"), c.x, c.y, c.z - 1.f, true, false, false);
+				if (is_invisible) {
+					ENTITY::SET_ENTITY_VISIBLE(cage, false, 0);
+				}
+					});
+				break;
+			}
+			
+		}
+	};
+	inline Cage cage;
+	class Incr {
+	public:
+		const char* type[5] = { "Griefing", "Game Exploits", "Exploits", "Punished", "Cheats" };
+		std::size_t data;
+		void add() {
+			g_GameFunctions->m_remote_increment(*(Hash*)type[data], 100, g_GameVariables->m_net_game_player(g_SelectedPlayer));
+		}
+	};
+	inline Incr incr;
 	inline void FeatureInitalize() {
+		if (mark_as_arctic) {
+			PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 109, true);
+			
+		}
 		flag_creator.init();
 		invisible.init();
 		no_clip.init();
@@ -2561,6 +2819,8 @@ namespace Arctic {
 		changeVehicleColor.init();
 		chat.init();
 		team.init();
+		wanted_lev.init();
+		all_players.m_explode.init();
 		if (NoPlaneTurbulance) {
 			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 

@@ -33,19 +33,21 @@ namespace Arctic::UserInterface
 		number(number&&) = default;
 		number& operator=(number&&) = default;
 
+		bool GetFlag(OptionFlag flag) override
+		{
+			if (flag == OptionFlag::Horizontal)
+			{
+
+				return true;
+			}
+
+			return Base::GetFlag(flag);
+		}
 		const char* GetRightText() override
 		{
 			
 			
-			auto sub = g_Render->m_SubmenuStack.top();
-			bool selectedOption = sub->GetSelectedOption() == sub->GetNumOptions() ? true : false;
-			if (sub->GetSelectedOption() == sub->GetNumOptions()) {
-				MemoryStringStream stream(Base::m_RightText);
-				stream << *m_Number << " <>" << std::fixed;
-				return Base::GetRightText();
-			}
-			else {
-				MemoryStringStream stream(Base::m_RightText);
+			MemoryStringStream stream(Base::m_RightText);
 				stream
 					<< std::setprecision(m_Precision)
 					<< std::fixed
@@ -53,7 +55,6 @@ namespace Arctic::UserInterface
 					<< static_cast<DisplayType>(*m_Number)
 					<< m_Suffix;
 				return Base::GetRightText();
-			}
 		}
 
 		void HandleAction(OptionAction action) override

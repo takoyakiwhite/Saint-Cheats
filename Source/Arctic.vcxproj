@@ -13,6 +13,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="All Players.h" />
+    <ClInclude Include="BoolWithChoose.h" />
+    <ClInclude Include="BoolWithNumber.hpp" />
     <ClInclude Include="Bypass Max Speed.h" />
     <ClInclude Include="Chat Commands.h" />
     <ClInclude Include="Classes.h" />
@@ -26,6 +28,7 @@
     <ClInclude Include="FiberHelper.hpp" />
     <ClInclude Include="Flash Blip.h" />
     <ClInclude Include="Jets.h" />
+    <ClInclude Include="KeyboardOption.h" />
     <ClInclude Include="Kick.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="OTR.h" />
@@ -58,6 +61,7 @@
     <ClInclude Include="ScriptHook.hpp" />
     <ClInclude Include="ScriptManager.hpp" />
     <ClInclude Include="Settings.hpp" />
+    <ClInclude Include="Spoofing.h" />
     <ClInclude Include="Timer.hpp" />
     <ClInclude Include="Translation.hpp" />
     <ClInclude Include="Types.hpp" />

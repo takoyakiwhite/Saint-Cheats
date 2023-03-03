@@ -36,7 +36,15 @@ namespace Arctic::UserInterface
 				Base::SetDescription(description);
 			Base::SetAction(std::move(action));
 		}
+		bool GetFlag(OptionFlag flag) override
+		{
+			if (flag == OptionFlag::Choose)
+			{
+				return true;
+			}
 
+			return Base::GetFlag(flag);
+		}
 		const char* GetRightText() override
 		{
 			MemoryStringStream stream(Base::m_RightText);

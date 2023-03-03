@@ -31,7 +31,34 @@ namespace Arctic
 	protected:
 		AbstractCallback() = default;
 	};
+	class AnimationCallback : public AbstractCallback
+	{
+	public:
+		explicit AnimationCallback(const char* anim, std::function<void()> action) :
+			m_Name(anim),
+			m_Action(std::move(action))
+		{
+		}
 
+		bool IsDone() override
+		{
+			return STREAMING::HAS_ANIM_DICT_LOADED(m_Name);
+		}
+
+		void OnSuccess() override
+		{
+			if (m_Action)
+				std::invoke(m_Action);
+		}
+
+		void OnFailure() override
+		{
+			STREAMING::REQUEST_ANIM_DICT(m_Name);
+		}
+	private:
+		const char* m_Name;
+		std::function<void()> m_Action;
+	};
 	class ModelCallback : public AbstractCallback
 	{
 	public:

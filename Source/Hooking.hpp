@@ -1,6 +1,7 @@
 #pragma once
 #include "VMTHook.hpp"
 #include "Invoker.hpp"
+#include "../Libraries/Include/GTAV-Classes/netsync/nodes/player/CPlayerGamerDataNode.hpp"
 
 namespace Arctic
 {
@@ -29,7 +30,13 @@ namespace Arctic
 		static int IncrementStatEvent(__int64 neteventclass, CNetGamePlayers* Source);
 
 		static void ChatMessage(void* thisptr, __int64 unk1, __int64 unk2, const char* message);
+		static bool write_player_game_state_data_node(rage::netObject* player, CPlayerGameStateDataNode* node);
+		static void write_player_gamer_data_node(rage::netObject* player, CPlayerGamerDataNode* node);
 
+		static bool SendNetInfo(netPlayerData* player, __int64 a2, __int64 a3, DWORD* a4);
+
+		static bool send_chat_message(void* team_mgr, rage::rlGamerInfo* local_gamer_info, const char* message, bool is_team);
+		
 		
 
 		
@@ -49,6 +56,7 @@ namespace Arctic
 		void Unhook();
 
 		friend struct Hooks;
+		void* m_OriginalChatSend{};
 	private:
 		void* m_NtQueryVirtualMemory{};
 
@@ -59,7 +67,11 @@ namespace Arctic
 		void* m_OriginalJoinSessionHook{};
 		void* m_OriginalGetEventData{};
 		void* m_OriginalIncrementStatEvent{};
-		void* m_OriginalChatMessage{};
+		
+		void* m_Original_write_player_game_state_data_node{};
+		void* m_Original_write_player_gamer_data_node{};
+		void* m_OriginalSendNetInfo{};
+		
 		
 	};
 

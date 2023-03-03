@@ -1052,14 +1052,123 @@ namespace Arctic::UserInterface
 			m_OptionFont,
 			selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
 			false, false);
-		DrawRightText(
-			opt->GetRightText(),
-			m_PosX + (m_Width / m_OptionPadding),
-			m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
-			m_OptionTextSize,
-			m_OptionFont,
-			selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
-			false, false);
+		if (opt->GetFlag(OptionFlag::BoolWithNumber)) {
+			if (selected) {
+
+				auto res = GetSpriteScale(0.030);
+				auto res2 = GetSpriteScale(0.033);
+				DrawSprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.015f, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
+
+				DrawRightText(
+					opt->GetRightText(),
+					m_PosX + (m_Width / m_OptionPadding) - 0.02,
+					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
+					m_OptionTextSize,
+					m_OptionFont,
+					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+					false, false);
+			}
+			else {
+				DrawRightText(
+					opt->GetRightText(),
+					m_PosX + (m_Width / m_OptionPadding) - 0.01,
+					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
+					m_OptionTextSize,
+					m_OptionFont,
+					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+					false, false);
+			}
+		}
+		else if (opt->GetFlag(OptionFlag::Horizontal)) {
+			if (selected) {
+
+				auto res = GetSpriteScale(0.030);
+				auto res2 = GetSpriteScale(0.033);
+				DrawSprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.005f, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
+
+				DrawRightText(
+					opt->GetRightText(),
+					m_PosX + (m_Width / m_OptionPadding) - 0.01,
+					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
+					m_OptionTextSize,
+					m_OptionFont,
+					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+					false, false);
+			}
+			else {
+				DrawRightText(
+					opt->GetRightText(),
+					m_PosX + (m_Width / m_OptionPadding),
+					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
+					m_OptionTextSize,
+					m_OptionFont,
+					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+					false, false);
+			}
+		}
+		else if (opt->GetFlag(OptionFlag::ChooseBool)) {
+			if (selected) {
+
+				auto res = GetSpriteScale(0.030);
+				auto res2 = GetSpriteScale(0.033);
+				DrawSprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.015, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
+
+				DrawRightText(
+					opt->GetRightText(),
+					m_PosX + (m_Width / m_OptionPadding) - 0.02,
+					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
+					m_OptionTextSize,
+					m_OptionFont,
+					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+					false, false);
+			}
+			else {
+				DrawRightText(
+					opt->GetRightText(),
+					m_PosX + (m_Width / m_OptionPadding) - 0.01,
+					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
+					m_OptionTextSize,
+					m_OptionFont,
+					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+					false, false);
+			}
+		}
+		else if (opt->GetFlag(OptionFlag::Choose)) {
+			if (selected) {
+				auto res = GetSpriteScale(0.030);
+				auto res2 = GetSpriteScale(0.033);
+				DrawSprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding - 0.005f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
+
+				DrawRightText(
+					opt->GetRightText(),
+					m_PosX + (m_Width / m_OptionPadding) - 0.01,
+					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
+					m_OptionTextSize,
+					m_OptionFont,
+					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+					false, false);
+			}
+			else {
+				DrawRightText(
+					opt->GetRightText(),
+					m_PosX + (m_Width / m_OptionPadding),
+					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
+					m_OptionTextSize,
+					m_OptionFont,
+					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+					false, false);
+			}
+		}
+		else {
+						DrawRightText(
+							opt->GetRightText(),
+							m_PosX + (m_Width / m_OptionPadding),
+							m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
+							m_OptionTextSize,
+							m_OptionFont,
+							selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+							false, false);
+		}
 		DrawCenteredText(
 			opt->GetCenteredText(),
 			m_PosX,
@@ -1076,11 +1185,11 @@ namespace Arctic::UserInterface
 			{
 				if (ToggledOn)
 				{
-					GRAPHICS::DRAW_SPRITE("CommonMenu", "common_medal",
-						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f)
-						, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont
-							, g_Render->m_OptionTextSize) / 1.5f) + 0.014f
-						, res.x, res.y, 0.0, m_ToggleOnColor.r, m_ToggleOnColor.g, m_ToggleOnColor.b, m_ToggleOnColor.a,false,false);
+					GRAPHICS::DRAW_SPRITE("CommonMenu", "common_medal", g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f), 
+						g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont, g_Render->m_OptionTextSize) / 1.5f) + 0.014f, 
+						res.x, res.y, 
+						0.0, 
+						m_ToggleOnColor.r, m_ToggleOnColor.g, m_ToggleOnColor.b, m_ToggleOnColor.a,false,false);
 				}
 				else if (!ToggledOn)
 				{
@@ -1112,7 +1221,50 @@ namespace Arctic::UserInterface
 				}
 			}
 		}
+		if (opt->GetFlag(OptionFlag::BoolWithNumber) || opt->GetFlag(OptionFlag::ChooseBool))
+		{
+			auto res = GetSpriteScale(0.025f);
+			auto res2 = GetSpriteScale(0.032f);
+			if (ToggleIterator == 0)
+			{
+				if (ToggledOn)
+				{
+					GRAPHICS::DRAW_SPRITE("CommonMenu", "common_medal",
+						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f)
+						, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont
+							, g_Render->m_OptionTextSize) / 1.5f) + 0.014f
+						, res.x, res.y, 0.0, m_ToggleOnColor.r, m_ToggleOnColor.g, m_ToggleOnColor.b, m_ToggleOnColor.a, false, false);
+				}
+				else if (!ToggledOn)
+				{
+					GRAPHICS::DRAW_SPRITE("CommonMenu", "common_medal",
+						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f)
+						, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont
+							, g_Render->m_OptionTextSize) / 1.5f) + 0.014f
+						, res.x, res.y, 0.0, m_ToggleOffColor.r, m_ToggleOffColor.g, m_ToggleOffColor.b, m_ToggleOffColor.a, false, false);
+				}
+			}
+			else if (ToggleIterator == 1)
+			{
+				if (ToggledOn)
+				{
+					GRAPHICS::DRAW_SPRITE("CommonMenu", "shop_box_tick",
+						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f)
+						, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont
+							, g_Render->m_OptionTextSize) / 1.5f) + 0.014f
+						, res2.x, res2.y, 0.0, m_ToggleCheckColor.r, m_ToggleCheckColor.g, m_ToggleCheckColor.b, m_ToggleCheckColor.a, false, false);
 
+				}
+				else if (!ToggledOn)
+				{
+					GRAPHICS::DRAW_SPRITE("CommonMenu", "shop_box_blank",
+						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f)
+						, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont
+							, g_Render->m_OptionTextSize) / 1.5f) + 0.014f
+						, res2.x, res2.y, 0.0, m_ToggleCheckColor.r, m_ToggleCheckColor.g, m_ToggleCheckColor.b, m_ToggleCheckColor.a, false, false);
+				}
+			}
+		}
 		if (opt->GetFlag(OptionFlag::Enterable))
 		{
 			if (IndicatorIterator == 0)

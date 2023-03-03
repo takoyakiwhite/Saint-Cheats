@@ -7,7 +7,6 @@
 
 #include <cstdint>
 
-
 enum class eDamageType : int32_t
 {
     Unknown,
