@@ -2,7 +2,8 @@
 #include "VMTHook.hpp"
 #include "Invoker.hpp"
 #include "../Libraries/Include/GTAV-Classes/netsync/nodes/player/CPlayerGamerDataNode.hpp"
-
+#include "../Libraries/Include/GTAV-Classes/network/CNetworkPlayerMgr.hpp"
+#include "../Libraries/Include/GTAV-Classes/network/CNetGamePlayer.hpp"
 namespace Arctic
 {
 	inline bool m_EnableSCIDJoiner;
@@ -36,6 +37,10 @@ namespace Arctic
 		static bool SendNetInfo(netPlayerData* player, __int64 a2, __int64 a3, DWORD* a4);
 
 		static bool send_chat_message(void* team_mgr, rage::rlGamerInfo* local_gamer_info, const char* message, bool is_team);
+
+		static void* AssignNewPhysicalIndexHandler(CNetworkPlayerMgr* NetworkPlayerMgr, CNetGamePlayer* player, uint8_t new_index);
+
+		
 		
 		
 
@@ -71,6 +76,9 @@ namespace Arctic
 		void* m_Original_write_player_game_state_data_node{};
 		void* m_Original_write_player_gamer_data_node{};
 		void* m_OriginalSendNetInfo{};
+
+		void* m_OriginalAssignPhysicalIndex{};
+		void* m_OriginalRecieveEvent{};
 		
 		
 	};

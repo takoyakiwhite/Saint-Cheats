@@ -91,6 +91,7 @@
     <ClCompile Include="CrossMap.cpp" />
     <ClCompile Include="CustomText.cpp" />
     <ClCompile Include="D3DRenderer.cpp" />
+    <ClCompile Include="Render.cpp" />
     <ClCompile Include="ScriptGlobal.cpp" />
     <ClCompile Include="Signatures.cpp" />
     <ClCompile Include="Hooking.cpp" />

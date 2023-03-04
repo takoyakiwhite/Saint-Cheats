@@ -11,6 +11,7 @@
 #include "Translation.hpp"
 #include "FiberHelper.hpp"
 #include "Script.h"
+#include "Render.h"
 BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 {
 	using namespace Arctic;
@@ -156,6 +157,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 			g_Logger->Info("Game Version %s", g_GameVariables->m_GameBuild);
 			g_Logger->Info("Finished Injecting Have A Fun Time!");
+			Noti::InsertNotification({ ImGuiToastType_None, 2000, "Menu Injected" });
 			while (g_Running)
 			{
 				if (IsKeyPressed(VK_DELETE))

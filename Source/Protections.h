@@ -1,4 +1,5 @@
 #pragma once
+#include "Render.h"
 namespace Arctic {
 	
 	class Protections {
@@ -6,10 +7,7 @@ namespace Arctic {
 		void push_notification(const char* body) {
 
 			
-			HUD::BEGIN_TEXT_COMMAND_THEFEED_POST("STRING");
-
-			HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(body);
-			HUD::END_TEXT_COMMAND_THEFEED_POST_TICKER(FALSE, TRUE);
+			Noti::InsertNotification({ ImGuiToastType_None, 4000, body });
 
 
 

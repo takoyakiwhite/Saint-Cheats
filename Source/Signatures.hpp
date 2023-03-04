@@ -77,6 +77,9 @@ namespace Arctic
 		GameFunctions& operator=(GameFunctions const&) = delete;
 		GameFunctions& operator=(GameFunctions&&) = delete;
 
+		using clear_ped_tasks_network = void(*)(CPed* ped, bool immediately);
+		clear_ped_tasks_network m_clear_ped_tasks_network;
+
 		int64_t** m_send_chat_ptr{};
 		using chat_message = bool(*)(int64_t* send_chat_ptr, rage::rlGamerInfo* gamer_info, char* message, bool is_team);
 		chat_message m_send_chat_message{};
@@ -133,6 +136,8 @@ namespace Arctic
 
 		using SendNetInfoo = bool(netPlayerData* player, __int64 a2, __int64 a3, DWORD* a4);
 		SendNetInfoo* m_SendNetInfo;
+
+		PVOID m_AssignPhysicalIndexHandler;
 	};
 
 	inline std::unique_ptr<GameVariables> g_GameVariables;

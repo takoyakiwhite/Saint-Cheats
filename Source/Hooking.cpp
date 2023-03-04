@@ -132,91 +132,91 @@ namespace Arctic
 			{
 				case 0xE7072CD: {
 					char name[64];
-					sprintf(name, "%s reported you for ~o~hate", Source->PlayerInfo->m_net_player_data.m_name);
+					sprintf(name, "%s reported you for hate", Source->PlayerInfo->m_net_player_data.m_name);
 					protections.push_notification(name);
 					return true;
 					break;
 				}
 				case 0xB722D6C0: {
 					char name[64];
-					sprintf(name, "%s reported you for ~o~hate", Source->PlayerInfo->m_net_player_data.m_name);
+					sprintf(name, "%s reported you for hate", Source->PlayerInfo->m_net_player_data.m_name);
 					protections.push_notification(name);
 					return true;
 					break;
 				}
 				case 0x762F9994: {
 					char name[64];
-					sprintf(name, "%s reported you for ~o~annoying", Source->PlayerInfo->m_net_player_data.m_name);
+					sprintf(name, "%s reported you for annoying", Source->PlayerInfo->m_net_player_data.m_name);
 					protections.push_notification(name);
 					return true;
 					break;
 				}
 				case 0x9F79BA0B: {
 					char name[64];
-					sprintf(name, "%s reported you for ~r~exploits", Source->PlayerInfo->m_net_player_data.m_name);
+					sprintf(name, "%s reported you for exploits", Source->PlayerInfo->m_net_player_data.m_name);
 					protections.push_notification(name);
 					return true;
 					break;
 				}
 				case 0xCBFD04A4: {
 					char name[64];
-					sprintf(name, "%s reported you for ~r~exploits", Source->PlayerInfo->m_net_player_data.m_name);
+					sprintf(name, "%s reported you for exploits", Source->PlayerInfo->m_net_player_data.m_name);
 					protections.push_notification(name);
 					return true;
 					break;
 				}
 				case 0x9C6A0C42: {
 					char name[64];
-					sprintf(name, "%s reported you for ~r~griefing", Source->PlayerInfo->m_net_player_data.m_name);
+					sprintf(name, "%s reported you for griefing", Source->PlayerInfo->m_net_player_data.m_name);
 					protections.push_notification(name);
 					return true;
 					break;
 				}
 				case 0x3CDB43E2: {
 					char name[64];
-					sprintf(name, "%s reported you for ~o~offensive language", Source->PlayerInfo->m_net_player_data.m_name);
+					sprintf(name, "%s reported you for offensive language", Source->PlayerInfo->m_net_player_data.m_name);
 					protections.push_notification(name);
 					return true;
 					break;
 				}
 				case 0xE8FB6DD5: {
 					char name[64];
-					sprintf(name, "%s reported you for ~g~offensive tag plate??", Source->PlayerInfo->m_net_player_data.m_name);
+					sprintf(name, "%s reported you for offensive tag plate??", Source->PlayerInfo->m_net_player_data.m_name);
 					protections.push_notification(name);
 					return true;
 					break;
 				}
 				case 0xF3DE4879: {
 					char name[64];
-					sprintf(name, "%s reported you for ~g~ugc??", Source->PlayerInfo->m_net_player_data.m_name);
+					sprintf(name, "%s reported you for ugc??", Source->PlayerInfo->m_net_player_data.m_name);
 					protections.push_notification(name);
 					return true;
 					break;
 				}
 				case 0xAA238FF0: {
 					char name[64];
-					sprintf(name, "%s reported you for ~g~bad crew name", Source->PlayerInfo->m_net_player_data.m_name);
+					sprintf(name, "%s reported you for bad crew name", Source->PlayerInfo->m_net_player_data.m_name);
 					protections.push_notification(name);
 					return true;
 					break;
 				}
 				case 0x03511A79: {
 					char name[64];
-					sprintf(name, "%s reported you for ~g~bad crew moto", Source->PlayerInfo->m_net_player_data.m_name);
+					sprintf(name, "%s reported you for bad crew moto", Source->PlayerInfo->m_net_player_data.m_name);
 					protections.push_notification(name);
 					return true;
 					break;
 				}
 				case 0x3B566D5C: {
 					char name[64];
-					sprintf(name, "%s reported you for ~g~bad crew status", Source->PlayerInfo->m_net_player_data.m_name);
+					sprintf(name, "%s reported you for bad crew status", Source->PlayerInfo->m_net_player_data.m_name);
 					protections.push_notification(name);
 					return true;
 					break;
 				}
 				case 0x368F6FD9: {
 					char name[64];
-					sprintf(name, "%s reported you for ~g~bad crew emblem", Source->PlayerInfo->m_net_player_data.m_name);
+					sprintf(name, "%s reported you for bad crew emblem", Source->PlayerInfo->m_net_player_data.m_name);
 					protections.push_notification(name);
 					return true;
 					break;
@@ -277,6 +277,7 @@ namespace Arctic
 		if (spoofing.qa_tester) {
 			//node->m_is_rockstar_qa = true;
 		}
+
 		if (spoofing.m_crew.enabled) {
 			node->m_clan_data.m_clan_member_id = 1;
 			node->m_clan_data.m_clan_id = 41564112;
@@ -294,6 +295,58 @@ namespace Arctic
 		
 		return static_cast<decltype(&send_chat_message)>(g_Hooking->m_OriginalChatSend)(team_mgr, local_gamer_info, message, is_team);
 	}
+	void* Hooks::AssignNewPhysicalIndexHandler(CNetworkPlayerMgr* netPlayerMgr, CNetGamePlayer* player, uint8_t new_index)
+	{
+		const auto* net_player_data = player->get_net_data();
+
+		if (new_index == static_cast<uint8_t>(-1))
+		{
+			
+
+			if (net_player_data)
+			{
+				
+				char name[64];
+				sprintf(name, "%s is leaving slot %i", player->m_player_info->m_net_player_data.m_name, (int)player->m_player_id);
+				antiCheat.remove_as_modder(player->m_player_id);
+				protections.push_notification(name);
+				if (all_players.notifications.log) {
+					g_Logger->Info(name);
+				}
+
+				
+			}
+
+			return static_cast<decltype(&AssignNewPhysicalIndexHandler)>(g_Hooking->m_OriginalAssignPhysicalIndex)(netPlayerMgr, player, new_index);
+		}
+
+		const auto result = static_cast<decltype(&AssignNewPhysicalIndexHandler)>(g_Hooking->m_OriginalAssignPhysicalIndex)(netPlayerMgr, player, new_index);
+		
+		
+		if (net_player_data)
+		{
+			
+			char name[64];
+			sprintf(name, "%s is joining slot %i", player->m_player_info->m_net_player_data.m_name, (int)player->m_player_id);
+			if (player->m_player_info->m_net_player_data.m_name == (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_net_player_data.m_name) {
+				for (std::uint32_t i = 0; i < 32; ++i) {
+					antiCheat.remove_as_modder(i);
+				}
+			}
+			protections.push_notification(name);
+			if (all_players.notifications.log) {
+				g_Logger->Info(name);
+			}
+
+			
+
+			
+		}
+
+		return result;
+	}
+
+	
 	Hooking::Hooking():
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
@@ -308,7 +361,7 @@ namespace Arctic
 		MH_CreateHook(g_GameFunctions->m_write_player_gamer_data_node, &Hooks::write_player_gamer_data_node, &m_Original_write_player_gamer_data_node);
 		MH_CreateHook(g_GameFunctions->m_SendNetInfo, &Hooks::SendNetInfo, &m_OriginalSendNetInfo);
 		MH_CreateHook(g_GameFunctions->m_send_chat_message, &Hooks::send_chat_message, &m_OriginalChatSend);
-		
+		MH_CreateHook(g_GameFunctions->m_AssignPhysicalIndexHandler, &Hooks::AssignNewPhysicalIndexHandler, &m_OriginalAssignPhysicalIndex);
 		m_D3DHook.Hook(&Hooks::Present, Hooks::PresentIndex);
 		m_D3DHook.Hook(&Hooks::ResizeBuffers, Hooks::ResizeBuffersIndex);
 	}
@@ -326,7 +379,7 @@ namespace Arctic
 		MH_RemoveHook(g_GameFunctions->m_write_player_gamer_data_node);
 		MH_RemoveHook(g_GameFunctions->m_SendNetInfo);
 		MH_RemoveHook(g_GameFunctions->m_send_chat_message);
-
+		MH_RemoveHook(g_GameFunctions->m_AssignPhysicalIndexHandler);
 		//MH_RemoveHook(g_GameFunctions->m_GetEventData);
 		MH_Uninitialize();
 	}

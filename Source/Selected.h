@@ -3,8 +3,42 @@
 #include "OTR.h"
 #include "Kick.h"
 namespace Arctic {
+    class ExplosiveAmmo2 {
+    public:
+        bool enabled = false;
+        bool invisible = false;
+        bool sound = true;
+        float damage = 1.0f;
+        float camera_shake = 0.0f;
+        const char* explode_type[81] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare",
+            "Unkown", "Extinguisher", "Unkown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
+            "Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
+            "Bomb (Wide)", "Explosive Ammo (Shotgun)", "Oppressor MK II", "Kinetic Mortar", "Kinetic Vehicle Mine", "EMP Vehicle Mine", "Spike Vehicle Mine", "Slick Vehicle Mine", "Tar Vehicle Mine", "Script Drone", "Up-n-Atomizer", "Burried Mine", "Script Missle", "RC Tank Rocket",
+            "Bomb (Water)", "Bomb (Water 2)", "Flash Grenade", "Stun Grenade", "Script Missle (Large)", "Submarine (Big)", "EMP Launcher" };
+        std::size_t explode_int = 0;
+        void add(Ped ped, float x, float y, float z, int explosionType, float damageScale, BOOL isAudible, BOOL isInvisible, float cameraShake) {
+            *(unsigned short*)g_GameFunctions->m_owned_explosion = 0xE990;
+            FIRE::ADD_OWNED_EXPLOSION(ped, x, y, z, explosionType, damageScale, isAudible, isInvisible, cameraShake);
+            *(unsigned short*)g_GameFunctions->m_owned_explosion = 0x850F;
+        }
+        void init() {
+            if (enabled) {
+                if (PED::IS_PED_SHOOTING(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer)))
+                {
+                    float Tmp[6];
+                    WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), (NativeVector3*)Tmp);
+                    if (Tmp[0] != 0 || Tmp[2] != 0 || Tmp[4] != 0) {
+                       add(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), Tmp[0], Tmp[2], Tmp[4], explode_int, damage, sound, invisible, camera_shake);
+
+                        
+                    }
+                }
+            }
+        }
+    };
 	class GetSelected {
 	public:
+        ExplosiveAmmo2 explosiveAmmo;
 		FlashBlip flash_blip;
 		OTR otr;
 		Kicks events;
@@ -12,6 +46,31 @@ namespace Arctic {
         bool freeze = false;
         uint8_t get_id() {
             return g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id;
+        }
+        void send_to_int(const std::vector<std::uint64_t>& _args) {
+            float max = 1e+38f;
+            auto coords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id), FALSE);
+            const size_t arg_count = 15;
+            int64_t args[arg_count] =
+            {
+                (int64_t)1727896103,
+                (int64_t)PLAYER::PLAYER_ID(),
+                (int64_t)(int)_args[0],
+                (int64_t)PLAYER::PLAYER_ID(),
+                (int64_t)false,
+                (int64_t)true, // true means enter sender interior
+                (int64_t) * (uint32_t*)&coords.x,
+                (int64_t) * (uint32_t*)&coords.y,
+                (int64_t) * (uint32_t*)&coords.z,
+                0,
+                0,
+                1,
+                (int64_t) * (uint32_t*)&max,
+                (int64_t)true,
+                -1
+            };
+
+            g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id);
         }
         void kick_from_vehicle() {
             const size_t arg_count = 9;
@@ -28,6 +87,7 @@ namespace Arctic {
         }
         bool request_control(Entity ent, int timeout = 300)
         {
+
             auto ptr = g_GameVariables->m_handle_to_ptr(ent);
             if (ptr)
             {
@@ -72,8 +132,10 @@ namespace Arctic {
         }
 		void init() {
             if (freeze) {
-               
+                CPed* ped = g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_info->m_ped;
+                g_GameFunctions->m_clear_ped_tasks_network(ped, true);
             }
+            explosiveAmmo.init();
 			flash_blip.init();
 			otr.init();
 			

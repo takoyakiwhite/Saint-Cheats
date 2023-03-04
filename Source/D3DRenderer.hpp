@@ -40,6 +40,8 @@ namespace Arctic
 	public: 
 		ImFont* m_QuantumFont;
 		ImFont* m_HeaderFont;
+		ImFont* m_DefaultFont;
+		ImColor* m_Color;
 	private:
 		IDXGISwapChain* m_Swapchain{};
 		ID3D11Device* m_Device{};

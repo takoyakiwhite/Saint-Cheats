@@ -6,6 +6,7 @@
 #include "../Enums.h"
 #include "../Features.h"
 #include "../ImGui/imgui.h"
+#include "../D3DRenderer.hpp"
 
 #define VERSION 4
 #define DEV_MODE
@@ -476,7 +477,7 @@ namespace Arctic::UserInterface
 		{
 			RenderToolTip();
 		}
-
+		
 		if (ThemeIterator == 0)
 		{
 			//Header
@@ -1061,7 +1062,7 @@ namespace Arctic::UserInterface
 
 				DrawRightText(
 					opt->GetRightText(),
-					m_PosX + (m_Width / m_OptionPadding) - 0.02,
+					m_PosX + (m_Width / m_OptionPadding) - 0.022,
 					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
 					m_OptionTextSize,
 					m_OptionFont,
@@ -1088,7 +1089,7 @@ namespace Arctic::UserInterface
 
 				DrawRightText(
 					opt->GetRightText(),
-					m_PosX + (m_Width / m_OptionPadding) - 0.01,
+					m_PosX + (m_Width / m_OptionPadding) - 0.012,
 					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
 					m_OptionTextSize,
 					m_OptionFont,
@@ -1115,7 +1116,7 @@ namespace Arctic::UserInterface
 
 				DrawRightText(
 					opt->GetRightText(),
-					m_PosX + (m_Width / m_OptionPadding) - 0.02,
+					m_PosX + (m_Width / m_OptionPadding) - 0.020,
 					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
 					m_OptionTextSize,
 					m_OptionFont,
@@ -1141,7 +1142,7 @@ namespace Arctic::UserInterface
 
 				DrawRightText(
 					opt->GetRightText(),
-					m_PosX + (m_Width / m_OptionPadding) - 0.01,
+					m_PosX + (m_Width / m_OptionPadding) - 0.012,
 					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
 					m_OptionTextSize,
 					m_OptionFont,
@@ -1269,11 +1270,16 @@ namespace Arctic::UserInterface
 		{
 			if (IndicatorIterator == 0)
 			{
+				
+				
 				DrawRightText(
 					">",
 					m_PosX + (m_Width / m_OptionPadding),
-					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(Font::Monospace, m_OptionTextSize) / 1.725f),
-					m_OptionTextSize,Font::Monospace,selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,false, false);
+					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(Font::Monospace, 0.35) / 1.725f),
+					0.35,
+					Font::Monospace,
+					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+					false, false);
 			}
 			else if (IndicatorIterator == 1)
 			{

@@ -283,6 +283,9 @@
     <ClCompile Include="ScriptGlobal.cpp">
       <Filter>Memory\Script\Global</Filter>
     </ClCompile>
+    <ClCompile Include="Render.cpp">
+      <Filter>Core\Notifications</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ImGui">
