@@ -27,7 +27,8 @@
 #include "Spoofing.h"
 #include "KeyboardOption.h"
 #include "Render.h"
-namespace Arctic
+#include "Notifications.h"
+namespace Saint
 {
 	enum Submenu : std::uint32_t
 	{
@@ -45,6 +46,8 @@ namespace Arctic
 		SubmenuSuperjump,
 		SubmenuMultipliers,
 		//SESSION
+		SubmenuSendToInt,
+		SubmenuApartments,
 		SubmenuNetwork,
 		SubmenuPlayerList,
 		SubmenuSelectedPlayer,
@@ -105,6 +108,8 @@ namespace Arctic
 		//WORLD
 		SubmenuWorld,
 		SubmeuWeather,
+		SpawnerSelectedSettings,
+		SubmenuSelectedVehicleSearch,
 
 		//LSC
 		LosSantosArmor,
@@ -231,6 +236,9 @@ namespace Arctic
 			SubmenuRecovery,
 			SubmenuRP,
 			SubmenuUnlocks,
+			SubmenuSelectedSpawner,
+			SubmenuSelectedGet,
+			SubmenuOutfitLoader,
 	};
 
 	bool MainScript::IsInitialized()
@@ -251,7 +259,7 @@ namespace Arctic
 		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_JOINING"), "Loading GTA Online with " BIGBASE_NAME "...");
 		
 		
-		g_Render->draw_submenu<sub>("Arctic", SubmenuHome, [](sub* sub)
+		g_Render->draw_submenu<sub>("Saint", SubmenuHome, [](sub* sub)
 		{
 				sub->draw_option<submenu>("Player", nullptr, SubmenuSelf);
 					sub->draw_option<submenu>("Network", nullptr, SubmenuNetwork);
@@ -374,6 +382,7 @@ namespace Arctic
 			});
 		g_Render->draw_submenu<sub>(("Outfit Editor"), SubmenuOutfitEditor, [](sub* sub)
 			{
+				sub->draw_option<submenu>("Load", nullptr, SubmenuOutfitLoader);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &Lists::HeaderTypesFrontend2, &Lists::HeaderTypesPosition2, true, -1, [] {
 				g_Render->outfits = Lists::HeaderTypesBackend2[Lists::HeaderTypesPosition2];
 					});
@@ -484,6 +493,50 @@ namespace Arctic
 				}
 				
 			});
+		g_Render->draw_submenu<sub>(("Load"), SubmenuOutfitLoader, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>(("Save"), nullptr, [=]
+					{
+						showKeyboard("Enter Something", "", 25, &g_Outfits->nameBuffer2, [] {});
+
+
+					});
+				sub->draw_option<RegularOption>(("Save"), nullptr, [=]
+					{
+					
+
+						g_Outfits->save(g_Outfits->nameBuffer2);
+							
+
+
+					});
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				namespace fs = std::filesystem;
+				fs::directory_iterator dirIt{ "C:\\Saint\\Outfits\\" };
+				for (auto&& dirEntry : dirIt)
+				{
+					if (dirEntry.is_regular_file())
+					{
+						auto path = dirEntry.path();
+						if (path.has_filename())
+						{
+							if (path.extension() == ".ini")
+							{
+								OutfitList();
+								char nigger[64];
+								sprintf(nigger, "%s", path.stem().u8string().c_str());
+								sub->draw_option<RegularOption>(nigger, nullptr, [=]
+									{
+										g_Outfits->load(nigger);
+									});
+
+							}
+
+						}
+					}
+				}
+			});
+		
 		g_Render->draw_submenu<sub>(("Invisible"), SubmenuInvisible, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &invisible.enabled, BoolDisplay::OnOff, false, [] {
@@ -3235,7 +3288,7 @@ namespace Arctic
 						if (i == PLAYER::PLAYER_ID())
 							name.append(" ~p~[Self]");
 						if (PED::GET_PED_CONFIG_FLAG(ped, 109, true)) {
-							name.append(" ~b~[Arctic]");
+							name.append(" ~b~[Saint]");
 						}
 						if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
 							if (antiCheat.cheater[g_GameVariables->m_net_game_player(i)->m_player_id] == true) {
@@ -3290,6 +3343,7 @@ namespace Arctic
 				sub->draw_option<submenu>("Friendly", nullptr, SubmenuFriendly);
 				sub->draw_option<submenu>("Weapon", nullptr, SubmenuSelectedWeapon);
 				sub->draw_option<submenu>("Teleport", nullptr, SubmenuPlayerTeleport);
+				sub->draw_option<submenu>("Spawner", nullptr, SubmenuSelectedSpawner);
 				sub->draw_option<submenu>("Removals", nullptr, SubmenuRemoval);
 				if (g_SelectedPlayer != PLAYER::PLAYER_ID()) {
 					sub->draw_option<toggle<bool>>(("Spectate"), nullptr, &features.spectate, BoolDisplay::OnOff, false, [] {
@@ -3314,19 +3368,129 @@ namespace Arctic
 							copytoclipboard(NETWORK::NETWORK_MEMBER_ID_FROM_GAMER_HANDLE(&netHandle[0]));
 							break;
 						case 1:
-							
-							copytoclipboard(g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_info->m_net_player_data.m_name);
+							if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+								copytoclipboard(g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_info->m_net_player_data.m_name);
+							}
+							else {
+								g_Notifcations->add("Please start a session.");
+								
+							}
 							break;
 						case 2:
-							char input2[64];
-							auto data = g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_clan_data;
-							sprintf(input2, "Name: %s\nTag: %s\nMember Count: %i\nMotto: %s", data.m_clan_name,data.m_clan_tag, data.m_clan_member_count, data.m_clan_motto);
-							copytoclipboard(input2);
+							if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+								char input2[64];
+								auto data = g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_clan_data;
+								sprintf(input2, "Name: %s\nTag: %s\nMember Count: %i\nMotto: %s", data.m_clan_name, data.m_clan_tag, data.m_clan_member_count, data.m_clan_motto);
+								copytoclipboard(input2);
+							}
+							else {
+								g_Notifcations->add("Please start a session.");
+							}
 							break;
 						}
 					});
 				
 	
+			});
+		g_Render->draw_submenu<sub>("Spawner", SubmenuSelectedSpawner, [](sub* sub)
+			{
+				sub->draw_option<submenu>("Settings", nullptr, Submenu::SpawnerSelectedSettings);
+				sub->draw_option<submenu>("Search", nullptr, Submenu::SubmenuSelectedVehicleSearch);
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				for (std::int32_t i = 0; i < 23; i++) {
+					sub->draw_option<submenu>(get_vehicle_class_name(i), nullptr, SubmenuSelectedGet, [=]
+						{
+							m_selected_player_vehicle_class = i;
+							
+						});
+
+				}
+
+			});
+		g_Render->draw_submenu<sub>(("Search"), SubmenuSelectedVehicleSearch, [](sub* sub)
+			{
+				
+				sub->draw_option<KeyboardOption>(("Input"), nullptr, ModelInput, []
+					{
+
+						showKeyboard("Enter Something", "", 25, &ModelInput, [] {
+						search_completed = true;
+							});
+					});
+		if (search_completed) {
+			Hash vehicleHash2 = MISC::GET_HASH_KEY(ModelInput.c_str());
+			if (STREAMING::IS_MODEL_VALID(vehicleHash2)) {
+				sub->draw_option<UnclickOption>(("Found ~r~1 ~w~Result."), nullptr, [] {});
+			}
+			else {
+				sub->draw_option<UnclickOption>(("Found ~r~0 ~w~Results."), nullptr, [] {});
+			}
+
+			if (STREAMING::IS_MODEL_VALID(vehicleHash2)) {
+
+				STREAMING::REQUEST_MODEL(vehicleHash2);
+				if (!STREAMING::HAS_MODEL_LOADED(vehicleHash2)) {
+
+
+				}
+				else {
+
+
+
+					sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(vehicleHash2))), nullptr, [=]
+						{
+							veh_spawner.spawn_for_ped(vehicleHash2);
+
+						});
+
+
+				}
+			}
+		}
+
+			});
+		g_Render->draw_submenu<sub>("Settings", SpawnerSelectedSettings, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Fade"), nullptr, &veh_spawner.selected_fade, BoolDisplay::OnOff);
+
+			});
+		g_Render->draw_submenu<sub>((get_vehicle_class_name(m_selected_player_vehicle_class)), SubmenuSelectedGet, [](sub* sub)
+			{
+				if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {
+					for (std::int32_t i = 0; i < g_GameFunctions->m_vehicle_hash_pool->capacity; i++) {
+						std::uint64_t info = g_GameFunctions->m_vehicle_hash_pool->get(i);
+						if (info != NULL) {
+							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
+								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
+								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
+								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(MISC::GET_HASH_KEY(model_ptr.c_str())) == m_selected_player_vehicle_class) {
+									std::stringstream ss;
+									std::string make(make_ptr);
+									std::string model(model_ptr);
+									if (make[0] || model[0]) {
+										make = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(make.c_str());
+										model = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(model.c_str());
+										if (make != "NULL" && model != "NULL") {
+											ss << make << " " << model;
+										}
+										else if (model != "NULL") {
+											ss << model;
+										}
+										else {
+											ss << "Unknown";
+										}
+									}
+
+									sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(*(std::uint32_t*)(info + 0x18)))), nullptr, [=]
+										{
+											veh_spawner.spawn_for_ped(*(std::uint32_t*)(info + 0x18));
+
+										});
+								}
+							}
+						}
+					}
+				}
 			});
 		g_Render->draw_submenu<sub>("Weapon", SubmenuSelectedWeapon, [](sub* sub)
 			{
@@ -3510,6 +3674,7 @@ namespace Arctic
 			});
 		g_Render->draw_submenu<sub>("Trolling", SubmenuTrolling, [](sub* sub)
 			{
+				sub->draw_option<submenu>("Send To Interior", nullptr, SubmenuSendToInt);
 				sub->draw_option<submenu>("Fake Drops", nullptr, SubmenuFakeDrops);
 				sub->draw_option<submenu>("Text Spam", nullptr, SubmenuSpamText);
 				sub->draw_option<submenu>("Explode", nullptr, SubmenuExplode);
@@ -3532,20 +3697,30 @@ namespace Arctic
 
 
 					});
-				sub->draw_option<RegularOption>(("Force Into Casino"), nullptr, [=]
-					{
-
-						g_players.get_selected.send_to_int({ 123 });
-
-
-
-					});
+				
 				sub->draw_option<number<std::int32_t>>("Wanted Level", nullptr, &g_players.get_selected.wanted_level, 0, 5, 1, 3, true, "", "", [] {
 					g_players.get_selected.set_wanted_level(g_players.get_selected.wanted_level);
 					});
 				//sub->draw_option<number<std::int32_t>>("Delay", nullptr, &Fake_drops.delay, 0, 5000, 50);
 				
 				
+			});
+		g_Render->draw_submenu<sub>(("Send To Interior"), SubmenuSendToInt, [](sub* sub) {
+			sub->draw_option<RegularOption>(("Casino"), nullptr, [=]
+				{
+					g_players.get_selected.send_to_int({ 123 });
+				});
+			sub->draw_option<UnclickOption>(("Custom"), nullptr, [] {});
+			sub->draw_option<KeyboardOption>(("ID"), nullptr, std::to_string(g_players.get_selected.int_id), []
+				{
+					showKeyboard("Enter Message", "", 50, &g_players.get_selected.buffer, [] {
+					g_players.get_selected.int_id = atoi(g_players.get_selected.buffer.c_str());
+						});
+				});
+			sub->draw_option<RegularOption>(("Send"), nullptr, [=]
+				{
+					g_players.get_selected.send_to_int({ g_players.get_selected.int_id });
+				});
 			});
 		g_Render->draw_submenu<sub>(("Cage"), SubmenuCage, [](sub* sub) {
 			sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &cage.type, &cage.data);
@@ -3959,6 +4134,7 @@ namespace Arctic
 			{
 				g_ThemeLoading->load();
 			});
+		
 		sub->draw_option<RegularOption>("Unload", nullptr, []
 			{
 				g_Running = false;
@@ -3979,7 +4155,7 @@ namespace Arctic
 				{
 						switch (Lists::MatchPos) {
 							case 0:
-								g_Render->m_ToggleOnColor = { 138, 43, 226, 255 };
+								g_Render->m_ToggleOnColor = { 108, 60, 175, 255 };
 								break;
 							case 1:
 								g_Render->m_ToggleOnColor = { 255, 108, 116, 255 };

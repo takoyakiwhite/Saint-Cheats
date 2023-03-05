@@ -1,7 +1,7 @@
 #pragma once
 #include "../Common.hpp"
 
-namespace Arctic
+namespace Saint
 {
 	class TextBox
 	{

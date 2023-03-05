@@ -1,6 +1,6 @@
 #include "ScriptCallback.hpp"
 
-namespace Arctic
+namespace Saint
 {
 	bool CallbackScript::IsInitialized()
 	{

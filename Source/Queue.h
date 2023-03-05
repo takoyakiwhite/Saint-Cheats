@@ -1,7 +1,7 @@
 #pragma once
 #include "Natives.hpp"
 #include "FiberHelper.hpp"
-namespace Arctic {
+namespace Saint {
 	class Queue {
 	public:
 		void add(std::optional<std::chrono::high_resolution_clock::duration> time, std::string text, std::function<void()> action = [] {}) {

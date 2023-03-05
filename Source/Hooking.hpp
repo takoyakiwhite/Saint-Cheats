@@ -4,11 +4,12 @@
 #include "../Libraries/Include/GTAV-Classes/netsync/nodes/player/CPlayerGamerDataNode.hpp"
 #include "../Libraries/Include/GTAV-Classes/network/CNetworkPlayerMgr.hpp"
 #include "../Libraries/Include/GTAV-Classes/network/CNetGamePlayer.hpp"
-namespace Arctic
+namespace Saint
 {
 	inline bool m_EnableSCIDJoiner;
 	inline __int64 m_SCIDJoiner;
 	inline __int64 m_PlayerListPointer;
+	inline int menu_version = 87456845654;
 	struct Hooks
 	{
 		static void GetStatInt(rage::scrNativeCallContext* src);

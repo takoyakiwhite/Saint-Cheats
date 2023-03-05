@@ -2,7 +2,7 @@
 #include "UI/BaseOption.hpp"
 #include "UI/Interface.hpp"
 
-namespace Arctic::UserInterface {
+namespace Saint::UserInterface {
     template <typename NumberType, typename BoolType = bool>
     class toggle_number_option : public BaseOption<toggle_number_option<NumberType, BoolType>>
     {

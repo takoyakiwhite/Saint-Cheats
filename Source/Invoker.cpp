@@ -3,7 +3,7 @@
 #include "Logger.hpp"
 
 extern "C" void	_call_asm(void* context, void* function, void* ret);
-namespace Arctic
+namespace Saint
 {
     Invoker::NativeCallContext::NativeCallContext()
     {

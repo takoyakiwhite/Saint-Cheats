@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Arctic {
+namespace Saint {
 	class Crew {
 	public:
 		std::string nameBuffer;
@@ -8,7 +8,7 @@ namespace Arctic {
 		bool enabled = false;
 		bool open = false;
 		int member_count = 0;
-		const char* name = "Arctic";
+		const char* name = "Saint";
 	};
 	class IP {
 	public:

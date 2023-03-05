@@ -1,6 +1,6 @@
 #include "Logger.hpp"
 
-namespace Arctic
+namespace Saint
 {
 	Logger::Logger()
 	{

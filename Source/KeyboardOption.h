@@ -1,7 +1,7 @@
 #pragma once
 #include "UI/BaseOption.hpp"
 
-namespace Arctic::UserInterface
+namespace Saint::UserInterface
 {
 	class KeyboardOption : public BaseOption<KeyboardOption>
 	{

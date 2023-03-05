@@ -1,6 +1,6 @@
 #pragma once
 #include "Natives.hpp"
-namespace Arctic {
+namespace Saint {
 	class BypassMaxSpeed {
 	public:
 		bool enabled = false;

@@ -8,7 +8,7 @@
 #include "D3DRenderer.hpp"
 #include "ImGui/imgui_internal.h"
 
-namespace Arctic
+namespace Saint
 {
 	bool LogScript::IsInitialized()
 	{

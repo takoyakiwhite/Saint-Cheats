@@ -2,7 +2,7 @@
 #include "Hooking.hpp"
 #include "Signatures.hpp"
 
-namespace Arctic
+namespace Saint
 {
 	auto ALL_SCRIPT_HASH = Joaat("ALL_SCRIPTS");
 

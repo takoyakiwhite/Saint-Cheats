@@ -20,7 +20,7 @@
 #  pragma comment(lib, "MinHook-Release.lib")
 #endif
 
-namespace Arctic
+namespace Saint
 {
 	namespace
 	{

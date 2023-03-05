@@ -2,7 +2,8 @@
 #include "Flash Blip.h"
 #include "OTR.h"
 #include "Kick.h"
-namespace Arctic {
+#include "Notifications.h"
+namespace Saint {
     class ExplosiveAmmo2 {
     public:
         bool enabled = false;
@@ -44,33 +45,42 @@ namespace Arctic {
 		Kicks events;
         int wanted_level = 0;
         bool freeze = false;
+        std::string buffer;
+        std::uint64_t int_id = 0;
         uint8_t get_id() {
             return g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id;
         }
         void send_to_int(const std::vector<std::uint64_t>& _args) {
-            float max = 1e+38f;
-            auto coords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id), FALSE);
-            const size_t arg_count = 15;
-            int64_t args[arg_count] =
-            {
-                (int64_t)1727896103,
-                (int64_t)PLAYER::PLAYER_ID(),
-                (int64_t)(int)_args[0],
-                (int64_t)PLAYER::PLAYER_ID(),
-                (int64_t)false,
-                (int64_t)true, // true means enter sender interior
-                (int64_t) * (uint32_t*)&coords.x,
-                (int64_t) * (uint32_t*)&coords.y,
-                (int64_t) * (uint32_t*)&coords.z,
-                0,
-                0,
-                1,
-                (int64_t) * (uint32_t*)&max,
-                (int64_t)true,
-                -1
-            };
+            if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+                float max = 1e+38f;
+                auto coords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id), FALSE);
+                const size_t arg_count = 15;
+                int64_t args[arg_count] =
+                {
+                    (int64_t)1727896103,
+                    (int64_t)PLAYER::PLAYER_ID(),
+                    (int64_t)(int)_args[0],
+                    (int64_t)PLAYER::PLAYER_ID(),
+                    (int64_t)false,
+                    (int64_t)true, // true means enter sender interior
+                    (int64_t) * (uint32_t*)&coords.x,
+                    (int64_t) * (uint32_t*)&coords.y,
+                    (int64_t) * (uint32_t*)&coords.z,
+                    0,
+                    0,
+                    1,
+                    (int64_t) * (uint32_t*)&max,
+                    (int64_t)true,
+                    -1
+                };
 
-            g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id);
+                g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id);
+            }
+            else {
+                g_Notifcations->add("Please start a session.");
+
+            }
+           
         }
         void kick_from_vehicle() {
             const size_t arg_count = 9;

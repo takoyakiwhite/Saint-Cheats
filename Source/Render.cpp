@@ -2,7 +2,7 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
 #include "D3DRenderer.hpp"
-namespace Arctic
+namespace Saint
 {
 	void tick()
 	{

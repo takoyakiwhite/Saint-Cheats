@@ -2,7 +2,7 @@
 #include "BaseSubmenu.hpp"
 #include "../Natives.hpp"
 
-namespace Arctic::UserInterface
+namespace Saint::UserInterface
 {
 	class PlayerSubmenu : public BaseSubmenu<PlayerSubmenu>
 	{

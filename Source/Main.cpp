@@ -14,14 +14,14 @@
 #include "Render.h"
 BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 {
-	using namespace Arctic;
+	using namespace Saint;
 	if (reason == DLL_PROCESS_ATTACH)
 	{
 		g_Module = hInstance;
 		CreateThread(nullptr, 0, [](LPVOID) -> DWORD
 		{
 			g_Logger = std::make_unique<Logger>();
-			g_Logger->Info("Arctic Version V2.5.");
+			g_Logger->Info("Saint Version V2.5.");
 			g_Logger->Info("This build was compiled at " __DATE__ ", " __TIME__ ".");
 
 			g_FiberPool.registerFbrPool();

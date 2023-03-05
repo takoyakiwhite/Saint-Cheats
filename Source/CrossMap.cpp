@@ -1,6 +1,6 @@
 #include "CrossMap.hpp"
 
-namespace Arctic
+namespace Saint
 {
     CrossMap g_CrossMap
     {

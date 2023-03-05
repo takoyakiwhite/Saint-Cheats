@@ -3,7 +3,7 @@
 #include "ScriptCallback.hpp"
 #include "Jets.h"
 #include "Explode.h"
-namespace Arctic {
+namespace Saint {
 	class Notifications {
 	public:
 		bool leaving_and_joining = true;

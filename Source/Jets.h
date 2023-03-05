@@ -1,7 +1,7 @@
 #pragma once
 #include "Natives.hpp"
 #include "ScriptCallback.hpp"
-namespace Arctic {
+namespace Saint {
 	class Excludes {
 	public:
 		bool friends = false;

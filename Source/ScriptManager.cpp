@@ -1,7 +1,7 @@
 #include "ScriptManager.hpp"
 #include "Invoker.hpp"
 
-namespace Arctic
+namespace Saint
 {
 	ScriptManager::ScriptManager()
 	{

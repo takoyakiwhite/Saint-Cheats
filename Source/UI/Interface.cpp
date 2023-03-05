@@ -20,7 +20,7 @@
 #define VERSION_TYPE "DEV"
 #endif
 
-namespace Arctic::UserInterface
+namespace Saint::UserInterface
 {
 	void MenuOpeningAnimation()
 	{
@@ -367,8 +367,8 @@ namespace Arctic::UserInterface
 	void UIManager::RenderToolTip()
 	{
 		static const char* names[] = {
-			"Get Good Get Arctic",
-			"Sexy Arctic Cheats",
+			"Get Good Get Saint",
+			"Sexy Saint Cheats",
 			"what am i doing wrong??? - patek",
 			"Kiddions VIP On Top",
 			"Become you're inner vali."
@@ -481,16 +481,16 @@ namespace Arctic::UserInterface
 		if (ThemeIterator == 0)
 		{
 			//Header
-			g_Render->m_HeaderBackgroundColor = { 138, 43, 226, 255 };
+			g_Render->m_HeaderBackgroundColor = { 108, 60, 175, 255 };
 
 			//Footer
-			g_Render->m_FooterBackgroundColor = { 138, 43, 226, 255 };
+			g_Render->m_FooterBackgroundColor = { 108, 60, 175, 255 };
 
 			//Option
-			g_Render->m_OptionSelectedBackgroundColor = { 138, 43, 226, 255 };
+			g_Render->m_OptionSelectedBackgroundColor = { 108, 60, 175, 255 };
 
 			//Description
-			g_Render->m_DescriptionBackgroundColor = { 138, 43, 226, 255 };
+			g_Render->m_DescriptionBackgroundColor = { 108, 60, 175, 255 };
 
 			//Background
 			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
@@ -1395,7 +1395,7 @@ namespace Arctic::UserInterface
 
 			if (LeftFooterText) {
 				DrawLeftText(
-					"Arctic Private",
+					"Saint Private",
 					m_PosX - (m_Width / m_FooterTextPadding),
 					m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
 					m_FooterTextSize, m_FooterTextFont,
@@ -1442,6 +1442,12 @@ namespace Arctic::UserInterface
 			m_DrawBaseY + (m_DescriptionHeight / 2.f),
 			m_Width,
 			m_DescriptionHeight,
+			m_OptionUnselectedBackgroundColor);
+		DrawRect(
+			m_PosX,
+			m_DrawBaseY + (m_DescriptionHeight / 2.f) - 0.015f,
+			m_Width,
+			0.005f,
 			m_DescriptionBackgroundColor);
 		//HUD::SET_TEXT_WRAP(0.0f, 0.9f);
 		DrawLeftText(

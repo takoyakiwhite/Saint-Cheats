@@ -2,7 +2,7 @@
 #include "Signatures.hpp"
 
 
-namespace Arctic
+namespace Saint
 {
 	inline bool has_string(std::string& str, std::string check)
 	{
@@ -153,6 +153,6 @@ namespace Arctic
 		return hash;
 	}
 
-#	define CONSTEXPR_JOAAT_IMPL(x) (::Arctic::ConstexprJooat<sizeof(x) - 1>((x), std::make_index_sequence<sizeof(x) - 1>()).GetHash())
+#	define CONSTEXPR_JOAAT_IMPL(x) (::Saint::ConstexprJooat<sizeof(x) - 1>((x), std::make_index_sequence<sizeof(x) - 1>()).GetHash())
 #	define CONSTEXPR_JOAAT(x) (std::integral_constant<std::uint32_t, CONSTEXPR_JOAAT_IMPL(x)>::value)
 }

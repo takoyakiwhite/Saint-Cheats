@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Arctic
+namespace Saint
 {
 	class Settings
 	{

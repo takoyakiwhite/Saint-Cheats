@@ -1,7 +1,7 @@
 #pragma once
 #include "CrossMap.hpp"
 
-namespace Arctic
+namespace Saint
 {
     class Invoker
     {
@@ -78,7 +78,7 @@ namespace Arctic
 template<typename ReturnType, typename ...Args>
 inline ReturnType Invoke(rage::scrNativeHash hash, Args&& ...args)
 {
-    using namespace Arctic;
+    using namespace Saint;
 
     Invoker::BeginCall();
     (Invoker::PushArg(std::forward<Args>(args)), ...);

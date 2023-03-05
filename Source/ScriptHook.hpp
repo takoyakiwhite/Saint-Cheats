@@ -4,7 +4,7 @@
 #include <GTAV-Classes/script/scrProgram.hpp>
 #include <GTAV-Classes/rage/joaat.hpp>
 
-namespace Arctic
+namespace Saint
 {
 	class ScriptHook
 	{

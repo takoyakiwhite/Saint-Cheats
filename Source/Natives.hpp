@@ -3611,16 +3611,16 @@ namespace OBJECT
 {
 	static Object CREATE_OBJECT(Hash modelHash, float x, float y, float z, BOOL isNetwork, BOOL bScriptHostObj, BOOL dynamic)
 	{ 
-		*(unsigned short*)Arctic::g_GameVariables->m_ModelSpawnBypass = 0x9090;
+		*(unsigned short*)Saint::g_GameVariables->m_ModelSpawnBypass = 0x9090;
 		auto temp = Invoke<Object>(0x509D5878EB39E842, modelHash, x, y, z, isNetwork, bScriptHostObj, dynamic); 
-		*(unsigned short*)Arctic::g_GameVariables->m_ModelSpawnBypass = 0x0574;
+		*(unsigned short*)Saint::g_GameVariables->m_ModelSpawnBypass = 0x0574;
 		return temp;
 	} // 0x509D5878EB39E842 0x2F7AA05C b323
 	static Object CREATE_OBJECT_NO_OFFSET(Hash modelHash, float x, float y, float z, BOOL isNetwork, BOOL bScriptHostObj, BOOL dynamic) 
 	{ 
-		*(unsigned short*)Arctic::g_GameVariables->m_ModelSpawnBypass = 0x9090;
+		*(unsigned short*)Saint::g_GameVariables->m_ModelSpawnBypass = 0x9090;
 		auto temp = Invoke<Object>(0x9A294B2138ABB884, modelHash, x, y, z, isNetwork, bScriptHostObj, dynamic);
-		*(unsigned short*)Arctic::g_GameVariables->m_ModelSpawnBypass = 0x0574;
+		*(unsigned short*)Saint::g_GameVariables->m_ModelSpawnBypass = 0x0574;
 		return temp;
 	} // 0x9A294B2138ABB884 0x58040420 b323
 	static void DELETE_OBJECT(Object* object) { Invoke<int>(0x539E0AE3E6634B9F, object); } // 0x539E0AE3E6634B9F 0xD6EF9DA7 b323
@@ -3904,9 +3904,9 @@ namespace PED
 {
 	static Ped CREATE_PED(int pedType, Hash modelHash, float x, float y, float z, float heading, BOOL isNetwork, BOOL bScriptHostPed) 
 	{ 
-		*(unsigned short*)Arctic::g_GameVariables->m_ModelSpawnBypass = 0x9090;
+		*(unsigned short*)Saint::g_GameVariables->m_ModelSpawnBypass = 0x9090;
 		auto temp = Invoke<Ped>(0xD49F9B0955C367DE, pedType, modelHash, x, y, z, heading, isNetwork, bScriptHostPed);
-		*(unsigned short*)Arctic::g_GameVariables->m_ModelSpawnBypass = 0x0574;
+		*(unsigned short*)Saint::g_GameVariables->m_ModelSpawnBypass = 0x0574;
 		return temp;
 	} // 0xD49F9B0955C367DE 0x0389EF71 b323
 	static void DELETE_PED(Ped* ped) { Invoke<int>(0x9614299DCB53E54B, ped); } // 0x9614299DCB53E54B 0x13EFB9A0 b323
@@ -5768,9 +5768,9 @@ namespace VEHICLE
 {
 	static Vehicle CREATE_VEHICLE(Hash modelHash, float x, float y, float z, float heading, BOOL isNetwork, BOOL bScriptHostVeh, BOOL p7) 
 	{ 
-		*(unsigned short*)Arctic::g_GameVariables->m_ModelSpawnBypass = 0x9090;
+		*(unsigned short*)Saint::g_GameVariables->m_ModelSpawnBypass = 0x9090;
 		auto temp = Invoke<Vehicle>(0xAF35D0D2583051B0, modelHash, x, y, z, heading, isNetwork, bScriptHostVeh, p7); 
-		*(unsigned short*)Arctic::g_GameVariables->m_ModelSpawnBypass = 0x0574;
+		*(unsigned short*)Saint::g_GameVariables->m_ModelSpawnBypass = 0x0574;
 		return temp;
 	} // 0xAF35D0D2583051B0 0xDD75460A b323
 	static void DELETE_VEHICLE(Vehicle* vehicle) { Invoke<int>(0xEA386986E786A54F, vehicle); } // 0xEA386986E786A54F 0x9803AF60 b323

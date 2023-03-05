@@ -55,9 +55,9 @@
 #define BIGBASE_STRINGIZE_IMPL(x) #x
 #define BIGBASE_STRINGIZE(x) BIGBASE_STRINGIZE_IMPL(x)
 
-#define BIGBASE_NAME "Arctic"
+#define BIGBASE_NAME "Saint"
 
-namespace Arctic
+namespace Saint
 {
 	using namespace std::chrono_literals;
 	namespace fs = std::filesystem;

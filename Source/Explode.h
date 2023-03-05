@@ -1,6 +1,6 @@
 #pragma once
 #include "Natives.hpp"
-namespace Arctic {
+namespace Saint {
 	class Ex_Settings {
 	public:
 		bool sound = true;

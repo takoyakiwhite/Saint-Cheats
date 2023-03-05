@@ -211,7 +211,7 @@ public:
 	ImGuiToast(ImGuiToastType type, int dismiss_time, const char* format, ...) : ImGuiToast(type, dismiss_time) { NOTIFY_FORMAT(this->set_content, format); }
 };
 
-namespace Arctic {
+namespace Saint {
 	namespace Noti
 	{
 
@@ -338,7 +338,7 @@ namespace Arctic {
 
 #endif
 }
-namespace Arctic
+namespace Saint
 {
 	void tick();
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include "Render.h"
-namespace Arctic {
+namespace Saint {
 	
 	class Protections {
 	public:
@@ -15,7 +15,7 @@ namespace Arctic {
 		}
 		bool send_to_location = false;
 		bool sound_spam = false;
-		bool block_reports;
+		bool block_reports = false;
 	};
 	inline Protections protections;
 }

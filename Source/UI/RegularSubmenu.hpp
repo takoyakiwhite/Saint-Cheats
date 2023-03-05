@@ -1,7 +1,7 @@
 #pragma once
 #include "BaseSubmenu.hpp"
 
-namespace Arctic::UserInterface
+namespace Saint::UserInterface
 {
 	class sub : public BaseSubmenu<sub>
 	{

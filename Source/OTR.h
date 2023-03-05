@@ -2,7 +2,7 @@
 #include "Natives.hpp" 
 #include "ScriptGlobal.hpp"
 #include "Signatures.hpp"
-namespace Arctic {
+namespace Saint {
 	class OTR {
 	public:
 		bool enabled = false;

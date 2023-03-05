@@ -2,7 +2,7 @@
 #include "UI/BaseOption.hpp"
 #include "UI/Interface.hpp"
 
-namespace Arctic::UserInterface {
+namespace Saint::UserInterface {
 	template <typename DataType, typename PositionType, typename BoolType>
 	class BoolChoose : public BaseOption<BoolChoose<DataType, PositionType, BoolType>>
 	{

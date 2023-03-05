@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Arctic
+namespace Saint
 {
 	class TranslationManager
 	{
@@ -103,5 +103,5 @@ namespace Arctic
 	inline std::unique_ptr<TranslationManager> g_TranslationManager;
 }
 
-#define BIG_TRANSLATE_IMPL(label) (::Arctic::g_TranslationManager->GetTranslation(CONSTEXPR_JOAAT(label)))
+#define BIG_TRANSLATE_IMPL(label) (::Saint::g_TranslationManager->GetTranslation(CONSTEXPR_JOAAT(label)))
 #define BIG_TRANSLATE(label) BIG_TRANSLATE_IMPL(label)

@@ -1,7 +1,7 @@
 #pragma once
 #include "ImGui/imgui.h"
 
-namespace Arctic
+namespace Saint
 {
 	class D3DRenderer
 	{

@@ -1,7 +1,7 @@
 #pragma once
 #include "BaseOption.hpp"
 
-namespace Arctic::UserInterface
+namespace Saint::UserInterface
 {
 	class RegularOption : public BaseOption<RegularOption>
 	{

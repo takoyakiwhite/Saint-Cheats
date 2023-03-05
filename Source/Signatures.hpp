@@ -10,7 +10,7 @@
 #include "Classes.h"
 #include "Types.hpp"
 #include <GTAV-Classes/netsync/nodes/player/CPlayerGameStateDataNode.hpp>
-namespace Arctic
+namespace Saint
 {
 	
 	class netConnectionManager;

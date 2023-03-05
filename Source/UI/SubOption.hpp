@@ -2,7 +2,7 @@
 #include "BaseOption.hpp"
 #include "Interface.hpp"
 #include "../FiberHelper.hpp"
-namespace Arctic::UserInterface
+namespace Saint::UserInterface
 {
 	class submenu : public BaseOption<submenu>
 	{

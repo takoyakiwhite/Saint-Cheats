@@ -4,7 +4,7 @@
 #include "TextBox.hpp"
 #include "AbstractSubmenu.hpp"
 
-namespace Arctic::UserInterface
+namespace Saint::UserInterface
 {
 	enum class Font : std::int32_t
 	{
@@ -172,7 +172,7 @@ namespace Arctic::UserInterface
 		//Themes
 		const char* ThemeList[9]
 		{
-			"Light Purple",
+			"Saint Purple",
 			"Red Salmon",
 			"Sapphire Blue",
 			"Soft Black",
@@ -182,7 +182,7 @@ namespace Arctic::UserInterface
 			"Stash Skid Menu",
 			"Ozark"
 		};
-		std::size_t ThemeIterator = 1;
+		std::size_t ThemeIterator = 0;
 
 		const char* HeaderFont[6]
 		{
@@ -300,7 +300,7 @@ namespace Arctic::UserInterface
 	};
 }
 
-namespace Arctic
+namespace Saint
 {
 	inline std::unique_ptr<UserInterface::UIManager> g_Render;
 }

@@ -14,7 +14,7 @@
 #include "All Players.h"
 #include "Hooking.hpp"
 #include "Render.h"
-namespace Arctic {
+namespace Saint {
 	inline std::string handlingBuffer = "";
 	inline std::string ridBuffer = "";
 	inline int selected_rid = 0;
@@ -1011,7 +1011,7 @@ namespace Arctic {
 		void mapNotification(const char* body, const char* who) {
 
 			char messageBuffer[256];
-			sprintf_s(messageBuffer, sizeof(messageBuffer), "Arctic | ~t~%s ~w~failed ~r~%s", who, body);
+			sprintf_s(messageBuffer, sizeof(messageBuffer), "Saint | ~t~%s ~w~failed ~r~%s", who, body);
 			HUD::BEGIN_TEXT_COMMAND_THEFEED_POST("STRING");
 
 			HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(messageBuffer);
@@ -1744,6 +1744,7 @@ namespace Arctic {
 		return HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(ss.str().c_str()) == "NULL" ? "Unknown Class" : HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(ss.str().c_str());
 	}
 	inline int m_selected_vehicle_class;
+	inline int m_selected_player_vehicle_class;
 	
 	
 	class Veh_spawner {
@@ -1808,16 +1809,17 @@ namespace Arctic {
 			}
 				});
 		}
-		void spawn_for_ped(Hash hash, Player player) {
+		bool selected_fade = true;
+		void spawn_for_ped(Hash hash) {
 			*script_global(4540726).as<bool*>() = true;
 			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
 				{
 					
 
 
-			NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(player, { 0.f, dellast ? 0.f : 8.0f, 1.0f });
+			NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), {0.f, dellast ? 0.f : 8.0f, 1.0f});
 			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-			Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(player), true, false, false);
+			Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer)), true, false, false);
 			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 			DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
 			auto networkId = NETWORK::VEH_TO_NET(vehicle);
@@ -1828,7 +1830,7 @@ namespace Arctic {
 			
 			
 			
-			if (fade_in) {
+			if (selected_fade) {
 				NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, false);
 			}
 			
@@ -2688,7 +2690,7 @@ namespace Arctic {
 		bool override_restrictions = false;
 		bool use_player_colour_instead_of_team = false;
 		const char* type[2] = {"Red", "Blue"};
-		std::size_t data;
+		std::size_t data = 0;
 		void init() {
 			if (use_player_colour_instead_of_team) {
 				NETWORK::USE_PLAYER_COLOUR_INSTEAD_OF_TEAM_COLOUR(true);
@@ -2739,7 +2741,7 @@ namespace Arctic {
 		}
 	};
 	inline Animations animation;
-	inline bool mark_as_arctic = true;
+	inline bool mark_as_Saint = true;
 	class WantedLev {
 	public:
 		bool always = false;
@@ -2754,7 +2756,7 @@ namespace Arctic {
 	public:
 		bool is_invisible = false;
 		const char* type[2] = { "Stunt Tube", "Normal" };
-		std::size_t data;
+		std::size_t data = 0;
 		void add() {
 			switch (data) {
 			case 0:
@@ -3174,14 +3176,14 @@ namespace Arctic {
 		
 		void save() {
 			std::string AppDataPath = getenv("APPDATA");
-			std::string MenuFolderPath = AppDataPath + "\\Arctic\\Vehicles\\";
+			std::string MenuFolderPath = AppDataPath + "\\Saint\\Vehicles\\";
 			Ini* ColorIni = new Ini(MenuFolderPath + "Saved.ini");
 			Hash hash = ENTITY::GET_ENTITY_MODEL(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false));
 			ColorIni->WriteHash(hash, "Info", "hash");
 		}
 		void load() {
 			std::string AppDataPath = getenv("APPDATA");
-			std::string MenuFolderPath = AppDataPath + "\\Arctic\\Vehicles\\";
+			std::string MenuFolderPath = AppDataPath + "\\Saint\\Vehicles\\";
 			if (VehicleIniExist((MenuFolderPath + "Saved.ini").c_str())) {
 				Ini* ColorIni = new Ini(MenuFolderPath + "Saved.ini");
 				veh_spawner.spawn(ColorIni->GetInt("Info", "hash"));
@@ -3200,14 +3202,14 @@ namespace Arctic {
 		}
 		void save() {
 			std::string AppDataPath = getenv("APPDATA");
-			std::string MenuFolderPath = AppDataPath + "\\Arctic\\";
+			std::string MenuFolderPath = AppDataPath + "\\Saint\\";
 			Ini* ColorIni = new Ini(MenuFolderPath + "Colors.ini");
 
 			ColorIni->WriteInt(g_Render->ThemeIterator, "Themes", "get_current");
 		}
 		void load() {
 			std::string AppDataPath = getenv("APPDATA");
-			std::string MenuFolderPath = AppDataPath + "\\Arctic\\";
+			std::string MenuFolderPath = AppDataPath + "\\Saint\\";
 			if (ColorIniExist((MenuFolderPath + "Colors.ini").c_str())) {
 				Ini* ColorIni = new Ini(MenuFolderPath + "Colors.ini");
 				g_Render->ThemeIterator = ColorIni->GetInt("Themes", "get_current");
@@ -3462,9 +3464,108 @@ namespace Arctic {
 		CLevel m_level;
 	};
 	inline CRecovery m_recovery;
+	inline std::vector<std::string> outfitNames;
+	inline std::vector<std::string> OutfitList()
+	{
+		std::string folderpath = "C:\\Saint\\Outfits\\";
+		if (!fs::exists(folderpath.c_str()))
+		{
+			fs::create_directory(folderpath.c_str());
+		}
+		std::vector<std::string> tempVector;
+		int fileCount = 0;
+		std::stringstream tempStringStream;
+		for (auto& collectedFiles : fs::directory_iterator("C:\\Saint\\Outfits\\"))
+		{
+
+			std::string oing = tempStringStream.str();
+			if (oing.substr(oing.find_last_of(".") + 1) == "ini")
+			{
+				unsigned foundAmount = oing.find_last_of("/\\");
+				std::string TempHolder = oing.substr(0, foundAmount);
+				std::string TempHolder2 = oing.substr(foundAmount + 1);
+				tempVector.push_back(TempHolder2.substr(0, TempHolder2.find(".", 0)));
+				outfitNames = tempVector;
+			}
+		}
+		return tempVector;
+	}
+	class OutfitLoader {
+	public:
+		std::string nameBuffer;
+		std::string nameBuffer2 = "Fortnitefr";
+		void save(std::string name) {
+			std::string iniPath = "C:\\Saint\\Outfits\\" + name + ".ini";
+
+			WritePrivateProfileStringA("Outfit", "Face", std::to_string(testa).c_str(), iniPath.c_str());
+			WritePrivateProfileStringA("Outfit", "Head", std::to_string(testb).c_str(), iniPath.c_str());
+			WritePrivateProfileStringA("Outfit", "Hair", std::to_string(testc).c_str(), iniPath.c_str());
+			WritePrivateProfileStringA("Outfit", "Torso", std::to_string(testd).c_str(), iniPath.c_str());
+			WritePrivateProfileStringA("Outfit", "Legs", std::to_string(testl).c_str(), iniPath.c_str());
+			WritePrivateProfileStringA("Outfit", "Hands", std::to_string(teste).c_str(), iniPath.c_str());
+			WritePrivateProfileStringA("Outfit", "Feet", std::to_string(testf).c_str(), iniPath.c_str());
+			WritePrivateProfileStringA("Outfit", "Eyes", std::to_string(testg).c_str(), iniPath.c_str());
+			WritePrivateProfileStringA("Outfit", "Accessories", std::to_string(testh).c_str(), iniPath.c_str());
+			WritePrivateProfileStringA("Outfit", "Tasks", std::to_string(testi).c_str(), iniPath.c_str());
+			WritePrivateProfileStringA("Outfit", "Textures", std::to_string(testj).c_str(), iniPath.c_str());
+			WritePrivateProfileStringA("Outfit", "Torso2", std::to_string(testk).c_str(), iniPath.c_str());
+			WritePrivateProfileStringA("Outfit", "HeadProp", std::to_string(testm).c_str(), iniPath.c_str());
+			
+		}
+		void load(std::string name)
+		{
+			std::string iniPath = "C:\\Saint\\Outfits\\" + name + ".ini";
+			char o1[255];
+			char o2[255];
+			char o3[255];
+			char o4[255];
+			char o5[255];
+			char o6[255];
+			char o7[255];
+			char o8[255];
+			char o9[255];
+			char o10[255];
+			char o11[255];
+			char o12[255];
+			char o13[255];
+			char o14[255];
+			char o15[255];
+			GetPrivateProfileStringA("Outfit", "Face", "", o1, 255, iniPath.c_str());
+			GetPrivateProfileStringA("Outfit", "Head", "", o2, 255, iniPath.c_str());
+			GetPrivateProfileStringA("Outfit", "Hair", "", o3, 255, iniPath.c_str());
+			GetPrivateProfileStringA("Outfit", "Torso", "", o4, 255, iniPath.c_str());
+			GetPrivateProfileStringA("Outfit", "Legs", "", o5, 255, iniPath.c_str());
+			GetPrivateProfileStringA("Outfit", "Hands", "", o6, 255, iniPath.c_str());
+			GetPrivateProfileStringA("Outfit", "Feet", "", o7, 255, iniPath.c_str());
+			GetPrivateProfileStringA("Outfit", "Eyes", "", o8, 255, iniPath.c_str());
+			GetPrivateProfileStringA("Outfit", "Accessories", "", o9, 255, iniPath.c_str());
+			GetPrivateProfileStringA("Outfit", "Tasks", "", o10, 255, iniPath.c_str());
+			GetPrivateProfileStringA("Outfit", "Textures", "", o11, 255, iniPath.c_str());
+			GetPrivateProfileStringA("Outfit", "Torso2", "", o12, 255, iniPath.c_str());
+			GetPrivateProfileStringA("Outfit", "HeadProp", "", o13, 255, iniPath.c_str());
+			GetPrivateProfileStringA("Outfit", "EarProp", "", o15, 255, iniPath.c_str());
+
+			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 0, atoi(o1), 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 1, atoi(o2), 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 2, atoi(o3), 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 3, atoi(o4), 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 4, atoi(o5), 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 5, atoi(o6), 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 6, atoi(o7), 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 7, atoi(o8), 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 8, atoi(o9), 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 9, atoi(o10), 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 10, atoi(o11), 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 11, atoi(o12), 0, 0);
+			PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 1, atoi(o13), 0, 0);
+			//PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 2, atoi(o14), 0, 0);
+			PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 3, atoi(o15), 0, 0);
+		}
+	};
+	inline OutfitLoader* g_Outfits;
 	inline void FeatureInitalize() {
 		
-		if (mark_as_arctic) {
+		if (mark_as_Saint) {
 			PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 109, true);
 			
 		}

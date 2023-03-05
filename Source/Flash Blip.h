@@ -1,6 +1,6 @@
 #pragma once
 #include "Natives.hpp" 
-namespace Arctic {
+namespace Saint {
 	class FlashBlip {
 	public:
 		bool enabled = false;

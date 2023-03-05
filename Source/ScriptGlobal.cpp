@@ -2,7 +2,7 @@
 #include "Signatures.hpp"
 #include "ScriptGlobal.hpp"
 
-namespace Arctic
+namespace Saint
 {
 	script_global::script_global(std::size_t index) :
 		m_index(index)

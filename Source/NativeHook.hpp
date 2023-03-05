@@ -4,7 +4,7 @@
 #include <GTAV-Classes/script/scrThread.hpp>
 #include <GTAV-Classes/script/scrProgram.hpp>
 
-namespace Arctic
+namespace Saint
 {
 	class NativeHooks final
 	{

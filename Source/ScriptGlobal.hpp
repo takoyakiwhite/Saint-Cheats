@@ -1,7 +1,7 @@
 #pragma once
 #include "Signatures.hpp"
 
-namespace Arctic
+namespace Saint
 {
 	class script_global
 	{

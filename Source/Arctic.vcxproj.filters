@@ -211,6 +211,9 @@
     <ClInclude Include="KeyboardOption.h">
       <Filter>Interface\Option</Filter>
     </ClInclude>
+    <ClInclude Include="Notifications.h">
+      <Filter>Core\Features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">

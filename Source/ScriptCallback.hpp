@@ -2,7 +2,7 @@
 #include "Script.hpp"
 #include "Natives.hpp"
 
-namespace Arctic
+namespace Saint
 {
 	class AbstractCallback
 	{

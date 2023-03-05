@@ -1,7 +1,7 @@
 #include "Signatures.hpp"
 #include "Invoker.hpp"
 
-namespace Arctic
+namespace Saint
 {
 
 	GameVariables::GameVariables():

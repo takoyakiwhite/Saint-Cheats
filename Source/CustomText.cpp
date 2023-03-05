@@ -1,6 +1,6 @@
 #include "CustomText.hpp"
 
-namespace Arctic
+namespace Saint
 {
 	void CustomText::AddText(std::uint32_t hash, const char* text)
 	{

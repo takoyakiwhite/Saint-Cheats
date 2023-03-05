@@ -2,7 +2,7 @@
 #include "AbstractSubmenu.hpp"
 #include "AbstractOption.hpp"
 
-namespace Arctic::UserInterface
+namespace Saint::UserInterface
 {
 	template <typename T>
 	class BaseSubmenu : public AbstractSubmenu

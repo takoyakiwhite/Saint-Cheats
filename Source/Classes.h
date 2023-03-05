@@ -109,7 +109,7 @@ namespace rage {
 #pragma pack(pop)
 }
 
-namespace Arctic {
+namespace Saint {
 #ifndef __PE_IMAGE__
 #define __PE_IMAGE__
 	typedef const IMAGE_NT_HEADERS64 NT64H;

@@ -11,7 +11,7 @@
 #include "Render.h"
 IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-namespace Arctic
+namespace Saint
 {
 	D3DRenderer::D3DRenderer():
 		m_Swapchain(g_GameVariables->m_Swapchain)
@@ -99,7 +99,7 @@ namespace Arctic
 		colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
 		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 
-		m_HeaderFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Arctic\\Fonts\\Chinese-Rocks.ttf", 70.f);
+		m_HeaderFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Saint\\Fonts\\Chinese-Rocks.ttf", 70.f);
 		ImGui::GetIO().Fonts->AddFontDefault();
 		ImFontConfig font_cfg;
 		m_DefaultFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Arial.ttf", 19.f, &font_cfg);

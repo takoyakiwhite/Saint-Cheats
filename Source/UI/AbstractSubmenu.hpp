@@ -2,7 +2,7 @@
 #include "../Common.hpp"
 #include "AbstractOption.hpp"
 
-namespace Arctic::UserInterface
+namespace Saint::UserInterface
 {
 	class AbstractSubmenu
 	{

@@ -1,7 +1,7 @@
 #include "ScriptHook.hpp"
 #include "Signatures.hpp"
 
-namespace Arctic
+namespace Saint
 {
 	inline std::unordered_map<rage::scrProgram*, ScriptHook*> ScriptHook::s_Map;
 

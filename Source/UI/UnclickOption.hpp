@@ -2,7 +2,7 @@
 #include "BaseOption.hpp"
 #include "Interface.hpp"
 
-namespace Arctic::UserInterface
+namespace Saint::UserInterface
 {
 	class UnclickOption : public BaseOption<UnclickOption>
 	{

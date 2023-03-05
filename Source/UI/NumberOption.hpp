@@ -3,7 +3,7 @@
 #include "Interface.hpp"
 #include "../Features.h"
 
-namespace Arctic::UserInterface
+namespace Saint::UserInterface
 {
 	std::string sliderKeyboardBuffer;
 	template <typename NumberType>

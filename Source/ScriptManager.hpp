@@ -1,7 +1,7 @@
 #pragma once
 #include "Script.hpp"
 
-namespace Arctic
+namespace Saint
 {
 	class ScriptManager
 	{

@@ -1,7 +1,7 @@
 #pragma once
 #include "Common.hpp"
 
-namespace Arctic
+namespace Saint
 {
     constexpr auto g_NativeCount = 6439;
     using CrossMap = std::array<std::pair<rage::scrNativeHash, rage::scrNativeHash>, g_NativeCount>;
