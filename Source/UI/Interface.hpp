@@ -199,9 +199,9 @@ namespace Saint::UserInterface
 
 		// Options
 		float m_OptionHeight = 0.0315f;
-		float m_OptionTextSize = 0.37f;
+		float m_OptionTextSize = 0.29f;
 		float m_SeperatorSize = 0.315f;
-		Font m_OptionFont = Font::ChaletComprimeCologne;
+		Font m_OptionFont = Font::ChaletLondon;
 		Font m_SeperatorFont = Font::ChaletComprimeCologne;
 		float m_OptionPadding = 2.1f;
 		Color m_OptionSelectedTextColor{ 255,255,255, 255 };
