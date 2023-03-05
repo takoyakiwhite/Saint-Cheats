@@ -214,6 +214,15 @@
     <ClInclude Include="Notifications.h">
       <Filter>Core\Features</Filter>
     </ClInclude>
+    <ClInclude Include="Discord\Discord_Register.h">
+      <Filter>Discord</Filter>
+    </ClInclude>
+    <ClInclude Include="Discord\Discord_RPC.h">
+      <Filter>Discord</Filter>
+    </ClInclude>
+    <ClInclude Include="Discord\DiscordHandler.hpp">
+      <Filter>Discord</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">
@@ -288,6 +297,9 @@
     </ClCompile>
     <ClCompile Include="Render.cpp">
       <Filter>Core\Notifications</Filter>
+    </ClCompile>
+    <ClCompile Include="Discord\Discord.cpp">
+      <Filter>Discord</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -401,6 +413,9 @@
     </Filter>
     <Filter Include="Core\Features\Network\Spoofing">
       <UniqueIdentifier>{1338ba6a-7a5e-4dee-b66c-e8ef465274ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Discord">
+      <UniqueIdentifier>{61022400-0f03-44ce-b9a7-f83563a2fd12}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

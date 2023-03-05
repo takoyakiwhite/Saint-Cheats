@@ -567,7 +567,7 @@ namespace Saint {
 				Lists::MatchPos = g_Render->ThemeIterator;
 				switch (g_Render->ThemeIterator) {
 				case 0:
-					g_Render->m_ToggleOnColor = { 138, 43, 226, 255 };
+					g_Render->m_ToggleOnColor = { 70, 38, 180, 255 };
 					break;
 				case 1:
 					g_Render->m_ToggleOnColor = { 255, 108, 116, 255 };

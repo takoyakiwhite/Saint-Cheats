@@ -142,7 +142,7 @@ namespace Saint::UserInterface
 		bool m_HeaderNativeText = false;
 		float m_HeaderTextSize = 1.f;
 		Font m_HeaderFont = Font::HouseScript;
-		Color m_HeaderBackgroundColor{ 138, 43, 226, 255 };
+		Color m_HeaderBackgroundColor{ 70, 38, 180, 255 };
 		Color m_HeaderTextColor{ 255, 255, 255, 255 };
 		HeaderType m_HeaderType = HeaderType::Static;
 
@@ -156,8 +156,8 @@ namespace Saint::UserInterface
 		// Footer Text
 		bool LeftFooterText = false;
 		bool RightFooterText = true;
-		float m_FooterTextSize = 0.27f;
-		Font m_FooterTextFont = Font::ChaletLondon;
+		float m_FooterTextSize = 0.32f;
+		Font m_FooterTextFont = Font::ChaletComprimeCologne;
 		float m_FooterTextPadding = 2.1f;
 		Color m_FooterTextColor{ 255,255,255, 255 };
 
@@ -199,13 +199,14 @@ namespace Saint::UserInterface
 
 		// Options
 		float m_OptionHeight = 0.0315f;
-		float m_OptionTextSize = 0.29f;
-		Font m_OptionFont = Font::ChaletLondon;
-		Font m_SeperatorFont = Font::HouseScript;
+		float m_OptionTextSize = 0.37f;
+		float m_SeperatorSize = 0.315f;
+		Font m_OptionFont = Font::ChaletComprimeCologne;
+		Font m_SeperatorFont = Font::ChaletComprimeCologne;
 		float m_OptionPadding = 2.1f;
 		Color m_OptionSelectedTextColor{ 255,255,255, 255 };
 		Color m_OptionUnselectedTextColor{ 255,255,255, 255 };
-		Color m_OptionSelectedBackgroundColor{ 138, 43, 226, 255 };
+		Color m_OptionSelectedBackgroundColor{ 70, 38, 180, 255 };
 		Color m_OptionUnselectedBackgroundColor{ 0, 0, 0, 160 };
 
 		// Footer
@@ -216,7 +217,7 @@ namespace Saint::UserInterface
 
 		float m_FooterHeight = 0.030f;
 		float m_FooterSpriteSize = 0.025f;
-		Color m_FooterBackgroundColor{ 138, 43, 226, 255 };
+		Color m_FooterBackgroundColor{ 70, 38, 180, 255 };
 		Color m_FooterSpriteColor{ 255,255,255, 255 };
 
 		//Enterable

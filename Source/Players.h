@@ -9,7 +9,7 @@ namespace Saint {
 		void get_theme(Color col) {
 			switch (g_Render->ThemeIterator) {
 			case 0:
-				col = { 138, 43, 226, 255 };
+				col = { 70, 38, 180, 255 };
 				break;
 			case 1:
 				col = { 255, 108, 116, 255 };
@@ -113,7 +113,7 @@ namespace Saint {
 			
 			switch (g_Render->ThemeIterator) {
 			case 0:
-				col = { 138, 43, 226, 255 };
+				col = { 70, 38, 180, 255 };
 				break;
 			case 1:
 				col = { 255, 108, 116, 255 };

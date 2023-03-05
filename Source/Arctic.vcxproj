@@ -22,6 +22,9 @@
     <ClInclude Include="CrossMap.hpp" />
     <ClInclude Include="CustomText.hpp" />
     <ClInclude Include="D3DRenderer.hpp" />
+    <ClInclude Include="Discord\DiscordHandler.hpp" />
+    <ClInclude Include="Discord\Discord_Register.h" />
+    <ClInclude Include="Discord\Discord_RPC.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Explode.h" />
     <ClInclude Include="Features.h" />
@@ -92,6 +95,7 @@
     <ClCompile Include="CrossMap.cpp" />
     <ClCompile Include="CustomText.cpp" />
     <ClCompile Include="D3DRenderer.cpp" />
+    <ClCompile Include="Discord\Discord.cpp" />
     <ClCompile Include="Render.cpp" />
     <ClCompile Include="ScriptGlobal.cpp" />
     <ClCompile Include="Signatures.cpp" />

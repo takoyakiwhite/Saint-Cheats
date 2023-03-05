@@ -28,6 +28,8 @@
 #include "KeyboardOption.h"
 #include "Render.h"
 #include "Notifications.h"
+#include "Discord/DiscordHandler.hpp"
+
 namespace Saint
 {
 	enum Submenu : std::uint32_t
@@ -160,10 +162,9 @@ namespace Saint
 		SubmenuGetClass,
 		SpawnerSettings,
 		SpawnerSettingsColor,
-			SpawnerSettingsSpawnInAir,
-			SpawnerSettingsSetForwardSpeed,
-			SubmenuVehicleAll,
-		
+		SpawnerSettingsSpawnInAir,
+		SpawnerSettingsSetForwardSpeed,
+		SubmenuVehicleAll,
 		SubmenuAllSettings,
 		SubmenuAllJets,
 		SubmenuJetExcludes,
@@ -197,16 +198,16 @@ namespace Saint
 		WINDOWS,
 		UNK47,
 		SubmenuMisc,
-			SubmenuReplaceText,
-			SubmenuFOV,
-			SubmenuRemoval,
-			SubmenuCrashes,
-			SubmenuKicks,
-			SubmenuRequests,
-			SubmenuSesStart,
-			SubmenuFriendly,
-			SubmenuGiveWeapons,
-			SubmenuOffRadar,
+		SubmenuReplaceText,
+		SubmenuFOV,
+		SubmenuRemoval,
+		SubmenuCrashes,
+		SubmenuKicks,
+		SubmenuRequests,
+		SubmenuSesStart,
+		SubmenuFriendly,
+		SubmenuGiveWeapons,
+		SubmenuOffRadar,
 		SubmenuFlagCreator,
 		SubmenuTeleport,
 		SubmenuRIDJoiner,
@@ -214,33 +215,33 @@ namespace Saint
 		SubmenuScriptEvents,
 		SubmenuWater,
 		SubmenuAimbot,
-			SubmenuAimbotExcludes,
-			SubmenuChangeVehicleColor,
-			SubmenuChat,
-			SubmenuPeds,
-			SubmenuAnimations,
-			SubmenuScenarios,
-			SubmenuCage,
-			SubmenuIncrement,
-			SubmenuSpoofing,
-			SubmenuGame,
-			SubmenuInformation,
-			SubmenuIP,
-			SubmenuSelectedWeapon,
-			SubmenuSelectedExplosiveAmmo,
-			SubmenuBlameExplosiveAmmo,
-			SubmenuPersonalVehicles,
-			SubmenuVehicleRamps,
-			SubmenuSavedVehicles,
-			SubmenuScripts,
-			SubmenuRecovery,
-			SubmenuRP,
-			SubmenuUnlocks,
-			SubmenuSelectedSpawner,
-			SubmenuSelectedGet,
-			SubmenuOutfitLoader,
-			SubmenuVehicleInvis,
-			SubmenuSelectedVehicle,
+		SubmenuAimbotExcludes,
+		SubmenuChangeVehicleColor,
+		SubmenuChat,
+		SubmenuPeds,
+		SubmenuAnimations,
+		SubmenuScenarios,
+		SubmenuCage,
+		SubmenuIncrement,
+		SubmenuSpoofing,
+		SubmenuGame,
+		SubmenuInformation,
+		SubmenuIP,
+		SubmenuSelectedWeapon,
+		SubmenuSelectedExplosiveAmmo,
+		SubmenuBlameExplosiveAmmo,
+		SubmenuPersonalVehicles,
+		SubmenuVehicleRamps,
+		SubmenuSavedVehicles,
+		SubmenuScripts,
+		SubmenuRecovery,
+		SubmenuRP,
+		SubmenuUnlocks,
+		SubmenuSelectedSpawner,
+		SubmenuSelectedGet,
+		SubmenuOutfitLoader,
+		SubmenuVehicleInvis,
+		SubmenuSelectedVehicle,
 	};
 
 	bool MainScript::IsInitialized()
@@ -259,6 +260,26 @@ namespace Saint
 		m_Initialized = true;
 		using namespace UserInterface;
 		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_JOINING"), "Loading GTA Online with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_QUITTING"), "Leaving with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_QUIT_MP"), "Exiting GTA Online with " BIGBASE_NAME);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_ENTER_MP"), "Play GTA Online with " BIGBASE_NAME);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_EXIT_GAME"), "Quit GTA with" BIGBASE_NAME);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_GO"), "Online with " BIGBASE_NAME);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_MPREENTER"), "Joining a new session with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_FRIEND_FM"), "Closed Friend Session with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_GOTO_STORE"), "Purchase Shark Cards with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INF_EXIT"), "Quit to desktop with " BIGBASE_NAME "?");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_CRESES"), "Joining A Crew Only Session with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INF_PGOB"), "Cut to the chase and	 head straight into the world of GTA Online with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INF_PGOT"), "Online w/ " BIGBASE_NAME "!");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INVO_FM"), "Join A Invite Only Session with " BIGBASE_NAME ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("LOADING_SPLAYER_L"), "Loading Story Mode with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_NCREW_FM"), "Join A Crew Session with " BIGBASE_NAME ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_CREW_FM"), "Join A Closed Crew Session with " BIGBASE_NAME ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_SOLO_FM"), "Join A Solo Session with " BIGBASE_NAME ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_FRESES"), "Join A Friends Only Session with " BIGBASE_NAME ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_MAINTIT"), BIGBASE_NAME);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("MP_CHAT_ALL"), BIGBASE_NAME);
 		
 		
 		g_Render->draw_submenu<sub>("Saint", SubmenuHome, [](sub* sub)
@@ -443,7 +464,7 @@ namespace Saint
 						TASK::CLEAR_PED_TASKS_IMMEDIATELY(PLAYER::PLAYER_PED_ID());
 
 					});
-				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~List"), nullptr, [] {});
 				sub->draw_option<RegularOption>(("Pole Dance"), nullptr, [=]
 					{
 						animation.start("mini@strip_club@pole_dance@pole_dance1", "pd_dance_01");
@@ -512,7 +533,7 @@ namespace Saint
 
 
 					});
-				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~List"), nullptr, [] {});
 				namespace fs = std::filesystem;
 				fs::directory_iterator dirIt{ "C:\\Saint\\Outfits\\" };
 				for (auto&& dirEntry : dirIt)
@@ -749,7 +770,7 @@ namespace Saint
 				sub->draw_option<submenu>("Settings", nullptr, Submenu::SpawnerSettings);
 				sub->draw_option<submenu>("Search", nullptr, Submenu::SubmenuVehicleSearch);
 				sub->draw_option<submenu>("Saved", nullptr, Submenu::SubmenuSavedVehicles);
-				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~List"), nullptr, [] {});
 				sub->draw_option<submenu>("All", nullptr, SubmenuVehicleAll);
 				for (std::int32_t i = 0; i < 23; i++) {
 					sub->draw_option<submenu>(get_vehicle_class_name(i), nullptr, SubmenuGetClass, [=]
@@ -768,7 +789,7 @@ namespace Saint
 						g_VehicleLoading->save();
 
 					});
-				sub->draw_option<UnclickOption>(("Saved"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~Saved"), nullptr, [] {});
 				sub->draw_option<RegularOption>(("Load"), nullptr, [=]
 					{
 						g_VehicleLoading->load();
@@ -916,10 +937,10 @@ namespace Saint
 				if (search_completed) {
 					Hash vehicleHash2 = MISC::GET_HASH_KEY(ModelInput.c_str());
 					if (STREAMING::IS_MODEL_VALID(vehicleHash2)) {
-						sub->draw_option<UnclickOption>(("Found ~r~1 ~w~Result."), nullptr, [] {});
+						sub->draw_option<UnclickOption>(("~italic~Found ~r~1 ~w~Result."), nullptr, [] {});
 					}
 					else {
-						sub->draw_option<UnclickOption>(("Found ~r~0 ~w~Results."), nullptr, [] {});
+						sub->draw_option<UnclickOption>(("~italic~Found ~r~0 ~w~Results."), nullptr, [] {});
 					}
 					
 					if (STREAMING::IS_MODEL_VALID(vehicleHash2)) {
@@ -1042,7 +1063,7 @@ namespace Saint
 						PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), oldveh, -1);
 				
 					});
-				sub->draw_option<UnclickOption>(("Current Flags"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~Current Flags"), nullptr, [] {});
 				char wreckless[64];
 				sprintf(wreckless, "%i", autopilot.wreckless_flag);
 				sub->draw_option<KeyboardOption>(("Reckless"), nullptr, wreckless, []
@@ -1104,7 +1125,7 @@ namespace Saint
 						
 
 					});
-				sub->draw_option<UnclickOption>(("Current"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~Current"), nullptr, [] {});
 				char current[64];
 				sprintf(current, "%i", flag_creator.current);
 				sub->draw_option<RegularOption>((current), "", []
@@ -1112,7 +1133,7 @@ namespace Saint
 				
 
 				});
-				sub->draw_option<UnclickOption>(("Names"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~Names"), nullptr, [] {});
 				
 				sub->draw_option<KeyboardOption>(("Slot 3"), nullptr, autopilot.avoid_roads_name.c_str(), []
 					{
@@ -2408,7 +2429,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Handling"), SubmenuVehicleMultipliers, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Presets", nullptr, SubmenuPresets);
-				sub->draw_option<UnclickOption>(("Edit"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~Edit"), nullptr, [] {});
 				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
 				{
 					auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
@@ -2483,7 +2504,7 @@ namespace Saint
 						
 							});
 				});
-				sub->draw_option<UnclickOption>(("Lists"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~Lists"), nullptr, [] {});
 				if (handlingBuffer.c_str() != "") {
 					sub->draw_option<RegularOption>(handlingBuffer.c_str(), "");
 				}
@@ -2873,7 +2894,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Blame", SubmenuBlameExplosiveAmmo, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &explosiveAmmo.blame, BoolDisplay::OnOff);
-		sub->draw_option<UnclickOption>(("Player List"), nullptr, [] {});
+		sub->draw_option<UnclickOption>(("~italic~Player List"), nullptr, [] {});
 
 		if (!explosiveAmmo.blame) {
 			return;
@@ -2964,7 +2985,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Modder Detection", SubmenuAntiCheat, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &antiCheat.enabled, BoolDisplay::OnOff);
-				sub->draw_option<UnclickOption>(("Checks"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~Checks"), nullptr, [] {});
 				sub->draw_option<toggle<bool>>(("Godmode"), nullptr, &antiCheat.godmode, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Infinite Ammo"), nullptr, &antiCheat.infinite_ammo, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Infinite Clip"), nullptr, &antiCheat.infinite_ammo2, BoolDisplay::OnOff);
@@ -3031,7 +3052,7 @@ namespace Saint
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &spoofing.m_crew.enabled, BoolDisplay::OnOff);
 				sub->draw_option<number<std::int32_t>>("Members", nullptr, &spoofing.m_crew.member_count, 0, 5000);
-				sub->draw_option<UnclickOption>(("Values"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~Values"), nullptr, [] {});
 				
 				sub->draw_option<KeyboardOption>(("Name"), nullptr, spoofing.m_crew.name, []
 					{
@@ -3073,7 +3094,7 @@ namespace Saint
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Team", nullptr, &team.type, &team.data, true, -1, [] {
 					PLAYER::SET_PLAYER_TEAM(PLAYER::PLAYER_PED_ID(), team.data);
 				});
-				sub->draw_option<UnclickOption>(("Players"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~Players"), nullptr, [] {});
 				for (std::uint32_t i = 0; i < 32; ++i)
 				{
 					if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))
@@ -3140,7 +3161,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Spoof Sender"), SubmenuSpoofSpammer, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &chat.spoof_sender, BoolDisplay::OnOff);
-				sub->draw_option<UnclickOption>(("Player List"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~Player List"), nullptr, [] {});
 
 				if (!chat.spoof_sender) {
 					return;
@@ -3191,7 +3212,7 @@ namespace Saint
 						
 					});
 		
-		sub->draw_option<UnclickOption>(("RID"), nullptr, [] {});
+		sub->draw_option<UnclickOption>(("~italic~RID"), nullptr, [] {});
 		if (ridBuffer.c_str() != "") {
 			
 			sub->draw_option<KeyboardOption>(("RID"), nullptr, ridBuffer.c_str(), []
@@ -3286,7 +3307,7 @@ namespace Saint
 			{
 				sub->draw_option<submenu>("All", nullptr, SubmenuAllPlayers);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Filter", nullptr, &p_filter.data, &p_filter.data_i);
-				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~List"), nullptr, [] {});
 				
 				for (std::uint32_t i = 0; i < 32; ++i)
 				{
@@ -3425,7 +3446,7 @@ namespace Saint
 			{
 				sub->draw_option<submenu>("Settings", nullptr, Submenu::SpawnerSelectedSettings);
 				sub->draw_option<submenu>("Search", nullptr, Submenu::SubmenuSelectedVehicleSearch);
-				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~List"), nullptr, [] {});
 				for (std::int32_t i = 0; i < 23; i++) {
 					sub->draw_option<submenu>(get_vehicle_class_name(i), nullptr, SubmenuSelectedGet, [=]
 						{
@@ -3449,10 +3470,10 @@ namespace Saint
 		if (search_completed) {
 			Hash vehicleHash2 = MISC::GET_HASH_KEY(ModelInput.c_str());
 			if (STREAMING::IS_MODEL_VALID(vehicleHash2)) {
-				sub->draw_option<UnclickOption>(("Found ~r~1 ~w~Result."), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~Found ~r~1 ~w~Result."), nullptr, [] {});
 			}
 			else {
-				sub->draw_option<UnclickOption>(("Found ~r~0 ~w~Results."), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~Found ~r~0 ~w~Results."), nullptr, [] {});
 			}
 
 			if (STREAMING::IS_MODEL_VALID(vehicleHash2)) {
@@ -3620,7 +3641,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("All", SubmenuAllPlayers, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Settings", nullptr, SubmenuAllSettings);
-				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~List"), nullptr, [] {});
 				sub->draw_option<submenu>("Jets", nullptr, SubmenuAllJets);
 				sub->draw_option<submenu>("Explode", nullptr, SubmenuAllExplode);
 				sub->draw_option<toggle<bool>>(("Off The Radar"), "Can cause crashes.", &all_players.off_the_radar, BoolDisplay::OnOff);
@@ -3663,7 +3684,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Blame", SubmenuAllExplodeBlame, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &all_players.m_explode.settings.blame, BoolDisplay::OnOff);
-		sub->draw_option<UnclickOption>(("Player List"), nullptr, [] {});
+		sub->draw_option<UnclickOption>(("~italic~Player List"), nullptr, [] {});
 
 		if (!all_players.m_explode.settings.blame) {
 			return;
@@ -3739,7 +3760,7 @@ namespace Saint
 				{
 					g_players.get_selected.send_to_int({ 123 });
 				});
-			sub->draw_option<UnclickOption>(("Custom"), nullptr, [] {});
+			sub->draw_option<UnclickOption>(("~italic~Custom"), nullptr, [] {});
 			sub->draw_option<KeyboardOption>(("ID"), nullptr, std::to_string(g_players.get_selected.int_id), []
 				{
 					showKeyboard("Enter Message", "", 50, &g_players.get_selected.buffer, [] {
@@ -3815,7 +3836,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Blame", SubmenuExplodeBlame, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &owned_explosion.blame, BoolDisplay::OnOff);
-				sub->draw_option<UnclickOption>(("Player List"), nullptr, [] {});
+				sub->draw_option<UnclickOption>(("~italic~Player List"), nullptr, [] {});
 				
 				if (!owned_explosion.blame) {
 					return;
@@ -4095,7 +4116,7 @@ namespace Saint
 				
 			});
 		if (replaced || replaced2) {
-			sub->draw_option<UnclickOption>(("Input"), nullptr, [] {});
+			sub->draw_option<UnclickOption>(("~italic~Input"), nullptr, [] {});
 			char inputfr[64];
 			sprintf(inputfr, "%s>%s", replaceTextBuffer.c_str(), replaceTextBuffer2.c_str());
 			sub->draw_option<RegularOption>(inputfr, "");
@@ -4113,7 +4134,7 @@ namespace Saint
 			static bool testBool1{};
 			sub->draw_option<toggle<bool>>(("Bool Option"), nullptr, &testBool1, BoolDisplay::OnOff);
 
-			sub->draw_option<UnclickOption>(("Unclickable Option"), nullptr, [] {});
+			sub->draw_option<UnclickOption>(("~italic~Unclickable Option"), nullptr, [] {});
 
 			static std::int32_t int32Test{ 1337 };
 			static std::int32_t in32Test22{ 1337 };
@@ -4238,7 +4259,7 @@ namespace Saint
 			sub->draw_option<number<float>>("Text Size", nullptr, &g_Render->m_FooterTextSize, 0.01f, 1.f, 0.01f, 2);
 			sub->draw_option<toggle<bool>>("Left Text", nullptr, &g_Render->LeftFooterText, BoolDisplay::OnOff);
 			sub->draw_option<toggle<bool>>("Right Text", nullptr, &g_Render->RightFooterText, BoolDisplay::OnOff);
-			sub->draw_option<UnclickOption>(("Colors"), nullptr, [] {});
+			sub->draw_option<UnclickOption>(("~italic~Colors"), nullptr, [] {});
 			sub->draw_option<number<std::uint8_t>>("Text R", nullptr, &g_Render->m_FooterTextColor.r, '\0', static_cast<std::uint8_t>(255));
 			sub->draw_option<number<std::uint8_t>>("Text G", nullptr, &g_Render->m_FooterTextColor.g, '\0', static_cast<std::uint8_t>(255));
 			sub->draw_option<number<std::uint8_t>>("Text B", nullptr, &g_Render->m_FooterTextColor.b, '\0', static_cast<std::uint8_t>(255));
@@ -4249,7 +4270,7 @@ namespace Saint
 		{
 			sub->draw_option<number<float>>("Height", nullptr, &g_Render->m_OptionHeight, 0.01f, 0.1f, 0.001f, 3);
 			sub->draw_option<number<float>>("Text Size", nullptr, &g_Render->m_OptionTextSize, 0.01f, 1.f, 0.01f, 2);
-			sub->draw_option<UnclickOption>(("Colors"), nullptr, [] {});
+			sub->draw_option<UnclickOption>(("~italic~Colors"), nullptr, [] {});
 			sub->draw_option<number<std::uint8_t>>("Selected Background R", nullptr, &g_Render->m_OptionSelectedBackgroundColor.r, '\0', static_cast<std::uint8_t>(255));
 			sub->draw_option<number<std::uint8_t>>("Selected Background G", nullptr, &g_Render->m_OptionSelectedBackgroundColor.g, '\0', static_cast<std::uint8_t>(255));
 			sub->draw_option<number<std::uint8_t>>("Selected Background B", nullptr, &g_Render->m_OptionSelectedBackgroundColor.b, '\0', static_cast<std::uint8_t>(255));
@@ -4274,7 +4295,7 @@ namespace Saint
 			sub->draw_option<number<float>>("Height", nullptr, &g_Render->m_FooterHeight, 0.01f, 0.1f, 0.001f, 3);
 			sub->draw_option<number<float>>("Sprite Size", nullptr, &g_Render->m_FooterSpriteSize, 0.01f, 1.f, 0.001f, 3);
 			sub->draw_option<toggle<bool>>("Dynamic Footer", nullptr, &g_Render->m_dynamic_footer, BoolDisplay::OnOff);
-			sub->draw_option<UnclickOption>(("Colors"), nullptr, [] {});
+			sub->draw_option<UnclickOption>(("~italic~Colors"), nullptr, [] {});
 			sub->draw_option<number<std::uint8_t>>("Background R", nullptr, &g_Render->m_FooterBackgroundColor.r, '\0', static_cast<std::uint8_t>(255));
 			sub->draw_option<number<std::uint8_t>>("Background G", nullptr, &g_Render->m_FooterBackgroundColor.g, '\0', static_cast<std::uint8_t>(255));
 			sub->draw_option<number<std::uint8_t>>("Background B", nullptr, &g_Render->m_FooterBackgroundColor.b, '\0', static_cast<std::uint8_t>(255));
@@ -4318,7 +4339,7 @@ namespace Saint
 		{
 			sub->draw_option<toggle<bool>>("Transparent", nullptr, &g_Render->m_HeaderGradientTransparent, BoolDisplay::YesNo);
 			sub->draw_option<toggle<bool>>("Flip", nullptr, &g_Render->m_HeaderGradientFlip, BoolDisplay::YesNo);
-			sub->draw_option<UnclickOption>(("Colors"), nullptr, [] {});
+			sub->draw_option<UnclickOption>(("~italic~Colors"), nullptr, [] {});
 			sub->draw_option<number<std::uint8_t>>("R1", nullptr, &g_Render->m_HeaderGradientColorLeft.r, '\0', static_cast<std::uint8_t>(255));
 			sub->draw_option<number<std::uint8_t>>("G1", nullptr, &g_Render->m_HeaderGradientColorLeft.g, '\0', static_cast<std::uint8_t>(255));
 			sub->draw_option<number<std::uint8_t>>("B1", nullptr, &g_Render->m_HeaderGradientColorLeft.b, '\0', static_cast<std::uint8_t>(255));
@@ -4357,7 +4378,7 @@ namespace Saint
 					});
 			}
 			sub->draw_option<number<float>>("Size", nullptr, &g_Render->m_HeaderTextSize, 0.1f, 2.f, 0.01f, 2);
-			sub->draw_option<UnclickOption>(("Colors"), nullptr, [] {});
+			sub->draw_option<UnclickOption>(("~italic~Colors"), nullptr, [] {});
 			sub->draw_option<number<std::uint8_t>>("R", nullptr, &g_Render->m_HeaderTextColor.r, '\0', static_cast<std::uint8_t>(255));
 			sub->draw_option<number<std::uint8_t>>("G", nullptr, &g_Render->m_HeaderTextColor.g, '\0', static_cast<std::uint8_t>(255));
 			sub->draw_option<number<std::uint8_t>>("B", nullptr, &g_Render->m_HeaderTextColor.b, '\0', static_cast<std::uint8_t>(255));
@@ -4389,6 +4410,7 @@ namespace Saint
 
 	void MainScript::Tick()
 	{
+		g_Discord->Tick();
 		Initialize();
 		while (true) {
 			g_Render->OnTick();

@@ -12,6 +12,7 @@
 #include "FiberHelper.hpp"
 #include "Script.h"
 #include "Render.h"
+#include "Discord/DiscordHandler.hpp"
 BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 {
 	using namespace Saint;
@@ -118,10 +119,11 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 			g_Hooking = std::make_unique<Hooking>();
 			g_Hooking->Hook();
 			auto g_NativeHook = std::make_unique<NativeHooks>();
+			g_Discord->Init();
 
 			g_Logger->Info("Game Version %s", g_GameVariables->m_GameBuild);
 			g_Logger->Info("Finished Injecting Have A Fun Time!");
-			Noti::InsertNotification({ ImGuiToastType_None, 2000, "Menu Injected" });
+			Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome %s",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
 			while (g_Running)
 			{
 				if (IsKeyPressed(VK_DELETE))
@@ -131,6 +133,8 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 			}
 
 			std::this_thread::sleep_for(500ms);
+
+			g_Discord->Shutdown();
 
 			g_NativeHook.reset();
 
