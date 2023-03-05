@@ -239,6 +239,8 @@ namespace Saint
 			SubmenuSelectedSpawner,
 			SubmenuSelectedGet,
 			SubmenuOutfitLoader,
+			SubmenuVehicleInvis,
+			SubmenuSelectedVehicle,
 	};
 
 	bool MainScript::IsInitialized()
@@ -601,6 +603,7 @@ namespace Saint
 				sub->draw_option<submenu>("Speedometer", nullptr, Submenu::SubmenuSpeedo);
 				sub->draw_option<submenu>("Engine Sound", nullptr, Submenu::SubmenuEngineSound);
 				sub->draw_option<submenu>("Negitive Torque", nullptr, Submenu::SubmenuNegitiveTorque);
+				sub->draw_option<submenu>("Invisible", nullptr, Submenu::SubmenuVehicleInvis);
 				sub->draw_option<submenu>("Ramps", nullptr, Submenu::SubmenuVehicleRamps);
 				sub->draw_option<submenu>("Spawner", nullptr, Submenu::SubmenuVehicleSpawner);
 				sub->draw_option<submenu>("Upgrades", nullptr, Submenu::SubmenuUpgrades);
@@ -641,10 +644,20 @@ namespace Saint
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Infinite Rocket Boost"), "Instantly refills your vehicle's rocket boost.", &features.infiniter, BoolDisplay::OnOff);
-				sub->draw_option<toggle<bool>>(("Bypass Max Speed"), "Removes the speed cap of your vehicle.", &m_vehicle.bypass_max_speed.enabled, BoolDisplay::OnOff, false, [] {
+				sub->draw_option<toggle<bool>>(("Bypass Max Speed"), "Allows you to exceed the maximum speed limit your current vehicle.", &m_vehicle.bypass_max_speed.enabled, BoolDisplay::OnOff, false, [] {
 					m_vehicle.bypass_max_speed.disable(); //trying something new
 					});
 
+			});
+		g_Render->draw_submenu<sub>(("Invisible"), SubmenuVehicleInvis, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &features.invisible_car, BoolDisplay::OnOff, false, [] {
+				if (!features.invisible_car) {
+					ENTITY::SET_ENTITY_VISIBLE(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true, false);
+
+				}
+					});
+				sub->draw_option<toggle<bool>>(("Locally Visible"), nullptr, &features.invisible_carlocal_visible, BoolDisplay::OnOff);
 			});
 		g_Render->draw_submenu<sub>(("Ramps"), SubmenuVehicleRamps, [](sub* sub)
 			{
@@ -2843,7 +2856,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Disable When Reloading"), nullptr, &rapid_fire.disable_when_reloading, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Disable Shooting"), nullptr, &rapid_fire.disable_shooting, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Only When Aiming"), nullptr, &rapid_fire.only_when_aiming, BoolDisplay::OnOff);
-				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &rapid_fire.delay, 0, 5000);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &rapid_fire.delay, 0, 5000, 50);
 
 			});
 		g_Render->draw_submenu<sub>(("Explosive Ammo"), SubmenuExplosiveAmmo, [](sub* sub)
@@ -3341,6 +3354,7 @@ namespace Saint
 				sub->draw_option<submenu>("Bodygaurds", nullptr, SubmenuBodyguards);
 				sub->draw_option<submenu>("Increment", nullptr, SubmenuIncrement);
 				sub->draw_option<submenu>("Friendly", nullptr, SubmenuFriendly);
+				sub->draw_option<submenu>("Vehicle", nullptr, SubmenuSelectedVehicle);
 				sub->draw_option<submenu>("Weapon", nullptr, SubmenuSelectedWeapon);
 				sub->draw_option<submenu>("Teleport", nullptr, SubmenuPlayerTeleport);
 				sub->draw_option<submenu>("Spawner", nullptr, SubmenuSelectedSpawner);
@@ -3391,6 +3405,21 @@ namespace Saint
 					});
 				
 	
+			});
+		g_Render->draw_submenu<sub>("Vehicle", SubmenuSelectedVehicle, [](sub* sub)
+			{
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &rapid_fire.delay, 0, 5000, 50);
+				sub->draw_option<RegularOption>("Boost", nullptr, [=]
+					{
+						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false))) {
+
+							Vehicle get_veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+							VEHICLE::SET_VEHICLE_FORWARD_SPEED(get_veh, features.boost_speed);
+						}
+
+					});
+					
+
 			});
 		g_Render->draw_submenu<sub>("Spawner", SubmenuSelectedSpawner, [](sub* sub)
 			{

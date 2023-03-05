@@ -42,6 +42,7 @@ namespace Saint {
 			HUD::SET_TEXT_FONT(font);
 			HUD::SET_TEXT_COLOUR(color.r, color.g, color.b, color.a);
 			HUD::SET_TEXT_CENTRE(center);
+			
 			if (right) {
 				HUD::SET_TEXT_WRAP(0.0f, x);
 				HUD::SET_TEXT_RIGHT_JUSTIFY(true);
@@ -58,11 +59,11 @@ namespace Saint {
 			Color col2 = { 255, 255, 255, 190 };
 			if (first) {
 				drawText(text, 0.505, 0.105f, 0.25f, 0, false, col2, false);
-				drawText(text2, 0.630 - x_offset, 0.105f, 0.25f, 0, false, col2, false);
+				drawText(text2, 0.678 - x_offset, 0.105f, 0.25f, 0, false, col2, true);
 			}
 			else {
 				drawText(text, 0.505, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, false);
-				drawText(text2, 0.630 - x_offset, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, false);
+				drawText(text2, 0.678 - x_offset, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, true);
 			}
 		}
 		void draw_info(std::uint32_t player) {
@@ -75,12 +76,38 @@ namespace Saint {
 			char name2[64];
 			int netHandle[13];
 			char run_speed[64];
+			char wanted_level[64];
 			int infos = 2;
 			NETWORK::NETWORK_HANDLE_FROM_PLAYER(player, netHandle, 13);
-			
-			sprintf(name, "RID: %s", NETWORK::NETWORK_MEMBER_ID_FROM_GAMER_HANDLE(&netHandle[0]));
-			draw_info_text("Coords", "ALL TALK", 1, 0, true);
+			Ped playerPed = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player);
+			int ms2 = PLAYER::GET_TIME_SINCE_LAST_DEATH(playerPed);
+
+			int sec = ms2 / 1000;
+
+			ms2 = ms2 % 1000;
+
+			int min = sec / 60;
+			sec = sec % 60;
+
+			int hour = min / 60;
+			min = min % 60;
+
+			if (ms2 == -1)
+			{
+				hour = 0;
+				min = 0;
+				sec = 0;
+			}
+			char timesince[128];
+			NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player), false);
+			sprintf(run_speed, "%i, %i, %i", (int)c.x, (int)c.y, (int)c.z);
+			sprintf(wanted_level, "%i", PLAYER::GET_PLAYER_WANTED_LEVEL(player));
+			sprintf(timesince, "%ih %im %is", hour, min, sec);
+			draw_info_text("Coords", run_speed, 1, 0, true);
 			draw_info_text("RID", NETWORK::NETWORK_MEMBER_ID_FROM_GAMER_HANDLE(&netHandle[0]), 1, 0);
+			draw_info_text("Vehicle", (PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player), false) == 0) ? "N/A" : HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player), false)))), 2, 0);
+			draw_info_text("Wanted Level", wanted_level, 3, 0);
+			draw_info_text("Time Since Last Death", timesince, 4, 0);
 			//draw_info_text("Clan Name", g_GameVariables->m_net_game_player(player)->m_clan_data.m_clan_name, 2, 0);
 			
 			

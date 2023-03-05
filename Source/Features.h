@@ -515,7 +515,16 @@ namespace Saint {
 		bool infiniter = false;
 		bool drugs = false;
 		bool no_ragdoll = false;
+		bool invisible_car = false;
+		bool invisible_carlocal_visible = false;
+		int boost_speed = 150;
 		void init() {
+			if (invisible_car) {
+				if (invisible_carlocal_visible) {
+					NETWORK::SET_ENTITY_LOCALLY_VISIBLE(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false));
+				}
+				ENTITY::SET_ENTITY_VISIBLE(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false, false);
+			}
 			if (no_ragdoll) {
 				PED::SET_PED_RAGDOLL_ON_COLLISION(PLAYER::PLAYER_PED_ID(), false);
 				PED::SET_PED_CAN_RAGDOLL(PLAYER::PLAYER_PED_ID(), false);

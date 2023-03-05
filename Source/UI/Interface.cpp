@@ -1437,19 +1437,10 @@ namespace Saint::UserInterface
 
 		m_DrawBaseY += m_DescriptionHeightPadding;
 
-		DrawRect(
-			m_PosX,
-			m_DrawBaseY + (m_DescriptionHeight / 2.f),
-			m_Width,
-			m_DescriptionHeight,
-			m_OptionUnselectedBackgroundColor);
-		DrawRect(
-			m_PosX,
-			m_DrawBaseY + (m_DescriptionHeight / 2.f) - 0.015f,
-			m_Width,
-			0.005f,
-			m_DescriptionBackgroundColor);
-		//HUD::SET_TEXT_WRAP(0.0f, 0.9f);
+		
+		GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (m_DescriptionHeight2 / 2.f), m_Width, m_DescriptionHeight2, m_OptionUnselectedBackgroundColor.r, m_OptionUnselectedBackgroundColor.g, m_OptionUnselectedBackgroundColor.b, m_OptionUnselectedBackgroundColor.a, 0);
+		GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (m_DescriptionHeight / 2.f) - 0.015f, m_Width, 0.005f, m_DescriptionBackgroundColor.r, m_DescriptionBackgroundColor.g, m_DescriptionBackgroundColor.b, m_DescriptionBackgroundColor.a, 0);
+		HUD::SET_TEXT_WRAP(m_PosX, m_PosX + m_Width / 2);
 		DrawLeftText(
 			description,
 			m_PosX - (m_Width / m_DescriptionPadding),
@@ -1457,7 +1448,7 @@ namespace Saint::UserInterface
 			m_DescriptionTextSize,
 			m_DescriptionFont,
 			m_DescriptionTextColor,
-			false, false, true
+			false, false, false
 		);
 
 		m_DrawBaseY += m_DescriptionHeight;

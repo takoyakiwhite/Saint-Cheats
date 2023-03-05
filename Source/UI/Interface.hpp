@@ -245,7 +245,8 @@ namespace Saint::UserInterface
 
 		// Description
 		float m_DescriptionHeightPadding = 0.01f;
-		float m_DescriptionHeight = 0.033f;
+		float m_DescriptionHeight = 0.060f;
+		float m_DescriptionHeight2 = 0.033f;
 		float m_DescriptionTextSize = 0.28f;
 		Font m_DescriptionFont = Font::ChaletLondon;
 		Color m_DescriptionBackgroundColor{ 0, 0, 0, 160 };
