@@ -48,7 +48,7 @@ namespace Saint::UserInterface
 			auto right = m_Center.x + (m_Size.x / 2.f);
 			auto top = m_Center.y + (m_Size.y / 2.f);
 			auto bottom = m_Center.y - (m_Size.y / 2.f);
-			
+
 			if (point.x > right || point.x < left)
 				return false;
 			if (point.y > top || point.y < bottom)
@@ -77,7 +77,7 @@ namespace Saint::UserInterface
 		UIManager(UIManager&&) = delete;
 		UIManager& operator=(UIManager const&) = delete;
 		UIManager& operator=(UIManager&&) = delete;
-		
+
 		template <typename SubmenuType, typename ...TArgs>
 		void draw_submenu(TArgs&&... args)
 		{
@@ -89,7 +89,7 @@ namespace Saint::UserInterface
 
 			m_AllSubmenus.push_back(std::move(sub));
 		}
-		
+
 		void SwitchToSubmenu(std::uint32_t id)
 		{
 			for (auto&& sub : m_AllSubmenus)
@@ -114,7 +114,7 @@ namespace Saint::UserInterface
 		std::size_t m_OptionsPerPage = 13;
 		bool m_Sounds = true;
 		bool welcomemessage = false;
-		
+
 		// Glare
 		bool m_render_glare = { true };
 		int m_glare_handle;
@@ -128,7 +128,7 @@ namespace Saint::UserInterface
 		std::int32_t m_VerticalDelay = 120;
 		std::int32_t m_HorizontalDelay = 120;
 
-		
+
 
 		//ToolTip
 		void RenderToolTip();
@@ -142,7 +142,7 @@ namespace Saint::UserInterface
 		bool m_HeaderNativeText = false;
 		float m_HeaderTextSize = 1.f;
 		Font m_HeaderFont = Font::HouseScript;
-		Color m_HeaderBackgroundColor{ 70, 38, 180, 255 };
+		Color m_HeaderBackgroundColor{ 138, 43, 226, 255 };
 		Color m_HeaderTextColor{ 255, 255, 255, 255 };
 		HeaderType m_HeaderType = HeaderType::Static;
 
@@ -156,8 +156,8 @@ namespace Saint::UserInterface
 		// Footer Text
 		bool LeftFooterText = false;
 		bool RightFooterText = true;
-		float m_FooterTextSize = 0.32f;
-		Font m_FooterTextFont = Font::ChaletComprimeCologne;
+		float m_FooterTextSize = 0.27f;
+		Font m_FooterTextFont = Font::ChaletLondon;
 		float m_FooterTextPadding = 2.1f;
 		Color m_FooterTextColor{ 255,255,255, 255 };
 
@@ -195,18 +195,17 @@ namespace Saint::UserInterface
 		};
 		std::size_t HeaderFontIterator = 3;
 		Outfits outfits = Outfits::Face;
-		
+
 
 		// Options
 		float m_OptionHeight = 0.0315f;
 		float m_OptionTextSize = 0.29f;
-		float m_SeperatorSize = 0.315f;
 		Font m_OptionFont = Font::ChaletLondon;
-		Font m_SeperatorFont = Font::ChaletComprimeCologne;
+		Font m_SeperatorFont = Font::HouseScript;
 		float m_OptionPadding = 2.1f;
 		Color m_OptionSelectedTextColor{ 255,255,255, 255 };
 		Color m_OptionUnselectedTextColor{ 255,255,255, 255 };
-		Color m_OptionSelectedBackgroundColor{ 70, 38, 180, 255 };
+		Color m_OptionSelectedBackgroundColor{ 138, 43, 226, 255 };
 		Color m_OptionUnselectedBackgroundColor{ 0, 0, 0, 160 };
 
 		// Footer
@@ -217,7 +216,7 @@ namespace Saint::UserInterface
 
 		float m_FooterHeight = 0.030f;
 		float m_FooterSpriteSize = 0.025f;
-		Color m_FooterBackgroundColor{ 70, 38, 180, 255 };
+		Color m_FooterBackgroundColor{ 138, 43, 226, 255 };
 		Color m_FooterSpriteColor{ 255,255,255, 255 };
 
 		//Enterable
@@ -260,7 +259,7 @@ namespace Saint::UserInterface
 		int g_MenuAlpha = 0;
 		const char* m_CurrentSubMenuName = "Hello";
 		bool m_AnimationCheck;
-		
+
 		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
 	private:
 		bool m_OpenKeyPressed = false;
@@ -279,7 +278,7 @@ namespace Saint::UserInterface
 		void DrawHeader();
 		void drawstring(char* text, float X, float Y);
 		void setupdraw(bool outline);
-		
+
 		void RenderText(std::string text, std::float_t x, std::float_t y, Font font, std::float_t scale, RGBA color, bool centered, bool right_justified, bool outlined);
 		void DrawOption(AbstractOption* opt, bool selected);
 		void DrawFooter();
@@ -298,7 +297,7 @@ namespace Saint::UserInterface
 		Vector2 GetMousePos();
 
 		std::vector<std::unique_ptr<AbstractSubmenu>> m_AllSubmenus;
-		
+
 	};
 }
 

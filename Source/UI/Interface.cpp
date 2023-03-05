@@ -26,7 +26,7 @@ namespace Saint::UserInterface
 	{
 		g_FiberPool.queue([]
 			{
-		g_Render->m_MenuOpeningAnimation = true;
+				g_Render->m_MenuOpeningAnimation = true;
 		g_Render->m_Opened = true;
 		g_Render->g_MenuAlpha = 0;
 		g_Render->m_HeaderTextColor.a = 0;
@@ -190,7 +190,7 @@ namespace Saint::UserInterface
 	{
 		g_FiberPool.queue([]
 			{
-		g_Render->m_MenuOpeningAnimation = true;
+				g_Render->m_MenuOpeningAnimation = true;
 		g_Render->m_Opened = true;
 		//g_Render->g_MenuAlpha = 255;
 		g_Render->m_HeaderTextColor.a = 255;
@@ -349,7 +349,7 @@ namespace Saint::UserInterface
 		g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
 		g_Render->m_Opened = false;
 		g_Render->m_MenuOpeningAnimation = false;
-		});
+			});
 	}
 
 	bool g_HasSetToolTip = false;
@@ -478,6 +478,208 @@ namespace Saint::UserInterface
 			RenderToolTip();
 		}
 
+		if (ThemeIterator == 0)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 108, 60, 175, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 108, 60, 175, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 108, 60, 175, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 108, 60, 175, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Default Theme");
+		}
+
+		if (ThemeIterator == 1)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 255, 108, 116, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 255, 108, 116, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 255, 108, 116, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 255, 108, 116, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Salmon Red Theme");
+		}
+
+		if (ThemeIterator == 2)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 15, 82, 186, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 15, 82, 186, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 15, 82, 186, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 15, 82, 186, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Sapphire Blue Theme");
+		}
+
+		if (ThemeIterator == 3)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 24, 26, 24, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 24, 26, 24, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 24, 26, 24, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 24, 26, 24, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Soft Black Theme");
+		}
+
+		if (ThemeIterator == 4)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 0, 155, 119, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 0, 155, 119, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 0, 155, 119, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 0, 155, 119, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Emerald Green Theme");
+		}
+
+		if (ThemeIterator == 5)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 70, 38, 180, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 70, 38, 180, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 70, 38, 180, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 70, 38, 180, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Violet Purple Theme");
+		}
+
+		if (ThemeIterator == 6)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 255, 145, 164, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 255, 145, 164, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 255, 145, 164, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 255, 145, 164, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Salmon Pink Theme");
+		}
+
+		if (ThemeIterator == 7)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 17, 17, 17, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 17, 17, 17, 255 };
+			g_Render->m_FooterSpriteColor = { 181,181,181, 255 };
+			g_Render->m_FooterHeight = 0.030f;
+			g_Render->m_FooterSpriteSize = 0.030f;
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 65, 60, 60, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 0, 0, 0, 120 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 30,35,36, 230 };
+
+			//Option Height
+			g_Render->m_OptionHeight = 0.033f;
+
+			//Option Text Size
+			g_Render->m_OptionTextSize = 0.29f;
+
+			//Option Text Color
+			g_Render->m_OptionUnselectedTextColor = { 181,181,181, 255 };
+			g_Render->m_OptionSelectedTextColor = { 181,181,181, 255 };
+
+			//Logger
+			//g_Logger->Theme("Salmon Pink Theme");
+		}
+		if (ThemeIterator == 8)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 234, 90, 81, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 234, 90, 81, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 187, 64, 71, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 234, 90, 81, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Default Theme");
+		}
+
+
 		CheckForInput();
 
 		HandleInput();
@@ -544,7 +746,7 @@ namespace Saint::UserInterface
 				}
 				else {
 					MenuClosingAnimation();
-					
+
 				}
 
 				if (m_Sounds)
@@ -959,19 +1161,20 @@ namespace Saint::UserInterface
 			}
 		}
 		else {
-						DrawRightText(
-							opt->GetRightText(),
-							m_PosX + (m_Width / m_OptionPadding),
-							m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
-							m_OptionTextSize,
-							m_OptionFont,
-							selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
-							false, false);
+			DrawRightText(
+				opt->GetRightText(),
+				m_PosX + (m_Width / m_OptionPadding),
+				m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
+				m_OptionTextSize,
+				m_OptionFont,
+				selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+				false, false);
 		}
-		DrawCenteredText(opt->GetCenteredText(),
+		DrawCenteredText(
+			opt->GetCenteredText(),
 			m_PosX,
-			m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_SeperatorFont, m_SeperatorSize) / 1.5f),
-			m_SeperatorSize + 0.004f,
+			m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_SeperatorFont, m_OptionTextSize) / 1.5f),
+			m_OptionTextSize + 0.02f,
 			m_SeperatorFont,
 			selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
 			false, false);
@@ -983,11 +1186,11 @@ namespace Saint::UserInterface
 			{
 				if (ToggledOn)
 				{
-					GRAPHICS::DRAW_SPRITE("CommonMenu", "common_medal", g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f), 
-						g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont, g_Render->m_OptionTextSize) / 1.5f) + 0.014f, 
-						res.x, res.y, 
-						0.0, 
-						m_ToggleOnColor.r, m_ToggleOnColor.g, m_ToggleOnColor.b, m_ToggleOnColor.a,false,false);
+					GRAPHICS::DRAW_SPRITE("CommonMenu", "common_medal", g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f),
+						g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont, g_Render->m_OptionTextSize) / 1.5f) + 0.014f,
+						res.x, res.y,
+						0.0,
+						m_ToggleOnColor.r, m_ToggleOnColor.g, m_ToggleOnColor.b, m_ToggleOnColor.a, false, false);
 				}
 				else if (!ToggledOn)
 				{
@@ -1067,8 +1270,8 @@ namespace Saint::UserInterface
 		{
 			if (IndicatorIterator == 0)
 			{
-				
-				
+
+
 				DrawRightText(
 					">",
 					m_PosX + (m_Width / m_OptionPadding),
@@ -1080,10 +1283,10 @@ namespace Saint::UserInterface
 			}
 			else if (IndicatorIterator == 1)
 			{
-				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.003f,m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f,m_OptionHeight,{ m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, 190 });
+				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.003f, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f, m_OptionHeight, { m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, 190 });
 			}
 		}
-		
+
 		m_DrawBaseY += m_OptionHeight;
 	}
 
@@ -1100,7 +1303,7 @@ namespace Saint::UserInterface
 	}
 
 	void UIManager::DrawFooter()
-	{	
+	{
 		float size = m_FooterSpriteSize;
 		float rotation = 0.f;
 		const char* texture = "shop_arrows_upanddown";
@@ -1123,7 +1326,7 @@ namespace Saint::UserInterface
 		}
 
 		if (sub->GetNumOptions() >= m_OptionsPerPage && m_dynamic_footer) {
-			
+
 			auto sizee = GetSpriteScale(size);
 
 			DrawRect(
@@ -1188,7 +1391,7 @@ namespace Saint::UserInterface
 				rotation);
 
 			char rightText[32] = {};
-			std::snprintf(rightText, sizeof(rightText) - 1,  "%zu ~s~&#8226; %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
+			std::snprintf(rightText, sizeof(rightText) - 1, "%zu ~s~&#8226; %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
 
 			if (LeftFooterText) {
 				DrawLeftText(
@@ -1234,7 +1437,7 @@ namespace Saint::UserInterface
 
 		m_DrawBaseY += m_DescriptionHeightPadding;
 
-		
+
 		GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (m_DescriptionHeight2 / 2.f), m_Width, m_DescriptionHeight2, m_OptionUnselectedBackgroundColor.r, m_OptionUnselectedBackgroundColor.g, m_OptionUnselectedBackgroundColor.b, m_OptionUnselectedBackgroundColor.a, 0);
 		GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (m_DescriptionHeight / 2.f) - 0.015f, m_Width, 0.005f, m_DescriptionBackgroundColor.r, m_DescriptionBackgroundColor.g, m_DescriptionBackgroundColor.b, m_DescriptionBackgroundColor.a, 0);
 		HUD::SET_TEXT_WRAP(m_PosX, m_PosX + m_Width / 2);
@@ -1290,7 +1493,7 @@ namespace Saint::UserInterface
 		if (shadow)
 			HUD::SET_TEXT_DROP_SHADOW();
 		if (wrap) {
-			
+
 		}
 		HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
 		HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text);

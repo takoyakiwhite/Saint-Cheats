@@ -12,22 +12,22 @@
 #include <GTAV-Classes/netsync/nodes/player/CPlayerGameStateDataNode.hpp>
 namespace Saint
 {
-	
+
 	class netConnectionManager;
 	class netConnectionPeer
 	{
 	public:
-			uint32_t m_internal_ip; //0x0000
-			uint16_t m_internal_port; //0x0004
-			uint32_t m_external_ip; //0x0008
-			uint16_t m_external_port; //0x000C
-			uint64_t m_peer_id; //0x0010
-			uint32_t unk_0018; //0x0018
-			uint16_t unk_001C; //0x001C
-			uint8_t m_platform; //0x001E
+		uint32_t m_internal_ip; //0x0000
+		uint16_t m_internal_port; //0x0004
+		uint32_t m_external_ip; //0x0008
+		uint16_t m_external_port; //0x000C
+		uint64_t m_peer_id; //0x0010
+		uint32_t unk_0018; //0x0018
+		uint16_t unk_001C; //0x001C
+		uint8_t m_platform; //0x001E
 	};
 	static_assert(sizeof(netConnectionPeer) == 0x20);
-	
+
 	class GameVariables
 	{
 	public:
@@ -44,7 +44,7 @@ namespace Saint
 		std::uint32_t* m_FrameCount;
 		HWND m_GameWindow;
 		IDXGISwapChain* m_Swapchain;
-		
+
 		rage::scrProgramTable* m_ScriptProgramTable;
 		rage::scrNativeRegistrationTable* m_NativeRegistrations;
 		void* m_NativeReturnAddress;
@@ -64,7 +64,7 @@ namespace Saint
 		using request_control = void (*)(rage::netObject* net_object);
 		request_control m_request_control;
 
-		
+
 	};
 
 	class GameFunctions
@@ -87,7 +87,9 @@ namespace Saint
 		using WndProc = LRESULT(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		WndProc* m_WndProc;
 
-		using GetLabelText = const char*(void* unk, const char* label);
+		PVOID crashProtection;
+
+		using GetLabelText = const char* (void* unk, const char* label);
 		GetLabelText* m_GetLabelText;
 
 		using GetNativeHandler = rage::scrNativeHandler(rage::scrNativeRegistrationTable*, rage::scrNativeHash);
@@ -106,7 +108,7 @@ namespace Saint
 
 		using ChatMessage = void(void* thisptr, __int64  unk1, __int64 unk2, const char* message);
 		ChatMessage* m_ChatMessage;
-		
+
 		PVOID m_owned_explosion;
 		rage::hash_list* m_vehicle_hash_pool;
 
@@ -130,7 +132,7 @@ namespace Saint
 		using increment_Stat = void (*) (Hash hash, unsigned int value, CNetGamePlayer* player);
 		increment_Stat m_remote_increment;
 		PVOID m_write_player_gamer_data_node{};
-		
+
 		using write_player_game_state_data_node2 = bool(*)(rage::netObject* plr, CPlayerGameStateDataNode* node);
 		write_player_game_state_data_node2 m_write_player_game_state_data_node;
 
@@ -143,5 +145,5 @@ namespace Saint
 	inline std::unique_ptr<GameVariables> g_GameVariables;
 	inline std::unique_ptr<GameFunctions> g_GameFunctions;
 
-	
+
 }

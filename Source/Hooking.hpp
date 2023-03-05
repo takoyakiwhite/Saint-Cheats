@@ -13,7 +13,7 @@ namespace Saint
 	struct Hooks
 	{
 		static void GetStatInt(rage::scrNativeCallContext* src);
-		
+
 		static const char* GetLabelText(void* unk, const char* label);
 		static LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -40,12 +40,13 @@ namespace Saint
 		static bool send_chat_message(void* team_mgr, rage::rlGamerInfo* local_gamer_info, const char* message, bool is_team);
 
 		static void* AssignNewPhysicalIndexHandler(CNetworkPlayerMgr* NetworkPlayerMgr, CNetGamePlayer* player, uint8_t new_index);
+		static void InvalidModsCrashPatch(std::int64_t a1, std::int64_t a2, int a3, char a4);
 
-		
-		
-		
 
-		
+
+
+
+
 	};
 
 	class Hooking
@@ -73,15 +74,16 @@ namespace Saint
 		void* m_OriginalJoinSessionHook{};
 		void* m_OriginalGetEventData{};
 		void* m_OriginalIncrementStatEvent{};
-		
+
 		void* m_Original_write_player_game_state_data_node{};
 		void* m_Original_write_player_gamer_data_node{};
 		void* m_OriginalSendNetInfo{};
 
 		void* m_OriginalAssignPhysicalIndex{};
 		void* m_OriginalRecieveEvent{};
-		
-		
+		void* m_OriginalModCrash{};
+
+
 	};
 
 	inline std::unique_ptr<Hooking> g_Hooking;

@@ -9,7 +9,7 @@ namespace Saint {
 		void get_theme(Color col) {
 			switch (g_Render->ThemeIterator) {
 			case 0:
-				col = { 70, 38, 180, 255 };
+				col = { 138, 43, 226, 255 };
 				break;
 			case 1:
 				col = { 255, 108, 116, 255 };
@@ -42,7 +42,7 @@ namespace Saint {
 			HUD::SET_TEXT_FONT(font);
 			HUD::SET_TEXT_COLOUR(color.r, color.g, color.b, color.a);
 			HUD::SET_TEXT_CENTRE(center);
-			
+
 			if (right) {
 				HUD::SET_TEXT_WRAP(0.0f, x);
 				HUD::SET_TEXT_RIGHT_JUSTIFY(true);
@@ -109,11 +109,11 @@ namespace Saint {
 			draw_info_text("Wanted Level", wanted_level, 3, 0);
 			draw_info_text("Time Since Last Death", timesince, 4, 0);
 			//draw_info_text("Clan Name", g_GameVariables->m_net_game_player(player)->m_clan_data.m_clan_name, 2, 0);
-			
-			
+
+
 			switch (g_Render->ThemeIterator) {
 			case 0:
-				col = { 70, 38, 180, 255 };
+				col = { 138, 43, 226, 255 };
 				break;
 			case 1:
 				col = { 255, 108, 116, 255 };
@@ -141,7 +141,7 @@ namespace Saint {
 
 			}
 			GRAPHICS::DRAW_RECT(x - 0.210, y + -0.000, 0.183, -0.002, col.r, col.g, col.b, col.a, false);
-			
+
 		}
 	};
 	inline PlayersData g_players;

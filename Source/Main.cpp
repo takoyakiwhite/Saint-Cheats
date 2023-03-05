@@ -123,7 +123,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 			g_Logger->Info("Game Version %s", g_GameVariables->m_GameBuild);
 			g_Logger->Info("Finished Injecting Have A Fun Time!");
-			Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome %s",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
+			//Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome %s",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
 			while (g_Running)
 			{
 				if (IsKeyPressed(VK_DELETE))

@@ -23,7 +23,7 @@ namespace Saint {
 	inline std::string replaceTextBuffer2 = "";
 	inline bool replaced = false;
 	inline bool replaced2 = false;
-	
+
 	inline bool raycast(NativeVector3& raycastHitCoords) {
 		bool raycastHit;
 		NativeVector3 surfaceNormal;
@@ -36,7 +36,7 @@ namespace Saint {
 		SHAPETEST::GET_SHAPE_TEST_RESULT(ray, &raycastHit, &raycastHitCoords, &surfaceNormal, &raycastHitEntity);
 		return raycastHit;
 	}
-	
+
 	inline bool raycast(Entity& raycastHitEntity) {
 		bool raycastHit;
 		NativeVector3 surfaceNormal;
@@ -148,7 +148,7 @@ namespace Saint {
 					}
 				}
 			}
-			
+
 		}
 	};
 	inline NoClip no_clip;
@@ -163,7 +163,7 @@ namespace Saint {
 				}
 				ENTITY::SET_ENTITY_VISIBLE(PLAYER::PLAYER_PED_ID(), false, false);
 			}
-			
+
 		}
 	};
 	inline Invisible invisible;
@@ -191,15 +191,15 @@ namespace Saint {
 
 		//models
 		const char* Models[3]
-		{ "FIB", "Cop", "Blackops"};
+		{ "FIB", "Cop", "Blackops" };
 		const char* ModelHashes[3]
-		{ "mp_m_fibsec_01", "s_m_y_cop_01", "s_m_y_blackops_01"};
+		{ "mp_m_fibsec_01", "s_m_y_cop_01", "s_m_y_blackops_01" };
 		std::size_t ModelInt = 0;
 
 		//firing pattern
 		bool FiringPatternEnabled = false;
 		const char* FiringPattern[7]
-		{ "Burst", "Full Auto", "Pistol", "Shotgun", "Slow Fire Tank", "Rifle", "Delayed By One Second"};
+		{ "Burst", "Full Auto", "Pistol", "Shotgun", "Slow Fire Tank", "Rifle", "Delayed By One Second" };
 		std::uint32_t FiringPatternHashes[7]
 		{ 0xD6FF6D61 , 0xC6EE6B4C, 0xA018DB8A, 0x00BAC39B, 0xE2CA3A71, 0x9C74B406, 0x7A845691 };
 		std::size_t FiringPatternInt = 0;
@@ -261,13 +261,13 @@ namespace Saint {
 							}
 						}
 
-						
+
 					}
 					if (Boost_Int == 1)
 					{
 						Vehicle vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
 						ENTITY::APPLY_FORCE_TO_ENTITY(vehicle, 1, 0 + ENTITY::GET_ENTITY_FORWARD_X(vehicle), 0 + ENTITY::GET_ENTITY_FORWARD_Y(vehicle), 0.5f, 0, 0, 0, 1, 0, 1, 1, 1, 1);
-						
+
 					}
 				}
 			}
@@ -297,7 +297,7 @@ namespace Saint {
 	inline superJump superjump;
 	class Upgrades {
 	public:
-		const char* types[3] = { "All", "Visual", "Performance"};
+		const char* types[3] = { "All", "Visual", "Performance" };
 		std::size_t data = 0;
 		void apply(int type) {
 
@@ -331,7 +331,7 @@ namespace Saint {
 						VEHICLE::SET_VEHICLE_MOD(playerVehicle, i, MISC::GET_RANDOM_INT_IN_RANGE(0, VEHICLE::GET_NUM_VEHICLE_MODS(playerVehicle, i) - 1), false);
 
 					}
-					
+
 					//VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
 					VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
 				}
@@ -347,7 +347,7 @@ namespace Saint {
 					}
 					VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 2));
 
-					
+
 				}
 			}
 			data = type;
@@ -379,7 +379,7 @@ namespace Saint {
 		"Free Aim - Assisted",
 		"Free Aim" };
 		std::size_t init = 0;
-		
+
 	};
 	inline targeting_mode t_mode;
 	inline bool get_blip_location(NativeVector3& location, int sprite, int color = -1)
@@ -556,18 +556,18 @@ namespace Saint {
 			}
 			if (remove_def) {
 				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-					VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(veh);
-				
+				VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(veh);
+
 			}
 			if (bypass_c4_limit) {
 				(*g_GameFunctions->m_pedFactory)->m_local_ped->fired_sticky_bombs = 0;
-				
+
 			}
 			if (match) {
 				Lists::MatchPos = g_Render->ThemeIterator;
 				switch (g_Render->ThemeIterator) {
 				case 0:
-					g_Render->m_ToggleOnColor = { 70, 38, 180, 255 };
+					g_Render->m_ToggleOnColor = { 138, 43, 226, 255 };
 					break;
 				case 1:
 					g_Render->m_ToggleOnColor = { 255, 108, 116, 255 };
@@ -600,7 +600,7 @@ namespace Saint {
 					VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
 					VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, false);
 				}
-				
+
 			}
 			if (keep_engine_on) {
 				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
@@ -654,11 +654,11 @@ namespace Saint {
 			if (pickup_mode) {
 				static bool Locked = false;
 				HUD::DISPLAY_SNIPER_SCOPE_THIS_FRAME();
-				
+
 				PED::SET_PED_RAGDOLL_ON_COLLISION(PLAYER::PLAYER_PED_ID(), false);
 				PED::SET_PED_CAN_RAGDOLL(PLAYER::PLAYER_PED_ID(), false);
 				PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(PLAYER::PLAYER_PED_ID(), false);
-				
+
 
 
 				Entity target;
@@ -669,7 +669,7 @@ namespace Saint {
 						if (ENTITY::IS_ENTITY_A_PED(target) && PED::IS_PED_IN_ANY_VEHICLE(target, true)) {
 							target = PED::GET_VEHICLE_PED_IS_IN(target, false);
 						}
-						
+
 
 
 						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(target);
@@ -684,13 +684,13 @@ namespace Saint {
 						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(target, set_position.x, set_position.y, set_position.z, false, false, false);
 
 						if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 24)) {
-							
 
-							
+
+
 							ENTITY::APPLY_FORCE_TO_ENTITY(target, 1, camera_direction.x * 10000.0f, camera_direction.y * 10000.0f, camera_direction.z * 10000.0f, 0.0f, 0.0f, 0.0f, 0, false, true, true, false, true);
 							Locked = false;
 							PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_ID(), false);
-							
+
 						}
 					}
 				}
@@ -702,7 +702,7 @@ namespace Saint {
 			}
 			if (spectate) {
 				ENTITY::FREEZE_ENTITY_POSITION(PLAYER::PLAYER_PED_ID(), true);
-			
+
 				NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(true, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
 				STREAMING::SET_FOCUS_ENTITY(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
 				HUD::SET_MINIMAP_IN_SPECTATOR_MODE(true, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
@@ -711,11 +711,11 @@ namespace Saint {
 					NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, PLAYER::PLAYER_PED_ID());
 				}
 			}
-			
+
 			if (infinite_ammo) {
 				WEAPON::SET_PED_INFINITE_AMMO_CLIP(PLAYER::PLAYER_PED_ID(), true);
 			}
-			
+
 			if (delete_gun) {
 				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
 				{
@@ -734,12 +734,12 @@ namespace Saint {
 					}
 				}
 			}
-			
+
 			if (seatbelt) {
 				PED::SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(PLAYER::PLAYER_PED_ID(), true);
 				PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 32, false);
 			}
-			
+
 			if (auto_parachute) {
 				if (PED::GET_PED_PARACHUTE_STATE(PLAYER::PLAYER_PED_ID()) == 0)
 				{
@@ -769,10 +769,10 @@ namespace Saint {
 					VEHICLE::SET_VEHICLE_WHEELS_CAN_BREAK(playerVehicle, !true);
 				}
 			}
-			
+
 		}
 	};
-	
+
 	inline Features features;
 	class ExplosiveAmmo {
 	public:
@@ -783,10 +783,10 @@ namespace Saint {
 		float camera_shake = 0.0f;
 		int blamed_person = 0;
 		bool blame = false;
-		const char* explode_type[81] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare", 
-			"Unkown", "Extinguisher", "Unkown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb", 
-			"Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon", 
-			"Bomb (Wide)", "Explosive Ammo (Shotgun)", "Oppressor MK II", "Kinetic Mortar", "Kinetic Vehicle Mine", "EMP Vehicle Mine", "Spike Vehicle Mine", "Slick Vehicle Mine", "Tar Vehicle Mine", "Script Drone", "Up-n-Atomizer", "Burried Mine", "Script Missle", "RC Tank Rocket", 
+		const char* explode_type[81] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare",
+			"Unkown", "Extinguisher", "Unkown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
+			"Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
+			"Bomb (Wide)", "Explosive Ammo (Shotgun)", "Oppressor MK II", "Kinetic Mortar", "Kinetic Vehicle Mine", "EMP Vehicle Mine", "Spike Vehicle Mine", "Slick Vehicle Mine", "Tar Vehicle Mine", "Script Drone", "Up-n-Atomizer", "Burried Mine", "Script Missle", "RC Tank Rocket",
 			"Bomb (Water)", "Bomb (Water 2)", "Flash Grenade", "Stun Grenade", "Script Missle (Large)", "Submarine (Big)", "EMP Launcher" };
 		std::size_t explode_int = 0;
 		void add(Ped ped, NativeVector3 vec, int explosionType, float damageScale, BOOL isAudible, BOOL isInvisible, float cameraShake) {
@@ -801,7 +801,7 @@ namespace Saint {
 					NativeVector3 c;
 					if (raycast(c)) {
 						if (blame) {
-							
+
 							add(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(blamed_person), c, explode_int, damage, sound, invisible, camera_shake);
 						}
 						else {
@@ -879,7 +879,7 @@ namespace Saint {
 				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 				VEHICLE::SET_VEHICLE_CHEAT_POWER_INCREASE(veh, 0.0 - multiplier);
 			}
-			
+
 		}
 	};
 	inline NegitiveTorque negitiveTorque;
@@ -898,7 +898,7 @@ namespace Saint {
 				if (rp) {
 					float dz = c.z;
 					c.z = dz + height;
-					
+
 					g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), [=] {
 						*g_GameFunctions->should_sync_money_rewards = true;
 					OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, c.x, c.y, c.z, 0, 10, MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), false, true);
@@ -906,14 +906,14 @@ namespace Saint {
 
 
 
-					
+
 					delayfr3 = GetTickCount64();
 
 						});
 
-					
+
 				}
-				if(money) {
+				if (money) {
 					float dz = c.z;
 					c.z = dz + height;
 					g_CallbackScript->AddCallback<ModelCallback>(-1666779307, [=] {
@@ -970,7 +970,7 @@ namespace Saint {
 					*g_GameFunctions->should_sync_money_rewards = false;
 
 
-					
+
 
 					delayfr3 = GetTickCount64();
 						});
@@ -992,6 +992,7 @@ namespace Saint {
 			VEHICLE::SET_VEHICLE_MOD(PED::GET_VEHICLE_PED_IS_USING(PLAYER::PLAYER_PED_ID()), type, index, false);
 		}
 	}
+
 	class AntiCheat {
 	public:
 		bool enabled = false;
@@ -1014,7 +1015,7 @@ namespace Saint {
 
 		bool is_in_interior(int i)
 		{
-			
+
 			return get_interior_from_player(g_GameVariables->m_net_game_player(i)->m_player_id) != 0;
 		}
 		void mapNotification(const char* body, const char* who) {
@@ -1045,7 +1046,7 @@ namespace Saint {
 		}
 		bool is_modding(int i) {
 			auto player = g_GameVariables->m_net_game_player(i)->m_player_info->m_ped;
-			
+
 			uint32_t ped_damage_bits = 0;
 			uint32_t ped_task_flag = 0;
 			if (CPed* ped = g_GameVariables->m_net_game_player(i)->m_player_info->m_ped; ped != nullptr)
@@ -1056,7 +1057,7 @@ namespace Saint {
 			}
 			if (player->m_weapon_manager->m_weapon_info->m_wheel_slot != eWeaponWheelSlot::UnarmedMelee) {
 				if (ped_task_flag & (uint8_t)1 << 6) {
-					
+
 				}
 				else {
 					if (player->m_inventory->m_infinite_ammo) {
@@ -1072,7 +1073,7 @@ namespace Saint {
 					return true;
 				}
 			}
-			
+
 			if (player->m_player_info->m_run_speed > 1.80f) {
 
 				return true;
@@ -1108,7 +1109,7 @@ namespace Saint {
 				for (int i = 0; i < 32; i++) {
 					if (Ped ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i)) {
 
-						
+
 						int speedflags2 = 0;
 						bool invalidModel = false;
 						Hash playerModel = ENTITY::GET_ENTITY_MODEL(ped);
@@ -1133,20 +1134,20 @@ namespace Saint {
 							}
 						}
 						bool godmodec = false;
-						
-						
-						
-							
-							
-						
-						
-								if (fly) {
-									if (ENTITY::GET_ENTITY_SPEED(ped) > 77.0f) {
-										if (!PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
-											flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
-										}
-									}
+
+
+
+
+
+
+
+						if (fly) {
+							if (ENTITY::GET_ENTITY_SPEED(ped) > 77.0f) {
+								if (!PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
+									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
 								}
+							}
+						}
 						if (scenarios) {
 							if (PED::GET_PED_CONFIG_FLAG(ped, 194, true)) {
 
@@ -1331,9 +1332,9 @@ namespace Saint {
 	};
 	inline multis multi;
 	inline Multipliers multipliers;
-	
+
 	inline bool controlsEnabled = true;
-	
+
 	inline void showKeyboard(const char* title, const char* defaultText, int length, std::string* buffer, std::function<void()> action) {
 		g_CustomText->AddText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"), title);
 		controlsEnabled = false;
@@ -1355,7 +1356,7 @@ namespace Saint {
 	class Speedo {
 	public:
 		bool enabled = false;
-		const char* type[3] = { "MPH", "KPH", "Game"};
+		const char* type[3] = { "MPH", "KPH", "Game" };
 		std::size_t type_i = 0;
 		float x_offset = 0.00f;
 		float y_offset = 0.00f;
@@ -1406,7 +1407,7 @@ namespace Saint {
 		int damage = 250;
 		void init() {
 			if (enabled) {
-				
+
 				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
 				{
 					NativeVector3 hitCoords;
@@ -1430,8 +1431,8 @@ namespace Saint {
 		bool d1 = true;
 		bool d2 = true;
 		int delay = 0;
-		const char* filter[3] = {"Player", "Ped", "Both"};
-		const char* shoot_coords[2] = { "None", "Mouth"};
+		const char* filter[3] = { "Player", "Ped", "Both" };
+		const char* shoot_coords[2] = { "None", "Mouth" };
 		std::size_t filter_i = 0;
 		std::size_t scoords_i = 0;
 		Entity AimedAtEntity;
@@ -1457,7 +1458,7 @@ namespace Saint {
 		}
 		void init() {
 			if (enabled) {
-				
+
 				if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &AimedAtEntity))
 				{
 					if (PED::IS_PED_RELOADING(PLAYER::PLAYER_PED_ID())) {
@@ -1480,26 +1481,26 @@ namespace Saint {
 							else {
 								shoot();
 							}
-							
+
 						}
-						
+
 					}
 					else if (filter_i == 1) {
 						if (ENTITY::IS_ENTITY_A_PED(AimedAtEntity)) {
 							shoot();
 						}
-						
+
 					}
 					else if (filter_i == 2) {
 						shoot();
 					}
-					
+
 				}
 			}
 		}
 	};
 	inline Triggerbot triggerbot;
-	
+
 	class Text_spam {
 	public:
 		bool enabled = false;
@@ -1513,7 +1514,7 @@ namespace Saint {
 				if (NETWORK::NETWORK_IS_HANDLE_VALID(&handle[0], 13)) {
 					NETWORK::NETWORK_SEND_TEXT_MESSAGE(text.c_str(), &handle[0]);
 				}
-				
+
 			}
 		}
 	};
@@ -1530,7 +1531,7 @@ namespace Saint {
 			if (enabled) {
 				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
 				{
-					
+
 					if (upgradedelay == 0 || (int)(GetTickCount64() - upgradedelay) > delay)
 					{
 						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
@@ -1625,7 +1626,7 @@ namespace Saint {
 	inline Owned_explosion owned_explosion;
 	class P_filter {
 	public:
-		const char* data[4] = { "None", "Vehicle", "Interior", "On Foot"};
+		const char* data[4] = { "None", "Vehicle", "Interior", "On Foot" };
 		std::size_t data_i = 0;
 	};
 	inline P_filter p_filter;
@@ -1657,9 +1658,9 @@ namespace Saint {
 		{ "s_m_y_cop_01", "mp_m_fibsec_01" };
 		std::size_t cop_int = 0;
 		const char* veh[1]
-		{ "Lazar"};
+		{ "Lazar" };
 		const char* veh_hash[1]
-		{ "lazer"};
+		{ "lazer" };
 		std::size_t veh_int = 0;
 		Vehicle angryPlanesPlane;
 		Ped angryPlanesPed;
@@ -1678,19 +1679,19 @@ namespace Saint {
 
 			if (mode_i == 1) {
 				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
-				
+
 				g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(cop_hashes[cop_int]), [=] {
-					
-				ped = PED::CREATE_PED(26, MISC::GET_HASH_KEY(cop_hashes[cop_int]), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
+
+					ped = PED::CREATE_PED(26, MISC::GET_HASH_KEY(cop_hashes[cop_int]), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
 				WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, data2[data_i], 9998, true);
 				TASK::TASK_COMBAT_PED(ped, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
 				if (godmode)
 				{
 					ENTITY::SET_ENTITY_INVINCIBLE(ped, godmode);
 				}
-				
 
-				});
+
+					});
 				g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY("police3"), [=] {
 					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 				Vehicle vehicle = VEHICLE::CREATE_VEHICLE(MISC::GET_HASH_KEY("police3"), c.x + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.y + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, false, false);
@@ -1734,15 +1735,15 @@ namespace Saint {
 					ENTITY::SET_ENTITY_PROOFS(angryPlanesPlane, true, true, true, true, true, true, true, true);
 					VEHICLE::SET_VEHICLE_DAMAGE(angryPlanesPlane, 0.f, 0.f, 0.f, 0.f, 200.f, false);
 						});
-				g_CallbackScript->AddCallback<ModelCallback>(pedModelHash, [=]
-							{
-								angryPlanesPed = PED::CREATE_PED(26, pedModelHash, spawnX, spawnY, spawnZ + 100.0f, spawnHeading, true, true);
+					g_CallbackScript->AddCallback<ModelCallback>(pedModelHash, [=]
+						{
+							angryPlanesPed = PED::CREATE_PED(26, pedModelHash, spawnX, spawnY, spawnZ + 100.0f, spawnHeading, true, true);
 					PED::SET_PED_INTO_VEHICLE(angryPlanesPed, angryPlanesPlane, -1);
 					PED::SET_DRIVER_ABILITY(angryPlanesPed, 0.99f);
 					ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPed, 1);
 					TASK::TASK_COMBAT_PED(angryPlanesPed, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
-							});
-						
+						});
+
 				}
 			}
 		}
@@ -1754,8 +1755,8 @@ namespace Saint {
 	}
 	inline int m_selected_vehicle_class;
 	inline int m_selected_player_vehicle_class;
-	
-	
+
+
 	class Veh_spawner {
 	public:
 		bool spawn_in_air = true;
@@ -1779,13 +1780,13 @@ namespace Saint {
 			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
 				{
 					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-					float veh_speed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
-					if (dellast) {
-						Vehicle lastVehicle = PLAYER::GET_PLAYERS_LAST_VEHICLE();
-						VEHICLE::DELETE_VEHICLE(&lastVehicle);
-					}
-			
-			
+			float veh_speed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
+			if (dellast) {
+				Vehicle lastVehicle = PLAYER::GET_PLAYERS_LAST_VEHICLE();
+				VEHICLE::DELETE_VEHICLE(&lastVehicle);
+			}
+
+
 			NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::PLAYER_PED_ID(), { 0.f, dellast ? 0.f : 8.0f, (VEHICLE::IS_THIS_MODEL_A_PLANE(hash) && spawninair || VEHICLE::IS_THIS_MODEL_A_HELI(hash) && spawninair) ? 1.0f + heightmulti : 1.0f });
 			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 			Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
@@ -1819,16 +1820,17 @@ namespace Saint {
 				});
 		}
 		bool selected_fade = true;
-		void spawn_for_ped(Hash hash) {
+		void spawn_for_ped(Hash hash, Vehicle* buffer) {
 			*script_global(4540726).as<bool*>() = true;
 			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
 				{
-					
 
 
-			NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), {0.f, dellast ? 0.f : 8.0f, 1.0f});
+
+					NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), { 0.f, dellast ? 0.f : 8.0f, 1.0f });
 			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 			Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer)), true, false, false);
+			*buffer = vehicle;
 			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 			DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
 			auto networkId = NETWORK::VEH_TO_NET(vehicle);
@@ -1836,20 +1838,47 @@ namespace Saint {
 				NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
 			VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
 			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
-			
-			
-			
+
+
+
 			if (selected_fade) {
 				NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, false);
 			}
-			
+
+				});
+		}
+		void spawn_for_ped2(Hash hash, Vehicle* buffer) {
+			*script_global(4540726).as<bool*>() = true;
+			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
+				{
+
+
+
+					NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), { 0.f, 0.f, 1.0f });
+			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+			Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer)), true, false, false);
+			*buffer = vehicle;
+			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+			DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+			auto networkId = NETWORK::VEH_TO_NET(vehicle);
+			if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
+				NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+			VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
+
+
+
+			if (selected_fade) {
+				NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, false);
+			}
+
 				});
 		}
 	};
 	inline Veh_spawner veh_spawner;
 	class Region {
 	public:
-		
+
 		const char* type[9]
 		{
 			"CIS",
@@ -1863,9 +1892,9 @@ namespace Saint {
 			"Unknown",
 		};
 		std::size_t region_id = 0;
-		
-		void override (uint32_t id) {
-			
+
+		void override(uint32_t id) {
+
 			*g_GameVariables->m_region_code = id;
 		}
 	};
@@ -1896,7 +1925,7 @@ namespace Saint {
 				}
 			}
 
-			
+
 		}
 	};
 	inline c_FOV m_fov;
@@ -1923,12 +1952,12 @@ namespace Saint {
 				PAD::DISABLE_CONTROL_ACTION(2, 8, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 32, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 34, true);
-				
+
 				NativeVector3 freecamCoords = CAM::GET_CAM_COORD(freecamCamera);
 				NativeVector3 cameraDirection = RotationToDirection(CAM::GET_GAMEPLAY_CAM_ROT(0));
 				NativeVector3 accelerateCoords = multiply(&cameraDirection, 0.1f);
 				if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 8)) {
-				
+
 					NativeVector3 newCoords = addn(&freecamCoords, &accelerateCoords);
 					CAM::SET_CAM_COORD(freecamCamera, newCoords);
 				}
@@ -1955,15 +1984,15 @@ namespace Saint {
 		Excludes466 excludes;
 		bool enabled = false;
 		float distance = 50.0f;
-		const char* bone[2] = {"Head", "Lower Chest"};
+		const char* bone[2] = { "Head", "Lower Chest" };
 		std::size_t data = 0;
-		
+
 		Ped aimbot_ped;
 		Cam aimcam;
 		int SKEL_Head = 0x796e;
-		
+
 		std::uint32_t BoneHashes[2]
-		{ 0x796e, 0xdd1c};
+		{ 0x796e, 0xdd1c };
 		std::size_t WeaponInt = 0;
 		void aim() {
 			NativeVector3 aimpos = CAM::GET_GAMEPLAY_CAM_COORD();
@@ -2139,7 +2168,7 @@ namespace Saint {
 								}
 							}
 						}
-						
+
 					}
 				}
 			}
@@ -2280,7 +2309,7 @@ namespace Saint {
 									Any ped = veh[offsettedID];
 
 									if (closest == 0) closest = ped;
-									else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;                                                                                                                          
+									else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;
 									Hash weaponhash;
 									WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
 									float screenX, screenY;
@@ -2306,9 +2335,9 @@ namespace Saint {
 	class DamageC {
 	public:
 		void change(int size) {
-			
 
-			
+
+
 			switch (size) {
 			case 0:
 				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Unknown;
@@ -2384,7 +2413,7 @@ namespace Saint {
 	class TargetingMode {
 	public:
 		void change(int size) {
-			
+
 			//PLAYER::SET_PLAYER_TARGETING_MODE(size);
 			t_mode.init = size;
 			g_Render->m_SubmenuStack.pop();
@@ -2404,7 +2433,7 @@ namespace Saint {
 	inline Globals global;
 	class Requests {
 	public:
-		const char* data[7] = { "Helicopter Pickup", "Boat Pickup", "Backup Helicopter", "Airstrike", "Ammo Drop", "BST", "Ballistic Armor"};
+		const char* data[7] = { "Helicopter Pickup", "Boat Pickup", "Backup Helicopter", "Airstrike", "Ammo Drop", "BST", "Ballistic Armor" };
 		std::size_t data_i = 0;
 		void add(int type) {
 			*script_global(global.mobile).at(type).as<int*>() = 1;
@@ -2413,16 +2442,16 @@ namespace Saint {
 	inline Requests requests;
 	class Load {
 	public:
-		
+
 		void add(std::string text) {
 			HUD::BEGIN_TEXT_COMMAND_BUSYSPINNER_ON("STRING");
-				HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());
-				HUD::END_TEXT_COMMAND_BUSYSPINNER_ON(3);
+			HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());
+			HUD::END_TEXT_COMMAND_BUSYSPINNER_ON(3);
 
-				
 
-				
-			
+
+
+
 		}
 		void remove() {
 			HUD::BUSYSPINNER_OFF();
@@ -2432,29 +2461,29 @@ namespace Saint {
 	class off_the_radar {
 	public:
 		bool enabled = false;
-		const char* time[4] = { "Normal", "13:37", "69:69", "99:99"};
+		const char* time[4] = { "Normal", "13:37", "69:69", "99:99" };
 		std::size_t data = 0;
 		void init() {
 			if (enabled) {
 				script_global globalplayer_bd(2657589);
 				switch (data) {
 				case 0:
-					
+
 					*globalplayer_bd.at(PLAYER::GET_PLAYER_INDEX(), 466).at(210).as<int*>() = true;
 					*script_global(2672505).at(57).as<int*>() = NETWORK::GET_NETWORK_TIME() + 1;
 					break;
 				case 1:
-					
+
 					*globalplayer_bd.at(PLAYER::GET_PLAYER_INDEX(), 466).at(210).as<int*>() = true;
 					*script_global(2672505).at(57).as<int*>() = NETWORK::GET_NETWORK_TIME() + 1337;
 					break;
 				case 2:
-					
+
 					*globalplayer_bd.at(PLAYER::GET_PLAYER_INDEX(), 466).at(210).as<int*>() = true;
 					*script_global(2672505).at(57).as<int*>() = NETWORK::GET_NETWORK_TIME() + 6969;
 					break;
 				case 3:
-					
+
 					*globalplayer_bd.at(PLAYER::GET_PLAYER_INDEX(), 466).at(210).as<int*>() = true;
 					*script_global(2672505).at(57).as<int*>() = NETWORK::GET_NETWORK_TIME() + 9999;
 					break;
@@ -2465,7 +2494,7 @@ namespace Saint {
 	inline off_the_radar m_radar;
 	class join_ses {
 	public:
-		const char* name[10] = { "Populated Public", "New Public", "Closed Crew", "Crew", "Closed Friend", "Find Friend", "Solo", "Invite Only", "Social-Club TV", "Story Mode"};
+		const char* name[10] = { "Populated Public", "New Public", "Closed Crew", "Crew", "Closed Friend", "Find Friend", "Solo", "Invite Only", "Social-Club TV", "Story Mode" };
 		std::size_t data = 0;
 		void join(eSessionType session) {
 			*script_global(2695915).as<int*>() = (session == eSessionType::SC_TV ? 1 : 0);
@@ -2483,7 +2512,7 @@ namespace Saint {
 	inline join_ses session;
 	class Flag_creator {
 	public:
-		const char* direction[3] = { "Reckless", "Non-Reckless",autopilot.avoid_roads_name.c_str()};
+		const char* direction[3] = { "Reckless", "Non-Reckless",autopilot.avoid_roads_name.c_str() };
 		std::size_t data = 0;
 		bool auto_save = false;
 		bool stop_before_vehicles = false;
@@ -2540,9 +2569,9 @@ namespace Saint {
 				ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ped, coords.x, coords.y, GROUND_HEIGHT[i], true, true, true);
 
 				fbr::cur()->wait(100ms);
-				
-				
-				
+
+
+
 
 				if (MISC::GET_GROUND_Z_FOR_3D_COORD(coords.x, coords.y, GROUND_HEIGHT[i], &coords.z, 0, false))
 				{
@@ -2605,8 +2634,8 @@ namespace Saint {
 		bool enabled = false;
 		bool change_secondary = false;
 		int delay = 0;
-		
-		
+
+
 	};
 	class ChangeVehicleColor {
 	public:
@@ -2615,11 +2644,11 @@ namespace Saint {
 		int b = 0;
 		RainbowColor rainbow;
 		void override() {
-			
+
 		}
 		void init() {
 			if (rainbow.enabled) {
-				
+
 				static int timer;
 				if (timer == 0 || (int)(GetTickCount64() - timer) > rainbow.delay) {
 					if (r > 0 && b == 0) {
@@ -2635,7 +2664,7 @@ namespace Saint {
 						b--;
 					}
 					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-					
+
 					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVehicle, r, g, b);
 					if (rainbow.change_secondary) {
 						VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(playerVehicle, r, g, b);
@@ -2675,7 +2704,7 @@ namespace Saint {
 				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
 				GRAPHICS::DRAW_SCALEFORM_MOVIE_FULLSCREEN(scaleform, 255, 255, 255, 255, 0);
 			}
-			
+
 		}
 		void init() {
 			if (spammer) {
@@ -2698,7 +2727,7 @@ namespace Saint {
 	public:
 		bool override_restrictions = false;
 		bool use_player_colour_instead_of_team = false;
-		const char* type[2] = {"Red", "Blue"};
+		const char* type[2] = { "Red", "Blue" };
 		std::size_t data = 0;
 		void init() {
 			if (use_player_colour_instead_of_team) {
@@ -2711,18 +2740,18 @@ namespace Saint {
 	};
 	inline Team team;
 	inline Ped selected_ped_i = 0;
-	
+
 	class Scenarios {
 	public:
 		const char* name[2] = {
-			"Showering", 
-			"Stripper Dance"};
+			"Showering",
+			"Stripper Dance" };
 		const char* dict[2] = {
-			"mp_safehouseshower@male@", 
-			"mini@strip_club@private_dance@part1"};
-		const char* id[2] = { 
-			"male_shower_idle_b", 
-			"priv_dance_p1"};
+			"mp_safehouseshower@male@",
+			"mini@strip_club@private_dance@part1" };
+		const char* id[2] = {
+			"male_shower_idle_b",
+			"priv_dance_p1" };
 		std::size_t size = 2;
 	};
 	class Animations {
@@ -2770,16 +2799,16 @@ namespace Saint {
 			switch (data) {
 			case 0:
 				m_queue.add(10ms, "Adding Cage", [=] {
-						Player ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
-					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(ped, true);
-					Hash hash = MISC::GET_HASH_KEY("stt_prop_stunt_tube_l");
-					
+					Player ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
+				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(ped, true);
+				Hash hash = MISC::GET_HASH_KEY("stt_prop_stunt_tube_l");
 
-					Object cage = OBJECT::CREATE_OBJECT_NO_OFFSET(hash, c.x, c.y, c.z, true, false, false);
-					if (is_invisible) {
-						ENTITY::SET_ENTITY_VISIBLE(cage, false, 0);
-					}
-					ENTITY::SET_ENTITY_ROTATION(cage, 0.0, 90.0, 0.0, 1, true);
+
+				Object cage = OBJECT::CREATE_OBJECT_NO_OFFSET(hash, c.x, c.y, c.z, true, false, false);
+				if (is_invisible) {
+					ENTITY::SET_ENTITY_VISIBLE(cage, false, 0);
+				}
+				ENTITY::SET_ENTITY_ROTATION(cage, 0.0, 90.0, 0.0, 1, true);
 					});
 				break;
 			case 1:
@@ -2793,7 +2822,7 @@ namespace Saint {
 					});
 				break;
 			}
-			
+
 		}
 	};
 	inline Cage cage;
@@ -2842,7 +2871,7 @@ namespace Saint {
 		}
 		void init() {
 			if (enabled) {
-				
+
 				static bool locked = false;
 				static int zoom = 5;
 				static Entity currEnt{ NULL };
@@ -2889,7 +2918,7 @@ namespace Saint {
 					else
 						currEnt = NULL;
 				}
-				
+
 				if (!PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &currEnt)) {
 					locked = true;
 					PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_ID(), false);
@@ -3046,12 +3075,12 @@ namespace Saint {
 			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 
 			Hash ramp = MISC::GET_HASH_KEY(m_ramp_data[m_ramp_type_data]);
-			
+
 			STREAMING::REQUEST_MODEL(ramp);
 			if (ENTITY::DOES_ENTITY_EXIST(veh))
 			{
 				//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(veh);
-				
+
 				if (m_ramp_location.m_front)
 				{
 					m_ramp_location.front = OBJECT::CREATE_OBJECT(ramp, 0.f, 0.f, 0.f, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), 1, 0);
@@ -3098,7 +3127,7 @@ namespace Saint {
 	inline CVehicleRamps m_vehicle_ramps;
 	class CopyToClipboard {
 	public:
-		const char* to_copy[3] = { "RID", "Name", "Crew Data"};
+		const char* to_copy[3] = { "RID", "Name", "Crew Data" };
 		std::size_t data = 0;
 	};
 	inline CopyToClipboard c_clipboard;
@@ -3182,7 +3211,7 @@ namespace Saint {
 			return (stat(path, &buffer) == 0);
 
 		}
-		
+
 		void save() {
 			std::string AppDataPath = getenv("APPDATA");
 			std::string MenuFolderPath = AppDataPath + "\\Saint\\Vehicles\\";
@@ -3226,8 +3255,8 @@ namespace Saint {
 		}
 	};
 	inline ThemeLoading* g_ThemeLoading;
-	
-	
+
+
 	class Scripts {
 	public:
 		void load(fs::path asi_path) {
@@ -3519,7 +3548,7 @@ namespace Saint {
 			WritePrivateProfileStringA("Outfit", "Textures", std::to_string(testj).c_str(), iniPath.c_str());
 			WritePrivateProfileStringA("Outfit", "Torso2", std::to_string(testk).c_str(), iniPath.c_str());
 			WritePrivateProfileStringA("Outfit", "HeadProp", std::to_string(testm).c_str(), iniPath.c_str());
-			
+
 		}
 		void load(std::string name)
 		{
@@ -3573,10 +3602,10 @@ namespace Saint {
 	};
 	inline OutfitLoader* g_Outfits;
 	inline void FeatureInitalize() {
-		
+
 		if (mark_as_Saint) {
 			PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 109, true);
-			
+
 		}
 		m_vehicle_ramps.init();
 		flag_creator.init();
@@ -3636,10 +3665,10 @@ namespace Saint {
 				uint32_t unchanged_bits = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_damage_bits & ~changed_or_enabled_bits;
 				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_damage_bits = unchanged_bits | bits;
 				last_bits = bits;
-			
+
 			}
 		}
-		
+
 		if (neverWantedBool)
 		{
 			PLAYER::SET_MAX_WANTED_LEVEL(0);
@@ -3647,5 +3676,5 @@ namespace Saint {
 			PLAYER::SET_PLAYER_WANTED_LEVEL_NOW(PLAYER::PLAYER_ID(), true);
 		}
 	}
-	
+
 }
