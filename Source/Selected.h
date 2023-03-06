@@ -143,7 +143,7 @@ namespace Saint {
         }
 		void init() {
             if (freeze) {
-                CPed* ped = g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_info->m_ped;
+                CPed* ped = all_players.get_player_info(g_SelectedPlayer)->m_ped;
                 g_GameFunctions->m_clear_ped_tasks_network(ped, true);
             }
             explosiveAmmo.init();

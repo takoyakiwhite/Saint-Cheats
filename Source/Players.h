@@ -62,12 +62,12 @@ namespace Saint {
 		void draw_info_text(const char* text, const char* text2, int pos, float x_offset, bool first = false) {
 			Color col2 = { 255, 255, 255, 190 };
 			if (first) {
-				drawText(text, 0.505, 0.105f, 0.25f, 0, false, col2, false);
-				drawText(text2, 0.678 - x_offset, 0.105f, 0.25f, 0, false, col2, true);
+				drawText(text, 0.0202f, 0.105f, 0.25f, 0, false, col2, false);
+				drawText(text2, 0.0302f - x_offset, 0.105f, 0.25f, 0, false, col2, true);
 			}
 			else {
-				drawText(text, 0.505, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, false);
-				drawText(text2, 0.678 - x_offset, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, true);
+				drawText(text, 0.0202f, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, false);
+				drawText(text2, 0.0302f - x_offset, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, true);
 			}
 		}
 		void drawSprite(const char* dict, const char* texture, float x, float y, float width, float height, Color color, float rotation)
@@ -87,7 +87,7 @@ namespace Saint {
 			float x = g_Render->m_PosX;
 			float y = g_Render->m_PosY;
 			Color col;
-			GRAPHICS::DRAW_RECT(x - 0.210, y + -0.090 + 0.178, 0.183f, 0.178, g_Render->m_OptionUnselectedBackgroundColor.r, g_Render->m_OptionUnselectedBackgroundColor.g, g_Render->m_OptionUnselectedBackgroundColor.b, 160, false);
+			GRAPHICS::DRAW_RECT(x + 0.0202f, y + -0.090 + 0.178, 0.183f, 0.178, g_Render->m_OptionUnselectedBackgroundColor.r, g_Render->m_OptionUnselectedBackgroundColor.g, g_Render->m_OptionUnselectedBackgroundColor.b, 160, false);
 			Color col2 = { 255, 255, 255, 190 };
 
 			char timesince[128];
@@ -136,68 +136,231 @@ namespace Saint {
 				break;
 
 			}
-			GRAPHICS::DRAW_RECT(x - 0.210, y + -0.000, 0.183, -0.002, col.r, col.g, col.b, col.a, false);
+			GRAPHICS::DRAW_RECT(x - 0.510, y + -0.000, 0.183, -0.002, col.r, col.g, col.b, col.a, false);
 		}
-		float pedx = 0.95f;
+		float pedx = 0.630f;
+		float pedyy = 1.680f;
 		float pedy = 0.196;
+		int GetSpeed(Ped ped) {
+
+			int speed = (int)round(ENTITY::GET_ENTITY_SPEED(ped) * 2.24);
+			return speed;
+		}
+		char* GetWanted(Player p)
+		{
+			char buffer[20];
+			int Stars = (int)PLAYER::GET_PLAYER_WANTED_LEVEL(p);
+			sprintf_s(buffer, "%i/5", Stars);
+			return buffer;
+		}
+		void Text(const char* text, Color color, Vector2 position, Vector2 size, bool center)
+		{
+			HUD::SET_TEXT_CENTRE(center);
+			HUD::SET_TEXT_COLOUR(color.r, color.g, color.b, color.a);
+			HUD::SET_TEXT_FONT(0);
+			HUD::SET_TEXT_SCALE(size.x, size.y);
+			HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
+			HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char*)text);
+			HUD::END_TEXT_COMMAND_DISPLAY_TEXT(position.x, position.y, 0);
+		}
 		void draw_info(std::uint32_t player) {
+			Color m_InfoBG{ 0, 0, 0, 190 };
 			float x = g_Render->m_PosX;
 			float y = g_Render->m_PosY;
-			Color col;
-			GRAPHICS::DRAW_RECT(x - 0.210, y + -0.090 + 0.178, 0.183f, 0.178, g_Render->m_OptionUnselectedBackgroundColor.r, g_Render->m_OptionUnselectedBackgroundColor.g, g_Render->m_OptionUnselectedBackgroundColor.b, 160, false);
-			Color col2 = { 255, 255, 255, 190 };
-			char name[64];
-			char name2[64];
-			int netHandle[13];
-			char run_speed[64];
-			char wanted_level[64];
-			int infos = 2;
-			NETWORK::NETWORK_HANDLE_FROM_PLAYER(player, netHandle, 13);
-			Ped playerPed = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player);
-			int ms2 = PLAYER::GET_TIME_SINCE_LAST_DEATH(playerPed);
+			float offset = 0.02;
+			Color m_white{ 255, 255, 255, 255 };
+			float PosX = x + 0.225f + offset;
+			float PosY = y + 0.168f;
+			float LTextX = PosX - 0.1225;
+			float RTextX = PosX + 0.009f;
+			float TextY = y - 0.055;
+			float SeperatorX = PosX + 0.05;
+
+			float RTextX2 = PosX + 0.1215f;
+
+			float rightresult = 0.49f;
+			float righttext = SeperatorX - 0.048f;
+
+			float LeftOffset = SeperatorX - 0.0523f;
+
+			g_Render->DrawRect(PosX, PosY + 0.0202f, 0.25f, 0.375f, m_InfoBG);//draw main info rect
+			g_Render->DrawRect(PosX, PosY - 0.0220f * 7.652f, 0.25f, 0.002f, g_Render->m_HeaderBackgroundColor);//draw main info top bar 
+
+
+			g_Render->DrawRect(PosX + 0.195, PosY + 0.0202f, 0.135f, 0.375f, m_InfoBG);//draw ped preview rect
+			g_Render->DrawRect(PosX + 0.195, PosY - 0.0220f * 7.652f, 0.135f, 0.002f, g_Render->m_HeaderBackgroundColor);//draw ped preview top bar 
+
+
+			//geo info
+
+			g_Render->DrawRect(PosX, PosY + 0.28, 0.25f, 0.125, m_InfoBG);//draw geo info rect
+			g_Render->DrawRect(PosX, PosY + 0.31 - 0.09375, 0.25f, 0.002f, g_Render->m_HeaderBackgroundColor);//draw geo info top bar 
 
 			Ped ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player);
+			//std::string Health = ("%s", std::to_string(GetHealth(ped)));
+			//std::string Armor = ("%s", std::to_string(GetArmor(ped, player)));
 
-			int sec = ms2 / 1000;
+			NativeVector3 get_coords = ENTITY::GET_ENTITY_COORDS(ped, 0);
+			std::string wantedlvl = GetWanted(player);
+			std::string ammo = std::format("{}", WEAPON::GET_AMMO_IN_PED_WEAPON(ped, WEAPON::GET_SELECTED_PED_WEAPON(ped)));
+			std::string coords = std::format("[{0},{1},{2}]", std::roundl(get_coords.x), std::roundl(get_coords.y), std::roundl(get_coords.z));
 
-			ms2 = ms2 % 1000;
 
-			int min = sec / 60;
-			sec = sec % 60;
 
-			int hour = min / 60;
-			min = min % 60;
+			Hash street[2]{};
+			PATHFIND::GET_STREET_NAME_AT_COORD(get_coords.x, get_coords.y, get_coords.z, &street[0], &street[1]);
+			std::string Street = HUD::GET_STREET_NAME_FROM_HASH_KEY(street[0]);
+			std::string Zone = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(ZONE::GET_NAME_OF_ZONE(get_coords.x, get_coords.y, get_coords.z));
+			std::string heading = std::format("{}", roundf(ENTITY::GET_ENTITY_HEADING(ped)));
 
-			if (ms2 == -1)
-			{
-				hour = 0;
-				min = 0;
-				sec = 0;
-			}
-			char timesince[128];
-			NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player), false);
-			sprintf(run_speed, "%i, %i, %i", (int)c.x, (int)c.y, (int)c.z);
-			sprintf(wanted_level, "%i", PLAYER::GET_PLAYER_WANTED_LEVEL(player));
-			sprintf(timesince, "%ih %im %is", hour, min, sec);
+			NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(ped, false);
+			NativeVector3 selfCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+			float distance = MISC::GET_DISTANCE_BETWEEN_COORDS(selfCoords.x, selfCoords.y, selfCoords.z, playerCoords.x, playerCoords.y, playerCoords.z, true);
+			std::string Distance = std::format("{}m", roundf(distance));
+			std::string Speed = std::to_string(GetSpeed(ped));
+			std::string passive = PLAYER::IS_PLAYER_BATTLE_AWARE(ped) ? "Yes" : "No";
 			std::string rockstar = NETWORK::NETWORK_PLAYER_IS_ROCKSTAR_DEV(ped) ? "Yes" : "No";
+
+			const char* playerstate2 = "None / If you see this, buy a lottery ticket!";
+			const char* parachutestate2 = "None";
+			Ped playerPed = ped;
+			if (PED::GET_PED_PARACHUTE_STATE(playerPed) == 0)
+			{
+				parachutestate2 = "Wearing";
+
+			}
+			if (PED::GET_PED_PARACHUTE_STATE(playerPed) == 1)
+			{
+				parachutestate2 = "Opening";
+			}
+			if (PED::GET_PED_PARACHUTE_STATE(playerPed) == 2)
+			{
+				parachutestate2 = "Open";
+			}
+			if (PED::GET_PED_PARACHUTE_STATE(playerPed) == 3)
+			{
+				parachutestate2 = "Falling To Death";
+			}
 			
+
+			if (PED::IS_PED_RAGDOLL(playerPed))
+			{
+				playerstate2 = "Ragdolling";
+			}
+			if (PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
+			{
+				playerstate2 = "Respawning";
+			}
+			if (!PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_STILL(playerPed) && !PED::IS_PED_RAGDOLL(playerPed) && !PED::IS_PED_RELOADING(playerPed) && !TASK::IS_PED_GETTING_UP(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1));
+			{
+				playerstate2 = "Standing Still";
+			}
+			if (TASK::IS_PED_GETTING_UP(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
+			{
+				playerstate2 = "Getting Up From Ragdoll";
+			}
+			if (PED::IS_PED_RELOADING(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
+			{
+				playerstate2 = "Reloading";
+			}
+			if (PED::IS_PED_SHOOTING(playerPed) && !PED::IS_PED_DOING_DRIVEBY(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
+			{
+				playerstate2 = "Shooting";
+			}
+			if (PED::IS_PED_DOING_DRIVEBY(playerPed))
+			{
+				playerstate2 = "Doing Drive-by";
+			}
+			if (PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_SPRINTING(playerPed) || PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_RUNNING(playerPed) && !PED::IS_PED_RELOADING(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
+			{
+				playerstate2 = "Sprinting & Shooting";
+			}
+			if (!PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_SPRINTING(playerPed) || !PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_RUNNING(playerPed) && !PED::IS_PED_RELOADING(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
+			{
+				playerstate2 = "Sprinting";
+			}
+			if (PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_WALKING(playerPed) && !PED::IS_PED_RELOADING(playerPed))
+			{
+				playerstate2 = "Shooting & Walking";
+			}
+			if (!PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_WALKING(playerPed) && !PED::IS_PED_RELOADING(playerPed))
+			{
+				playerstate2 = "Walking";
+			}
+			if (PED::IS_PED_JUMPING(playerPed) && !TASK::IS_PED_GETTING_UP(playerPed))
+			{
+				playerstate2 = "Jumping";
+			}
+			char wantedLevel[128];
+			//info
+			//g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.135f, 0.001f, 0.015f, m_white);
+			if (!PLAYER::ARE_PLAYER_FLASHING_STARS_ABOUT_TO_DROP(playerPed))
+			{
+				sprintf(wantedLevel, "%i", PLAYER::GET_PLAYER_WANTED_LEVEL(player));
+			}
+			if (PLAYER::ARE_PLAYER_FLASHING_STARS_ABOUT_TO_DROP(playerPed))
+			{
+				sprintf(wantedLevel, "%i (Flashing/About To Drop)", PLAYER::GET_PLAYER_WANTED_LEVEL(player));
+			}
+			float placey = 0.057f;
+			Text("Vehicle", { m_white }, { LTextX, TextY + placey }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText((PED::GET_VEHICLE_PED_IS_IN(ped, false) == 0) ? "N/A" : HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(PED::GET_VEHICLE_PED_IS_IN(playerPed, false)))), RTextX2, TextY + placey, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+			float placey2 = 0.077f;
+			Text("State", { m_white }, { LTextX, TextY + placey2 }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(playerstate2, RTextX2, TextY + placey2, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+			Text("Wanted Level", { m_white }, { LTextX, TextY + placey2 + 0.020f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(wantedLevel, RTextX2, TextY + placey2 + 0.020f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+			Text("ID", { m_white }, { LTextX, TextY + placey2 + 0.040f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(std::to_string(player).c_str(), RTextX2, TextY + placey2 + 0.040f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+			Text("Parachute State", { m_white }, { LTextX, TextY + 0.135f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(parachutestate2, LeftOffset, TextY + 0.135f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.145f, 0.001f, 0.015f, m_white);
+			Text("Ammo", { m_white }, { SeperatorX - 0.048f, TextY + 0.135f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(ammo.c_str(), RTextX2, TextY + 0.135f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+			Text("Weapon", { m_white }, { LTextX, TextY + 0.16f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText("~c~None", RTextX2, TextY + 0.16f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+			Text("Zone", { m_white }, { LTextX, TextY + 0.185f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(Zone.c_str(), RTextX2, TextY + 0.185, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+			Text("Street", { m_white }, { LTextX, TextY + 0.21f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(Street.c_str(), RTextX2, TextY + 0.21, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+			Text("Coords", { m_white }, { LTextX, TextY + 0.235f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(coords.c_str(), SeperatorX - 0.0523f, TextY + 0.235f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.245f, 0.001f, 0.015f, m_white);
+			Text("Heading", { m_white }, { SeperatorX - 0.048f, TextY + 0.235f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(heading.c_str(), RTextX2, TextY + 0.235f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+			Text("Distance", { m_white }, { LTextX, TextY + 0.26f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(Distance.c_str(), SeperatorX - 0.0523f, TextY + 0.26f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.27f, 0.001f, 0.015f, m_white);
+			Text("Speed", { m_white }, { SeperatorX - 0.048f, TextY + 0.26f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(Speed.c_str(), RTextX2, TextY + 0.26f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+			Text("Passive", { m_white }, { LTextX, TextY + 0.41f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(passive.c_str(), SeperatorX - 0.0523f, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.42f, 0.001f, 0.015f, m_white);
+			Text("Rockstar", { m_white }, { SeperatorX - 0.048f, TextY + 0.41f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(rockstar.c_str(), RTextX2, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
 			
-			draw_info_text("Coords", run_speed, 1, 0, true);
-			draw_info_text("RID", NETWORK::NETWORK_MEMBER_ID_FROM_GAMER_HANDLE(&netHandle[0]), 1, 0);
-			draw_info_text("Vehicle", (PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player), false) == 0) ? "N/A" : HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player), false)))), 2, 0);
-			draw_info_text("Wanted Level", wanted_level, 3, 0);
-			draw_info_text("Time Since Last Death", timesince, 4, 0);
-			draw_info_text("Rockstar Dev", rockstar.c_str(), 5, 0);
-			
+
 			//draw_info_text("Clan Name", g_GameVariables->m_net_game_player(player)->m_clan_data.m_clan_name, 2, 0);
 
 			//CNetGamePlayer* g_player = g_GameVariables->m_net_game_player(player);
 			rage::joaat_t scene_hash = 0x390DCCF5;//0xAD197067, 0x390DCCF5, 0x3D8F5C29, 0x5ADFAFD0
 			rage::joaat_t element = 0;
-			CPed* local_ped = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_ped;
+			CPed* local_ped = NETWORK::NETWORK_IS_SESSION_STARTED() ? all_players.get_ped(player) : (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_ped;
 			uintptr_t ui_3d_draw_manager = *(uint64_t*)(g_GameVariables->ui_3d_draw_manager);
 
-			Vector3 pos = { x - pedx, y * 0.8f, 0.65f };
+			Vector3 pos = { x - pedx, y * 0.8f, pedyy };
 
 			if (ui_3d_draw_manager) {
 
@@ -215,41 +378,10 @@ namespace Saint {
 					}
 				}
 			}
+			
+			
+			
 
-			switch (g_Render->ThemeIterator) {
-			case 0:
-				col = { 138, 43, 226, 255 };
-				break;
-			case 1:
-				col = { 255, 108, 116, 255 };
-				break;
-			case 2:
-				col = { 15, 82, 186, 255 };
-				break;
-			case 3:
-				col = { 24, 26, 24, 255 };
-				break;
-			case 4:
-				col = { 0, 155, 119, 255 };
-				break;
-			case 5:
-				col = { 70, 38, 180, 255 };
-			case 6:
-				col = { 255, 145, 164, 255 };
-				break;
-			case 7:
-				col = { 17, 17, 17, 255 };
-				break;
-			case 8:
-				col = { 234, 90, 81, 255 };
-				break;
-
-			}
-			GRAPHICS::DRAW_RECT(x - 0.210, y + -0.000, 0.183, -0.002, col.r, col.g, col.b, col.a, false);
-
-			//3dped 
-			GRAPHICS::DRAW_RECT(x - 0.210, y + -0.090 + 0.485, 0.183f, 0.400, g_Render->m_OptionUnselectedBackgroundColor.r, g_Render->m_OptionUnselectedBackgroundColor.g, g_Render->m_OptionUnselectedBackgroundColor.b, 160, false);
-			GRAPHICS::DRAW_RECT(x - 0.210, y + pedy, 0.183, -0.002, col.r, col.g, col.b, col.a, false);
 		}
 	};
 	inline PlayersData g_players;

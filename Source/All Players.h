@@ -24,7 +24,13 @@ namespace Saint {
 				return g_GameVariables->m_net_game_player(p)->m_player_info;
 			return nullptr;
 		}
-		
+		CPed* get_ped(int p) const
+		{
+			if (const auto player_info = get_player_info(p); player_info != nullptr)
+				if (const auto ped = player_info->m_ped; ped != nullptr)
+					return ped;
+			return nullptr;
+		}
 		Notifications notifications;
 		m_Jets jet;
 		Explode m_explode;

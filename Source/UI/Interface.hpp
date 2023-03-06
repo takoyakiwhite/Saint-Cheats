@@ -108,7 +108,7 @@ namespace Saint::UserInterface
 
 		bool m_Opened = false;
 		bool m_MouseLocked = false;
-		float m_PosX = 0.8f;
+		float m_PosX = 0.18f;
 		float m_PosY = 0.1f;
 		float m_Width = 0.22f;
 		std::size_t m_OptionsPerPage = 13;
@@ -259,7 +259,8 @@ namespace Saint::UserInterface
 		int g_MenuAlpha = 0;
 		const char* m_CurrentSubMenuName = "Hello";
 		bool m_AnimationCheck;
-
+		void DrawRect(float x, float y, float width, float height, Color color);
+		void DrawRightText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow);
 		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
 	private:
 		bool m_OpenKeyPressed = false;
@@ -284,11 +285,11 @@ namespace Saint::UserInterface
 		void DrawFooter();
 		void DrawDescription();
 		void DrawSprite1(const char* textureDict, const char* textureName, float screenX, float screenY, float width, float height, float heading, int red, int green, int blue, int alpha);
-		void DrawRect(float x, float y, float width, float height, Color color);
+		
 		void DrawSprite(const char* dict, const char* texture, float x, float y, float width, float height, Color color, float rotation);
 		void DrawLeftText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow, bool wrap = false);
 		void DrawCenteredText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow);
-		void DrawRightText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow);
+		
 		float GetTextHeight(Font font, float size);
 		Vector2 GetSpriteScale(float size);
 

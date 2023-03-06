@@ -166,9 +166,6 @@
     <ClInclude Include="Explode.h">
       <Filter>Core\Features\Network\All Players\Features</Filter>
     </ClInclude>
-    <ClInclude Include="Players.h">
-      <Filter>Core\Features\Network\Players</Filter>
-    </ClInclude>
     <ClInclude Include="Vehicle.h">
       <Filter>Core\Features\Vehicle</Filter>
     </ClInclude>
@@ -227,6 +224,9 @@
       <Filter>Core\Features\Network</Filter>
     </ClInclude>
     <ClInclude Include="Caller.h">
+      <Filter>Core\Features\Network\Players</Filter>
+    </ClInclude>
+    <ClInclude Include="Players.h">
       <Filter>Core\Features\Network\Players</Filter>
     </ClInclude>
   </ItemGroup>

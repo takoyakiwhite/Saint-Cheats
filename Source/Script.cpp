@@ -3364,6 +3364,8 @@ namespace Saint
 			{
 				sub->draw_option<submenu>("All", nullptr, SubmenuAllPlayers);
 		sub->draw_option<ChooseOption<const char*, std::size_t>>("Filter", nullptr, &p_filter.data, &p_filter.data_i);
+		sub->draw_option<number<float>>("Suspension X", nullptr, &g_players.pedx, -1000.f, 1000.f, 0.01f, 3);
+		sub->draw_option<number<float>>("Suspension Y", nullptr, &g_players.pedyy, -1000.f, 1000.f, 0.01f, 3);
 		
 		sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 
