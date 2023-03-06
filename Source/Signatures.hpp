@@ -64,6 +64,12 @@ namespace Saint
 		using request_control = void (*)(rage::netObject* net_object);
 		request_control m_request_control;
 
+		uintptr_t ui_3d_draw_manager;
+		uintptr_t add_element_to_scene;
+		uintptr_t push_scene_preset_manager;
+		uintptr_t set_scene_element_lighting;
+		uintptr_t get_scene_preset;
+
 
 	};
 

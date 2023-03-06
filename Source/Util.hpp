@@ -4,6 +4,17 @@
 
 namespace Saint
 {
+	template<typename T>
+	inline bool is_valid_ptr(T ptr) {
+		uint64_t address = (uint64_t)ptr;
+		if (address < 0x5000) return false;
+		if ((address & 0xFFFFFFFF) == 0xFFFFFFFF) return false;
+		if ((address & 0xFFFFFFFF) <= 0xFF) return false;
+
+		if (*(uint8_t*)((uint64_t)&address + 6) != 0 || *(uint8_t*)((uint64_t)&address + 7) != 0) return false;
+
+		return true;
+	}
 	inline bool has_string(std::string& str, std::string check)
 	{
 		std::size_t found = str.find_first_of(' ');

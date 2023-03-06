@@ -223,6 +223,12 @@
     <ClInclude Include="Discord\DiscordHandler.hpp">
       <Filter>Discord</Filter>
     </ClInclude>
+    <ClInclude Include="Images.h">
+      <Filter>Core\Features\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Caller.h">
+      <Filter>Core\Features\Network\Players</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">

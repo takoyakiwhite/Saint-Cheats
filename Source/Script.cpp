@@ -28,6 +28,7 @@
 #include "KeyboardOption.h"
 #include "Render.h"
 #include "Notifications.h"
+#include "Discord/DiscordHandler.hpp"
 namespace Saint
 {
 	enum Submenu : std::uint32_t
@@ -242,6 +243,9 @@ namespace Saint
 		SubmenuVehicleInvis,
 		SubmenuSelectedVehicle,
 		SubmenuProtCrash,
+		EntityShooter,
+		EntityShooterVehicle,
+		EntityShooterSelectedClass,
 	};
 
 	bool MainScript::IsInitialized()
@@ -302,6 +306,7 @@ namespace Saint
 				PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 32, true);
 			}
 			});
+		sub->draw_option<toggle<bool>>(("Explosive Melee"), nullptr, &m_frame_flags.m_explosive_melee, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("No Ragdoll"), nullptr, &features.no_ragdoll, BoolDisplay::OnOff, false, [] {
 			if (!features.no_ragdoll)
 			{
@@ -864,7 +869,7 @@ namespace Saint
 			{
 
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &veh_spawner.spawninair, BoolDisplay::OnOff);
-		sub->draw_option<number<std::int32_t>>("Height", nullptr, &veh_spawner.heightmulti, 0, 1000);
+				sub->draw_option<number<std::int32_t>>("Height", nullptr, &veh_spawner.heightmulti, 0, 1000);
 
 			});
 		g_Render->draw_submenu<sub>((get_vehicle_class_name(m_selected_vehicle_class)), SubmenuGetClass, [](sub* sub)
@@ -893,7 +898,10 @@ namespace Saint
 											ss << "Unknown";
 										}
 									}
-
+									if (sub->GetSelectedOption() == sub->GetNumOptions()) {
+										g_players.draw_info2(*(std::uint32_t*)(info + 0x18));
+									}
+									
 									sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(*(std::uint32_t*)(info + 0x18)))), nullptr, [=]
 										{
 											veh_spawner.spawn(*(std::uint32_t*)(info + 0x18));
@@ -2517,6 +2525,7 @@ namespace Saint
 		sub->draw_option<submenu>("Multipliers", nullptr, SubmenuWeaponMultipliers);
 		sub->draw_option<submenu>("Animation", nullptr, SubmenuWeaponAnimation);
 		sub->draw_option<submenu>("Gun Locker", nullptr, SubmenuGunLocker);
+		sub->draw_option<submenu>("Entity Shooter", nullptr, EntityShooter);
 		sub->draw_option<toggle<bool>>(("Infinite Ammo"), nullptr, &features.infinite_ammo, BoolDisplay::OnOff, false, [] {
 			if (!features.infinite_ammo) {
 				WEAPON::SET_PED_INFINITE_AMMO_CLIP(PLAYER::PLAYER_PED_ID(), false);
@@ -2526,8 +2535,75 @@ namespace Saint
 		sub->draw_option<toggle<bool>>(("Delete"), nullptr, &features.delete_gun, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Bypass C4 Limit"), nullptr, &features.bypass_c4_limit, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Magnet"), nullptr, &gravity.enabled, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>(("Incendiary"), nullptr, &m_frame_flags.m_fire, BoolDisplay::OnOff);
 
 
+			});
+		g_Render->draw_submenu<sub>(("Entity Shooter"), EntityShooter, [](sub* sub)
+			{
+				
+				sub->draw_option<submenu>("Entity", nullptr, EntityShooterVehicle);
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &m_entity_shooter.enabled, BoolDisplay::OnOff);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Entity"), EntityShooterVehicle, [](sub* sub)
+			{
+				sub->draw_option<KeyboardOption>(("Selected"), nullptr, HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(m_entity_shooter.selected_hash)), []
+					{
+						
+
+
+					});
+				sub->draw_option<UnclickOption>("List", nullptr, [] {});
+				for (std::int32_t i = 0; i < 23; i++) {
+					sub->draw_option<submenu>(get_vehicle_class_name(i), nullptr, EntityShooterSelectedClass, [=]
+						{
+							m_entity_shooter.selected_class = i;
+
+						});
+
+				}
+
+
+			});
+		g_Render->draw_submenu<sub>((get_vehicle_class_name(m_entity_shooter.selected_class)), EntityShooterSelectedClass, [](sub* sub)
+			{
+				if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {
+					for (std::int32_t i = 0; i < g_GameFunctions->m_vehicle_hash_pool->capacity; i++) {
+						std::uint64_t info = g_GameFunctions->m_vehicle_hash_pool->get(i);
+						if (info != NULL) {
+							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
+								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
+								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
+								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(MISC::GET_HASH_KEY(model_ptr.c_str())) == m_entity_shooter.selected_class) {
+									std::stringstream ss;
+									std::string make(make_ptr);
+									std::string model(model_ptr);
+									if (make[0] || model[0]) {
+										make = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(make.c_str());
+										model = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(model.c_str());
+										if (make != "NULL" && model != "NULL") {
+											ss << make << " " << model;
+										}
+										else if (model != "NULL") {
+											ss << model;
+										}
+										else {
+											ss << "Unknown";
+										}
+									}
+
+									sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(*(std::uint32_t*)(info + 0x18)))), nullptr, [=]
+										{
+											m_entity_shooter.selected_hash = (*(std::uint32_t*)(info + 0x18));
+
+										});
+								}
+							}
+						}
+					}
+				}
 			});
 		g_Render->draw_submenu<sub>(("Aimbot"), SubmenuAimbot, [](sub* sub)
 			{
@@ -2786,6 +2862,7 @@ namespace Saint
 		if (give_weapon.type_int == 0) {
 			Maxammo = 9999;
 		}
+		
 		sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &give_weapon.type, &give_weapon.type_int);
 		sub->draw_option<number<std::int32_t>>("Ammo", nullptr, &give_weapon.amount, 1, Maxammo);
 		sub->draw_option<RegularOption>(("Apply"), nullptr, []
@@ -3287,6 +3364,7 @@ namespace Saint
 			{
 				sub->draw_option<submenu>("All", nullptr, SubmenuAllPlayers);
 		sub->draw_option<ChooseOption<const char*, std::size_t>>("Filter", nullptr, &p_filter.data, &p_filter.data_i);
+		
 		sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 
 		for (std::uint32_t i = 0; i < 32; ++i)
@@ -3384,7 +3462,7 @@ namespace Saint
 					break;
 				case 1:
 					if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
-						copytoclipboard(g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_info->m_net_player_data.m_name);
+						copytoclipboard(all_players.get_player_info(g_SelectedPlayer)->m_net_player_data.m_name);
 					}
 					else {
 						g_Notifcations->add("Please start a session.");
@@ -3393,10 +3471,14 @@ namespace Saint
 					break;
 				case 2:
 					if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
-						char input2[64];
+						const auto* net_player_data = g_GameVariables->m_net_game_player(g_SelectedPlayer)->get_net_data();
+						
+						
 						auto data = g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_clan_data;
+						char input2[64];
 						sprintf(input2, "Name: %s\nTag: %s\nMember Count: %i\nMotto: %s", data.m_clan_name, data.m_clan_tag, data.m_clan_member_count, data.m_clan_motto);
 						copytoclipboard(input2);
+						
 					}
 					else {
 						g_Notifcations->add("Please start a session.");
@@ -3409,16 +3491,32 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Vehicle", SubmenuSelectedVehicle, [](sub* sub)
 			{
-				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &rapid_fire.delay, 0, 5000, 50);
-		sub->draw_option<RegularOption>("Boost", nullptr, [=]
-			{
-				if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false))) {
+				static int boost_power = 150;
+				sub->draw_option<number<std::int32_t>>("Boost", nullptr, &boost_power, 0, 300, 10, 3, false, "", "", [] {
+								if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false))) {
 
-					Vehicle get_veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
-					VEHICLE::SET_VEHICLE_FORWARD_SPEED(get_veh, features.boost_speed);
-				}
+									Vehicle get_veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+									VEHICLE::SET_VEHICLE_FORWARD_SPEED(get_veh, features.boost_speed);
+								}
+				});
+				sub->draw_option<RegularOption>("Stop", nullptr, [=]
+					{
+						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false))) {
 
-			});
+							Vehicle get_veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+							VEHICLE::SET_VEHICLE_FORWARD_SPEED(get_veh, 0);
+						}
+
+					});
+				sub->draw_option<RegularOption>("Launch", nullptr, [=]
+					{
+						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false))) {
+
+							ENTITY::APPLY_FORCE_TO_ENTITY(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false), 1, 0, 0, 300, 0, 0, 0, 1, false, true, true, true, true);
+						}
+
+					});
+				
 
 
 			});
@@ -3562,7 +3660,7 @@ namespace Saint
 		sub->draw_option<toggle<bool>>(("Off The Radar"), nullptr, &g_players.get_selected.otr.enabled, BoolDisplay::OnOff);
 
 			});
-		g_Render->draw_submenu<sub>(("Give"), SubmenuGiveWeapons, [](sub* sub)
+		g_Render->draw_submenu<sub>(("Give Weapons"), SubmenuGiveWeapons, [](sub* sub)
 			{
 				int Maxammo = 0;
 
@@ -3970,6 +4068,7 @@ namespace Saint
 				//sub->draw_option<submenu>("Peds", nullptr, SubmenuPeds);
 				sub->draw_option<submenu>("Weather", nullptr, SubmeuWeather);
 		sub->draw_option<submenu>("Water", nullptr, SubmenuWater);
+		
 
 			});
 		g_Render->draw_submenu<sub>(("Peds"), SubmenuPeds, [](sub* sub)
@@ -4398,6 +4497,7 @@ namespace Saint
 
 	void MainScript::Tick()
 	{
+		g_Discord->Tick();
 		Initialize();
 		while (true) {
 			g_Render->OnTick();

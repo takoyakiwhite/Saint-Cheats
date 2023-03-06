@@ -17,6 +17,11 @@ namespace Saint
 		m_net_game_player(Signature("48 83 EC ? 33 C0 38 05 ? ? ? ? 74 ? 83 F9").Scan().As<decltype(m_net_game_player)>()),
 		m_handle_to_ptr(Signature("83 F9 FF 74 31 4C 8B 0D").Scan().As<decltype(m_handle_to_ptr)>()),
 		m_request_control(Signature("E8 ? ? ? ? EB 3E 48 8B D3").Scan().Add(1).Rip().As<decltype(m_request_control)>()),
+		ui_3d_draw_manager(Signature("4C 8B 15 ? ? ? ? F3 0F 11 45 ? F3 0F 10 05 ? ? ? ? BF ? ? ? ? BB ? ? ? ? 41 BE ? ? ? ? F3 0F 11").Scan().Add(3).Rip().As<decltype(ui_3d_draw_manager)>()),
+		push_scene_preset_manager(Signature("40 53 48 83 EC 20 8B 02 48 8D 54 24 38 48 8B D9 89 44 24 38 E8 ? ? ? ? 48 8B C8").Scan().As<decltype(push_scene_preset_manager)>()),
+		add_element_to_scene(Signature("4C 8B DC 48 83 EC 58 8B").Scan().As<decltype(add_element_to_scene)>()),
+		set_scene_element_lighting(Signature("48 8B C4 48 89 58 10 48 89 70 18 57 48 83 EC 30 48 83 B9").Scan().As<decltype(set_scene_element_lighting)>()),
+		get_scene_preset(Signature("0F B7 81 10 08 00 00").Scan().As<decltype(get_scene_preset)>()),
 		m_is_session_started(Signature("40 38 35 ? ? ? ? 75 0E 4C 8B C3 49 8B D7 49 8B CE").Scan().Add(3).Rip().As<bool*>()),
 		m_ModelSpawnBypass(Signature("48 8B C8 FF 52 30 84 C0 74 05 48").Scan().Add(8).As<decltype(m_ModelSpawnBypass)>())
 	{

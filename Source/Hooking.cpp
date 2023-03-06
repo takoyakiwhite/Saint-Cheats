@@ -329,6 +329,7 @@ namespace Saint
 			char name[64];
 			sprintf(name, "%s is joining slot %i", player->m_player_info->m_net_player_data.m_name, (int)player->m_player_id);
 			if (player->m_player_info->m_net_player_data.m_name == (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_net_player_data.m_name) {
+				
 				for (std::uint32_t i = 0; i < 32; ++i) {
 					antiCheat.remove_as_modder(i);
 				}

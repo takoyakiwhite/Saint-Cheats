@@ -3,6 +3,7 @@
 #include "OTR.h"
 #include "Kick.h"
 #include "Notifications.h"
+#include "All Players.h"
 namespace Saint {
     class ExplosiveAmmo2 {
     public:
@@ -53,7 +54,7 @@ namespace Saint {
         void send_to_int(const std::vector<std::uint64_t>& _args) {
             if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
                 float max = 1e+38f;
-                auto coords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id), FALSE);
+                auto coords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(all_players.get_id(g_SelectedPlayer)), FALSE);
                 const size_t arg_count = 15;
                 int64_t args[arg_count] =
                 {
@@ -74,7 +75,7 @@ namespace Saint {
                     -1
                 };
 
-                g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id);
+                g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << all_players.get_id(g_SelectedPlayer));
             }
             else {
                 g_Notifcations->add("Please start a session.");
@@ -118,7 +119,7 @@ namespace Saint {
         }
 
         void set_wanted_level(int level) {
-            PLAYER::REPORT_CRIME(g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id, 8, PLAYER::GET_WANTED_LEVEL_THRESHOLD(level));
+            PLAYER::REPORT_CRIME(all_players.get_id(g_SelectedPlayer), 8, PLAYER::GET_WANTED_LEVEL_THRESHOLD(level));
         }
         void taze() {
             int currentAttempt = 0;

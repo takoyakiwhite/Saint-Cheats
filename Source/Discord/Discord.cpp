@@ -20,13 +20,13 @@ void discordhandler::Tick() {
     DiscordRichPresence discordPresence;
     std::memset(&discordPresence, 0, sizeof(discordPresence));
     if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
-        discordPresence.state = "Modding Online";
+        discordPresence.state = "Online";
         discordPresence.partySize = NETWORK::NETWORK_GET_NUM_CONNECTED_PLAYERS();
         discordPresence.partyMax = 32;
     } else {
-        discordPresence.state = "Modding In Story Mode";
+        discordPresence.state = "Story Mode";
     }
-    discordPresence.details = "Modding With Saint [GTA V]";
+    discordPresence.details = "Modding With Saint [PAID]";
     discordPresence.startTimestamp = StartTime;
     discordPresence.largeImageKey = "saint";
     discordPresence.largeImageText = "SaintCheats.xyz";

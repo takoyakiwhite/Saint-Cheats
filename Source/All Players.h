@@ -13,6 +13,18 @@ namespace Saint {
 	};
 	class All_players {
 	public:
+		uint8_t get_id(int p) const
+		{
+			
+			return g_GameVariables->m_net_game_player(p) == nullptr ? -1 : g_GameVariables->m_net_game_player(p)->m_player_id;
+		}
+		CPlayerInfo* get_player_info(int p) const
+		{
+			if (g_GameVariables->m_net_game_player(p) != nullptr && g_GameVariables->m_net_game_player(p)->m_player_info != nullptr)
+				return g_GameVariables->m_net_game_player(p)->m_player_info;
+			return nullptr;
+		}
+		
 		Notifications notifications;
 		m_Jets jet;
 		Explode m_explode;
@@ -21,7 +33,7 @@ namespace Saint {
 			const size_t arg_count = 22;
 			int64_t args[arg_count] = { (int64_t)1459520933,
 				PLAYER::PLAYER_ID(),
-				g_GameVariables->m_net_game_player(i)->m_player_id,
+				get_id(i),
 				1,
 				bounty_amount,
 				0,
@@ -42,7 +54,7 @@ namespace Saint {
 				*script_global(1923597).at(9).as<int64_t*>(),
 				*script_global(1923597).at(10).as<int64_t*>() };
 
-			g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << g_GameVariables->m_net_game_player(i)->m_player_id);
+			g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << get_id(i));
 		}
 		void get(std::uint32_t buffer) {
 			buffer = PLAYER::GET_NUMBER_OF_PLAYERS();

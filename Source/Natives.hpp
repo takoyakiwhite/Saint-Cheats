@@ -921,6 +921,7 @@ namespace ENTITY
 	static void SET_ENTITY_WATER_REFLECTION_FLAG(Entity entity, BOOL toggle) { Invoke<int>(0xC34BC448DA29F5E9, entity, toggle); } // 0xC34BC448DA29F5E9  b573
 	static void SET_ENTITY_MIRROR_REFLECTION_FLAG(Entity entity, BOOL p1) { Invoke<int>(0xE66377CDDADA4810, entity, p1); } // 0xE66377CDDADA4810  b1734
 	static void SET_ENTITY_VELOCITY(Entity entity, float x, float y, float z) { Invoke<int>(0x1C99BB7B6E96D16F, entity, x, y, z); } // 0x1C99BB7B6E96D16F 0xFF5A1988 b323
+	static void SET_ENTITY_VELOCITY2(Entity entity, NativeVector3 vec) { Invoke<int>(0x1C99BB7B6E96D16F, entity, vec.x, vec.y, vec.z); } // 0x1C99BB7B6E96D16F 0xFF5A1988 b323
 	static void SET_ENTITY_ANGULAR_VELOCITY(Entity entity, float x, float y, float z) { Invoke<int>(0x8339643499D1222E, entity, x, y, z); } // 0x8339643499D1222E  b2372
 	static void SET_ENTITY_HAS_GRAVITY(Entity entity, BOOL toggle) { Invoke<int>(0x4A4722448F18EEF5, entity, toggle); } // 0x4A4722448F18EEF5 0xE2F262BF b323
 	static void SET_ENTITY_LOD_DIST(Entity entity, int value) { Invoke<int>(0x5927F96A78577363, entity, value); } // 0x5927F96A78577363 0xD7ACC7AD b323

@@ -3601,12 +3601,72 @@ namespace Saint {
 		}
 	};
 	inline OutfitLoader* g_Outfits;
+	class FrameFlags {
+	public:
+		bool m_fire = false;
+		bool m_explosive_melee = false;
+		void init() {
+			if (m_explosive_melee) {
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_frame_flags = 1 << 13;
+			}
+			if (m_fire) {
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_frame_flags = 1 << 12;
+			}
+		}
+	};
+	inline FrameFlags m_frame_flags;
+	class EntityShooter2 {
+	public:
+		int selected_class;
+		std::string buffer;
+		Hash selected_hash = 0x6838FC1D;
+		bool enabled = false;
+		Vehicle entityGunVehicle;
+		void init() {
+			if (enabled) {
+				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+				{
+						NativeVector3 cameraCoords = CAM::GET_GAMEPLAY_CAM_COORD();
+						NativeVector3 cameraDirection = RotationToDirection(CAM::GET_GAMEPLAY_CAM_ROT(0));
+						NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+						NativeVector3 startMutliply = multiply(&cameraDirection, std::distance(&cameraCoords, &playerCoords) + 15.25f);
+						NativeVector3 start = addn(&cameraCoords, &startMutliply);
+						NativeVector3 rot = CAM::GET_GAMEPLAY_CAM_ROT(2);
+						float pitch = DegreeToRadian(rot.x);
+						float yaw = DegreeToRadian(rot.z + 90);
+						NativeVector3 location = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+						
+						g_CallbackScript->AddCallback<ModelCallback>(selected_hash, [=] {
+							*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+							entityGunVehicle = VEHICLE::CREATE_VEHICLE(selected_hash, start.x, start.y, start.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
+							*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+							DECORATOR::DECOR_SET_INT(entityGunVehicle, "MPBitset", 0);
+							auto networkId = NETWORK::VEH_TO_NET(entityGunVehicle);
+							if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(entityGunVehicle))
+								NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+							VEHICLE::SET_VEHICLE_IS_STOLEN(entityGunVehicle, FALSE);
+							NativeVector3 velocity;
+							NativeVector3 other = ENTITY::GET_ENTITY_COORDS(entityGunVehicle, true);
+							velocity.x = location.x + (1000.0f * cos(pitch) * cos(yaw)) - other.x;
+							velocity.y = location.y + (1000.0f * sin(yaw) * cos(pitch)) - other.y;
+							velocity.z = location.z + (1000.0f * sin(pitch)) - other.z;
+							ENTITY::SET_ENTITY_ROTATION(entityGunVehicle, rot.x, rot.y, rot.z, 2, false);
+							ENTITY::SET_ENTITY_VELOCITY2(entityGunVehicle, { velocity.x * (float)3.0, velocity.y * (float)3.0, velocity.z * (float)3.0 });
+						});
+					
+				}
+			}
+		}
+	};
+	inline EntityShooter2 m_entity_shooter;
 	inline void FeatureInitalize() {
 
 		if (mark_as_Saint) {
 			PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 109, true);
 
 		}
+		m_entity_shooter.init();
+		m_frame_flags.init();
 		m_vehicle_ramps.init();
 		flag_creator.init();
 		invisible.init();
