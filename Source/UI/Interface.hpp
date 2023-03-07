@@ -234,7 +234,7 @@ namespace Saint::UserInterface
 			"None"
 		};
 		std::size_t IndicatorIterator = 1;
-
+		bool controlsEnabled = true;
 		// Bool Toogles
 		bool ToggledOn = false;
 		bool ToggledOff = false;

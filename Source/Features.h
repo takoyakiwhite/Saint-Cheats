@@ -1374,11 +1374,11 @@ namespace Saint {
 	inline multis multi;
 	inline Multipliers multipliers;
 
-	inline bool controlsEnabled = true;
+	
 
 	inline void showKeyboard(const char* title, const char* defaultText, int length, std::string* buffer, std::function<void()> action) {
 		g_CustomText->AddText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"), title);
-		controlsEnabled = false;
+		g_Render->controlsEnabled = false;
 		MISC::DISPLAY_ONSCREEN_KEYBOARD(0, "FMMC_KEY_TIP8", "", defaultText, "", "", "", length);
 		g_CallbackScript->AddCallback<KeyboardCallBack>(title, length, [=] {
 			if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT()) {
@@ -1389,7 +1389,7 @@ namespace Saint {
 			}
 
 		std::invoke(std::move(action));
-		controlsEnabled = true;
+		g_Render->controlsEnabled = true;
 			});
 		buffer = buffer;
 		g_CustomText->RemoveText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"));

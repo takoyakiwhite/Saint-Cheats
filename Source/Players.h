@@ -91,8 +91,8 @@ namespace Saint {
 			float y = g_Render->m_PosY;
 			Color col;
 
-			float offset = 0.02;
-			float xfr = x + 0.205f + offset;
+			float offset = 0.012;
+			float xfr = x + 0.205f + offset - 0.025f;
 			GRAPHICS::DRAW_RECT(xfr, y + -0.090 + 0.178, 0.183f, 0.178, g_Render->m_OptionUnselectedBackgroundColor.r, g_Render->m_OptionUnselectedBackgroundColor.g, g_Render->m_OptionUnselectedBackgroundColor.b, 160, false);
 			Color col2 = { 255, 255, 255, 190 };
 
@@ -145,7 +145,7 @@ namespace Saint {
 			GRAPHICS::DRAW_RECT(x - 0.510, y + -0.000, 0.183, -0.002, col.r, col.g, col.b, col.a, false);
 			GRAPHICS::DRAW_RECT(xfr, y + -0.000, 0.183f, -0.002, g_Render->m_OptionSelectedBackgroundColor.r, g_Render->m_OptionSelectedBackgroundColor.g, g_Render->m_OptionSelectedBackgroundColor.b, 255, false);
 		}
-		float pedx = 0.630f;
+		float pedx = 0.540f;
 		float pedyy = 1.680f;
 		float pedy = 0.196;
 		int GetSpeed(Ped ped) {
@@ -174,7 +174,7 @@ namespace Saint {
 			Color m_InfoBG{ 0, 0, 0, 190 };
 			float x = g_Render->m_PosX;
 			float y = g_Render->m_PosY;
-			float offset = 0.02;
+			float offset = 0.012;
 			Color m_white{ 255, 255, 255, 255 };
 			float PosX = x + 0.225f + offset;
 			float PosY = y + 0.168f;
@@ -303,11 +303,11 @@ namespace Saint {
 			//g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.135f, 0.001f, 0.015f, m_white);
 			if (!PLAYER::ARE_PLAYER_FLASHING_STARS_ABOUT_TO_DROP(playerPed))
 			{
-				sprintf(wantedLevel, "%i", PLAYER::GET_PLAYER_WANTED_LEVEL(player));
+				sprintf(wantedLevel, "%i/5", PLAYER::GET_PLAYER_WANTED_LEVEL(player));
 			}
 			if (PLAYER::ARE_PLAYER_FLASHING_STARS_ABOUT_TO_DROP(playerPed))
 			{
-				sprintf(wantedLevel, "%i (Flashing/About To Drop)", PLAYER::GET_PLAYER_WANTED_LEVEL(player));
+				sprintf(wantedLevel, "%i/5 (Flashing/About To Drop)", PLAYER::GET_PLAYER_WANTED_LEVEL(player));
 			}
 			float placey = 0.057f;
 			Text("Vehicle", { m_white }, { LTextX, TextY + placey }, { 0.23f, 0.23f }, false);

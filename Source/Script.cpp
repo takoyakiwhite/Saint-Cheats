@@ -3158,11 +3158,9 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("IP"), SubmenuIP, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &spoofing.ip.enabled, BoolDisplay::OnOff);
-		sub->draw_option<KeyboardOption>(("Field 1"), nullptr, spoofing.ip.f1.c_str(), []
+		sub->draw_option<KeyboardOption>(("Field 1"), nullptr, spoofing.ip.f1, []
 			{
-				showKeyboard("Enter Something", "", 3, &spoofing.ip.f1, [] {
-				spoofing.ip.field1 = atoi(spoofing.ip.f1.c_str());
-					});
+				
 
 
 			});
