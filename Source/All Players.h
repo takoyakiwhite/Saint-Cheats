@@ -24,6 +24,7 @@ namespace Saint {
 				return g_GameVariables->m_net_game_player(p)->m_player_info;
 			return nullptr;
 		}
+		
 		CPed* get_ped(int p) const
 		{
 			if (const auto player_info = get_player_info(p); player_info != nullptr)
@@ -35,6 +36,7 @@ namespace Saint {
 		m_Jets jet;
 		Explode m_explode;
 		int bounty_amount = 10000;
+		
 		void set_bounty(int i) {
 			const size_t arg_count = 22;
 			int64_t args[arg_count] = { (int64_t)1459520933,

@@ -60,14 +60,17 @@ namespace Saint {
 		float height = 0.178;
 		
 		void draw_info_text(const char* text, const char* text2, int pos, float x_offset, bool first = false) {
+			float x = g_Render->m_PosX;
 			Color col2 = { 255, 255, 255, 190 };
+			float offset = 0.02;
+			float xfr = x + 0.205f + offset;
 			if (first) {
-				drawText(text, 0.0202f, 0.105f, 0.25f, 0, false, col2, false);
-				drawText(text2, 0.0302f - x_offset, 0.105f, 0.25f, 0, false, col2, true);
+				drawText(text, xfr - 0.087f, 0.105f, 0.25f, 0, false, col2, false);
+				drawText(text2, xfr + 0.087f -x_offset, 0.105f, 0.25f, 0, false, col2, true);
 			}
 			else {
-				drawText(text, 0.0202f, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, false);
-				drawText(text2, 0.0302f - x_offset, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, true);
+				drawText(text, xfr - 0.087f, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, false);
+				drawText(text2, xfr + 0.087f - x_offset, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, true);
 			}
 		}
 		void drawSprite(const char* dict, const char* texture, float x, float y, float width, float height, Color color, float rotation)
@@ -87,7 +90,10 @@ namespace Saint {
 			float x = g_Render->m_PosX;
 			float y = g_Render->m_PosY;
 			Color col;
-			GRAPHICS::DRAW_RECT(x + 0.0202f, y + -0.090 + 0.178, 0.183f, 0.178, g_Render->m_OptionUnselectedBackgroundColor.r, g_Render->m_OptionUnselectedBackgroundColor.g, g_Render->m_OptionUnselectedBackgroundColor.b, 160, false);
+
+			float offset = 0.02;
+			float xfr = x + 0.205f + offset;
+			GRAPHICS::DRAW_RECT(xfr, y + -0.090 + 0.178, 0.183f, 0.178, g_Render->m_OptionUnselectedBackgroundColor.r, g_Render->m_OptionUnselectedBackgroundColor.g, g_Render->m_OptionUnselectedBackgroundColor.b, 160, false);
 			Color col2 = { 255, 255, 255, 190 };
 
 			char timesince[128];
@@ -137,6 +143,7 @@ namespace Saint {
 
 			}
 			GRAPHICS::DRAW_RECT(x - 0.510, y + -0.000, 0.183, -0.002, col.r, col.g, col.b, col.a, false);
+			GRAPHICS::DRAW_RECT(xfr, y + -0.000, 0.183f, -0.002, g_Render->m_OptionSelectedBackgroundColor.r, g_Render->m_OptionSelectedBackgroundColor.g, g_Render->m_OptionSelectedBackgroundColor.b, 255, false);
 		}
 		float pedx = 0.630f;
 		float pedyy = 1.680f;
@@ -344,11 +351,12 @@ namespace Saint {
 			Text("Speed", { m_white }, { SeperatorX - 0.048f, TextY + 0.26f }, { 0.23f, 0.23f }, false);
 			g_Render->DrawRightText(Speed.c_str(), RTextX2, TextY + 0.26f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			Text("Passive", { m_white }, { LTextX, TextY + 0.41f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(passive.c_str(), SeperatorX - 0.0523f, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.42f, 0.001f, 0.015f, m_white);
-			Text("Rockstar", { m_white }, { SeperatorX - 0.048f, TextY + 0.41f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(rockstar.c_str(), RTextX2, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+			Text("Passive", { m_white }, { LTextX, TextY + 0.44f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(passive.c_str(), SeperatorX - 0.0523f, TextY + 0.44f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.45f, 0.001f, 0.015f, m_white);
+			Text("Rockstar", { m_white }, { SeperatorX - 0.048f, TextY + 0.44f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(rockstar.c_str(), RTextX2, TextY + 0.44f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			
 

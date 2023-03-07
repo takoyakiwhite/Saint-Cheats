@@ -123,6 +123,19 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 			g_Logger->Info("Game Version %s", g_GameVariables->m_GameBuild);
 			g_Logger->Info("Finished Injecting Have A Fun Time!");
+			g_Render->m_HeaderBackgroundColor = { 108, 60, 175, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 108, 60, 175, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 108, 60, 175, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 108, 60, 175, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
 			//Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome %s",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
 			while (g_Running)
 			{

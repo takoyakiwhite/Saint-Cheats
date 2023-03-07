@@ -146,6 +146,8 @@ namespace Saint
 		SendNetInfoo* m_SendNetInfo;
 
 		PVOID m_AssignPhysicalIndexHandler;
+
+
 	};
 
 	inline std::unique_ptr<GameVariables> g_GameVariables;

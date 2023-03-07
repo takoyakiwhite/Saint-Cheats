@@ -48,8 +48,42 @@ namespace Saint {
         bool freeze = false;
         std::string buffer;
         std::uint64_t int_id = 0;
-        uint8_t get_id() {
-            return g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id;
+        
+        uint8_t get_id() const
+        {
+
+            return g_GameVariables->m_net_game_player(g_SelectedPlayer) == nullptr ? -1 : g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id;
+        }
+        void bounty(int value)
+        {
+            const size_t arg_count = 22;
+            int64_t args[arg_count] =
+            {
+                (int64_t)1459520933,
+                PLAYER::PLAYER_ID(),
+                get_id(),
+                1,
+                value,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                *script_global(1923597).at(9).as<int64_t*>(),
+                *script_global(1923597).at(10).as<int64_t*>()
+            };
+
+            g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << get_id());
         }
         void send_to_int(const std::vector<std::uint64_t>& _args) {
             if (NETWORK::NETWORK_IS_SESSION_STARTED()) {

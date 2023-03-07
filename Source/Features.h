@@ -518,7 +518,13 @@ namespace Saint {
 		bool invisible_car = false;
 		bool invisible_carlocal_visible = false;
 		int boost_speed = 150;
+		bool disable_lock_on = false;
 		void init() {
+			if (disable_lock_on) {
+				auto g_local_player = (*g_GameFunctions->m_pedFactory)->m_local_ped;
+				if (g_local_player && g_local_player->m_vehicle)
+					g_local_player->m_vehicle->m_is_targetable = false;
+			}
 			if (invisible_car) {
 				if (invisible_carlocal_visible) {
 					NETWORK::SET_ENTITY_LOCALLY_VISIBLE(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false));
@@ -889,9 +895,44 @@ namespace Saint {
 		bool rp = false;
 		int height = 0;
 		int delay = 1100;
+		bool random_rp_model = false;
+		const char* location[2] = {"Traditional", "Rain"};
+		std::size_t data = 0;
+		const char* rp_model[8] = { "Alien", "Beast", "Impotent Rage", "Pogo", "Princess Bubblegum", "Ranger", "Generic", "Sasquatch"};
+		const char* rp_model_init[8] = { "vw_prop_vw_colle_alien", "vw_prop_vw_colle_beast", "vw_prop_vw_colle_imporage", "vw_prop_vw_colle_pogo", "vw_prop_vw_colle_prbubble", "vw_prop_vw_colle_rsrcomm", "vw_prop_vw_colle_rsrgeneric", "vw_prop_vw_colle_sasquatch"};
+		std::size_t rp_model_data = 0;
+		const char* money_model[2] = { "Store Bag", "Bank Bag", };
+		int money_model_init[2] = { -1666779307, 289396019 };
+		std::size_t money_model_data = 0;
+		std::int32_t model_delay = 550;
 		void init() {
+			if (random_rp_model) {
+				static int timer;
+				if (timer == 0 || (int)(GetTickCount64() - timer) > model_delay) {
+					if (rp_model_data == 7) {
+						rp_model_data = 0;
+						
+					}
+					if (rp_model_data < 7) {
+						rp_model_data++;
+			
+					}
+					
+
+					
+					timer = GetTickCount64();
+				}
+			}
 			Player p = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
-			NativeVector3 c = ENTITY::GET_ENTITY_COORDS(p, false);
+			NativeVector3 c;
+			if (data == 0) {
+				c = ENTITY::GET_ENTITY_COORDS(p, false);
+			}
+			if (data == 1) {
+				NativeVector3 pos_get = ENTITY::GET_ENTITY_COORDS(p, false);
+				NativeVector3 pos = { pos_get.x - MISC::GET_RANDOM_INT_IN_RANGE(-20, 15), pos_get.y + MISC::GET_RANDOM_INT_IN_RANGE(-13, 6), pos_get.z };
+				c = pos;
+			}
 			static int delayfr3 = 0;
 			if (delayfr3 == 0 || (int)(GetTickCount64() - delayfr3) > delay)
 			{
@@ -899,9 +940,9 @@ namespace Saint {
 					float dz = c.z;
 					c.z = dz + height;
 
-					g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), [=] {
+					g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), [=] {
 						*g_GameFunctions->should_sync_money_rewards = true;
-					OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, c.x, c.y, c.z, 0, 10, MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), false, true);
+					OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, c.x, c.y, c.z, 0, 10, MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), false, true);
 					*g_GameFunctions->should_sync_money_rewards = false;
 
 
@@ -916,9 +957,9 @@ namespace Saint {
 				if (money) {
 					float dz = c.z;
 					c.z = dz + height;
-					g_CallbackScript->AddCallback<ModelCallback>(-1666779307, [=] {
+					g_CallbackScript->AddCallback<ModelCallback>(money_model_init[money_model_data], [=] {
 						*g_GameFunctions->should_sync_money_rewards = true;
-					OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 2500, -1666779307, false, true);
+					OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 2500, money_model_init[money_model_data], false, true);
 					*g_GameFunctions->should_sync_money_rewards = false;
 
 
@@ -3244,6 +3285,28 @@ namespace Saint {
 			Ini* ColorIni = new Ini(MenuFolderPath + "Colors.ini");
 
 			ColorIni->WriteInt(g_Render->ThemeIterator, "Themes", "get_current");
+			//ColorIni->WriteBool(g_Render->submenu_enabled, "Themes", "submenu_enabled");
+			//footer
+			ColorIni->WriteInt(g_Render->m_FooterBackgroundColor.r, "Footer", "r");
+			ColorIni->WriteInt(g_Render->m_FooterBackgroundColor.g, "Footer", "g");
+			ColorIni->WriteInt(g_Render->m_FooterBackgroundColor.b, "Footer", "b");
+			ColorIni->WriteInt(g_Render->m_FooterBackgroundColor.a, "Footer", "a");
+			//option
+			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.r, "option", "selected_background_r");
+			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.g, "option", "selected_background_g");
+			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.b, "option", "selected_background_b");
+			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.a, "option", "selected_background_a");
+			//selected
+			ColorIni->WriteInt(g_Render->m_OptionSelectedTextColor.r, "option", "selected_test_r");
+			ColorIni->WriteInt(g_Render->m_OptionSelectedTextColor.g, "option", "selected_test_g");
+			ColorIni->WriteInt(g_Render->m_OptionSelectedTextColor.b, "option", "selected_test_b");
+			ColorIni->WriteInt(g_Render->m_OptionSelectedTextColor.a, "option", "selected_test_a");
+
+			//ColorIni->WriteString(g_Render->header_name, "header", "name");
+			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.r, "header", "r");
+			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.g, "header", "g");
+			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.b, "header", "b");
+			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.a, "header", "b");
 		}
 		void load() {
 			std::string AppDataPath = getenv("APPDATA");
@@ -3251,6 +3314,34 @@ namespace Saint {
 			if (ColorIniExist((MenuFolderPath + "Colors.ini").c_str())) {
 				Ini* ColorIni = new Ini(MenuFolderPath + "Colors.ini");
 				g_Render->ThemeIterator = ColorIni->GetInt("Themes", "get_current");
+				//g_Render->submenu_enabled = ColorIni->GetBool("Themes", "submenu_enabled");
+
+				g_Render->m_FooterBackgroundColor.r = ColorIni->GetInt("Footer", "r");
+				g_Render->m_FooterBackgroundColor.g = ColorIni->GetInt("Footer", "g");
+				g_Render->m_FooterBackgroundColor.b = ColorIni->GetInt("Footer", "b");
+				g_Render->m_FooterBackgroundColor.a = ColorIni->GetInt("Footer", "a");
+
+				g_Render->m_OptionSelectedBackgroundColor.r = ColorIni->GetInt("option", "selected_background_r");
+				g_Render->m_OptionSelectedBackgroundColor.g = ColorIni->GetInt("option", "selected_background_g");
+				g_Render->m_OptionSelectedBackgroundColor.b = ColorIni->GetInt("option", "selected_background_b");
+				g_Render->m_OptionSelectedBackgroundColor.a = ColorIni->GetInt("option", "selected_background_a");
+
+				g_Render->m_OptionSelectedTextColor.r = ColorIni->GetInt("option", "selected_text_r");
+				g_Render->m_OptionSelectedTextColor.g = ColorIni->GetInt("option", "selected_text_g");
+				g_Render->m_OptionSelectedTextColor.b = ColorIni->GetInt("option", "selected_text_b");
+				g_Render->m_OptionSelectedTextColor.a = ColorIni->GetInt("option", "selected_text_a");
+
+				//g_Render->header_name = ColorIni->GetString("header", "name");
+
+
+				g_Render->m_HeaderBackgroundColor.r = ColorIni->GetInt("header", "r");
+				g_Render->m_HeaderBackgroundColor.g = ColorIni->GetInt("header", "g");
+				g_Render->m_HeaderBackgroundColor.b = ColorIni->GetInt("header", "b");
+				g_Render->m_HeaderBackgroundColor.a = ColorIni->GetInt("header", "a");
+
+			
+
+				
 			}
 		}
 	};
@@ -3659,6 +3750,12 @@ namespace Saint {
 		}
 	};
 	inline EntityShooter2 m_entity_shooter;
+	inline const char* casino_teleport[4] = { "Mantrap Door", "Inside The Vault", "Main Gate", "Planning Boards" };
+	inline std::size_t casino_tp = 0;
+	inline const char* Aproach[4] = { "Diamonds", "Gold", "Artwork", "Cash" };
+	inline std::size_t Opreracogh2 = 0;
+	inline const char* Aproach2[5] = { "Chester McCoy (Best)", "Eddie Toh", "Taliana Martinez", "Zach Nelson", "Karim Denz" };
+	inline std::size_t Opreracogh22 = 0;
 	inline void FeatureInitalize() {
 
 		if (mark_as_Saint) {

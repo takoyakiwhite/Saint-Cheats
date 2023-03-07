@@ -208,6 +208,11 @@ namespace Saint::UserInterface
 		Color m_OptionSelectedBackgroundColor{ 138, 43, 226, 255 };
 		Color m_OptionUnselectedBackgroundColor{ 0, 0, 0, 160 };
 
+		//submenubar
+		bool submenu_enabled = false;
+
+		std::string header_name = "Saint";
+
 		// Footer
 		bool m_dynamic_footer = { false };
 		int m_option_count;
@@ -289,7 +294,7 @@ namespace Saint::UserInterface
 		void DrawSprite(const char* dict, const char* texture, float x, float y, float width, float height, Color color, float rotation);
 		void DrawLeftText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow, bool wrap = false);
 		void DrawCenteredText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow);
-		
+		void DrawSubmenuBar(AbstractSubmenu* sub);
 		float GetTextHeight(Font font, float size);
 		Vector2 GetSpriteScale(float size);
 

@@ -452,7 +452,7 @@ namespace Saint::UserInterface
 				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_FLOAT(m_glare_direction);
 				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
 			}
-			GRAPHICS::DRAW_SCALEFORM_MOVIE(m_glare_handle, (m_PosX + 0.345f), (m_DrawBaseY + (m_HeaderHeight / 2.f) + 0.38f), (m_Width + 0.82700f), (m_HeaderHeight + 0.852f), 255, 255, 255, 255, 0);
+			GRAPHICS::DRAW_SCALEFORM_MOVIE(m_glare_handle, (m_PosX + 0.3456f), (m_DrawBaseY + (m_HeaderHeight / 2.f) + 0.38f), (m_Width + 0.82700f), (m_HeaderHeight + 0.852f), 255, 255, 255, 255, 0);
 		}
 	}
 
@@ -478,206 +478,7 @@ namespace Saint::UserInterface
 			RenderToolTip();
 		}
 
-		if (ThemeIterator == 0)
-		{
-			//Header
-			g_Render->m_HeaderBackgroundColor = { 108, 60, 175, 255 };
-
-			//Footer
-			g_Render->m_FooterBackgroundColor = { 108, 60, 175, 255 };
-
-			//Option
-			g_Render->m_OptionSelectedBackgroundColor = { 108, 60, 175, 255 };
-
-			//Description
-			g_Render->m_DescriptionBackgroundColor = { 108, 60, 175, 255 };
-
-			//Background
-			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-			//Logger
-			//g_Logger->Theme("Default Theme");
-		}
-
-		if (ThemeIterator == 1)
-		{
-			//Header
-			g_Render->m_HeaderBackgroundColor = { 255, 108, 116, 255 };
-
-			//Footer
-			g_Render->m_FooterBackgroundColor = { 255, 108, 116, 255 };
-
-			//Option
-			g_Render->m_OptionSelectedBackgroundColor = { 255, 108, 116, 255 };
-
-			//Description
-			g_Render->m_DescriptionBackgroundColor = { 255, 108, 116, 255 };
-
-			//Background
-			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-			//Logger
-			//g_Logger->Theme("Salmon Red Theme");
-		}
-
-		if (ThemeIterator == 2)
-		{
-			//Header
-			g_Render->m_HeaderBackgroundColor = { 15, 82, 186, 255 };
-
-			//Footer
-			g_Render->m_FooterBackgroundColor = { 15, 82, 186, 255 };
-
-			//Option
-			g_Render->m_OptionSelectedBackgroundColor = { 15, 82, 186, 255 };
-
-			//Description
-			g_Render->m_DescriptionBackgroundColor = { 15, 82, 186, 255 };
-
-			//Background
-			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-			//Logger
-			//g_Logger->Theme("Sapphire Blue Theme");
-		}
-
-		if (ThemeIterator == 3)
-		{
-			//Header
-			g_Render->m_HeaderBackgroundColor = { 24, 26, 24, 255 };
-
-			//Footer
-			g_Render->m_FooterBackgroundColor = { 24, 26, 24, 255 };
-
-			//Option
-			g_Render->m_OptionSelectedBackgroundColor = { 24, 26, 24, 255 };
-
-			//Description
-			g_Render->m_DescriptionBackgroundColor = { 24, 26, 24, 255 };
-
-			//Background
-			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-			//Logger
-			//g_Logger->Theme("Soft Black Theme");
-		}
-
-		if (ThemeIterator == 4)
-		{
-			//Header
-			g_Render->m_HeaderBackgroundColor = { 0, 155, 119, 255 };
-
-			//Footer
-			g_Render->m_FooterBackgroundColor = { 0, 155, 119, 255 };
-
-			//Option
-			g_Render->m_OptionSelectedBackgroundColor = { 0, 155, 119, 255 };
-
-			//Description
-			g_Render->m_DescriptionBackgroundColor = { 0, 155, 119, 255 };
-
-			//Background
-			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-			//Logger
-			//g_Logger->Theme("Emerald Green Theme");
-		}
-
-		if (ThemeIterator == 5)
-		{
-			//Header
-			g_Render->m_HeaderBackgroundColor = { 70, 38, 180, 255 };
-
-			//Footer
-			g_Render->m_FooterBackgroundColor = { 70, 38, 180, 255 };
-
-			//Option
-			g_Render->m_OptionSelectedBackgroundColor = { 70, 38, 180, 255 };
-
-			//Description
-			g_Render->m_DescriptionBackgroundColor = { 70, 38, 180, 255 };
-
-			//Background
-			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-			//Logger
-			//g_Logger->Theme("Violet Purple Theme");
-		}
-
-		if (ThemeIterator == 6)
-		{
-			//Header
-			g_Render->m_HeaderBackgroundColor = { 255, 145, 164, 255 };
-
-			//Footer
-			g_Render->m_FooterBackgroundColor = { 255, 145, 164, 255 };
-
-			//Option
-			g_Render->m_OptionSelectedBackgroundColor = { 255, 145, 164, 255 };
-
-			//Description
-			g_Render->m_DescriptionBackgroundColor = { 255, 145, 164, 255 };
-
-			//Background
-			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-			//Logger
-			//g_Logger->Theme("Salmon Pink Theme");
-		}
-
-		if (ThemeIterator == 7)
-		{
-			//Header
-			g_Render->m_HeaderBackgroundColor = { 17, 17, 17, 255 };
-
-			//Footer
-			g_Render->m_FooterBackgroundColor = { 17, 17, 17, 255 };
-			g_Render->m_FooterSpriteColor = { 181,181,181, 255 };
-			g_Render->m_FooterHeight = 0.030f;
-			g_Render->m_FooterSpriteSize = 0.030f;
-
-			//Option
-			g_Render->m_OptionSelectedBackgroundColor = { 65, 60, 60, 255 };
-
-			//Description
-			g_Render->m_DescriptionBackgroundColor = { 0, 0, 0, 120 };
-
-			//Background
-			g_Render->m_OptionUnselectedBackgroundColor = { 30,35,36, 230 };
-
-			//Option Height
-			g_Render->m_OptionHeight = 0.033f;
-
-			//Option Text Size
-			g_Render->m_OptionTextSize = 0.29f;
-
-			//Option Text Color
-			g_Render->m_OptionUnselectedTextColor = { 181,181,181, 255 };
-			g_Render->m_OptionSelectedTextColor = { 181,181,181, 255 };
-
-			//Logger
-			//g_Logger->Theme("Salmon Pink Theme");
-		}
-		if (ThemeIterator == 8)
-		{
-			//Header
-			g_Render->m_HeaderBackgroundColor = { 234, 90, 81, 255 };
-
-			//Footer
-			g_Render->m_FooterBackgroundColor = { 234, 90, 81, 255 };
-
-			//Option
-			g_Render->m_OptionSelectedBackgroundColor = { 187, 64, 71, 255 };
-
-			//Description
-			g_Render->m_DescriptionBackgroundColor = { 234, 90, 81, 255 };
-
-			//Background
-			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-			//Logger
-			//g_Logger->Theme("Default Theme");
-		}
+		
 
 
 		CheckForInput();
@@ -699,7 +500,8 @@ namespace Saint::UserInterface
 				auto sub = m_SubmenuStack.top();
 				sub->Reset();
 				sub->Execute();
-				g_Render->m_CurrentSubMenuName = sub->GetName();
+				DrawSubmenuBar(sub);
+				g_Render->m_CurrentSubMenuName = submenu_enabled ? header_name.c_str() : sub->GetName();
 				if (sub->GetNumOptions() != 0)
 				{
 					std::size_t startPoint = 0;
@@ -1022,7 +824,49 @@ namespace Saint::UserInterface
 		draw_glare();
 		m_DrawBaseY += m_HeaderHeight;
 	}
+	void UIManager::DrawSubmenuBar(AbstractSubmenu* sub)
+	{
+		if (submenu_enabled) {
+			char leftText[64] = {};
+			std::strncpy(&leftText[0], sub->GetName(), sizeof(leftText) - 1);
+			std::transform(std::begin(leftText), std::end(leftText), std::begin(leftText), [](char c) { return static_cast<char>(toupper(c)); });
 
+			char rightText[32] = {};
+			std::snprintf(rightText, sizeof(rightText) - 1, "%zu / %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
+
+
+
+			DrawRect(
+				m_PosX,
+				m_DrawBaseY + (0.03f / 2.f),
+				m_Width, 0.03f,
+				m_FooterBackgroundColor);
+
+
+			DrawLeftText(
+				&leftText[0],
+				m_PosX - (m_Width / 2.1f),
+				m_DrawBaseY + (0.03f / 2.f) - (GetTextHeight(Font::ChaletLondon, 0.28f) / 1.5f),
+				0.28f, Font::ChaletLondon,
+				{ 255, 255, 255, 255 },
+				false, true);
+			DrawRightText(
+				&rightText[0],
+				m_PosX + (m_Width / 2.1f),
+				m_DrawBaseY + (0.03f / 2.f) - (GetTextHeight(Font::ChaletLondon, 0.28f) / 1.5f),
+				0.28f, Font::ChaletLondon,
+				{ 255, 255, 255, 255 },
+				false, true);
+
+
+
+			m_DrawBaseY += 0.03f;
+		}
+
+
+
+
+	}
 	void UIManager::DrawOption(AbstractOption* opt, bool selected)
 	{
 		GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(1);
@@ -1034,7 +878,7 @@ namespace Saint::UserInterface
 			m_OptionUnselectedBackgroundColor);
 		if (selected)
 		{
-			m_CurrentCoord = lerp(m_CurrentCoord, m_DrawBaseY + (m_OptionHeight / 2.f), 0.15f);
+			m_CurrentCoord = lerp(m_CurrentCoord, m_DrawBaseY + (m_OptionHeight / 2.f), 0.15f); m_OptionSelectedTextColor;
 			GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(2);
 			DrawRect(
 				m_PosX,
@@ -1112,7 +956,7 @@ namespace Saint::UserInterface
 
 				auto res = GetSpriteScale(0.030);
 				auto res2 = GetSpriteScale(0.033);
-				DrawSprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.015, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
+				DrawSprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.017, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
 
 				DrawRightText(
 					opt->GetRightText(),
@@ -1275,7 +1119,7 @@ namespace Saint::UserInterface
 				DrawRightText(
 					">",
 					m_PosX + (m_Width / m_OptionPadding),
-					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(Font::Monospace, 0.35) / 1.725f),
+					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(Font::Monospace, 0.35) / 1.725f) - 0.001,
 					0.35,
 					Font::Monospace,
 					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
@@ -1487,6 +1331,9 @@ namespace Saint::UserInterface
 		HUD::SET_TEXT_FONT(static_cast<int>(font));
 		if (m_MenuOpeningAnimation) {
 			HUD::SET_TEXT_COLOUR(color.r, color.g, color.b, g_MenuAlpha);
+		}
+		else {
+			HUD::SET_TEXT_COLOUR(color.r, color.g, color.b, 255);
 		}
 		if (outline)
 			HUD::SET_TEXT_OUTLINE();

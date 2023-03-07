@@ -246,6 +246,11 @@ namespace Saint
 		EntityShooter,
 		EntityShooterVehicle,
 		EntityShooterSelectedClass,
+
+		//Heist Editing
+		HeistControl,
+		DiamondCasino,
+		CayoPerico,
 	};
 
 	bool MainScript::IsInitialized()
@@ -651,9 +656,17 @@ namespace Saint
 			});
 		sub->draw_option<toggle<bool>>(("Infinite Rocket Boost"), "Instantly refills your vehicle's rocket boost.", &features.infiniter, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Bypass Max Speed"), "Allows you to exceed the maximum speed limit your current vehicle.", &m_vehicle.bypass_max_speed.enabled, BoolDisplay::OnOff, false, [] {
-			m_vehicle.bypass_max_speed.disable(); //trying something new
+			if (!m_vehicle.bypass_max_speed.enabled) {
+				m_vehicle.bypass_max_speed.disable(); //trying something new
+			}
 			});
-
+		sub->draw_option<toggle<bool>>(("Disable Lock-On"), "Allows you to exceed the maximum speed limit your current vehicle.", &features.disable_lock_on, BoolDisplay::OnOff, false, [] {
+			if (!features.disable_lock_on) {
+				auto g_local_player = (*g_GameFunctions->m_pedFactory)->m_local_ped;
+				if (g_local_player && g_local_player->m_vehicle)
+					g_local_player->m_vehicle->m_is_targetable = true;
+			}
+			});
 			});
 		g_Render->draw_submenu<sub>(("Invisible"), SubmenuVehicleInvis, [](sub* sub)
 			{
@@ -2425,9 +2438,9 @@ namespace Saint
 			sub->draw_option<number<float>>("Initial Drag Coeff", nullptr, &handling->m_initial_drag_coeff, 0.f, 10000.f, 0.1f, 1);
 			sub->draw_option<number<float>>("Downforce Multiplier", nullptr, &handling->m_downforce_multiplier, 0.f, 10000.f, 0.1f, 1);
 			sub->draw_option<number<float>>("Popup Light Rotation", nullptr, &handling->m_popup_light_rotation, 0.f, 10000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Centre Of Max X", nullptr, &handling->m_centre_of_mass.x, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Centre Of Max Y", nullptr, &handling->m_centre_of_mass.y, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Centre Of Max Z", nullptr, &handling->m_centre_of_mass.z, 0.0f, 1000.f, 0.1f, 1);
+			sub->draw_option<number<float>>("Centre Of Mass X", nullptr, &handling->m_centre_of_mass.x, 0.0f, 1000.f, 0.1f, 1);
+			sub->draw_option<number<float>>("Centre Of Mass Y", nullptr, &handling->m_centre_of_mass.y, 0.0f, 1000.f, 0.1f, 1);
+			sub->draw_option<number<float>>("Centre Of Mass Z", nullptr, &handling->m_centre_of_mass.z, 0.0f, 1000.f, 0.1f, 1);
 			sub->draw_option<number<float>>("Inertia Multiplier X", nullptr, &handling->m_inertia_mult.x, 0.0f, 1000.f, 0.1f, 1);
 			sub->draw_option<number<float>>("Inertia Multiplier Y", nullptr, &handling->m_inertia_mult.y, 0.0f, 1000.f, 0.1f, 1);
 			sub->draw_option<number<float>>("Inertia Multiplier Z", nullptr, &handling->m_inertia_mult.z, 0.0f, 1000.f, 0.1f, 1);
@@ -2978,7 +2991,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Network"), SubmenuNetwork, [](sub* sub)
 			{
-				sub->draw_option<submenu>("Players", nullptr, SubmenuPlayerList);
+				sub->draw_option<submenu>("Player List", nullptr, SubmenuPlayerList);
 		sub->draw_option<submenu>("Modder Detection", nullptr, SubmenuAntiCheat);
 		sub->draw_option<submenu>("Spoofing", nullptr, SubmenuSpoofing);
 		sub->draw_option<submenu>("Recovery", nullptr, SubmenuRecovery);
@@ -2989,6 +3002,81 @@ namespace Saint
 		sub->draw_option<submenu>("Chat", nullptr, SubmenuChat);
 		sub->draw_option<submenu>("Team", nullptr, SubmenuTeam);
 		sub->draw_option<submenu>("Off The Radar", nullptr, SubmenuOffRadar);
+		sub->draw_option<submenu>("Heist Control", nullptr, HeistControl);
+			});
+		g_Render->draw_submenu<sub>("Heist Control", HeistControl, [](sub* sub)
+			{
+				sub->draw_option<submenu>("Diamond Casino", nullptr, DiamondCasino);
+
+
+			});
+		g_Render->draw_submenu<sub>("Diamond Casino", DiamondCasino, [](sub* sub)
+			{
+				
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Driver", nullptr, &Aproach2, &Opreracogh22, false, -1, [=] {
+					switch (Opreracogh22) {
+					case 0:
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_CREWDRIVER"), 5, true);
+						break;
+					case 1:
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_CREWDRIVER"), 3, true);
+						break;
+					case 2:
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_CREWDRIVER"), 2, true);
+						break;
+					case 3:
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_CREWDRIVER"), 4, true);
+						break;
+					case 4:
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_CREWDRIVER"), 1, true);
+						break;
+					}
+				});
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Target", nullptr, &Aproach, &Opreracogh2, true, -1, [=] {
+					switch (Opreracogh2) {
+					case 0:
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_TARGET"), 3, true);
+						break;
+					case 1:
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_TARGET"), 1, true);
+						break;
+					case 2:
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_TARGET"), 2, true);
+						break;
+					case 3:
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_TARGET"), 4, true);
+						break;
+					}
+					});
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Teleprt", nullptr, &casino_teleport, &casino_tp, false, -1, [=] {
+					switch (casino_tp) {
+					case 0:
+						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 2465.4746, -279.2276, -70.694145);
+						break;
+					case 1:
+						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 2515.1252, -238.91661, -70.73713);
+						break;
+					case 2:
+						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 917.24634, 48.989567, 80.89892);
+						break;
+					
+					case 3:
+						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 2711.773, -369.458, -54.781);
+						break;
+			
+
+					}
+					
+						
+				});
+				sub->draw_option<RegularOption>("Hard Mode", "Puts heist on hard mode.", [] {
+				STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3_HARD_APPROACH"), 3, true);
+					});
+				sub->draw_option<RegularOption>("Scope POIS", "", [] {
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_POI"), 268435455, true);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_ACCESSPOINTS"), 2047, true);
+					});
+
 
 			});
 		g_Render->draw_submenu<sub>("Recovery", SubmenuRecovery, [](sub* sub)
@@ -3360,7 +3448,7 @@ namespace Saint
 			});
 
 			});
-		g_Render->draw_submenu<sub>("Players List", SubmenuPlayerList, [](sub* sub)
+		g_Render->draw_submenu<sub>("Player List", SubmenuPlayerList, [](sub* sub)
 			{
 				sub->draw_option<submenu>("All", nullptr, SubmenuAllPlayers);
 		sub->draw_option<ChooseOption<const char*, std::size_t>>("Filter", nullptr, &p_filter.data, &p_filter.data_i);
@@ -3814,6 +3902,10 @@ namespace Saint
 		sub->draw_option<submenu>("Cage", nullptr, SubmenuCage);
 		sub->draw_option<toggle<bool>>(("Always Wanted"), nullptr, &wanted_lev.always, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Freeze"), nullptr, &g_players.get_selected.freeze, BoolDisplay::OnOff);
+		static int boost_power = 10000;
+		sub->draw_option<number<std::int32_t>>("Bounty", nullptr, &boost_power, 0, 10000, 1, 3, false, "", "", [] {
+			g_players.get_selected.bounty(boost_power);
+		});
 		//sub->draw_option<toggle<bool>>(("Freeze"), nullptr, &g_players.get_selected.freeze, BoolDisplay::OnOff);
 		sub->draw_option<RegularOption>(("Taze"), nullptr, [=]
 			{
@@ -4032,6 +4124,11 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Drops"), SubmenuDrops, [](sub* sub) {
 			sub->draw_option<toggle<bool>>(("Money"), nullptr, &drops.money, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("RP"), nullptr, &drops.rp, BoolDisplay::OnOff);
+		sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
+		sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize RP Model", nullptr, &drops.random_rp_model, &drops.model_delay, 0, 5000, 50);
+		sub->draw_option<ChooseOption<const char*, std::size_t>>("Location", nullptr, &drops.location, &drops.data);
+		sub->draw_option<ChooseOption<const char*, std::size_t>>("RP Model", nullptr, &drops.rp_model, &drops.rp_model_data);
+		sub->draw_option<ChooseOption<const char*, std::size_t>>("Model Model", nullptr, &drops.money_model, &drops.money_model_data);
 		sub->draw_option<number<std::int32_t>>("Height", nullptr, &drops.height, 0, 100);
 		sub->draw_option<number<std::int32_t>>("Delay", nullptr, &drops.delay, 0, 5000, 50);
 			});
@@ -4261,15 +4358,15 @@ namespace Saint
 		sub->draw_option<number<float>>("Y Position", nullptr, &g_Render->m_PosY, 0.f, 1.f, 0.01f, 2);
 		sub->draw_option<number<float>>("Width", nullptr, &g_Render->m_Width, 0.01f, 1.f, 0.01f, 2);
 		sub->draw_option<toggle<bool>>("Sounds", nullptr, &g_Render->m_Sounds, BoolDisplay::OnOff);
-
+		sub->draw_option<toggle<bool>>("Submenu Bar", nullptr, &g_Render->submenu_enabled, BoolDisplay::OnOff);
 		sub->draw_option<ChooseOption<const char*, std::size_t>>(("Submenu Indicators"), nullptr, &g_Render->IndicatorList, &g_Render->IndicatorIterator);
 		sub->draw_option<toggle<bool>>("Glare", nullptr, &g_Render->m_render_glare, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>("Log Script Events", nullptr, &g_LogScriptEvents, BoolDisplay::OnOff);
-		sub->draw_option<RegularOption>("Save Test", "", []
+		sub->draw_option<RegularOption>("Save Theme", "", []
 			{
 				g_ThemeLoading->save();
 			});
-		sub->draw_option<RegularOption>("Load Test", "", []
+		sub->draw_option<RegularOption>("Load Theme", "", []
 			{
 				g_ThemeLoading->load();
 			});
@@ -4336,7 +4433,208 @@ namespace Saint
 
 		g_Render->draw_submenu<sub>(("Themes"), SubmenuThemes, [](sub* sub)
 			{
-				sub->draw_option<ChooseOption<const char*, std::size_t>>(("Themes"), nullptr, &g_Render->ThemeList, &g_Render->ThemeIterator);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>(("Themes"), nullptr, &g_Render->ThemeList, &g_Render->ThemeIterator, false, -1, [] {
+				if (g_Render->ThemeIterator == 0)
+				{
+					//Header
+					g_Render->m_HeaderBackgroundColor = { 108, 60, 175, 255 };
+
+					//Footer
+					g_Render->m_FooterBackgroundColor = { 108, 60, 175, 255 };
+
+					//Option
+					g_Render->m_OptionSelectedBackgroundColor = { 108, 60, 175, 255 };
+
+					//Description
+					g_Render->m_DescriptionBackgroundColor = { 108, 60, 175, 255 };
+
+					//Background
+					g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+					//Logger
+					//g_Logger->Theme("Default Theme");
+				}
+
+		if (g_Render->ThemeIterator == 1)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 255, 108, 116, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 255, 108, 116, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 255, 108, 116, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 255, 108, 116, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Salmon Red Theme");
+		}
+
+		if (g_Render->ThemeIterator == 2)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 15, 82, 186, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 15, 82, 186, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 15, 82, 186, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 15, 82, 186, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Sapphire Blue Theme");
+		}
+
+		if (g_Render->ThemeIterator == 3)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 24, 26, 24, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 24, 26, 24, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 24, 26, 24, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 24, 26, 24, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Soft Black Theme");
+		}
+
+		if (g_Render->ThemeIterator == 4)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 0, 155, 119, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 0, 155, 119, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 0, 155, 119, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 0, 155, 119, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Emerald Green Theme");
+		}
+
+		if (g_Render->ThemeIterator == 5)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 70, 38, 180, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 70, 38, 180, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 70, 38, 180, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 70, 38, 180, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Violet Purple Theme");
+		}
+
+		if (g_Render->ThemeIterator == 6)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 255, 145, 164, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 255, 145, 164, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 255, 145, 164, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 255, 145, 164, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Salmon Pink Theme");
+		}
+
+		if (g_Render->ThemeIterator == 7)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 17, 17, 17, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 17, 17, 17, 255 };
+			g_Render->m_FooterSpriteColor = { 181,181,181, 255 };
+			g_Render->m_FooterHeight = 0.030f;
+			g_Render->m_FooterSpriteSize = 0.030f;
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 65, 60, 60, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 0, 0, 0, 120 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 30,35,36, 230 };
+
+			//Option Height
+			g_Render->m_OptionHeight = 0.033f;
+
+			//Option Text Size
+			g_Render->m_OptionTextSize = 0.29f;
+
+			//Option Text Color
+			g_Render->m_OptionUnselectedTextColor = { 181,181,181, 255 };
+			g_Render->m_OptionSelectedTextColor = { 181,181,181, 255 };
+
+			//Logger
+			//g_Logger->Theme("Salmon Pink Theme");
+		}
+		if (g_Render->ThemeIterator == 8)
+		{
+			//Header
+			g_Render->m_HeaderBackgroundColor = { 234, 90, 81, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 234, 90, 81, 255 };
+
+			//Option
+			g_Render->m_OptionSelectedBackgroundColor = { 187, 64, 71, 255 };
+
+			//Description
+			g_Render->m_DescriptionBackgroundColor = { 234, 90, 81, 255 };
+
+			//Background
+			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//Logger
+			//g_Logger->Theme("Default Theme");
+		}
+					});
 		sub->draw_option<RegularOption>("Random", "", []
 			{
 				g_Render->ThemeIterator = MISC::GET_RANDOM_INT_IN_RANGE(0, 8);
@@ -4414,6 +4712,13 @@ namespace Saint
 
 		sub->draw_option<submenu>("Text", nullptr, SubmenuSettingsHeaderText);
 		sub->draw_option<number<float>>("Height", nullptr, &g_Render->m_HeaderHeight, 0.01f, 0.2f, 0.001f, 3);
+		sub->draw_option<KeyboardOption>(("Name"), nullptr, g_Render->header_name, []
+			{
+				showKeyboard("Enter Something", "", 25, &g_Render->header_name, [] {});
+
+
+
+			});
 			});
 
 		g_Render->draw_submenu<sub>("Header Background", SubmenuSettingsHeaderStaticBackground, [](sub* sub)
