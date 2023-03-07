@@ -65,12 +65,12 @@ namespace Saint {
 			float offset = 0.02;
 			float xfr = x + 0.205f + offset;
 			if (first) {
-				drawText(text, xfr - 0.087f, 0.105f, 0.25f, 0, false, col2, false);
-				drawText(text2, xfr + 0.087f -x_offset, 0.105f, 0.25f, 0, false, col2, true);
+				drawText(text, xfr - 0.110f, 0.105f, 0.25f, 0, false, col2, false);
+				drawText(text2, xfr + 0.075f -x_offset, 0.105f, 0.25f, 0, false, col2, true);
 			}
 			else {
-				drawText(text, xfr - 0.087f, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, false);
-				drawText(text2, xfr + 0.087f - x_offset, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, true);
+				drawText(text, xfr - 0.110f, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, false);
+				drawText(text2, xfr + 0.075f - x_offset, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, true);
 			}
 		}
 		void drawSprite(const char* dict, const char* texture, float x, float y, float width, float height, Color color, float rotation)
@@ -91,7 +91,7 @@ namespace Saint {
 			float y = g_Render->m_PosY;
 			Color col;
 
-			float offset = 0.012;
+			float offset = 0.023f;
 			float xfr = x + 0.205f + offset - 0.025f;
 			GRAPHICS::DRAW_RECT(xfr, y + -0.090 + 0.178, 0.183f, 0.178, g_Render->m_OptionUnselectedBackgroundColor.r, g_Render->m_OptionUnselectedBackgroundColor.g, g_Render->m_OptionUnselectedBackgroundColor.b, 160, false);
 			Color col2 = { 255, 255, 255, 190 };

@@ -251,6 +251,9 @@ namespace Saint
 		HeistControl,
 		DiamondCasino,
 		CayoPerico,
+		
+			//Disables
+			Disables,
 	};
 
 	bool MainScript::IsInitialized()
@@ -2544,7 +2547,7 @@ namespace Saint
 				WEAPON::SET_PED_INFINITE_AMMO_CLIP(PLAYER::PLAYER_PED_ID(), false);
 			}
 			});
-		sub->draw_option<toggle<bool>>(("Teleport"), nullptr, &features.teleport_gun, BoolDisplay::OnOff);
+		sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Teleport", nullptr, &features.teleport_gun, &features.teleport_gun_type, &features.teleport_gun_int);
 		sub->draw_option<toggle<bool>>(("Delete"), nullptr, &features.delete_gun, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Bypass C4 Limit"), nullptr, &features.bypass_c4_limit, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Magnet"), nullptr, &gravity.enabled, BoolDisplay::OnOff);
@@ -4262,7 +4265,18 @@ namespace Saint
 
 				sub->draw_option<submenu>("Replace Text", nullptr, SubmenuReplaceText);
 		sub->draw_option<submenu>("FOV", nullptr, SubmenuFOV);
+		sub->draw_option<submenu>("Disables", nullptr, Disables);
 
+			});
+		g_Render->draw_submenu<sub>("Disables", Disables, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Recording"), nullptr, &m_disables.recording, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Cinematics"), nullptr, &m_disables.cin, BoolDisplay::OnOff, false, [] {
+				if (!m_disables.cin) {
+					CAM::SET_CINEMATIC_BUTTON_ACTIVE(true);
+				}
+					});
+				sub->draw_option<toggle<bool>>(("Stunt Jumps"), nullptr, &m_disables.stuntjumps, BoolDisplay::OnOff);
 			});
 		g_Render->draw_submenu<sub>("FOV", SubmenuFOV, [](sub* sub)
 			{
@@ -4616,22 +4630,33 @@ namespace Saint
 		if (g_Render->ThemeIterator == 8)
 		{
 			//Header
-			g_Render->m_HeaderBackgroundColor = { 234, 90, 81, 255 };
+			g_Render->m_HeaderBackgroundColor = { 14, 37, 71, 255 };
 
 			//Footer
-			g_Render->m_FooterBackgroundColor = { 234, 90, 81, 255 };
+			g_Render->m_FooterBackgroundColor = { 0, 0, 0, 255 };
 
 			//Option
-			g_Render->m_OptionSelectedBackgroundColor = { 187, 64, 71, 255 };
+			g_Render->m_OptionSelectedBackgroundColor = { 255, 255, 255, 255 };
 
 			//Description
-			g_Render->m_DescriptionBackgroundColor = { 234, 90, 81, 255 };
+			//g_Render->m_DescriptionBackgroundColor = { 234, 90, 81, 255 };
 
 			//Background
-			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+			g_Render->m_OptionSelectedTextColor = { 0, 0, 0, 255 };
+
+			g_Render->header_name = "North";
+
+			g_Render->m_HeaderText = false;
+			g_Render->m_HeaderNativeText = true;
+
+			g_Render->submenu_enabled = true;
+
+			g_Render->IndicatorIterator = 0;
+
+			
 
 			//Logger
-			//g_Logger->Theme("Default Theme");
+			//g_Logger->Theme("North");
 		}
 					});
 		sub->draw_option<RegularOption>("Random", "", []

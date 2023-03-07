@@ -492,6 +492,8 @@ namespace Saint {
 		bool seatbelt = false;
 		bool off_the_radar = false;
 		bool teleport_gun = false;
+		const char* teleport_gun_type[2] = { "Smooth", "Rough" };
+		std::size_t teleport_gun_int = 0;
 		bool delete_gun = false;
 		bool infinite_ammo = false;
 		bool spectate = false;
@@ -736,7 +738,12 @@ namespace Saint {
 				{
 					NativeVector3 c;
 					if (raycast(c)) {
-						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(PLAYER::PLAYER_PED_ID(), c.x, c.y, c.z, true, true, true);
+						if (teleport_gun_int == 0) {
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(PLAYER::PLAYER_PED_ID(), c.x, c.y, c.z, true, true, true);
+						}
+						if (teleport_gun_int == 1) {
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(PLAYER::PLAYER_PED_ID(), c.x, c.y, c.z, false, false, false);
+						}
 					}
 				}
 			}
@@ -3756,12 +3763,33 @@ namespace Saint {
 	inline std::size_t Opreracogh2 = 0;
 	inline const char* Aproach2[5] = { "Chester McCoy (Best)", "Eddie Toh", "Taliana Martinez", "Zach Nelson", "Karim Denz" };
 	inline std::size_t Opreracogh22 = 0;
+	class Disables2 {
+	public:
+		bool recording = false;
+		bool cin = false;
+		bool stuntjumps = false;
+		void init() {
+			if (cin) {
+				CAM::SET_CINEMATIC_BUTTON_ACTIVE(false);
+			}
+			if (recording) {
+				RECORDING::CANCEL_REPLAY_RECORDING();
+				RECORDING::REPLAY_PREVENT_RECORDING_THIS_FRAME();
+			}
+			if (stuntjumps)
+			{
+				MISC::CANCEL_STUNT_JUMP();
+			}
+		}
+	};
+	inline Disables2 m_disables;
 	inline void FeatureInitalize() {
 
 		if (mark_as_Saint) {
 			PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 109, true);
 
 		}
+		m_disables.init();
 		m_entity_shooter.init();
 		m_frame_flags.init();
 		m_vehicle_ramps.init();
