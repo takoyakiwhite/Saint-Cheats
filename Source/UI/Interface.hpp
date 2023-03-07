@@ -211,6 +211,8 @@ namespace Saint::UserInterface
 		//submenubar
 		bool submenu_enabled = false;
 
+		bool animation_enabled = false;
+
 		std::string header_name = "Saint";
 
 		// Footer

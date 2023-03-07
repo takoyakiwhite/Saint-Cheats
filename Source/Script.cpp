@@ -4354,6 +4354,7 @@ namespace Saint
 		sub->draw_option<submenu>("Themes", nullptr, SubmenuThemes);
 		//sub->draw_option<submenu>("Scripts", nullptr, SubmenuScripts);
 		//sub->draw_option<submenu>("Demo", nullptr, SubmenuTest);
+		
 		sub->draw_option<number<float>>("X Position", nullptr, &g_Render->m_PosX, 0.f, 1.f, 0.01f, 2);
 		sub->draw_option<number<float>>("Y Position", nullptr, &g_Render->m_PosY, 0.f, 1.f, 0.01f, 2);
 		sub->draw_option<number<float>>("Width", nullptr, &g_Render->m_Width, 0.01f, 1.f, 0.01f, 2);
