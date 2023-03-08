@@ -5,6 +5,7 @@
 #include "../Libraries/Include/GTAV-Classes/network/CNetGamePlayer.hpp"
 
 namespace rage {
+	class netEventMgr;
 #pragma pack(push, 1)
 	class netGameEvent
 	{

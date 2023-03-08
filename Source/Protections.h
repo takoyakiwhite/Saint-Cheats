@@ -5,9 +5,15 @@ namespace Saint {
 	public:
 		bool vehicle = true;
 	};
+	class GameEvents {
+	public:
+		bool request_control = true;
+		bool request_pickup = true;
+	};
 	class Protections {
 	public:
 		Crash crash;
+		GameEvents m_game_events;
 		bool crash_blocked = false;
 		void push_notification(const char* body) {
 

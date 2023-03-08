@@ -42,6 +42,8 @@ namespace Saint
 		static void* AssignNewPhysicalIndexHandler(CNetworkPlayerMgr* NetworkPlayerMgr, CNetGamePlayer* player, uint8_t new_index);
 		static void InvalidModsCrashPatch(std::int64_t a1, std::int64_t a2, int a3, char a4);
 
+		static void hk_received_event(rage::netEventMgr* event_manager, CNetGamePlayer* source_player, CNetGamePlayer* target_player, uint16_t event_id, int event_index, int event_handled_bitset, int unk, rage::datBitBuffer* bit_buffer);
+
 
 
 
@@ -82,6 +84,8 @@ namespace Saint
 		void* m_OriginalAssignPhysicalIndex{};
 		void* m_OriginalRecieveEvent{};
 		void* m_OriginalModCrash{};
+
+		void* OriginalRecivied{};
 
 
 	};

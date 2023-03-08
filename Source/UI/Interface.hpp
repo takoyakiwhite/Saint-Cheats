@@ -263,9 +263,9 @@ namespace Saint::UserInterface
 		Color m_DescriptionSpriteColor{ 255,255,255, 255 };
 
 		bool m_MenuOpeningAnimation = false;
-		int g_MenuAlpha = 0;
+		int g_MenuAlpha = 255;
 		const char* m_CurrentSubMenuName = "Hello";
-		bool m_AnimationCheck;
+		bool m_AnimationCheck = false;
 		void DrawRect(float x, float y, float width, float height, Color color);
 		void DrawRightText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow);
 

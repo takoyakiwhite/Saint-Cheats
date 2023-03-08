@@ -132,6 +132,9 @@ namespace Saint
 		using RegisterFile = std::uint32_t(*)(std::uint32_t* texture_id, const char* path, bool p1, const char* name, bool p2);
 		RegisterFile m_RegisterFile;
 
+		using send_event_ack = void(*)(rage::netEventMgr* event_manager, CNetGamePlayer* source_player, CNetGamePlayer* target_player, int event_index, int event_handled_bitset);
+		send_event_ack m_send_event_ack{};
+
 		using GetEventData = bool(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount);
 		GetEventData* m_GetEventData;
 
@@ -149,6 +152,8 @@ namespace Saint
 		SendNetInfoo* m_SendNetInfo;
 
 		PVOID m_AssignPhysicalIndexHandler;
+
+		PVOID m_received_event{};
 
 
 	};
