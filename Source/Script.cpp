@@ -787,9 +787,11 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Spawner"), SubmenuVehicleSpawner, [](sub* sub)
 			{
+				
 				sub->draw_option<submenu>("Settings", nullptr, Submenu::SpawnerSettings);
 		sub->draw_option<submenu>("Search", nullptr, Submenu::SubmenuVehicleSearch);
 		sub->draw_option<submenu>("Saved", nullptr, Submenu::SubmenuSavedVehicles);
+		
 		sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 		sub->draw_option<submenu>("All", nullptr, SubmenuVehicleAll);
 		for (std::int32_t i = 0; i < 23; i++) {

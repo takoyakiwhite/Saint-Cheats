@@ -1035,7 +1035,7 @@ namespace Saint::UserInterface
 				m_OptionFont,
 				selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
 				false, false);
-			DrawSprite("Textures", "Pen", m_PosX + (m_Width / m_OptionPadding - 0.005f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 0.0);
+			DrawSprite("Textures", "Pen_White", m_PosX + (m_Width / m_OptionPadding - 0.004f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 0.0);
 		}
 		else {
 			DrawRightText(

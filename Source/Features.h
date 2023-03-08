@@ -971,25 +971,31 @@ namespace Saint {
 				}
 			}
 			Player p = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
-			NativeVector3 c;
+			NativeVector3 rp_c;
+			NativeVector3 money_c;
 			if (data == 0) {
-				c = ENTITY::GET_ENTITY_COORDS(p, false);
+				rp_c = ENTITY::GET_ENTITY_COORDS(p, false);
+				money_c = ENTITY::GET_ENTITY_COORDS(p, false);
 			}
 			if (data == 1) {
 				NativeVector3 pos_get = ENTITY::GET_ENTITY_COORDS(p, false);
 				NativeVector3 pos = { pos_get.x - MISC::GET_RANDOM_INT_IN_RANGE(-20, 15), pos_get.y + MISC::GET_RANDOM_INT_IN_RANGE(-13, 6), pos_get.z };
-				c = pos;
+				rp_c = pos;
+
+				NativeVector3 pos_get2 = ENTITY::GET_ENTITY_COORDS(p, false);
+				NativeVector3 pos2 = { pos_get2.x - MISC::GET_RANDOM_INT_IN_RANGE(-20, 15), pos_get2.y + MISC::GET_RANDOM_INT_IN_RANGE(-13, 6), pos_get2.z };
+				money_c = pos2;
 			}
 			static int delayfr3 = 0;
 			if (delayfr3 == 0 || (int)(GetTickCount64() - delayfr3) > delay)
 			{
 				if (rp) {
-					float dz = c.z;
-					c.z = dz + height;
+					float dz = rp_c.z;
+					rp_c.z = dz + height;
 
 					g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), [=] {
 						*g_GameFunctions->should_sync_money_rewards = true;
-					OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, c.x, c.y, c.z, 0, 10, MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), false, true);
+					OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, rp_c.x, rp_c.y, rp_c.z, 0, 10, MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), false, true);
 					*g_GameFunctions->should_sync_money_rewards = false;
 
 
@@ -1002,11 +1008,11 @@ namespace Saint {
 
 				}
 				if (money) {
-					float dz = c.z;
-					c.z = dz + height;
+					float dz = money_c.z;
+					money_c.z = dz + height;
 					g_CallbackScript->AddCallback<ModelCallback>(money_model_init[money_model_data], [=] {
 						*g_GameFunctions->should_sync_money_rewards = true;
-					OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 2500, money_model_init[money_model_data], false, true);
+					OBJECT::CREATE_AMBIENT_PICKUP(1704231442, money_c.x, money_c.y, money_c.z, 1, 2500, money_model_init[money_model_data], false, true);
 					*g_GameFunctions->should_sync_money_rewards = false;
 
 
@@ -3976,6 +3982,7 @@ namespace Saint {
 		}
 	};
 	inline Hotkeys m_hotkeys;
+	inline std::string Spawner_buffer = "";
 	class VehicleFX {
 	public:
 		bool lf = false;
