@@ -357,54 +357,7 @@ namespace Saint
 		}
 		return static_cast<decltype(&InvalidModsCrashPatch)>(g_Hooking->m_OriginalModCrash)(a1, a2, a3, a4);
 	}
-	void Hooks::hk_received_event(
-		rage::netEventMgr* event_manager,
-		CNetGamePlayer* source_player,
-		CNetGamePlayer* target_player,
-		uint16_t event_id,
-		int event_index,
-		int event_handled_bitset,
-		int buffer_size,
-		rage::datBitBuffer* buffer)
-	{
-		if (event_id > 91u)
-		{
-			g_GameFunctions->m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-
-			return;
-		}
-
-		const auto event_name = *(char**)((DWORD64)event_manager + 8i64 * event_id + 243376);
-		if (event_name == nullptr || source_player == nullptr || source_player->m_player_id < 0 || source_player->m_player_id >= 32)
-		{
-			g_GameFunctions->m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-			return;
-		}
-
-		switch (static_cast<eNetworkEvents>(event_id))
-		{
-			case eNetworkEvents::CRequestControlEvent:
-				{
-					if (source_player->m_player_id < 32)
-					{
-						g_GameFunctions->m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-						if (protections.m_game_events.request_control) {
-							Noti::InsertNotification({ ImGuiToastType_None, 2600, "Blocked Request Control From %s", source_player->get_name() });
-
-							
-							return;
-						}
-					}
-					
-					break;
-				}
-			
-		default:
-			break;
-		}
-		
-		return static_cast<decltype(&hk_received_event)>(g_Hooking->OriginalRecivied)(event_manager, source_player, target_player, event_id, event_index, event_handled_bitset, buffer_size, buffer);
-	}
+	
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
@@ -421,7 +374,7 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_send_chat_message, &Hooks::send_chat_message, &m_OriginalChatSend);
 		MH_CreateHook(g_GameFunctions->m_AssignPhysicalIndexHandler, &Hooks::AssignNewPhysicalIndexHandler, &m_OriginalAssignPhysicalIndex);
 		MH_CreateHook(g_GameFunctions->crashProtection, &Hooks::InvalidModsCrashPatch, &m_OriginalModCrash);
-		//MH_CreateHook(g_GameFunctions->m_received_event, &Hooks::hk_received_event, &OriginalRecivied);
+		
 		m_D3DHook.Hook(&Hooks::Present, Hooks::PresentIndex);
 		m_D3DHook.Hook(&Hooks::ResizeBuffers, Hooks::ResizeBuffersIndex);
 	}
@@ -441,7 +394,7 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->m_send_chat_message);
 		MH_RemoveHook(g_GameFunctions->m_AssignPhysicalIndexHandler);
 		MH_RemoveHook(g_GameFunctions->crashProtection);
-		//MH_RemoveHook(g_GameFunctions->m_received_event);
+		
 		//MH_RemoveHook(g_GameFunctions->m_GetEventData);
 		MH_Uninitialize();
 	}

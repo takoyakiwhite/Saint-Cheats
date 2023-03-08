@@ -4683,7 +4683,9 @@ namespace Saint
 		if (g_Render->ThemeIterator == 8)
 		{
 			//Header
-			g_Render->m_HeaderBackgroundColor = { 14, 37, 71, 255 };
+			g_Render->m_HeaderBackgroundColor = { 108, 60, 175, 255 };
+
+			//Footer
 
 			//Footer
 			g_Render->m_FooterBackgroundColor = { 0, 0, 0, 255 };
@@ -4697,7 +4699,7 @@ namespace Saint
 			//Background
 			g_Render->m_OptionSelectedTextColor = { 0, 0, 0, 255 };
 
-			g_Render->header_name = "North";
+			g_Render->header_name = "Saint";
 
 			g_Render->m_HeaderText = false;
 			g_Render->m_HeaderNativeText = true;
