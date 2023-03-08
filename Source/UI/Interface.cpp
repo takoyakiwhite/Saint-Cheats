@@ -22,6 +22,25 @@
 
 namespace Saint::UserInterface
 {
+	bool FileExists(const std::string& fileName)
+	{
+		struct stat buffer;
+		return (stat(fileName.c_str(), &buffer) == 0);
+	}
+	void LoadYTD()
+	{
+
+		std::string MenuFolderPath = "C:\\Saint\\";
+		std::string name = "Textures.ytd";
+
+		const std::string fullPath = MenuFolderPath + name;
+
+		uint32_t textureID;
+		if (FileExists(fullPath))
+			g_GameFunctions->m_RegisterFile(&textureID, fullPath.c_str(), true, name.c_str(), false);
+
+
+	}
 	void MenuOpeningAnimation()
 	{
 		g_FiberPool.queue([]
@@ -484,6 +503,7 @@ namespace Saint::UserInterface
 		CheckForInput();
 
 		HandleInput();
+		LoadYTD();
 
 		if (m_Opened)
 		{
@@ -1003,6 +1023,19 @@ namespace Saint::UserInterface
 					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
 					false, false);
 			}
+		}
+		else if (opt->GetFlag(OptionFlag::Keyboard)) {
+			auto res = GetSpriteScale(0.0185);
+			auto res2 = GetSpriteScale(0.0185);
+			DrawRightText(
+				opt->GetRightText(),
+				m_PosX + (m_Width / m_OptionPadding - 0.01f),
+				m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
+				m_OptionTextSize,
+				m_OptionFont,
+				selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+				false, false);
+			DrawSprite("Textures", "Pen", m_PosX + (m_Width / m_OptionPadding - 0.005f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 0.0);
 		}
 		else {
 			DrawRightText(

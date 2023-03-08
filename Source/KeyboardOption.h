@@ -21,7 +21,15 @@ namespace Saint::UserInterface
 			SetAction(std::move(action));
 		}
 
+		bool GetFlag(OptionFlag flag) override
+		{
+			if (flag == OptionFlag::Keyboard)
+			{
+				return true;
+			}
 
+			return BaseOption::GetFlag(flag);
+		}
 
 		~KeyboardOption() noexcept = default;
 		KeyboardOption(KeyboardOption const&) = default;

@@ -129,7 +129,8 @@ namespace Saint
 		using CPlayerWildCard = __int64* (std::int32_t friendindex);
 		CPlayerWildCard* m_PlayerWildcard;
 
-
+		using RegisterFile = std::uint32_t(*)(std::uint32_t* texture_id, const char* path, bool p1, const char* name, bool p2);
+		RegisterFile m_RegisterFile;
 
 		using GetEventData = bool(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount);
 		GetEventData* m_GetEventData;
