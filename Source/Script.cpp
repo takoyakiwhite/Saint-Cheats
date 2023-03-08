@@ -4782,7 +4782,7 @@ namespace Saint
 		case HeaderType::Static:
 			sub->draw_option<submenu>("Background", nullptr, SubmenuSettingsHeaderStaticBackground);
 			break;
-		case HeaderType::Gradient:
+		case HeaderType::YTD:
 			sub->draw_option<submenu>("Gradient", nullptr, SubmenuSettingsHeaderGradientBackground);
 			break;
 		}

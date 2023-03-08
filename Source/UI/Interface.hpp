@@ -34,7 +34,7 @@ namespace Saint::UserInterface
 	enum class HeaderType : std::int32_t
 	{
 		Static = 0,
-		Gradient = 1
+		YTD = 1
 	};
 
 	struct Rectangle

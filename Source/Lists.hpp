@@ -12,7 +12,7 @@ namespace Saint::Lists
 	inline UserInterface::HeaderType HeaderTypesBackend[]
 	{
 		UserInterface::HeaderType::Static,
-		UserInterface::HeaderType::Gradient
+		UserInterface::HeaderType::YTD
 	};
 
 	inline std::size_t HeaderTypesPosition = 1;
