@@ -268,6 +268,9 @@ namespace Saint::UserInterface
 		bool m_AnimationCheck;
 		void DrawRect(float x, float y, float width, float height, Color color);
 		void DrawRightText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow);
+
+		
+
 		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
 	private:
 		bool m_OpenKeyPressed = false;

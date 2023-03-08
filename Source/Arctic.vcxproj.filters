@@ -229,6 +229,9 @@
     <ClInclude Include="Players.h">
       <Filter>Core\Features\Network\Players</Filter>
     </ClInclude>
+    <ClInclude Include="Hotkeys.h">
+      <Filter>Core\Hotkeys</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">
@@ -422,6 +425,9 @@
     </Filter>
     <Filter Include="Discord">
       <UniqueIdentifier>{61022400-0f03-44ce-b9a7-f83563a2fd12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Hotkeys">
+      <UniqueIdentifier>{4fd2ef2d-02c9-4793-bcb8-2e983863f6cc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

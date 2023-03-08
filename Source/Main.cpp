@@ -136,6 +136,9 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 			//Background
 			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+
+			//registering
+			//g_Render->RegisterFile(std::string("C:\\Saint\\Textures.ytd"), std::string("Textures.ytd"));
 			//Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome %s",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
 			while (g_Running)
 			{

@@ -31,6 +31,34 @@ namespace Saint
 	protected:
 		AbstractCallback() = default;
 	};
+	class PTFXCallback : public AbstractCallback
+	{
+	public:
+		explicit PTFXCallback(const char* particleName, std::function<void()> action) :
+			m_ParticleName(particleName),
+			m_Action(std::move(action))
+		{
+		}
+
+		bool IsDone() override
+		{
+			return STREAMING::HAS_NAMED_PTFX_ASSET_LOADED(m_ParticleName);
+		}
+
+		void OnSuccess() override
+		{
+			if (m_Action)
+				std::invoke(m_Action);
+		}
+
+		void OnFailure() override
+		{
+			STREAMING::REQUEST_NAMED_PTFX_ASSET(m_ParticleName);
+		}
+	private:
+		const char* m_ParticleName;
+		std::function<void()> m_Action;
+	};
 	class AnimationCallback : public AbstractCallback
 	{
 	public:

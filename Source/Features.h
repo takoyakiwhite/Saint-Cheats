@@ -14,6 +14,7 @@
 #include "All Players.h"
 #include "Hooking.hpp"
 #include "Render.h"
+#include "Hotkeys.h"
 namespace Saint {
 	inline std::string handlingBuffer = "";
 	inline std::string ridBuffer = "";
@@ -65,6 +66,14 @@ namespace Saint {
 		};
 
 		std::size_t FlyInt = 0;
+		void onDisable() {
+			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+			if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), 0)) {
+				if (DisableCollision) {
+					ENTITY::SET_ENTITY_COLLISION(veh, true, true);
+				}
+			}
+		}
 		void init() {
 			if (enabled) {
 				if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
@@ -252,7 +261,7 @@ namespace Saint {
 						}
 						else {
 							if (smooth) {
-								if (ENTITY::GET_ENTITY_SPEED(playerVehicle) != speed) {
+								if (ENTITY::GET_ENTITY_SPEED(playerVehicle) < speed) {
 									VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVehicle, ENTITY::GET_ENTITY_SPEED(playerVehicle) + boost_power);
 								}
 							}
@@ -521,7 +530,38 @@ namespace Saint {
 		bool invisible_carlocal_visible = false;
 		int boost_speed = 150;
 		bool disable_lock_on = false;
+		bool aim_tracer = false;
+		bool is_free_aiming() {
+			return PED::GET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 78, true);
+		}
 		void init() {
+			if (aim_tracer) {
+				Vector3 minV, maxV;
+					Hash weapHash;
+
+					Entity weap = WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(PLAYER::PLAYER_PED_ID(), 0);
+					WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weapHash, 1);
+					NativeVector3 pos = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(weap, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(weap, "gun_muzzle"));
+					NativeVector3 rot = ENTITY::GET_ENTITY_ROTATION(weap, 2);
+					Entity get_ent;
+					if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_PED_ID(), &get_ent)) {
+						NativeVector3 hitCoords;
+						if (raycast(hitCoords)) {
+							GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, hitCoords.x, hitCoords.y, hitCoords.z, 255, 0, 0, 255);
+						}
+					}
+					else {
+						if (is_free_aiming()) {
+							NativeVector3 hitCoords;
+							if (raycast(hitCoords)) {
+								GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, hitCoords.x, hitCoords.y, hitCoords.z, 255, 255, 255, 255);
+							}
+						}
+					}
+
+
+				
+			}
 			if (disable_lock_on) {
 				auto g_local_player = (*g_GameFunctions->m_pedFactory)->m_local_ped;
 				if (g_local_player && g_local_player->m_vehicle)
@@ -1823,6 +1863,8 @@ namespace Saint {
 		int spawnr2 = 0;
 		int spawng2 = 0;
 		int spawnb2 = 0;
+		const char* fade_speed[2] = {"Fast", "Slow"};
+		std::size_t fade_speed_i = 0;
 		void spawn(Hash hash) {
 			*script_global(4540726).as<bool*>() = true;
 			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
@@ -1859,7 +1901,13 @@ namespace Saint {
 				PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
 			}
 			if (fade_in) {
-				NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, false);
+				if (fade_speed_i == 0) {
+					NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, false);
+				}
+				if (fade_speed_i == 1) {
+					NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, true);
+				}
+				
 			}
 			if (spawnwithcolor) {
 				VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, spawnr, spawng, spawnb);
@@ -2631,6 +2679,37 @@ namespace Saint {
 			m_load.remove();
 			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ped, coords.x, coords.y, coords.z, true, true, true);
 		}
+		void object() {
+			NativeVector3 coords = GetBlipIcon();
+			Ped ped = PLAYER::PLAYER_PED_ID();
+
+			if (coords.x == 0 && coords.y == 0) { return; }
+
+			if (PED::IS_PED_IN_ANY_VEHICLE(ped, 0))
+				ped = PED::GET_VEHICLE_PED_IS_USING(ped);
+
+			bool isGroundAvailable = false;
+			std::vector<float> GROUND_HEIGHT{ 100.0f, 150.0f, 50.0f, 0.0f, 200.0f, 250.0f, 300.0f, 350.0f, 400.0f, 450.0f, 500.0f, 550.0f, 600.0f, 650.0f, 700.0f, 750.0f, 800.0f };
+			m_load.add("Getting coordinates...");
+			for (int i = 0; i < GROUND_HEIGHT.size(); i++)
+			{
+				ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ped, coords.x, coords.y, GROUND_HEIGHT[i], true, true, true);
+
+				fbr::cur()->wait(100ms);
+
+
+
+
+				if (MISC::GET_GROUND_Z_FOR_3D_COORD(coords.x, coords.y, GROUND_HEIGHT[i], &coords.z, 0, false))
+				{
+					isGroundAvailable = true;
+					coords.z += 3.0;
+					break;
+				}
+			}
+			m_load.remove();
+			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ped, coords.x, coords.y, coords.z, true, true, true);
+		}
 		void init() {
 			if (automatic) {
 				waypoint();
@@ -3007,7 +3086,7 @@ namespace Saint {
 		{
 			 "prop_mp_ramp_01", "lts_prop_lts_ramp_02", "lts_prop_lts_ramp_03"
 		};
-		std::size_t m_ramp_type_data = 2;
+		std::size_t m_ramp_type_data = 0;
 		const char* m_remove_type[2]
 		{
 			 "Last", "Force"
@@ -3783,12 +3862,224 @@ namespace Saint {
 		}
 	};
 	inline Disables2 m_disables;
+	class Traffic {
+	public:
+		bool horn = false;
+		bool rainbow = false;
+		std::size_t acrobatic = 0;
+		int r = 0;
+		int g = 255;
+		int b = 0;
+		const char* rainbow_type[2] = { "Stop", "Constant"};
+		std::size_t rainbow_int = 0;
+		void init() {
+			if (rainbow_int == 1) {
+				if (r > 0 && b == 0) {
+					r--;
+					g++;
+				}
+				if (g > 0 && r == 0) {
+					g--;
+					b++;
+				}
+				if (b > 0 && g == 0) {
+					r++;
+					b--;
+				}
+			}
+
+			if (rainbow) {
+				if (rainbow_int == 0) {
+					if (r > 0 && b == 0) {
+						r--;
+						g++;
+					}
+					if (g > 0 && r == 0) {
+						g--;
+						b++;
+					}
+					if (b > 0 && g == 0) {
+						r++;
+						b--;
+					}
+				}
+			}
+			Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
+			vehicles[0] = 10;
+			for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), vehicles); i++)
+			{
+				Vehicle vehicle = vehicles[(i * 2 + 2)];
+				if (vehicle != PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false)) {
+					NativeVector3 vehicleCoords = ENTITY::GET_ENTITY_COORDS(vehicle, true);
+					if (horn) {
+						AUDIO::SET_HORN_PERMANENTLY_ON(vehicle);
+					}
+					if (rainbow) {
+						
+						VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, r, g, b);
+					}
+				}
+			}
+			delete vehicles;
+			
+		}
+	};
+	class Nearby {
+	public:
+		Traffic m_traffic;
+	};
+	inline Nearby m_nearby;
+	class PlayerImpacts {
+	public:
+		bool teleport = false;
+		void init() {
+			if (teleport) {
+				if (PED::IS_PED_SHOOTING(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer)))
+					{
+						float c[6];
+						WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), (NativeVector3*)c);
+						if (c[0] != 0 || c[2] != 0 || c[4] != 0) {
+							
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(PLAYER::PLAYER_PED_ID(), c[0], c[2], c[4], true, true, true);
+
+						}
+					}
+				
+			}
+		}
+	};
+	inline PlayerImpacts m_impacts;
+	class m_no_clip_hotkey {
+	public:
+		bool enabled = false;
+		int key = 0;
+	};
+	class Hotkeys {
+	public:
+		m_no_clip_hotkey no_clip_hotkey;
+		void add(bool buffer, int key) {
+
+		}
+		void init() {
+			if (GetAsyncKeyState(0x45) & 1)
+			{
+				if (no_clip.enabled == true)
+				{
+					no_clip.onDisable();
+					no_clip.enabled = false;
+				}
+				else
+				{
+					no_clip.enabled = true;
+				}
+			}
+		}
+	};
+	inline Hotkeys m_hotkeys;
+	class VehicleFX {
+	public:
+		bool lf = false;
+		bool bl5 = false;
+		bool fr5 = false;
+		bool br = false;
+		bool exaust2 = false;
+		bool brakele = false;
+		bool brakerig = false;
+		bool taill = false;
+		bool tailr = false;
+		bool spoilerr = false;
+		float vscale = 0.50f;
+		bool enabled = false;
+		bool networked = true;
+		const char* type[8] = { "Banknotes", "Fireworks (Trailburst)", "Fireworks (Burst)", "Fireworks (Spiral Starburst)","Fireworks (Trailburst Spawn)","Clown Appears", "Water Splash", "Cartoon" };
+		const char* particle_asset[8] = { "scr_ornate_heist", "scr_indep_fireworks", "proj_xmas_firework", "proj_xmas_firework","scr_rcpaparazzo1","scr_rcbarry2", "scr_fbi5a", "scr_rcbarry2"};
+		const char* particle_fx[8] = { "scr_heist_ornate_banknotes", "scr_indep_firework_trailburst", "scr_firework_xmas_burst_rgw", "scr_firework_xmas_spiral_burst_rgw","scr_mich4_firework_trailburst_spawn","scr_clown_appears", "scr_fbi5_ped_water_splash", "muz_clown" };
+		std::size_t size = 0;
+		bool gas_cap = false;
+		void init() {
+			Vehicle vplayerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+			NativeVector3 wheelOne = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "wheel_lf"));
+			NativeVector3 wheelTwo = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "wheel_lr"));
+			NativeVector3 wheelThree = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "wheel_rf"));
+			NativeVector3 wheelFour = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "wheel_rr"));
+			NativeVector3 exaust = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "exhaust"));
+			NativeVector3 brakeleft = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "brakelight_l"));
+			NativeVector3 brakeright = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "brakelight_r"));
+			NativeVector3 tailleft = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "taillight_l"));
+			NativeVector3 trailright = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "taillight_r"));
+			NativeVector3 spoiler = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "spoiler"));
+			NativeVector3 gas_cap_location = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "petrolcap"));
+			g_CallbackScript->AddCallback<PTFXCallback>(particle_asset[size], [=] {
+				if (gas_cap)
+				{
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], gas_cap_location, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+				}
+				if (lf)
+				{
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], wheelOne, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+				}
+				if (bl5)
+				{
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
+
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], wheelTwo, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+				}
+				if (fr5)
+				{
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], wheelThree, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+				}
+				if (br)
+				{
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], wheelFour, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+				}
+				//other
+				if (exaust2)
+				{
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], exaust, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+				}
+				if (brakele)
+				{
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], brakeleft, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+				}
+				if (brakerig)
+				{
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], brakeright, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+				}
+				if (taill)
+				{
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], tailleft, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+				}
+				if (tailr)
+				{
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], trailright, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+				}
+				if (spoilerr)
+				{
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], spoiler, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+				}
+			});
+		}
+	};
+	inline VehicleFX m_fx;
 	inline void FeatureInitalize() {
 
 		if (mark_as_Saint) {
 			PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 109, true);
 
 		}
+		m_fx.init();
+		m_impacts.init();
+		m_nearby.m_traffic.init();
 		m_disables.init();
 		m_entity_shooter.init();
 		m_frame_flags.init();
@@ -3827,7 +4118,7 @@ namespace Saint {
 		all_players.m_explode.init();
 		all_players.init();
 		gravity.init();
-
+		m_hotkeys.init();
 		if (NoPlaneTurbulance) {
 			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 

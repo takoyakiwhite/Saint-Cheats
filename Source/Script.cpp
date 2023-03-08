@@ -254,6 +254,11 @@ namespace Saint
 		
 			//Disables
 			Disables,
+		//world
+		NearbyPeds,
+		NearbyVehicles,
+		NearbyManager,
+		SubmenuVehParticles,
 	};
 
 	bool MainScript::IsInitialized()
@@ -567,12 +572,7 @@ namespace Saint
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &no_clip.enabled, BoolDisplay::OnOff, false, [] {
 				if (!no_clip.enabled) {
-					Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-					if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), 0)) {
-						if (no_clip.DisableCollision) {
-							ENTITY::SET_ENTITY_COLLISION(veh, true, true);
-						}
-					}
+					no_clip.onDisable();
 				}
 					});
 		sub->draw_option<toggle<bool>>(("Set Rotation"), nullptr, &no_clip.SetRotation, BoolDisplay::OnOff);
@@ -617,6 +617,7 @@ namespace Saint
 		sub->draw_option<submenu>("Speedometer", nullptr, Submenu::SubmenuSpeedo);
 		sub->draw_option<submenu>("Engine Sound", nullptr, Submenu::SubmenuEngineSound);
 		sub->draw_option<submenu>("Negitive Torque", nullptr, Submenu::SubmenuNegitiveTorque);
+		sub->draw_option<submenu>("Particles", nullptr, Submenu::SubmenuVehParticles);
 		sub->draw_option<submenu>("Invisible", nullptr, Submenu::SubmenuVehicleInvis);
 		sub->draw_option<submenu>("Ramps", nullptr, Submenu::SubmenuVehicleRamps);
 		sub->draw_option<submenu>("Spawner", nullptr, Submenu::SubmenuVehicleSpawner);
@@ -680,6 +681,24 @@ namespace Saint
 				}
 					});
 		sub->draw_option<toggle<bool>>(("Locally Visible"), nullptr, &features.invisible_carlocal_visible, BoolDisplay::OnOff);
+			});
+		g_Render->draw_submenu<sub>(("Particles"), SubmenuVehParticles, [](sub* sub)
+			{
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Particle", nullptr, &m_fx.type, &m_fx.size);
+				sub->draw_option<number<float>>("Scale", nullptr, &m_fx.vscale, 0.01f, 1000.f, 0.05f, 2);
+				sub->draw_option<UnclickOption>(("Bones"), nullptr, [] {});
+				sub->draw_option<toggle<bool>>(("Front Left Wheel"), nullptr, &m_fx.lf, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Back Left Wheel"), nullptr, &m_fx.bl5, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Front Right Wheel"), nullptr, &m_fx.fr5, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Back Right Wheel"), nullptr, &m_fx.br, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Exaust"), nullptr, &m_fx.exaust2, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Spoiler"), nullptr, &m_fx.spoilerr, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Brakelight Left"), nullptr, &m_fx.brakele, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Brakelight Right"), nullptr, &m_fx.brakerig, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Tail Light Left"), nullptr, &m_fx.taill, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Tail Light Right"), nullptr, &m_fx.tailr, BoolDisplay::OnOff);
+				//sub->draw_option<toggle<bool>>(("Gas Cap"), nullptr, &m_fx.gas_cap, BoolDisplay::OnOff);
+				
 			});
 		g_Render->draw_submenu<sub>(("Ramps"), SubmenuVehicleRamps, [](sub* sub)
 			{
@@ -859,7 +878,7 @@ namespace Saint
 		sub->draw_option<submenu>("Forward Speed", nullptr, Submenu::SpawnerSettingsSetForwardSpeed);
 		sub->draw_option<submenu>("Spawn In Air", nullptr, Submenu::SpawnerSettingsSpawnInAir);
 		sub->draw_option<toggle<bool>>(("Set Engine On"), nullptr, &veh_spawner.setengineon, BoolDisplay::OnOff);
-		sub->draw_option<toggle<bool>>(("Fade"), nullptr, &veh_spawner.fade_in, BoolDisplay::OnOff);
+		sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Fade", nullptr, &veh_spawner.fade_in, &veh_spawner.fade_speed, &veh_spawner.fade_speed_i);
 		sub->draw_option<toggle<bool>>(("Spawn Into"), nullptr, &veh_spawner.spawn_in, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Delete Last"), nullptr, &veh_spawner.dellast, BoolDisplay::OnOff);
 
@@ -2552,7 +2571,7 @@ namespace Saint
 		sub->draw_option<toggle<bool>>(("Bypass C4 Limit"), nullptr, &features.bypass_c4_limit, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Magnet"), nullptr, &gravity.enabled, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Incendiary"), nullptr, &m_frame_flags.m_fire, BoolDisplay::OnOff);
-
+		sub->draw_option<toggle<bool>>(("Aim Tracer"), nullptr, &features.aim_tracer, BoolDisplay::OnOff);
 
 			});
 		g_Render->draw_submenu<sub>(("Entity Shooter"), EntityShooter, [](sub* sub)
@@ -3051,7 +3070,7 @@ namespace Saint
 						break;
 					}
 					});
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Teleprt", nullptr, &casino_teleport, &casino_tp, false, -1, [=] {
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Teleport", nullptr, &casino_teleport, &casino_tp, false, -1, [=] {
 					switch (casino_tp) {
 					case 0:
 						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 2465.4746, -279.2276, -70.694145);
@@ -3453,8 +3472,7 @@ namespace Saint
 			{
 				sub->draw_option<submenu>("All", nullptr, SubmenuAllPlayers);
 		sub->draw_option<ChooseOption<const char*, std::size_t>>("Filter", nullptr, &p_filter.data, &p_filter.data_i);
-		sub->draw_option<number<float>>("Suspension X", nullptr, &g_players.pedx, -1000.f, 1000.f, 0.01f, 3);
-		sub->draw_option<number<float>>("Suspension Y", nullptr, &g_players.pedyy, -1000.f, 1000.f, 0.01f, 3);
+		
 		
 		sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 
@@ -3716,6 +3734,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Weapon", SubmenuSelectedWeapon, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Explosive Ammo", nullptr, SubmenuSelectedExplosiveAmmo);
+				sub->draw_option<toggle<bool>>(("Teleport You"), nullptr, &m_impacts.teleport, BoolDisplay::OnOff);
 
 			});
 		g_Render->draw_submenu<sub>("Explosive Ammo", SubmenuSelectedExplosiveAmmo, [](sub* sub)
@@ -4101,7 +4120,7 @@ namespace Saint
 				Ped ped;
 		NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
 		ped = PED::CREATE_PED(26, MISC::GET_HASH_KEY(bodygaurd.ModelHashes[bodygaurd.ModelInt]), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
-
+		NETWORK::NETWORK_FADE_IN_ENTITY(ped, true, false);
 		PED::SET_PED_AS_GROUP_LEADER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
 		PED::SET_PED_AS_GROUP_MEMBER(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
 		PED::SET_PED_NEVER_LEAVES_GROUP(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
@@ -4153,61 +4172,93 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Teleport"), SubmenuTeleport, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Automatic"), nullptr, &m_teleport.automatic, BoolDisplay::OnOff);
-		sub->draw_option<RegularOption>(("Waypoint"), nullptr, []
-			{
+				sub->draw_option<RegularOption>(("Waypoint"), nullptr, []
+					{
 
 
 
-				m_teleport.waypoint();
+						m_teleport.waypoint();
 
-			});
+					});
+				
 			});
 
 		g_Render->draw_submenu<sub>(("World"), SubmenuWorld, [](sub* sub)
 			{
 				//sub->draw_option<submenu>("Peds", nullptr, SubmenuPeds);
 				sub->draw_option<submenu>("Weather", nullptr, SubmeuWeather);
-		sub->draw_option<submenu>("Water", nullptr, SubmenuWater);
+				sub->draw_option<submenu>("Neraby Manager", nullptr, NearbyManager);
 		
 
 			});
-		g_Render->draw_submenu<sub>(("Peds"), SubmenuPeds, [](sub* sub)
+		g_Render->draw_submenu<sub>(("Neraby Manager"), NearbyManager, [](sub* sub)
 			{
-				Ped selected_ped;
-		for (std::uint32_t i = 0; i < PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), &selected_ped, -1); ++i) {
-
-		}
+				sub->draw_option<submenu>("Traffic", nullptr, NearbyVehicles);
+				sub->draw_option<submenu>("Pedestrians", nullptr, NearbyPeds);
 
 			});
-		g_Render->draw_submenu<sub>(("World"), SubmenuWater, [](sub* sub)
+		g_Render->draw_submenu<sub>(("Traffic"), NearbyVehicles, [](sub* sub)
 			{
-				//static CWaterDataItem* Water2 = (CWaterDataItem*)(*(std::uintptr_t*)(0x22B6DD0 + ModuleBaseAdress) + (1 * 0x1C));
-				static CWaterTune* WaterTune = reinterpret_cast<CWaterTune*>(0x1D20874 + ModuleBaseAdress);
-		sub->draw_option<number<float>>("Ocean Foam Scale", nullptr, &WaterTune->fOceanFoamScale, -10.0f, 10.0f, 0.1f);
-		sub->draw_option<number<float>>("Specular Falloff", nullptr, &WaterTune->fSpecularFalloff, 800.0f, 1200.0f, 0.5f);
-		sub->draw_option<number<float>>("FOD Pierce Intensity", nullptr, &WaterTune->fFodPierceIntensity, -100.0f, 100.0f, 0.25f);
-		sub->draw_option<number<float>>("Refraction Blend", nullptr, &WaterTune->fRefractionBlend, -10.0f, 10.0f, 0.1f);
-		sub->draw_option<number<float>>("Refraction Exponent", nullptr, &WaterTune->fRefractionExponent, -10.0f, 10.0f, 0.1f);
-		sub->draw_option<number<float>>("Cycle Depth", nullptr, &WaterTune->fWaterCycleDepth, -1000.0f, 1000.0f, 1.0f);
-		sub->draw_option<number<float>>("Cycle Fade", nullptr, &WaterTune->fWaterCycleFade, -1000.0f, 1000.0f, 1.0f);
-		sub->draw_option<number<float>>("Ripple Scale", nullptr, &WaterTune->fRippleScale, -10.0f, 10.0f, 0.1f);
-		sub->draw_option<number<float>>("Deep Water Mod Depth", nullptr, &WaterTune->fDeepWaterModDepth, -1000.0f, 1000.0f, 1.0f);
-		sub->draw_option<number<float>>("Deep Water Mod Fade", nullptr, &WaterTune->fDeepWaterModFade, -1000.0f, 1000.0f, 1.0f);
-		sub->draw_option<number<float>>("God Rays Lerp Start", nullptr, &WaterTune->fGodRaysLerpStart, -1000.0f, 1000.0f, 1.0f);
-		sub->draw_option<number<float>>("God Rays Lerp End", nullptr, &WaterTune->fGodRaysLerpEnd, -1000.0f, 1000.0f, 1.0f);
-		sub->draw_option<number<float>>("Disturb Foam Scale", nullptr, &WaterTune->fDisturbFoamScale, -10.0f, 10.0f, 0.1f);
-		sub->draw_option<number<float>>(("Lightning Fade"), nullptr, &WaterTune->fWaterLightningFade, -1000.0f, 1000.0f, 1.0f);
-		sub->draw_option<number<float>>(("Lightning Depth"), nullptr, &WaterTune->fWaterLightningDepth, -1000.0f, 1000.0f, 1.0f);
-		/*
-		static float fHeight{ Water2->fHeight }; //0x0014 (Z-Height, default 0.0)
-		sub->draw_option<number<float>>(("Height"), nullptr, &fHeight, -1000.f, 10000.f, 250.f, 3, true, "", "", [] {
-			for (int i = 0; i < 821; i++) {
-				CWaterDataItem* Water = (CWaterDataItem*)(*(std::uintptr_t*)(0x22B6DD0 + ModuleBaseAdress) + (i * 0x1C));
+				sub->draw_option<toggle<bool>>(("Horn"), nullptr, &m_nearby.m_traffic.horn, BoolDisplay::OnOff);
+				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Rainbow", nullptr, &m_nearby.m_traffic.rainbow, &m_nearby.m_traffic.rainbow_type, &m_nearby.m_traffic.rainbow_int);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Acrobatics", nullptr, &acrobatic_type, &m_nearby.m_traffic.acrobatic, false, -1, [] {
+							if (m_nearby.m_traffic.acrobatic == 0) {
+								Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
+								vehicles[0] = 10;
+								for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), vehicles); i++)
+								{
+									Vehicle playerVehicle = vehicles[(i * 2 + 2)];
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
 
-				Water->fHeight = fHeight;
-			}
-			});
-			*/
+								}
+								delete vehicles;
+					
+
+							}
+							if (m_nearby.m_traffic.acrobatic == 1) {
+								Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
+								vehicles[0] = 10;
+								for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), vehicles); i++)
+								{
+									Vehicle playerVehicle = vehicles[(i * 2 + 2)];
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
+
+								}
+								delete vehicles;
+
+							}
+							if (m_nearby.m_traffic.acrobatic == 2) {
+								Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
+								vehicles[0] = 10;
+								for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), vehicles); i++)
+								{
+									Vehicle playerVehicle = vehicles[(i * 2 + 2)];
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 10.0f, 20.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1);
+
+								}
+								delete vehicles;
+
+							}
+							if (m_nearby.m_traffic.acrobatic == 3) {
+								Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
+								vehicles[0] = 10;
+								for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), vehicles); i++)
+								{
+									Vehicle playerVehicle = vehicles[(i * 2 + 2)];
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 7.0f, 0, 0, 0, true, true, true, true, false, true);
+
+								}
+								delete vehicles;
+			
+
+
+
+							}
+					});
 
 			});
 		g_Render->draw_submenu<sub>(("Weather"), SubmeuWeather, [](sub* sub)

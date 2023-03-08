@@ -66,11 +66,11 @@ namespace Saint {
 			float xfr = x + 0.205f + offset;
 			if (first) {
 				drawText(text, xfr - 0.110f, 0.105f, 0.25f, 0, false, col2, false);
-				drawText(text2, xfr + 0.075f -x_offset, 0.105f, 0.25f, 0, false, col2, true);
+				drawText(text2, xfr + 0.066f -x_offset, 0.105f, 0.25f, 0, false, col2, true);
 			}
 			else {
 				drawText(text, xfr - 0.110f, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, false);
-				drawText(text2, xfr + 0.075f - x_offset, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, true);
+				drawText(text2, xfr + 0.066f - x_offset, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, true);
 			}
 		}
 		void drawSprite(const char* dict, const char* texture, float x, float y, float width, float height, Color color, float rotation)
@@ -142,8 +142,8 @@ namespace Saint {
 				break;
 
 			}
-			GRAPHICS::DRAW_RECT(x - 0.510, y + -0.000, 0.183, -0.002, col.r, col.g, col.b, col.a, false);
-			GRAPHICS::DRAW_RECT(xfr, y + -0.000, 0.183f, -0.002, g_Render->m_OptionSelectedBackgroundColor.r, g_Render->m_OptionSelectedBackgroundColor.g, g_Render->m_OptionSelectedBackgroundColor.b, 255, false);
+			GRAPHICS::DRAW_RECT(x - 0.510, y + -0.000, 0.183, -0.002, g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255, false);
+			GRAPHICS::DRAW_RECT(xfr, y + -0.000, 0.183f, -0.002, g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255, false);
 		}
 		float pedx = 0.540f;
 		float pedyy = 1.680f;
