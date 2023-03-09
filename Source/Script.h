@@ -3,6 +3,7 @@
 
 namespace Saint
 {
+	
 	class MainScript : public Script
 	{
 	public:

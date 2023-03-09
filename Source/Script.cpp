@@ -259,6 +259,25 @@ namespace Saint
 		NearbyVehicles,
 		NearbyManager,
 		SubmenuVehParticles,
+		SubmenuUnlocks2,
+
+		//Handling
+		HandlingMisc,
+		CentreOfMass,
+		InertiaMultiplier,
+		DriveBias,
+		Shift,
+		HandlingBrakes,
+		SteeringLock,
+		Traction,
+		Curve,
+		Suspension,
+		AntiRollbar,
+		RollCentreHeight,
+		HandlingDamage,
+		HandlingGas,
+		//Discord RPC
+		DiscordRPC,
 	};
 
 	bool MainScript::IsInitialized()
@@ -2458,64 +2477,166 @@ namespace Saint
 		if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
 		{
 			auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
-			sub->draw_option<number<float>>("Mass", nullptr, &handling->m_mass, 0.f, 10000.f, 50.0f, 1);
-			sub->draw_option<number<float>>("Initial Drag Coeff", nullptr, &handling->m_initial_drag_coeff, 0.f, 10000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Downforce Multiplier", nullptr, &handling->m_downforce_multiplier, 0.f, 10000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Popup Light Rotation", nullptr, &handling->m_popup_light_rotation, 0.f, 10000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Centre Of Mass X", nullptr, &handling->m_centre_of_mass.x, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Centre Of Mass Y", nullptr, &handling->m_centre_of_mass.y, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Centre Of Mass Z", nullptr, &handling->m_centre_of_mass.z, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Inertia Multiplier X", nullptr, &handling->m_inertia_mult.x, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Inertia Multiplier Y", nullptr, &handling->m_inertia_mult.y, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Inertia Multiplier Z", nullptr, &handling->m_inertia_mult.z, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Buoyancy", nullptr, &handling->m_buoyancy, 0.0f, 1000.f, 1.0f, 1);
-			sub->draw_option<number<float>>("Drive Bias Rear", nullptr, &handling->m_drive_bias_rear, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Drive Bias Front", nullptr, &handling->m_drive_bias_front, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Acceleration", nullptr, &handling->m_acceleration, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Upshift", nullptr, &handling->m_upshift, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Downshift", nullptr, &handling->m_downshift, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Initial Drive Force", nullptr, &handling->m_initial_drive_force, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Drive Maxx Flat Velocity", nullptr, &handling->m_drive_max_flat_velocity, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Initial Drive Max Flat Velocity", nullptr, &handling->m_initial_drive_max_flat_vel, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Brake Force", nullptr, &handling->m_brake_force, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Brake Bias Front", nullptr, &handling->m_brake_bias_front, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Brake Bias Rear", nullptr, &handling->m_brake_bias_rear, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Handbrake Force", nullptr, &handling->m_handbrake_force, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Steering Lock", nullptr, &handling->m_steering_lock, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Steering Lock Ratio", nullptr, &handling->m_steering_lock_ratio, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Traction Curve Max", nullptr, &handling->m_traction_curve_max, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Traction Curve Min", nullptr, &handling->m_traction_curve_min, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Traction Curve Lateral", nullptr, &handling->m_traction_curve_lateral, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Traction Curve Ratio", nullptr, &handling->m_traction_curve_ratio, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Curve Lateral", nullptr, &handling->m_curve_lateral, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Curve Lateral Ratio", nullptr, &handling->m_curve_lateral_ratio, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Traction Spring Delta Max", nullptr, &handling->m_traction_spring_delta_max, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Traction Spring Delta Max Ratio", nullptr, &handling->m_traction_spring_delta_max_ratio, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Low Speed Traction Loss Multiplier", nullptr, &handling->m_low_speed_traction_loss_mult, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Camber Stiffness", nullptr, &handling->m_camber_stiffness, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Traction Bias Front", nullptr, &handling->m_traction_bias_front, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Traction Bias Rear", nullptr, &handling->m_traction_bias_rear, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Traction Loss Multiplier", nullptr, &handling->m_traction_loss_mult, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Suspension Force", nullptr, &handling->m_suspension_force, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Suspension Comp Damp", nullptr, &handling->m_suspension_comp_damp, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Suspension Rebound Damp", nullptr, &handling->m_suspension_rebound_damp, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Suspsension Upper Limit", nullptr, &handling->m_suspension_upper_limit, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Suspension Lower Limit", nullptr, &handling->m_suspension_lower_limit, 0.0f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Suspension Raise", nullptr, &handling->m_suspension_raise, -1000.f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Suspension Bias Front", nullptr, &handling->m_suspension_bias_front, -1000.f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Suspension Bias Rear", nullptr, &handling->m_suspension_bias_rear, -1000.f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Anti Rollbar Force", nullptr, &handling->m_anti_rollbar_force, -1000.f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Anti Rollbar Bias Front", nullptr, &handling->m_anti_rollbar_bias_front, -1000.f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Anti Rollbar Bias Rear", nullptr, &handling->m_anti_rollbar_bias_rear, -1000.f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Roll Centre Height Front", nullptr, &handling->m_roll_centre_height_front, -1000.f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Roll Centre Height Rear", nullptr, &handling->m_roll_centre_height_rear, -1000.f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Collision Damage Multiplier", nullptr, &handling->m_collision_damage_mult, -1000.f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Weapon Damage Multiplier", nullptr, &handling->m_weapon_damamge_mult, -1000.f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Deformation Multiplier", nullptr, &handling->m_deformation_mult, -1000.f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Engine Damage Multiplier", nullptr, &handling->m_engine_damage_mult, -1000.f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Petrol Tank Volume", nullptr, &handling->m_petrol_tank_volume, -1000.f, 1000.f, 0.1f, 1);
-			sub->draw_option<number<float>>("Oil Volume", nullptr, &handling->m_oil_volume, 1000.f, 1000.f, 0.1f, 1);
+			sub->draw_option<submenu>("Miscellaneous", nullptr, HandlingMisc);
+			sub->draw_option<submenu>("Centre Of Mass", nullptr, CentreOfMass);
+			sub->draw_option<submenu>("Inertia Multiplier", nullptr, InertiaMultiplier);
+			sub->draw_option<submenu>("Drive Bias", nullptr, DriveBias);
+			sub->draw_option<submenu>("Shift", nullptr, Shift);
+			sub->draw_option<submenu>("Brakes", nullptr, HandlingBrakes);
+			sub->draw_option<submenu>("Steering Lock", nullptr, SteeringLock);
+			sub->draw_option<submenu>("Traction", nullptr, Traction);
+			sub->draw_option<submenu>("Curve", nullptr, Curve);
+			sub->draw_option<submenu>("Suspension", nullptr, Suspension);
+			sub->draw_option<submenu>("Anti Rollbar", nullptr, RollCentreHeight);
+			sub->draw_option<submenu>("Damage", nullptr, HandlingDamage);
+			sub->draw_option<submenu>("Gas", nullptr, HandlingGas);
 		}
+
+
+			});
+		g_Render->draw_submenu<sub>(("Miscellaneous"), HandlingMisc, [](sub* sub)
+			{
+				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+				sub->draw_option<number<float>>("Mass", nullptr, &handling->m_mass, 0.f, 10000.f, 50.0f, 1);
+				sub->draw_option<number<float>>("Initial Drag Coeff", nullptr, &handling->m_initial_drag_coeff, 0.f, 10000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Downforce Multiplier", nullptr, &handling->m_downforce_multiplier, 0.f, 10000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Popup Light Rotation", nullptr, &handling->m_popup_light_rotation, 0.f, 10000.f, 0.1f, 1);
+
+
+				sub->draw_option<number<float>>("Buoyancy", nullptr, &handling->m_buoyancy, 0.0f, 1000.f, 1.0f, 1);
+
+				sub->draw_option<number<float>>("Acceleration", nullptr, &handling->m_acceleration, 0.0f, 1000.f, 0.1f, 1);
+
+				sub->draw_option<number<float>>("Initial Drive Force", nullptr, &handling->m_initial_drive_force, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Drive Maxx Flat Velocity", nullptr, &handling->m_drive_max_flat_velocity, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Initial Drive Max Flat Velocity", nullptr, &handling->m_initial_drive_max_flat_vel, 0.0f, 1000.f, 0.1f, 1);
+
+				sub->draw_option<number<float>>("Handbrake Force", nullptr, &handling->m_handbrake_force, 0.0f, 1000.f, 0.1f, 1);
+
+
+
+
+
+				sub->draw_option<number<float>>("Camber Stiffness", nullptr, &handling->m_camber_stiffness, 0.0f, 1000.f, 0.1f, 1);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Damage"), HandlingDamage, [](sub* sub)
+			{
+				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+				sub->draw_option<number<float>>("Collision Multiplier", nullptr, &handling->m_collision_damage_mult, -1000.f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Weapon Multiplier", nullptr, &handling->m_weapon_damamge_mult, -1000.f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Deformation Multiplier", nullptr, &handling->m_deformation_mult, -1000.f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Engine Multiplier", nullptr, &handling->m_engine_damage_mult, -1000.f, 1000.f, 0.1f, 1);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Gas"), HandlingGas, [](sub* sub)
+			{
+				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+				sub->draw_option<number<float>>("Petrol Tank Volume", nullptr, &handling->m_petrol_tank_volume, -1000.f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Oil Volume", nullptr, &handling->m_oil_volume, 1000.f, 1000.f, 0.1f, 1);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Anti Rollbar"), RollCentreHeight, [](sub* sub)
+			{
+				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+				sub->draw_option<number<float>>("Force", nullptr, &handling->m_anti_rollbar_force, -1000.f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Bias Front", nullptr, &handling->m_anti_rollbar_bias_front, -1000.f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Bias Rear", nullptr, &handling->m_anti_rollbar_bias_rear, -1000.f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Centre Height Front", nullptr, &handling->m_roll_centre_height_front, -1000.f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Centre Height Rear", nullptr, &handling->m_roll_centre_height_rear, -1000.f, 1000.f, 0.1f, 1);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Shift"), Shift, [](sub* sub)
+			{
+				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+		sub->draw_option<number<float>>("Up", nullptr, &handling->m_upshift, 0.0f, 1000.f, 0.1f, 1);
+		sub->draw_option<number<float>>("Down", nullptr, &handling->m_downshift, 0.0f, 1000.f, 0.1f, 1);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Brakes"), HandlingBrakes, [](sub* sub)
+			{
+				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+				sub->draw_option<number<float>>("Force", nullptr, &handling->m_brake_force, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Bias Front", nullptr, &handling->m_brake_bias_front, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Bias Rear", nullptr, &handling->m_brake_bias_rear, 0.0f, 1000.f, 0.1f, 1);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Steering Lock"), SteeringLock, [](sub* sub)
+			{
+				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+				sub->draw_option<number<float>>("Multiplier", nullptr, &handling->m_steering_lock, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Ratio", nullptr, &handling->m_steering_lock_ratio, 0.0f, 1000.f, 0.1f, 1);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Curve"), Curve, [](sub* sub)
+			{
+				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+				sub->draw_option<number<float>>("Lateral", nullptr, &handling->m_curve_lateral, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Lateral Ratio", nullptr, &handling->m_curve_lateral_ratio, 0.0f, 1000.f, 0.1f, 1);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Suspension"), Suspension, [](sub* sub)
+			{
+				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+				sub->draw_option<number<float>>("Force", nullptr, &handling->m_suspension_force, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Comp Damp", nullptr, &handling->m_suspension_comp_damp, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Rebound Damp", nullptr, &handling->m_suspension_rebound_damp, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Upper Limit", nullptr, &handling->m_suspension_upper_limit, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Lower Limit", nullptr, &handling->m_suspension_lower_limit, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Raise", nullptr, &handling->m_suspension_raise, -1000.f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Bias Front", nullptr, &handling->m_suspension_bias_front, -1000.f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Bias Rear", nullptr, &handling->m_suspension_bias_rear, -1000.f, 1000.f, 0.1f, 1);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Traction"), Traction, [](sub* sub)
+			{
+				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+				sub->draw_option<number<float>>("Max", nullptr, &handling->m_traction_curve_max, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Min", nullptr, &handling->m_traction_curve_min, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Lateral", nullptr, &handling->m_traction_curve_lateral, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Ratio", nullptr, &handling->m_traction_curve_ratio, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Spring Delta Max", nullptr, &handling->m_traction_spring_delta_max, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Spring Delta Max Ratio", nullptr, &handling->m_traction_spring_delta_max_ratio, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Bias Front", nullptr, &handling->m_traction_bias_front, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Bias Rear", nullptr, &handling->m_traction_bias_rear, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Loss Multiplier", nullptr, &handling->m_traction_loss_mult, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Low Speed Loss Multiplier", nullptr, &handling->m_low_speed_traction_loss_mult, 0.0f, 1000.f, 0.1f, 1);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Drive Bias"), DriveBias, [](sub* sub)
+			{
+				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+				sub->draw_option<number<float>>("Rear", nullptr, &handling->m_drive_bias_rear, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Front", nullptr, &handling->m_drive_bias_front, 0.0f, 1000.f, 0.1f, 1);
+
+
+			});
+		
+		g_Render->draw_submenu<sub>(("Inertia Multiplier"), InertiaMultiplier, [](sub* sub)
+			{
+				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+			sub->draw_option<number<float>>("X", nullptr, &handling->m_inertia_mult.x, 0.0f, 1000.f, 0.1f, 1);
+			sub->draw_option<number<float>>("Y", nullptr, &handling->m_inertia_mult.y, 0.0f, 1000.f, 0.1f, 1);
+			sub->draw_option<number<float>>("Z", nullptr, &handling->m_inertia_mult.z, 0.0f, 1000.f, 0.1f, 1);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Centre Of Mass"), CentreOfMass, [](sub* sub)
+			{
+				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+		sub->draw_option<number<float>>("X", nullptr, &handling->m_centre_of_mass.x, 0.0f, 1000.f, 0.1f, 1);
+		sub->draw_option<number<float>>("Y", nullptr, &handling->m_centre_of_mass.y, 0.0f, 1000.f, 0.1f, 1);
+		sub->draw_option<number<float>>("Z", nullptr, &handling->m_centre_of_mass.z, 0.0f, 1000.f, 0.1f, 1);
 
 
 			});
@@ -2574,7 +2695,11 @@ namespace Saint
 		sub->draw_option<toggle<bool>>(("Magnet"), nullptr, &gravity.enabled, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Incendiary"), nullptr, &m_frame_flags.m_fire, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Aim Tracer"), nullptr, &features.aim_tracer, BoolDisplay::OnOff);
-
+		sub->draw_option<toggle<bool>>(("Shotgun"), nullptr, &m_shotgun.enabled, BoolDisplay::OnOff, false, [] {
+			if (!m_shotgun.enabled) {
+				m_shotgun.onDisable();
+			}
+			});
 			});
 		g_Render->draw_submenu<sub>(("Entity Shooter"), EntityShooter, [](sub* sub)
 			{
@@ -3106,6 +3231,68 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Recovery", SubmenuRecovery, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Level", nullptr, SubmenuRP);
+				sub->draw_option<submenu>("Unlocks", nullptr, SubmenuUnlocks);
+
+
+			});
+		g_Render->draw_submenu<sub>("Unlocks", SubmenuUnlocks, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>("Increase Throwable Cap", "", [] {
+					statSetBool("SR_INCREASE_THROW_CAP", true);
+					});
+				sub->draw_option<RegularOption>("Fast Run", "", [] {
+					statSetInt("CHAR_ABILITY_1_UNLCK", -1);
+					statSetInt("MP0_CHAR_ABILITY_2_UNLCK", -1);
+					statSetInt("MP0_CHAR_ABILITY_3_UNLCK", -1);
+					statSetInt("MP0_CHAR_FM_ABILITY_1_UNLCK", -1);
+					statSetInt("MP0_CHAR_FM_ABILITY_2_UNLCK", -1);
+					statSetInt("MP0_CHAR_FM_ABILITY_3_UNLCK", -1);
+					
+				});
+				sub->draw_option<RegularOption>("Hidden Liverys", "", [] {
+					statSetInt("XMASLIVERIES0", -1);
+				statSetInt("XMASLIVERIES1", -1);
+				statSetInt("XMASLIVERIES2", -1);
+				statSetInt("XMASLIVERIES3", -1);
+				statSetInt("XMASLIVERIES4", -1);
+				statSetInt("XMASLIVERIES5", -1);
+				statSetInt("XMASLIVERIES6", -1);
+				statSetInt("XMASLIVERIES7", -1);
+				statSetInt("XMASLIVERIES8", -1);
+				statSetInt("XMASLIVERIES9", -1);
+				statSetInt("XMASLIVERIES10", -1);
+				statSetInt("XMASLIVERIES11", -1);
+				statSetInt("XMASLIVERIES12", -1);
+				statSetInt("XMASLIVERIES13", -1);
+				statSetInt("XMASLIVERIES14", -1);
+				statSetInt("XMASLIVERIES15", -1);
+				statSetInt("XMASLIVERIES16", -1);
+				statSetInt("XMASLIVERIES17", -1);
+				statSetInt("XMASLIVERIES18", -1);
+				statSetInt("XMASLIVERIES19", -1);
+				statSetInt("XMASLIVERIES20", -1);
+					});
+				sub->draw_option<RegularOption>("Allow Gender Change", "", [] {
+					statSetInt("ALLOW_GENDER_CHANGE", -1);
+					});
+				sub->draw_option<RegularOption>("Casino", "", [] {
+					statSetBool("AWD_LEADER", true);
+				statSetBool("AWD_SURVIVALIST", true);
+				statSetBool("AWD_SUPPORTING_ROLE", true);
+					});
+				sub->draw_option<RegularOption>("Shooting Range", "", [] {
+					statSetInt("SR_HIGHSCORE_1", 690);
+				statSetInt("SR_HIGHSCORE_2", 1860);
+				statSetInt("SR_HIGHSCORE_3", 2690);
+				statSetInt("SR_HIGHSCORE_4", 2660);
+				statSetInt("SR_HIGHSCORE_5", 2650);
+				statSetInt("SR_HIGHSCORE_6", 450);
+				statSetInt("SR_TARGETS_HIT", 269);
+				statSetInt("SR_WEAPON_BIT_SET", -1);
+				statSetBool("SR_TIER_1_REWARD", true);
+				statSetBool("SR_TIER_3_REWARD", true);
+				statSetBool("SR_INCREASE_THROW_CAP", true);
+					});
 
 
 			});
@@ -4417,11 +4604,13 @@ namespace Saint
 		sub->draw_option<submenu>("Description", nullptr, SubmenuSettingsDescription);
 		sub->draw_option<submenu>("Input", nullptr, SubmenuSettingsInput);
 		sub->draw_option<submenu>("Themes", nullptr, SubmenuThemes);
+		//sub->draw_option<submenu>("Discord RPC", nullptr, DiscordRPC);
 		//sub->draw_option<submenu>("Scripts", nullptr, SubmenuScripts);
 		//sub->draw_option<submenu>("Demo", nullptr, SubmenuTest);
 		
 		sub->draw_option<number<float>>("X Position", nullptr, &g_Render->m_PosX, 0.f, 1.f, 0.01f, 2);
 		sub->draw_option<number<float>>("Y Position", nullptr, &g_Render->m_PosY, 0.f, 1.f, 0.01f, 2);
+		sub->draw_option<number<float>>("Glare X Offset", nullptr, &g_Render->glare_x_offset, -1000.f, 1000.f, 0.002f, 3);
 		sub->draw_option<number<float>>("Width", nullptr, &g_Render->m_Width, 0.01f, 1.f, 0.01f, 2);
 		sub->draw_option<toggle<bool>>("Sounds", nullptr, &g_Render->m_Sounds, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>("Submenu Bar", nullptr, &g_Render->submenu_enabled, BoolDisplay::OnOff);
@@ -4442,7 +4631,11 @@ namespace Saint
 				g_Running = false;
 			});
 			});
+		g_Render->draw_submenu<sub>(("Discord RPC"), DiscordRPC, [](sub* sub)
+			{
+				
 
+			});
 		g_Render->draw_submenu<sub>(("Toggles"), SubmenuToggles, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Color", nullptr, SubmenuTogglesColor);

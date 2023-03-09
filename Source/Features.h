@@ -3967,18 +3967,8 @@ namespace Saint {
 
 		}
 		void init() {
-			if (GetAsyncKeyState(0x45) & 1)
-			{
-				if (no_clip.enabled == true)
-				{
-					no_clip.onDisable();
-					no_clip.enabled = false;
-				}
-				else
-				{
-					no_clip.enabled = true;
-				}
-			}
+			
+			
 		}
 	};
 	inline Hotkeys m_hotkeys;
@@ -4078,12 +4068,66 @@ namespace Saint {
 		}
 	};
 	inline VehicleFX m_fx;
+	inline void statSetBool(const char* stat, bool value, bool direct = false, int slot = 0) {
+		if (direct) {
+			STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY(stat), value, true);
+		}
+		else {
+			if (slot == 0) {
+				STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY((std::string("MP0_") + std::string(stat)).c_str()), value, true);
+			}
+			else if (slot == 1) {
+				STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY((std::string("MP1_") + std::string(stat)).c_str()), value, true);
+			}
+			else {
+				STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY((std::string("MP0_") + std::string(stat)).c_str()), value, true);
+				STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY((std::string("MP1_") + std::string(stat)).c_str()), value, true);
+			}
+		}
+	}
+	inline void statSetInt(const char* stat, int value, bool direct = false, int slot = 0) {
+		if (direct) {
+			STATS::STAT_SET_INT(MISC::GET_HASH_KEY(stat), value, true);
+		}
+		else {
+			if (slot == 0) {
+				STATS::STAT_SET_INT(MISC::GET_HASH_KEY((std::string("MP0_") + std::string(stat)).c_str()), value, true);
+			}
+			else if (slot == 1) {
+				STATS::STAT_SET_INT(MISC::GET_HASH_KEY((std::string("MP1_") + std::string(stat)).c_str()), value, true);
+			}
+			else {
+				STATS::STAT_SET_INT(MISC::GET_HASH_KEY((std::string("MP0_") + std::string(stat)).c_str()), value, true);
+				STATS::STAT_SET_INT(MISC::GET_HASH_KEY((std::string("MP1_") + std::string(stat)).c_str()), value, true);
+			}
+		}
+	}
+	class ShotGunMode {
+	public:
+		bool enabled = false;
+		void onDisable() {
+			(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_batch_spread = 0.1f;
+			(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_bullets_in_batch = 1;
+			(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_force = 200.0f;
+			(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_speed = 5000.0f;
+		}
+		void init() {
+			if (enabled) {
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_batch_spread = 0.5f;
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_bullets_in_batch = 30;
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_force = 200.0f;
+				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_speed = 5000.0f;
+			}
+		}
+	};
+	inline ShotGunMode m_shotgun;
 	inline void FeatureInitalize() {
 
 		if (mark_as_Saint) {
 			PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 109, true);
 
 		}
+		m_shotgun.init();
 		m_fx.init();
 		m_impacts.init();
 		m_nearby.m_traffic.init();

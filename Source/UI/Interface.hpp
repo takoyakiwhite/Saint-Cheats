@@ -262,6 +262,8 @@ namespace Saint::UserInterface
 		float m_DescriptionPadding = 2.1f;
 		Color m_DescriptionSpriteColor{ 255,255,255, 255 };
 
+		float glare_x_offset = 0.0f;
+
 		bool m_MenuOpeningAnimation = false;
 		int g_MenuAlpha = 255;
 		const char* m_CurrentSubMenuName = "Hello";
