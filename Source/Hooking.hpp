@@ -4,8 +4,11 @@
 #include "../Libraries/Include/GTAV-Classes/netsync/nodes/player/CPlayerGamerDataNode.hpp"
 #include "../Libraries/Include/GTAV-Classes/network/CNetworkPlayerMgr.hpp"
 #include "../Libraries/Include/GTAV-Classes/network/CNetGamePlayer.hpp"
+#include "Enums.h"
 namespace Saint
 {
+	
+
 	inline bool m_EnableSCIDJoiner;
 	inline __int64 m_SCIDJoiner;
 	inline __int64 m_PlayerListPointer;
@@ -42,7 +45,9 @@ namespace Saint
 		static void* AssignNewPhysicalIndexHandler(CNetworkPlayerMgr* NetworkPlayerMgr, CNetGamePlayer* player, uint8_t new_index);
 		static void InvalidModsCrashPatch(std::int64_t a1, std::int64_t a2, int a3, char a4);
 
-		static void hk_received_event(rage::netEventMgr* event_manager, CNetGamePlayer* source_player, CNetGamePlayer* target_player, uint16_t event_id, int event_index, int event_handled_bitset, int unk, rage::datBitBuffer* bit_buffer);
+		
+
+		static bool GameEvent(rage::netEventMgr* event_manager, CNetGamePlayer* source_player, CNetGamePlayer* target_player, uint16_t event_id, int event_index, int event_handled_bitset, int buffer_size, rage::datBitBuffer* buffer);
 
 
 

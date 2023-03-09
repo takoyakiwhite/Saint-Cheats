@@ -10,6 +10,9 @@
 #include "Classes.h"
 #include "Types.hpp"
 #include <GTAV-Classes/netsync/nodes/player/CPlayerGameStateDataNode.hpp>
+
+#include "Protections.h"
+#include "Common.hpp"
 namespace Saint
 {
 
@@ -83,6 +86,8 @@ namespace Saint
 		GameFunctions& operator=(GameFunctions const&) = delete;
 		GameFunctions& operator=(GameFunctions&&) = delete;
 
+		
+
 		using clear_ped_tasks_network = void(*)(CPed* ped, bool immediately);
 		clear_ped_tasks_network m_clear_ped_tasks_network;
 
@@ -155,11 +160,15 @@ namespace Saint
 
 		PVOID m_received_event{};
 
+		
+
 
 	};
 
 	inline std::unique_ptr<GameVariables> g_GameVariables;
 	inline std::unique_ptr<GameFunctions> g_GameFunctions;
+
+	
 
 
 }

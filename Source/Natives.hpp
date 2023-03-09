@@ -11,6 +11,7 @@
 #pragma warning(push)
 #pragma warning(disable : 4505)
 
+
 namespace SYSTEM
 {
 	static void WAIT(int ms) { Invoke<int>(0x4EDE34FBADD967A6, ms); } // 0x4EDE34FBADD967A6 0x7715C03B b323

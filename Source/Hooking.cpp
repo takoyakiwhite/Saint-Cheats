@@ -8,7 +8,7 @@
 #include "Natives.hpp"
 #include "FiberHelper.hpp"
 #include <MinHook/MinHook.h>
-#include "Protections.h"
+
 #include "Chat Commands.h"
 #include "Features.h"
 #include "Spoofing.h"
@@ -22,6 +22,7 @@
 
 namespace Saint
 {
+
 	namespace
 	{
 		std::uint32_t g_HookFrameCount{};
@@ -76,7 +77,6 @@ namespace Saint
 			for (std::uint32_t i = 0; i < argCount; ++i)
 				g_Logger->Info("Script event args[%u] : %" PRIi64, i, args[i]);
 		}
-
 		src->set_return_value(SCRIPT::GET_EVENT_DATA(eventGroup, eventIndex, args, argCount));
 	}
 	HRESULT Hooks::Present(IDXGISwapChain* dis, UINT syncInterval, UINT flags)
@@ -374,7 +374,7 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_send_chat_message, &Hooks::send_chat_message, &m_OriginalChatSend);
 		MH_CreateHook(g_GameFunctions->m_AssignPhysicalIndexHandler, &Hooks::AssignNewPhysicalIndexHandler, &m_OriginalAssignPhysicalIndex);
 		MH_CreateHook(g_GameFunctions->crashProtection, &Hooks::InvalidModsCrashPatch, &m_OriginalModCrash);
-		
+		//MH_CreateHook(g_GameFunctions->m_received_event, &Hooks::GameEvent, &OriginalRecivied);
 		m_D3DHook.Hook(&Hooks::Present, Hooks::PresentIndex);
 		m_D3DHook.Hook(&Hooks::ResizeBuffers, Hooks::ResizeBuffersIndex);
 	}
@@ -394,7 +394,7 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->m_send_chat_message);
 		MH_RemoveHook(g_GameFunctions->m_AssignPhysicalIndexHandler);
 		MH_RemoveHook(g_GameFunctions->crashProtection);
-		
+		//MH_RemoveHook(g_GameFunctions->m_received_event);
 		//MH_RemoveHook(g_GameFunctions->m_GetEventData);
 		MH_Uninitialize();
 	}

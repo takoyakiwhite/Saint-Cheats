@@ -1,6 +1,7 @@
 #pragma once
 #include "Render.h"
 namespace Saint {
+	
 	class Crash {
 	public:
 		bool vehicle = true;
@@ -9,6 +10,7 @@ namespace Saint {
 	public:
 		bool request_control = true;
 		bool request_pickup = true;
+		bool give_weapons = true;
 	};
 	class Protections {
 	public:

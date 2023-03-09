@@ -232,6 +232,9 @@
     <ClInclude Include="Hotkeys.h">
       <Filter>Core\Hotkeys</Filter>
     </ClInclude>
+    <ClInclude Include="DatBitBuffer.h">
+      <Filter>Hooking</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">

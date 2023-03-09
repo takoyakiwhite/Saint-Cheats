@@ -2876,16 +2876,22 @@ namespace Saint {
 
 	class Scenarios {
 	public:
-		const char* name[2] = {
+		const char* name[3] = {
 			"Showering",
-			"Stripper Dance" };
-		const char* dict[2] = {
+			"Stripper Dance",
+			"Crouch Walking",
+		};
+		const char* dict[3] = {
 			"mp_safehouseshower@male@",
-			"mini@strip_club@private_dance@part1" };
-		const char* id[2] = {
+			"mini@strip_club@private_dance@part1",
+			"move_weapon@rifle@generic"
+		};
+		const char* id[3] = {
 			"male_shower_idle_b",
-			"priv_dance_p1" };
-		std::size_t size = 2;
+			"priv_dance_p1",
+			"walk_crouch",
+		};
+		std::size_t size = 3;
 	};
 	class Animations {
 	public:
@@ -4121,12 +4127,53 @@ namespace Saint {
 		}
 	};
 	inline ShotGunMode m_shotgun;
+	class HandTrail {
+	public:
+		bool enabled = false;
+		bool rainbow = false;
+		int r = 255;
+		int g = 255;
+		int b = 255;
+		void init() {
+			if (enabled) {
+				if (rainbow) {
+					if (r > 0 && b == 0) {
+						r--;
+						g++;
+					}
+					if (g > 0 && r == 0) {
+						g--;
+						b++;
+					}
+					if (b > 0 && g == 0) {
+						r++;
+						b--;
+					}
+				}
+				g_CallbackScript->AddCallback<PTFXCallback>("scr_indep_fireworks", [=] {
+
+					GRAPHICS::USE_PARTICLE_FX_ASSET("scr_indep_fireworks");
+					int handle = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("scr_indep_firework_sparkle_spawn", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 28422, 0.5f, 0, 0, 0);
+					GRAPHICS::SET_PARTICLE_FX_NON_LOOPED_COLOUR(r, g, b);
+
+
+
+					GRAPHICS::USE_PARTICLE_FX_ASSET("scr_indep_fireworks");
+					int handle1 = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("scr_indep_firework_sparkle_spawn", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 60309, 0.5f, 0, 0, 0);
+					GRAPHICS::SET_PARTICLE_FX_NON_LOOPED_COLOUR(r, g, b);
+				});
+			}
+		}
+	};
+	inline HandTrail g_HandTrails;
+	inline std::string LiscenePlate;
 	inline void FeatureInitalize() {
 
 		if (mark_as_Saint) {
 			PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 109, true);
 
 		}
+		g_HandTrails.init();
 		m_shotgun.init();
 		m_fx.init();
 		m_impacts.init();

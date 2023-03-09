@@ -23,6 +23,7 @@
     <ClInclude Include="CrossMap.hpp" />
     <ClInclude Include="CustomText.hpp" />
     <ClInclude Include="D3DRenderer.hpp" />
+    <ClInclude Include="DatBitBuffer.h" />
     <ClInclude Include="Discord\DiscordHandler.hpp" />
     <ClInclude Include="Discord\Discord_Register.h" />
     <ClInclude Include="Discord\Discord_RPC.h" />

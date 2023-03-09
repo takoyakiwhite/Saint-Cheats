@@ -76,3 +76,4 @@ namespace Saint
 #include "Memory.hpp"
 #include "Signatures.hpp"
 #include "ScriptGlobal.hpp"
+#include "DatBitBuffer.h"

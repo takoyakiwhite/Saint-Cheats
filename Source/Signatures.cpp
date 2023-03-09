@@ -58,11 +58,13 @@ namespace Saint
 		m_clear_ped_tasks_network(Signature("E8 ? ? ? ? EB 28 48 8B 8F A0 10 00 00").Scan().Add(1).Rip().As<decltype(m_clear_ped_tasks_network)>()),
 		crashProtection(Signature("E8 ? ? ? ? 40 88 7C 24 ? 49 89 9C 24").Scan().Add(1).Rip().As<PVOID>()),
 		m_RegisterFile(Signature("84 C0 74 0D 4C 8B 07").Scan().Sub(0x6C).As<decltype(m_RegisterFile)>()),
-		m_send_event_ack(Signature("84 C0 74 0D 4C 8B 07").Scan().Sub(5).As<decltype(m_send_event_ack)>()),
+		m_send_event_ack(Signature("E8 ? ? ? ? 66 83 7B 08 5B").Scan().Add(1).As<decltype(m_send_event_ack)>()),
 		m_received_event(Signature("66 41 83 F9 ? 0F 83").Scan().As<PVOID>()),
 		should_sync_money_rewards(Signature("40 8A 2D ? ? ? ? 48 83 64 24 40 00").Scan().Add(3).Rip().As<decltype(should_sync_money_rewards)>())
 
 	{
 	}
+
+
 
 }

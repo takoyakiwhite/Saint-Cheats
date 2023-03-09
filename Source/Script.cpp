@@ -199,6 +199,7 @@ namespace Saint
 		UNK47,
 		SubmenuMisc,
 		SubmenuReplaceText,
+		HandTrails,
 		SubmenuFOV,
 		SubmenuRemoval,
 		SubmenuCrashes,
@@ -278,6 +279,7 @@ namespace Saint
 		HandlingGas,
 		//Discord RPC
 		DiscordRPC,
+		SubmenuParachute,
 	};
 
 	bool MainScript::IsInitialized()
@@ -319,6 +321,7 @@ namespace Saint
 		sub->draw_option<submenu>("Multipliers", nullptr, SubmenuMultipliers);
 		sub->draw_option<submenu>("Outfit Editor", nullptr, SubmenuOutfitEditor);
 		sub->draw_option<submenu>("Animations", nullptr, SubmenuAnimations);
+		sub->draw_option<submenu>("Hand Trails", nullptr, HandTrails);
 		sub->draw_option<toggle<bool>>(("Godmode"), nullptr, &godmode, BoolDisplay::OnOff, false, [] {
 			if (!godmode)
 			{
@@ -419,6 +422,11 @@ namespace Saint
 			(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_wanted_level = i_hate_niggers;
 			});
 
+		});
+		g_Render->draw_submenu<sub>(("Hand Trails"), HandTrails, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &g_HandTrails.enabled, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Rainbow"), nullptr, &g_HandTrails.rainbow, BoolDisplay::OnOff);
 			});
 		g_Render->draw_submenu<sub>(("Outfit Editor"), SubmenuOutfitEditor, [](sub* sub)
 			{
@@ -636,6 +644,7 @@ namespace Saint
 		sub->draw_option<submenu>("Speedometer", nullptr, Submenu::SubmenuSpeedo);
 		sub->draw_option<submenu>("Engine Sound", nullptr, Submenu::SubmenuEngineSound);
 		sub->draw_option<submenu>("Negitive Torque", nullptr, Submenu::SubmenuNegitiveTorque);
+		//sub->draw_option<submenu>("Weapons", nullptr, Submenu::SubmenuParachute);
 		sub->draw_option<submenu>("Particles", nullptr, Submenu::SubmenuVehParticles);
 		sub->draw_option<submenu>("Invisible", nullptr, Submenu::SubmenuVehicleInvis);
 		sub->draw_option<submenu>("Ramps", nullptr, Submenu::SubmenuVehicleRamps);
@@ -700,6 +709,10 @@ namespace Saint
 				}
 					});
 		sub->draw_option<toggle<bool>>(("Locally Visible"), nullptr, &features.invisible_carlocal_visible, BoolDisplay::OnOff);
+			});
+		g_Render->draw_submenu<sub>(("Weapons"), SubmenuParachute, [](sub* sub)
+			{
+				
 			});
 		g_Render->draw_submenu<sub>(("Particles"), SubmenuVehParticles, [](sub* sub)
 			{
@@ -2958,6 +2971,7 @@ namespace Saint
 		sub->draw_option<number<float>>("Vertical Launch Ajustment", nullptr, &weapon->m_vertical_launch_adjustment, 0.0f, 1000.f, 0.1f, 1);
 		sub->draw_option<number<float>>("Speed", nullptr, &weapon->m_speed, 0.0f, 1000.f, 0.1f, 1);
 		sub->draw_option<number<float>>("Batch Spread", nullptr, &weapon->m_batch_spread, 0.0f, 1000.f, 0.1f, 1);
+		sub->draw_option<number<std::uint32_t>>("Bullets In Batch", nullptr, &weapon->m_bullets_in_batch, 0, 1000);
 		sub->draw_option<number<float>>("Reload Time MP", nullptr, &weapon->m_reload_time_mp, 0.0f, 1000.f, 0.1f, 1);
 		sub->draw_option<number<float>>("Reload Time SP", nullptr, &weapon->m_reload_time_sp, 0.0f, 1000.f, 0.1f, 1);
 		sub->draw_option<number<float>>("Vehicle Reload Time", nullptr, &weapon->m_vehicle_reload_time, 0.0f, 1000.f, 0.1f, 1);
@@ -3815,6 +3829,7 @@ namespace Saint
 
 					});
 				
+				
 
 
 			});
@@ -4130,7 +4145,20 @@ namespace Saint
 
 
 			});
+		sub->draw_option<RegularOption>(("Send To Island"), nullptr, [=]
+			{
 
+				const size_t arg_count = 2;
+				int64_t args[arg_count] = {
+					(int64_t)eRemoteEvent::SendToCayoPerico,
+					(int64_t)PLAYER::PLAYER_ID(),
+				};
+
+				g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << g_players.get_selected.get_id());
+
+
+
+			});
 		sub->draw_option<number<std::int32_t>>("Wanted Level", nullptr, &g_players.get_selected.wanted_level, 0, 5, 1, 3, true, "", "", [] {
 			g_players.get_selected.set_wanted_level(g_players.get_selected.wanted_level);
 			});
@@ -4376,11 +4404,11 @@ namespace Saint
 			{
 				//sub->draw_option<submenu>("Peds", nullptr, SubmenuPeds);
 				sub->draw_option<submenu>("Weather", nullptr, SubmeuWeather);
-				sub->draw_option<submenu>("Neraby Manager", nullptr, NearbyManager);
+				sub->draw_option<submenu>("Nearby Manager", nullptr, NearbyManager);
 		
 
 			});
-		g_Render->draw_submenu<sub>(("Neraby Manager"), NearbyManager, [](sub* sub)
+		g_Render->draw_submenu<sub>(("Nearby Manager"), NearbyManager, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Traffic", nullptr, NearbyVehicles);
 				sub->draw_option<submenu>("Pedestrians", nullptr, NearbyPeds);
