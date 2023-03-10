@@ -11,11 +11,21 @@ namespace Saint {
 		bool request_control = true;
 		bool request_pickup = true;
 		bool give_weapons = true;
+		
+	};
+	class Entites {
+	public:
+		bool cage = false;
+		bool invalid_pickups = true;
+		void init() {
+			
+		}
 	};
 	class Protections {
 	public:
 		Crash crash;
 		GameEvents m_game_events;
+		Entites m_entities;
 		bool crash_blocked = false;
 		void push_notification(const char* body) {
 

@@ -163,9 +163,9 @@ using ScrHandle = Entity;
 #pragma pack(push, 1)
 	struct Color
 	{
-		std::uint8_t r{ 255 };
-		std::uint8_t g{ 255 };
-		std::uint8_t b{ 255 };
-		std::uint8_t a{ 255 };
+        int r{ 255 };
+        int g{ 255 };
+        int b{ 255 };
+		int a{ 255 };
 	};
 #pragma pack(pop)

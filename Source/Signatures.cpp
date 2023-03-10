@@ -1,6 +1,6 @@
 #include "Signatures.hpp"
 #include "Invoker.hpp"
-
+#include "hex_memory.h"
 namespace Saint
 {
 
@@ -25,6 +25,10 @@ namespace Saint
 		m_is_session_started(Signature("40 38 35 ? ? ? ? 75 0E 4C 8B C3 49 8B D7 49 8B CE").Scan().Add(3).Rip().As<bool*>()),
 		m_ModelSpawnBypass(Signature("48 8B C8 FF 52 30 84 C0 74 05 48").Scan().Add(8).As<decltype(m_ModelSpawnBypass)>())
 	{
+		char* c_location = nullptr;
+		auto p_worldPtr = Memory::pattern("48 8B 05 ? ? ? ? 45 ? ? ? ? 48 8B 48 08 48 85 C9 74 07");
+		c_location = p_worldPtr.count(1).get(0).get<char>(0);
+		m_WorldPtr = reinterpret_cast<uint64_t>(c_location) + *reinterpret_cast<int*>(reinterpret_cast<uint64_t>(c_location) + 3) + 7;
 		m_GameBuild = Signature("48 83 EC 60 48 8D 0D ? ? ? ? E8").Scan().Sub(17).Add(268).Rip().As<decltype(m_GameBuild)>();
 	}
 
@@ -60,6 +64,11 @@ namespace Saint
 		m_RegisterFile(Signature("84 C0 74 0D 4C 8B 07").Scan().Sub(0x6C).As<decltype(m_RegisterFile)>()),
 		m_send_event_ack(Signature("E8 ? ? ? ? 66 83 7B 08 5B").Scan().Add(1).As<decltype(m_send_event_ack)>()),
 		m_received_event(Signature("66 41 83 F9 ? 0F 83").Scan().As<PVOID>()),
+		m_pickup_creation(Signature("48 8B EC 48 83 EC 20 80 B9 C0 00 00 00 00").Scan().As<PVOID>()),
+		m_start_get_session_by_gamer_handle(Signature("E8 ? ? ? ? 84 C0 0F 84 ? ? ? ? 8B 05 ? ? ? ? 48 8D 4C 24").Scan().Add(1).Rip().As<decltype(m_start_get_session_by_gamer_handle)>()),
+		m_join_session_by_info(Signature("E8 ? ? ? ? 0F B6 CB 84 C0 41 0F 44 CD").Scan().Add(1).Rip().As<decltype(m_join_session_by_info)>()),
+		m_network(Signature("48 8B 0D ? ? ? ? 48 8B D7 E8 ? ? ? ? 84 C0 75 17 48 8B 0D ? ? ? ? 48 8B D7").Scan().Add(3).Rip().As<Network**>()),
+		
 		should_sync_money_rewards(Signature("40 8A 2D ? ? ? ? 48 83 64 24 40 00").Scan().Add(3).Rip().As<decltype(should_sync_money_rewards)>())
 
 	{

@@ -13,6 +13,11 @@
 
 #include "Protections.h"
 #include "Common.hpp"
+#include <GTAV-Classes/rage/rlSessionByGamerTaskResult.hpp>
+#include <GTAV-Classes/rage/rlScHandle.hpp>
+#include <GTAV-Classes/rage/rlQueryPresenceAttributesContext.hpp>
+#include <GTAV-Classes/rage/rlTaskStatus.hpp>
+#include <GTAV-Classes/network/Network.hpp>
 namespace Saint
 {
 
@@ -72,6 +77,8 @@ namespace Saint
 		uintptr_t push_scene_preset_manager;
 		uintptr_t set_scene_element_lighting;
 		uintptr_t get_scene_preset;
+
+		uint64_t m_WorldPtr;
 
 
 	};
@@ -159,6 +166,16 @@ namespace Saint
 		PVOID m_AssignPhysicalIndexHandler;
 
 		PVOID m_received_event{};
+
+		PVOID m_pickup_creation{};
+
+		using start_get_session_by_gamer_handle = bool (*)(int profile_index, rage::rlGamerHandle* handles, int count, rage::rlSessionByGamerTaskResult* result, int unk, bool* success, rage::rlTaskStatus* state);
+		start_get_session_by_gamer_handle m_start_get_session_by_gamer_handle;
+		Network** m_network;
+		using join_session_by_info = bool (*)(Network* network, rage::rlSessionInfo* info, int unk, int flags, rage::rlGamerHandle* handles, int handlecount);
+		join_session_by_info m_join_session_by_info;
+
+		
 
 		
 

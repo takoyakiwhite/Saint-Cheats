@@ -126,16 +126,28 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 			g_Render->m_HeaderBackgroundColor = { 108, 60, 175, 255 };
 
 			//Footer
-			g_Render->m_FooterBackgroundColor = { 108, 60, 175, 255 };
+
+			//Footer
+			g_Render->m_FooterBackgroundColor = { 0, 0, 0, 255 };
 
 			//Option
-			g_Render->m_OptionSelectedBackgroundColor = { 108, 60, 175, 255 };
+			g_Render->m_OptionSelectedBackgroundColor = { 255, 255, 255, 255 };
 
 			//Description
-			g_Render->m_DescriptionBackgroundColor = { 108, 60, 175, 255 };
+			//g_Render->m_DescriptionBackgroundColor = { 234, 90, 81, 255 };
 
 			//Background
-			g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
+			g_Render->m_OptionSelectedTextColor = { 0, 0, 0, 255 };
+			g_Render->m_Width = 0.21;
+			g_Render->glare_x_offset = 0.008;
+			g_Render->header_name = "Saint";
+
+			g_Render->m_HeaderText = false;
+			g_Render->m_HeaderNativeText = true;
+
+			g_Render->submenu_enabled = true;
+
+			g_Render->IndicatorIterator = 0;
 
 			//registering
 			

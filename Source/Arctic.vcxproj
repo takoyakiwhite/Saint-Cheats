@@ -32,12 +32,14 @@
     <ClInclude Include="Features.h" />
     <ClInclude Include="FiberHelper.hpp" />
     <ClInclude Include="Flash Blip.h" />
+    <ClInclude Include="hex_memory.h" />
     <ClInclude Include="Hotkeys.h" />
     <ClInclude Include="Images.h" />
     <ClInclude Include="Jets.h" />
     <ClInclude Include="KeyboardOption.h" />
     <ClInclude Include="Kick.h" />
     <ClInclude Include="Math.h" />
+    <ClInclude Include="MemoryEdit.h" />
     <ClInclude Include="Notifications.h" />
     <ClInclude Include="OTR.h" />
     <ClInclude Include="Players.h" />
@@ -100,6 +102,7 @@
     <ClCompile Include="CustomText.cpp" />
     <ClCompile Include="D3DRenderer.cpp" />
     <ClCompile Include="Discord\Discord.cpp" />
+    <ClCompile Include="hex_memory.cpp" />
     <ClCompile Include="Render.cpp" />
     <ClCompile Include="ScriptGlobal.cpp" />
     <ClCompile Include="Signatures.cpp" />

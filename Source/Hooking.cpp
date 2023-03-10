@@ -62,6 +62,19 @@ namespace Saint
 		g_D3DRenderer->WndProc(hWnd, msg, wParam, lParam);
 		return static_cast<decltype(&WndProc)>(g_Hooking->m_OriginalWndProc)(hWnd, msg, wParam, lParam);
 	}
+	void Hooks::NETWORK_SESSION_HOST(rage::scrNativeCallContext* src)
+	{
+		if (join_queue)
+		{
+			g_GameFunctions->m_join_session_by_info(*g_GameFunctions->m_network, &g_Session_info, 1, 1 | 2, nullptr, 0);
+			join_queue = false;
+			src->set_return_value<BOOL>(TRUE);
+		}
+		else
+		{
+			src->set_return_value<BOOL>(NETWORK::NETWORK_SESSION_HOST(src->get_arg<int>(0), src->get_arg<int>(1), src->get_arg<BOOL>(2)));
+		}
+	}
 	void Hooks::GetEventData2(rage::scrNativeCallContext* src)
 	{
 		const auto eventGroup = src->get_arg<int>(0);
@@ -79,6 +92,94 @@ namespace Saint
 		}
 		src->set_return_value(SCRIPT::GET_EVENT_DATA(eventGroup, eventIndex, args, argCount));
 	}
+	void Hooks::SET_CURRENT_PED_WEAPON(rage::scrNativeCallContext* src)
+	{
+		const auto ped = src->get_arg<Ped>(0);
+		const auto hash = src->get_arg<rage::joaat_t>(1);
+
+		if (weapons_in_int && ped == PLAYER::PLAYER_PED_ID() && hash == rage::joaat("WEAPON_UNARMED"))
+			return;
+
+		WEAPON::SET_CURRENT_PED_WEAPON(ped, hash, src->get_arg<int>(2));
+	}
+
+	void Hooks::DISABLE_CONTROL_ACTION(rage::scrNativeCallContext* src)
+	{
+		const auto action = src->get_arg<ControllerInputs>(1);
+
+		if (weapons_in_int) // Filtering from the inside of Kosatka
+		{
+			switch (action)
+			{
+				// case ControllerInputs::INPUT_JUMP: TODO: add as separate feature
+			case ControllerInputs::INPUT_ATTACK:
+			case ControllerInputs::INPUT_AIM:
+			case ControllerInputs::INPUT_DUCK:
+			case ControllerInputs::INPUT_SELECT_WEAPON:
+			case ControllerInputs::INPUT_COVER:
+			case ControllerInputs::INPUT_TALK:
+			case ControllerInputs::INPUT_DETONATE:
+			case ControllerInputs::INPUT_WEAPON_SPECIAL:
+			case ControllerInputs::INPUT_WEAPON_SPECIAL_TWO:
+			case ControllerInputs::INPUT_VEH_AIM:
+			case ControllerInputs::INPUT_VEH_ATTACK:
+			case ControllerInputs::INPUT_VEH_ATTACK2:
+			case ControllerInputs::INPUT_VEH_HEADLIGHT:
+			case ControllerInputs::INPUT_VEH_NEXT_RADIO:
+			case ControllerInputs::INPUT_VEH_PREV_RADIO:
+			case ControllerInputs::INPUT_VEH_NEXT_RADIO_TRACK:
+			case ControllerInputs::INPUT_VEH_PREV_RADIO_TRACK:
+			case ControllerInputs::INPUT_VEH_RADIO_WHEEL:
+			case ControllerInputs::INPUT_VEH_PASSENGER_AIM:
+			case ControllerInputs::INPUT_VEH_PASSENGER_ATTACK:
+			case ControllerInputs::INPUT_VEH_SELECT_NEXT_WEAPON:
+			case ControllerInputs::INPUT_VEH_SELECT_PREV_WEAPON:
+			case ControllerInputs::INPUT_VEH_ROOF:
+			case ControllerInputs::INPUT_VEH_JUMP:
+			case ControllerInputs::INPUT_VEH_FLY_ATTACK:
+			case ControllerInputs::INPUT_MELEE_ATTACK_LIGHT:
+			case ControllerInputs::INPUT_MELEE_ATTACK_HEAVY:
+			case ControllerInputs::INPUT_MELEE_ATTACK_ALTERNATE:
+			case ControllerInputs::INPUT_MELEE_BLOCK:
+			case ControllerInputs::INPUT_SELECT_WEAPON_UNARMED:
+			case ControllerInputs::INPUT_SELECT_WEAPON_MELEE:
+			case ControllerInputs::INPUT_SELECT_WEAPON_HANDGUN:
+			case ControllerInputs::INPUT_SELECT_WEAPON_SHOTGUN:
+			case ControllerInputs::INPUT_SELECT_WEAPON_SMG:
+			case ControllerInputs::INPUT_SELECT_WEAPON_AUTO_RIFLE:
+			case ControllerInputs::INPUT_SELECT_WEAPON_SNIPER:
+			case ControllerInputs::INPUT_SELECT_WEAPON_HEAVY:
+			case ControllerInputs::INPUT_SELECT_WEAPON_SPECIAL:
+			case ControllerInputs::INPUT_ATTACK2:
+			case ControllerInputs::INPUT_MELEE_ATTACK1:
+			case ControllerInputs::INPUT_MELEE_ATTACK2:
+			case ControllerInputs::INPUT_VEH_GUN_LEFT:
+			case ControllerInputs::INPUT_VEH_GUN_RIGHT:
+			case ControllerInputs::INPUT_VEH_GUN_UP:
+			case ControllerInputs::INPUT_VEH_GUN_DOWN:
+			case ControllerInputs::INPUT_VEH_HYDRAULICS_CONTROL_TOGGLE:
+			case ControllerInputs::INPUT_VEH_MELEE_HOLD:
+			case ControllerInputs::INPUT_VEH_MELEE_LEFT:
+			case ControllerInputs::INPUT_VEH_MELEE_RIGHT:
+			case ControllerInputs::INPUT_VEH_CAR_JUMP:
+			case ControllerInputs::INPUT_VEH_ROCKET_BOOST:
+			case ControllerInputs::INPUT_VEH_FLY_BOOST:
+			case ControllerInputs::INPUT_VEH_PARACHUTE:
+			case ControllerInputs::INPUT_VEH_BIKE_WINGS:
+			case ControllerInputs::INPUT_VEH_TRANSFORM: return;
+			}
+		}
+
+		PAD::DISABLE_CONTROL_ACTION(src->get_arg<int>(0), (int)action, src->get_arg<int>(2));
+	}
+	void Hooks::HUD_FORCE_WEAPON_WHEEL(rage::scrNativeCallContext* src)
+	{
+		if (weapons_in_int && src->get_arg<BOOL>(0) == false)
+			return;
+
+		HUD::HUD_FORCE_WEAPON_WHEEL(src->get_arg<BOOL>(0));
+	}
+
 	HRESULT Hooks::Present(IDXGISwapChain* dis, UINT syncInterval, UINT flags)
 	{
 		if (g_Running)
@@ -357,7 +458,40 @@ namespace Saint
 		}
 		return static_cast<decltype(&InvalidModsCrashPatch)>(g_Hooking->m_OriginalModCrash)(a1, a2, a3, a4);
 	}
-	
+	uint32_t crash_models[] = { rage::joaat("prop_dummy_01"), rage::joaat("prop_dummy_car"), rage::joaat("prop_dummy_light"), rage::joaat("prop_dummy_plane"), rage::joaat("slod_human"),
+		rage::joaat("slod_small_quadped"), rage::joaat("slod_large_quadped"), rage::joaat("prop_distantcar_night"), rage::joaat("prop_distantcar_day"), rage::joaat("hei_bh1_08_details4_em_night"),
+		rage::joaat("dt1_18_sq_night_slod"), rage::joaat("ss1_12_night_slod"), rage::joaat("raketrailer"), rage::joaat("boattrailer"), rage::joaat("baletrailer"), rage::joaat("prop_grass_dry_02"), rage::joaat("prop_grass_dry_03"), 1349725314, -1288391198, rage::joaat("h4_prop_bush_bgnvla_med_01"), rage::joaat("h4_prop_bush_bgnvla_lrg_01"),
+		rage::joaat("h4_prop_bush_buddleia_low_01"), rage::joaat("h4_prop_bush_ear_aa"), rage::joaat("h4_prop_bush_ear_ab"), rage::joaat("h4_prop_bush_fern_low_01"),
+		rage::joaat("h4_prop_bush_fern_tall_cc"), rage::joaat("h4_prop_bush_mang_ad"), rage::joaat("h4_prop_bush_mang_low_aa"), rage::joaat("h4_prop_bush_mang_low_ab"),
+		rage::joaat("h4_prop_bush_seagrape_low_01"), rage::joaat("prop_h4_ground_cover"), rage::joaat("h4_prop_weed_groundcover_01"), rage::joaat("h4_prop_grass_med_01"),
+		rage::joaat("h4_prop_grass_tropical_lush_01"), rage::joaat("h4_prop_grass_wiregrass_01"), rage::joaat("h4_prop_weed_01_plant"), rage::joaat("h4_prop_weed_01_row"),
+		rage::joaat("urbanweeds02_l1"), rage::joaat("proc_forest_grass01"), rage::joaat("prop_small_bushyba"), rage::joaat("arbitergt"), rage::joaat("astron2"), rage::joaat("cyclone2"),
+		rage::joaat("ignus2"), rage::joaat("s95"), rage::joaat("v_res_d_dildo_a"), rage::joaat("v_res_d_dildo_b"), rage::joaat("v_res_d_dildo_c"),
+		rage::joaat("v_res_d_dildo_d"), rage::joaat("v_res_d_dildo_e"), rage::joaat("v_res_d_dildo_f"), rage::joaat("v_res_skateboard"), rage::joaat("prop_battery_01"), rage::joaat("prop_barbell_01"),
+		rage::joaat("prop_barbell_02"), rage::joaat("prop_bandsaw_01"), rage::joaat("prop_bbq_3"), rage::joaat("v_med_curtainsnewcloth2"), rage::joaat("bh1_07_flagpoles"),
+		92962485, rage::joaat("ig_wade"), rage::joaat("Entity3"), rage::joaat("Issi8") };
+
+	bool crash_model_check(uint32_t model) {
+		for (int i = 0; i < sizeof(crash_models) / sizeof(uint32_t); i++)
+		{
+			if (crash_models[i] == model) return true;
+		}
+		return false;
+	}
+	bool Hooks::pickup_creation_node(CPickupCreationDataNode* node, rage::netObject* obj)
+	{
+		auto result = static_cast<decltype(&pickup_creation_node)>(g_Hooking->m_OriginalPickupNode)(node, obj);
+
+		if (crash_model_check(node->m_custom_model) || crash_model_check(node->m_pickup_hash)) {
+			if (protections.m_entities.invalid_pickups) {
+				Noti::InsertNotification({ ImGuiToastType_None, 2600, "Blocked Invalid Pickup" });
+				return true;
+			}
+		}
+
+		
+		return result;
+	}
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
@@ -374,6 +508,7 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_send_chat_message, &Hooks::send_chat_message, &m_OriginalChatSend);
 		MH_CreateHook(g_GameFunctions->m_AssignPhysicalIndexHandler, &Hooks::AssignNewPhysicalIndexHandler, &m_OriginalAssignPhysicalIndex);
 		MH_CreateHook(g_GameFunctions->crashProtection, &Hooks::InvalidModsCrashPatch, &m_OriginalModCrash);
+		MH_CreateHook(g_GameFunctions->m_pickup_creation, &Hooks::pickup_creation_node, &m_OriginalPickupNode);
 		//MH_CreateHook(g_GameFunctions->m_received_event, &Hooks::GameEvent, &OriginalRecivied);
 		m_D3DHook.Hook(&Hooks::Present, Hooks::PresentIndex);
 		m_D3DHook.Hook(&Hooks::ResizeBuffers, Hooks::ResizeBuffersIndex);
@@ -394,6 +529,7 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->m_send_chat_message);
 		MH_RemoveHook(g_GameFunctions->m_AssignPhysicalIndexHandler);
 		MH_RemoveHook(g_GameFunctions->crashProtection);
+		MH_RemoveHook(g_GameFunctions->m_pickup_creation);
 		//MH_RemoveHook(g_GameFunctions->m_received_event);
 		//MH_RemoveHook(g_GameFunctions->m_GetEventData);
 		MH_Uninitialize();

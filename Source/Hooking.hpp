@@ -8,11 +8,16 @@
 namespace Saint
 {
 	
-
+	
 	inline bool m_EnableSCIDJoiner;
 	inline __int64 m_SCIDJoiner;
 	inline __int64 m_PlayerListPointer;
 	inline int menu_version = 87456845654;
+	inline bool streamer_mode = false;
+	inline std::string streamer_mode_name = "Saint";
+	inline bool weapons_in_int = false;
+	inline bool join_queue = false;
+	inline rage::rlSessionInfo g_Session_info;
 	struct Hooks
 	{
 		static void GetStatInt(rage::scrNativeCallContext* src);
@@ -31,7 +36,10 @@ namespace Saint
 
 		static bool GetEventData(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount);
 		static void GetEventData2(rage::scrNativeCallContext* src);
-
+		static void NETWORK_SESSION_HOST(rage::scrNativeCallContext* src);
+		static void DISABLE_CONTROL_ACTION(rage::scrNativeCallContext* src);
+		static void HUD_FORCE_WEAPON_WHEEL(rage::scrNativeCallContext* src);
+		static void SET_CURRENT_PED_WEAPON(rage::scrNativeCallContext* src);
 		static int IncrementStatEvent(__int64 neteventclass, CNetGamePlayers* Source);
 
 		static void ChatMessage(void* thisptr, __int64 unk1, __int64 unk2, const char* message);
@@ -48,6 +56,7 @@ namespace Saint
 		
 
 		static bool GameEvent(rage::netEventMgr* event_manager, CNetGamePlayer* source_player, CNetGamePlayer* target_player, uint16_t event_id, int event_index, int event_handled_bitset, int buffer_size, rage::datBitBuffer* buffer);
+		static bool pickup_creation_node(CPickupCreationDataNode* node, rage::netObject* obj);
 
 
 
@@ -91,6 +100,8 @@ namespace Saint
 		void* m_OriginalModCrash{};
 
 		void* OriginalRecivied{};
+
+		void* m_OriginalPickupNode{};
 
 
 	};

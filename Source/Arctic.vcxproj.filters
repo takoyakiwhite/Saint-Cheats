@@ -235,6 +235,12 @@
     <ClInclude Include="DatBitBuffer.h">
       <Filter>Hooking</Filter>
     </ClInclude>
+    <ClInclude Include="hex_memory.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryEdit.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">
@@ -312,6 +318,9 @@
     </ClCompile>
     <ClCompile Include="Discord\Discord.cpp">
       <Filter>Discord</Filter>
+    </ClCompile>
+    <ClCompile Include="hex_memory.cpp">
+      <Filter>Memory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

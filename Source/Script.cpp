@@ -29,6 +29,7 @@
 #include "Render.h"
 #include "Notifications.h"
 #include "Discord/DiscordHandler.hpp"
+#include "hex_memory.h"
 namespace Saint
 {
 	enum Submenu : std::uint32_t
@@ -280,6 +281,17 @@ namespace Saint
 		//Discord RPC
 		DiscordRPC,
 		SubmenuParachute,
+
+		//Protections
+		SubmenuEntities,
+
+		//More Player Stuff
+		SubmenuSavedPlayers,
+		SubmenuSelectedDetections,
+
+		SubmenuStreamerMode,
+
+		SubmenuWalkStyles,
 	};
 
 	bool MainScript::IsInitialized()
@@ -322,6 +334,7 @@ namespace Saint
 		sub->draw_option<submenu>("Outfit Editor", nullptr, SubmenuOutfitEditor);
 		sub->draw_option<submenu>("Animations", nullptr, SubmenuAnimations);
 		sub->draw_option<submenu>("Hand Trails", nullptr, HandTrails);
+		sub->draw_option<submenu>("Walk Styles", nullptr, SubmenuWalkStyles);
 		sub->draw_option<toggle<bool>>(("Godmode"), nullptr, &godmode, BoolDisplay::OnOff, false, [] {
 			if (!godmode)
 			{
@@ -417,12 +430,31 @@ namespace Saint
 
 			}
 			});
-
+		sub->draw_option<toggle<bool>>(("Walk Underwater"), nullptr, &features.walk_underwater, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>(("Push Water Away"), nullptr, &features.push_water_away, BoolDisplay::OnOff);
 		sub->draw_option<number<std::int32_t>>("Wanted Level", nullptr, &i_hate_niggers, 0, 5, 1, 3, true, "", "", [] {
 			(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_wanted_level = i_hate_niggers;
 			});
 
 		});
+		g_Render->draw_submenu<sub>(("Walk Styles"), SubmenuWalkStyles, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>(("Reset"), nullptr, []
+					{
+						PED::RESET_PED_MOVEMENT_CLIPSET(PLAYER::PLAYER_PED_ID(), 1.0f);
+
+					});
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				sub->draw_option<RegularOption>("Sexy", nullptr, [=]
+						{
+
+							walk_style->change("move_f@sexy@a");
+							
+						});
+
+				
+				
+			});
 		g_Render->draw_submenu<sub>(("Hand Trails"), HandTrails, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &g_HandTrails.enabled, BoolDisplay::OnOff);
@@ -622,11 +654,29 @@ namespace Saint
 					(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_run_speed = 1.0f;
 				}
 					});
-		sub->draw_option<toggle_number_option<float, bool>>("Swim Speed", nullptr, &multipliers.swim_run, &multipliers.swim_speed, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
-			if (!multipliers.run) {
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_swim_speed = 1.0f;
-			}
-			});
+				sub->draw_option<toggle_number_option<float, bool>>("Swim Speed", nullptr, &multipliers.swim_run, &multipliers.swim_speed, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
+					
+					if (!multipliers.run) {
+						(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_swim_speed = 1.0f;
+					}
+					});
+				sub->draw_option<toggle_number_option<float, bool>>("Width", nullptr, &get_model_info.width, &get_model_info.widthm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
+					
+					if (get_model_info.width) {
+						Memory::set_value<float>({ 0x08, 0x0064 }, get_model_info.widthm);
+					}
+					if (!get_model_info.width) {
+						Memory::set_value<float>({ 0x08, 0x0064 }, 1.0f);
+					}
+					});
+				sub->draw_option<toggle_number_option<float, bool>>("Height", nullptr, &get_model_info.height, &get_model_info.heightm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
+					if (get_model_info.height) {
+						Memory::set_value<float>({ 0x08, 0x88 }, get_model_info.heightm);
+					}
+					if (!get_model_info.height) {
+						Memory::set_value<float>({ 0x08, 0x88 }, 1.0f);
+					}
+					});
 
 
 			});
@@ -644,7 +694,7 @@ namespace Saint
 		sub->draw_option<submenu>("Speedometer", nullptr, Submenu::SubmenuSpeedo);
 		sub->draw_option<submenu>("Engine Sound", nullptr, Submenu::SubmenuEngineSound);
 		sub->draw_option<submenu>("Negitive Torque", nullptr, Submenu::SubmenuNegitiveTorque);
-		//sub->draw_option<submenu>("Weapons", nullptr, Submenu::SubmenuParachute);
+		sub->draw_option<submenu>("Parachute", nullptr, Submenu::SubmenuParachute);
 		sub->draw_option<submenu>("Particles", nullptr, Submenu::SubmenuVehParticles);
 		sub->draw_option<submenu>("Invisible", nullptr, Submenu::SubmenuVehicleInvis);
 		sub->draw_option<submenu>("Ramps", nullptr, Submenu::SubmenuVehicleRamps);
@@ -710,9 +760,9 @@ namespace Saint
 					});
 		sub->draw_option<toggle<bool>>(("Locally Visible"), nullptr, &features.invisible_carlocal_visible, BoolDisplay::OnOff);
 			});
-		g_Render->draw_submenu<sub>(("Weapons"), SubmenuParachute, [](sub* sub)
+		g_Render->draw_submenu<sub>(("Parachte"), SubmenuParachute, [](sub* sub)
 			{
-				
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &features.invisible_carlocal_visible, BoolDisplay::OnOff);
 			});
 		g_Render->draw_submenu<sub>(("Particles"), SubmenuVehParticles, [](sub* sub)
 			{
@@ -838,34 +888,38 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Saved"), SubmenuSavedVehicles, [](sub* sub)
 			{
-				sub->draw_option<RegularOption>(("Save"), nullptr, [=]
+				sub->draw_option<RegularOption>(("Save"), nullptr, []
 					{
-						g_VehicleLoading->save();
 
+						showKeyboard("Enter Something", "", 25, &VehNameBuffer, [] {
+						m_VehicleLoad.save(VehNameBuffer);
+							});
 					});
-		sub->draw_option<UnclickOption>(("Saved"), nullptr, [] {});
-		sub->draw_option<RegularOption>(("Load"), nullptr, [=]
-			{
-				g_VehicleLoading->load();
-
-			});
-		namespace fs = std::filesystem;
-		fs::directory_iterator dirIt{ g_TranslationManager->GetTranslationDirectory() };
-		for (auto&& dirEntry : dirIt)
-		{
-			if (dirEntry.is_regular_file())
-			{
-				auto path = dirEntry.path();
-				if (path.has_filename())
+				sub->draw_option<UnclickOption>(("Lists"), nullptr, [] {});
+				namespace fs = std::filesystem;
+				fs::directory_iterator dirIt{ "C:\\Saint\\Vehicles\\" };
+				for (auto&& dirEntry : dirIt)
 				{
-					const char* lmao = "hey";
-					sub->draw_option<RegularOption>(lmao, nullptr, [=]
+					if (dirEntry.is_regular_file())
+					{
+						auto path = dirEntry.path();
+						if (path.has_filename())
 						{
-							//g_TranslationManager->LoadTranslations(path.stem().u8string().c_str());
-						});
+							if (path.extension() == ".ini")
+							{
+								OutfitList();
+								char nigger[64];
+								sprintf(nigger, "%s", path.stem().u8string().c_str());
+								sub->draw_option<RegularOption>(nigger, nullptr, [=]
+									{
+										m_VehicleLoad.load(nigger);
+									});
+
+							}
+
+						}
+					}
 				}
-			}
-		}
 
 			});
 		g_Render->draw_submenu<sub>(("All"), SubmenuVehicleAll, [](sub* sub)
@@ -896,7 +950,8 @@ namespace Saint
 
 								sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(*(std::uint32_t*)(info + 0x18)))), nullptr, [=]
 									{
-										veh_spawner.spawn(*(std::uint32_t*)(info + 0x18));
+										Vehicle veh;
+										veh_spawner.spawn(*(std::uint32_t*)(info + 0x18), &veh);
 
 									});
 
@@ -973,7 +1028,8 @@ namespace Saint
 									
 									sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(*(std::uint32_t*)(info + 0x18)))), nullptr, [=]
 										{
-											veh_spawner.spawn(*(std::uint32_t*)(info + 0x18));
+											Vehicle veh;
+											veh_spawner.spawn(*(std::uint32_t*)(info + 0x18), &veh);
 
 										});
 								}
@@ -2521,7 +2577,7 @@ namespace Saint
 				sub->draw_option<number<float>>("Acceleration", nullptr, &handling->m_acceleration, 0.0f, 1000.f, 0.1f, 1);
 
 				sub->draw_option<number<float>>("Initial Drive Force", nullptr, &handling->m_initial_drive_force, 0.0f, 1000.f, 0.1f, 1);
-				sub->draw_option<number<float>>("Drive Maxx Flat Velocity", nullptr, &handling->m_drive_max_flat_velocity, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Drive Max Flat Velocity", nullptr, &handling->m_drive_max_flat_velocity, 0.0f, 1000.f, 0.1f, 1);
 				sub->draw_option<number<float>>("Initial Drive Max Flat Velocity", nullptr, &handling->m_initial_drive_max_flat_vel, 0.0f, 1000.f, 0.1f, 1);
 
 				sub->draw_option<number<float>>("Handbrake Force", nullptr, &handling->m_handbrake_force, 0.0f, 1000.f, 0.1f, 1);
@@ -2660,13 +2716,34 @@ namespace Saint
 					{
 
 						showKeyboard("Enter Something", "", 25, &handlingBuffer, [] {
-
-							});
+							m_handling.save(handlingBuffer);
+						});
 					});
-		sub->draw_option<UnclickOption>(("Lists"), nullptr, [] {});
-		if (handlingBuffer.c_str() != "") {
-			sub->draw_option<RegularOption>(handlingBuffer.c_str(), "");
-		}
+				sub->draw_option<UnclickOption>(("Lists"), nullptr, [] {});
+				namespace fs = std::filesystem;
+				fs::directory_iterator dirIt{ "C:\\Saint\\Handling\\" };
+				for (auto&& dirEntry : dirIt)
+				{
+					if (dirEntry.is_regular_file())
+					{
+						auto path = dirEntry.path();
+						if (path.has_filename())
+						{
+							if (path.extension() == ".ini")
+							{
+								OutfitList();
+								char nigger[64];
+								sprintf(nigger, "%s", path.stem().u8string().c_str());
+								sub->draw_option<RegularOption>(nigger, nullptr, [=]
+									{
+										m_handling.load(nigger);
+									});
+
+							}
+
+						}
+					}
+				}
 
 
 
@@ -2713,6 +2790,7 @@ namespace Saint
 				m_shotgun.onDisable();
 			}
 			});
+		sub->draw_option<toggle<bool>>(("Weapons In Interior"), nullptr, &weapons_in_int, BoolDisplay::OnOff);
 			});
 		g_Render->draw_submenu<sub>(("Entity Shooter"), EntityShooter, [](sub* sub)
 			{
@@ -2956,7 +3034,7 @@ namespace Saint
 		sub->draw_option<number<float>>("Hit Limbs Damage Modifier", nullptr, &weapon->m_hit_limbs_damage_modifier, 0.0f, 1000.f, 0.1f, 1);
 		sub->draw_option<number<float>>("Network Hit Limbs Damage Modifier", nullptr, &weapon->m_network_hit_limbs_damage_modifier, 0.0f, 1000.f, 0.1f, 1);
 		sub->draw_option<number<float>>("Lightly Armoured Damage Modifier", nullptr, &weapon->m_lightly_armoured_damage_modifier, 0.0f, 1000.f, 0.1f, 1);
-		sub->draw_option<number<float>>("Vehilce Damage Modifier", nullptr, &weapon->m_vehicle_damage_modifier, 0.0f, 1000.f, 0.1f, 1);
+		sub->draw_option<number<float>>("Vehicle Damage Modifier", nullptr, &weapon->m_vehicle_damage_modifier, 0.0f, 1000.f, 0.1f, 1);
 		sub->draw_option<number<float>>("Force", nullptr, &weapon->m_force, 0.0f, 1000.f, 0.1f, 1);
 		sub->draw_option<number<float>>("Force On Ped", nullptr, &weapon->m_force_on_ped, 0.0f, 1000.f, 0.1f, 1);
 		sub->draw_option<number<float>>("Force On Vehicle", nullptr, &weapon->m_force_on_vehicle, 0.0f, 1000.f, 0.1f, 1);
@@ -3167,6 +3245,15 @@ namespace Saint
 		sub->draw_option<submenu>("Off The Radar", nullptr, SubmenuOffRadar);
 		sub->draw_option<submenu>("Heist Control", nullptr, HeistControl);
 			});
+		g_Render->draw_submenu<sub>("Streamer Mode", SubmenuStreamerMode, [](sub* sub)
+			{
+				
+				sub->draw_option<KeyboardOption>(("Name"), nullptr, streamer_mode_name, []
+					{
+						showKeyboard("Enter Something", "", 4, &streamer_mode_name, [] {});
+					});
+
+			});
 		g_Render->draw_submenu<sub>("Heist Control", HeistControl, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Diamond Casino", nullptr, DiamondCasino);
@@ -3246,6 +3333,19 @@ namespace Saint
 			{
 				sub->draw_option<submenu>("Level", nullptr, SubmenuRP);
 				sub->draw_option<submenu>("Unlocks", nullptr, SubmenuUnlocks);
+				sub->draw_option<RegularOption>("1bil Hangar Sell", "", []
+					{
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_PROP_HANGAR_VALUE"), 1999000000, true);
+
+				STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_PROP_HANGAR_VALUE"), 1999000000, true);
+
+				*script_global(262145 + 1574918).as<int*>() = 1999000000;
+
+
+					});
+
+
+				
 
 
 			});
@@ -3566,17 +3666,7 @@ namespace Saint
 			{
 				sub->draw_option<RegularOption>(("Join"), nullptr, []
 					{
-						std::uint32_t g_RIDHash{ 0xDA4858C1 };
-		m_EnableSCIDJoiner = true;
-		HUD::ACTIVATE_FRONTEND_MENU(0XD528C7E2, 0, 2);
-		fbr::cur()->wait(250ms);
-		if (m_PlayerListPointer)
-		{
-			g_GameFunctions->m_PlayerGUIOptions(m_PlayerListPointer, &g_RIDHash);
-			m_PlayerListPointer = 0;
-			fbr::cur()->wait(300ms);
-		}
-		m_EnableSCIDJoiner = false;
+						rid_toolkit.join(selected_rid);
 
 					});
 
@@ -3674,6 +3764,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Player List", SubmenuPlayerList, [](sub* sub)
 			{
 				sub->draw_option<submenu>("All", nullptr, SubmenuAllPlayers);
+		sub->draw_option<submenu>("Saved", nullptr, SubmenuSavedPlayers);
 		sub->draw_option<ChooseOption<const char*, std::size_t>>("Filter", nullptr, &p_filter.data, &p_filter.data_i);
 		
 		
@@ -3750,6 +3841,7 @@ namespace Saint
 		sub->draw_option<submenu>("Teleport", nullptr, SubmenuPlayerTeleport);
 		sub->draw_option<submenu>("Spawner", nullptr, SubmenuSelectedSpawner);
 		sub->draw_option<submenu>("Removals", nullptr, SubmenuRemoval);
+		sub->draw_option<submenu>("Detections", nullptr, SubmenuSelectedDetections);
 		if (g_SelectedPlayer != PLAYER::PLAYER_ID()) {
 			sub->draw_option<toggle<bool>>(("Spectate"), nullptr, &features.spectate, BoolDisplay::OnOff, false, [] {
 				if (!features.spectate) {
@@ -3798,8 +3890,40 @@ namespace Saint
 					break;
 				}
 			});
+		sub->draw_option<RegularOption>("Save", nullptr, [=]
+			{
+				m_saved_players.add(g_SelectedPlayer);
+
+			});
 
 
+			});
+		g_Render->draw_submenu<sub>("Detections", SubmenuSelectedDetections, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Exclude"), nullptr, &antiCheat.excludethatuck, BoolDisplay::OnOff, false, [] {
+				if (antiCheat.excludethatuck) {
+					antiCheat.exclude_player(all_players.get_id(g_SelectedPlayer));
+				}
+				if (!antiCheat.excludethatuck) {
+					antiCheat.remove_exclude(all_players.get_id(g_SelectedPlayer));
+				}
+					});
+				if (antiCheat.excludethatuck) {
+					sub->draw_option<UnclickOption>(("This player is excluded."), nullptr, [] {});
+						}
+				if (!antiCheat.excludethatuck) {
+					sub->draw_option<RegularOption>("Mark As Cheater", nullptr, [=]
+						{
+							antiCheat.flag_as_modder(all_players.get_id(g_SelectedPlayer), g_SelectedPlayer, true);
+							
+
+						});
+					sub->draw_option<RegularOption>("Unmark As Cheater", nullptr, [=]
+						{
+							antiCheat.remove_as_modder(all_players.get_id(g_SelectedPlayer));
+
+						});
+				}
 			});
 		g_Render->draw_submenu<sub>("Vehicle", SubmenuSelectedVehicle, [](sub* sub)
 			{
@@ -4032,6 +4156,43 @@ namespace Saint
 			});
 
 			});
+		g_Render->draw_submenu<sub>(("Saved"), SubmenuSavedPlayers, [](sub* sub)
+			{
+
+				sub->draw_option<RegularOption>(("Delete All"), nullptr, []
+					{
+
+						
+					});
+		sub->draw_option<UnclickOption>(("Lists"), nullptr, [] {});
+		namespace fs = std::filesystem;
+		fs::directory_iterator dirIt{ "C:\\Saint\\Players\\" };
+		for (auto&& dirEntry : dirIt)
+		{
+			if (dirEntry.is_regular_file())
+			{
+				auto path = dirEntry.path();
+				if (path.has_filename())
+				{
+					if (path.extension() == ".ini")
+					{
+						OutfitList();
+						char nigger[64];
+						sprintf(nigger, "%s", path.stem().u8string().c_str());
+						sub->draw_option<RegularOption>(nigger, nullptr, [=]
+							{
+								
+							});
+
+					}
+
+				}
+			}
+		}
+
+
+
+			});
 		g_Render->draw_submenu<sub>("All", SubmenuAllPlayers, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Settings", nullptr, SubmenuAllSettings);
@@ -4050,6 +4211,13 @@ namespace Saint
 				}
 
 
+
+			});
+		sub->draw_option<RegularOption>("Save", nullptr, [=]
+			{
+				for (std::uint32_t i = 0; i < PLAYER::GET_NUMBER_OF_PLAYERS(); ++i) {
+					m_saved_players.add(i);
+				}
 
 			});
 
@@ -4372,8 +4540,14 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Protection"), SubmenuProtections, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Script Events", nullptr, SubmenuScriptEvents);
-		sub->draw_option<submenu>("Crash", nullptr, SubmenuProtCrash);
-		sub->draw_option<toggle<bool>>(("Reports"), nullptr, &protections.block_reports, BoolDisplay::OnOff);
+				sub->draw_option<submenu>("Entities", nullptr, SubmenuEntities);
+				sub->draw_option<submenu>("Crash", nullptr, SubmenuProtCrash);
+				sub->draw_option<toggle<bool>>(("Reports"), nullptr, &protections.block_reports, BoolDisplay::OnOff);
+
+			});
+		g_Render->draw_submenu<sub>(("Entities"), SubmenuEntities, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Cage"), nullptr, &protections.m_entities.cage, BoolDisplay::OnOff);
 
 			});
 		g_Render->draw_submenu<sub>(("Crash"), SubmenuProtCrash, [](sub* sub)
@@ -4705,10 +4879,10 @@ namespace Saint
 
 			});
 
-		sub->draw_option<number<std::uint8_t>>("Toggled (R)", nullptr, &g_Render->m_ToggleOnColor.r, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Toggled (G)", nullptr, &g_Render->m_ToggleOnColor.g, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Toggled (B)", nullptr, &g_Render->m_ToggleOnColor.b, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Toggled (A)", nullptr, &g_Render->m_ToggleOnColor.a, '\0', static_cast<std::uint8_t>(255));
+		sub->draw_option<number<std::int32_t>>("Toggled (R)", nullptr, &g_Render->m_ToggleOnColor.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Toggled (G)", nullptr, &g_Render->m_ToggleOnColor.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Toggled (B)", nullptr, &g_Render->m_ToggleOnColor.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Toggled (A)", nullptr, &g_Render->m_ToggleOnColor.a, 0, 255);
 		sub->draw_option<RegularOption>("Reset", "", []
 			{
 				features.match = false;
@@ -4947,10 +5121,10 @@ namespace Saint
 		sub->draw_option<toggle<bool>>("Left Text", nullptr, &g_Render->LeftFooterText, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>("Right Text", nullptr, &g_Render->RightFooterText, BoolDisplay::OnOff);
 		sub->draw_option<UnclickOption>(("Colors"), nullptr, [] {});
-		sub->draw_option<number<std::uint8_t>>("Text R", nullptr, &g_Render->m_FooterTextColor.r, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Text G", nullptr, &g_Render->m_FooterTextColor.g, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Text B", nullptr, &g_Render->m_FooterTextColor.b, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Text A", nullptr, &g_Render->m_FooterTextColor.a, '\0', static_cast<std::uint8_t>(255));
+		sub->draw_option<number<std::int32_t>>("Text R", nullptr, &g_Render->m_FooterTextColor.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Text G", nullptr, &g_Render->m_FooterTextColor.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Text B", nullptr, &g_Render->m_FooterTextColor.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Text A", nullptr, &g_Render->m_FooterTextColor.a, 0, 255);
 			});
 
 		g_Render->draw_submenu<sub>("Options", SubmenuSettingsOption, [](sub* sub)
@@ -4958,23 +5132,23 @@ namespace Saint
 				sub->draw_option<number<float>>("Height", nullptr, &g_Render->m_OptionHeight, 0.01f, 0.1f, 0.001f, 3);
 		sub->draw_option<number<float>>("Text Size", nullptr, &g_Render->m_OptionTextSize, 0.01f, 1.f, 0.01f, 2);
 		sub->draw_option<UnclickOption>(("Colors"), nullptr, [] {});
-		sub->draw_option<number<std::uint8_t>>("Selected Background R", nullptr, &g_Render->m_OptionSelectedBackgroundColor.r, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Selected Background G", nullptr, &g_Render->m_OptionSelectedBackgroundColor.g, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Selected Background B", nullptr, &g_Render->m_OptionSelectedBackgroundColor.b, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Selected Background A", nullptr, &g_Render->m_OptionSelectedBackgroundColor.a, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Unselected Background R", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.r, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Unselected Background G", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.g, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Unselected Background B", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.b, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Unselected Background A", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.a, '\0', static_cast<std::uint8_t>(255));
+		sub->draw_option<number<std::int32_t>>("Selected Background R", nullptr, &g_Render->m_OptionSelectedBackgroundColor.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Selected Background G", nullptr, &g_Render->m_OptionSelectedBackgroundColor.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Selected Background B", nullptr, &g_Render->m_OptionSelectedBackgroundColor.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Selected Background A", nullptr, &g_Render->m_OptionSelectedBackgroundColor.a, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Unselected Background R", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Unselected Background G", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Unselected Background B", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Unselected Background A", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.a, 0, 255);
 
-		sub->draw_option<number<std::uint8_t>>("Selected Text R", nullptr, &g_Render->m_OptionSelectedTextColor.r, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Selected Text G", nullptr, &g_Render->m_OptionSelectedTextColor.g, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Selected Text B", nullptr, &g_Render->m_OptionSelectedTextColor.b, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Selected Text A", nullptr, &g_Render->m_OptionSelectedTextColor.a, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Unselected Text R", nullptr, &g_Render->m_OptionUnselectedTextColor.r, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Unselected Text G", nullptr, &g_Render->m_OptionUnselectedTextColor.g, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Unselected Text B", nullptr, &g_Render->m_OptionUnselectedTextColor.b, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Unselected Text A", nullptr, &g_Render->m_OptionUnselectedTextColor.a, '\0', static_cast<std::uint8_t>(255));
+		sub->draw_option<number<std::int32_t>>("Selected Text R", nullptr, &g_Render->m_OptionSelectedTextColor.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Selected Text G", nullptr, &g_Render->m_OptionSelectedTextColor.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Selected Text B", nullptr, &g_Render->m_OptionSelectedTextColor.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Selected Text A", nullptr, &g_Render->m_OptionSelectedTextColor.a, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Unselected Text R", nullptr, &g_Render->m_OptionUnselectedTextColor.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Unselected Text G", nullptr, &g_Render->m_OptionUnselectedTextColor.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Unselected Text B", nullptr, &g_Render->m_OptionUnselectedTextColor.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Unselected Text A", nullptr, &g_Render->m_OptionUnselectedTextColor.a, 0, 255);
 			});
 
 		g_Render->draw_submenu<sub>("Footer", SubmenuSettingsFooter, [](sub* sub)
@@ -4983,14 +5157,14 @@ namespace Saint
 		sub->draw_option<number<float>>("Sprite Size", nullptr, &g_Render->m_FooterSpriteSize, 0.01f, 1.f, 0.001f, 3);
 		sub->draw_option<toggle<bool>>("Dynamic Footer", nullptr, &g_Render->m_dynamic_footer, BoolDisplay::OnOff);
 		sub->draw_option<UnclickOption>(("Colors"), nullptr, [] {});
-		sub->draw_option<number<std::uint8_t>>("Background R", nullptr, &g_Render->m_FooterBackgroundColor.r, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Background G", nullptr, &g_Render->m_FooterBackgroundColor.g, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Background B", nullptr, &g_Render->m_FooterBackgroundColor.b, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Background A", nullptr, &g_Render->m_FooterBackgroundColor.a, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Sprite R", nullptr, &g_Render->m_FooterSpriteColor.r, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Sprite G", nullptr, &g_Render->m_FooterSpriteColor.g, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Sprite B", nullptr, &g_Render->m_FooterSpriteColor.b, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("Sprite A", nullptr, &g_Render->m_FooterSpriteColor.a, '\0', static_cast<std::uint8_t>(255));
+		sub->draw_option<number<std::int32_t>>("Background R", nullptr, &g_Render->m_FooterBackgroundColor.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Background G", nullptr, &g_Render->m_FooterBackgroundColor.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Background B", nullptr, &g_Render->m_FooterBackgroundColor.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Background A", nullptr, &g_Render->m_FooterBackgroundColor.a, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Sprite R", nullptr, &g_Render->m_FooterSpriteColor.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Sprite G", nullptr, &g_Render->m_FooterSpriteColor.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Sprite B", nullptr, &g_Render->m_FooterSpriteColor.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("Sprite A", nullptr, &g_Render->m_FooterSpriteColor.a, 0, 255);
 			});
 
 		g_Render->draw_submenu<sub>("Header", SubmenuSettingsHeader, [](sub* sub)
@@ -5023,10 +5197,10 @@ namespace Saint
 
 		g_Render->draw_submenu<sub>("Header Background", SubmenuSettingsHeaderStaticBackground, [](sub* sub)
 			{
-				sub->draw_option<number<std::uint8_t>>("R", nullptr, &g_Render->m_HeaderBackgroundColor.r, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("G", nullptr, &g_Render->m_HeaderBackgroundColor.g, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("B", nullptr, &g_Render->m_HeaderBackgroundColor.b, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("A", nullptr, &g_Render->m_HeaderBackgroundColor.a, '\0', static_cast<std::uint8_t>(255));
+				sub->draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_HeaderBackgroundColor.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_HeaderBackgroundColor.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_HeaderBackgroundColor.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_HeaderBackgroundColor.a, 0, 255);
 			});
 
 		g_Render->draw_submenu<sub>("Header Gradient", SubmenuSettingsHeaderGradientBackground, [](sub* sub)
@@ -5034,14 +5208,14 @@ namespace Saint
 				sub->draw_option<toggle<bool>>("Transparent", nullptr, &g_Render->m_HeaderGradientTransparent, BoolDisplay::YesNo);
 		sub->draw_option<toggle<bool>>("Flip", nullptr, &g_Render->m_HeaderGradientFlip, BoolDisplay::YesNo);
 		sub->draw_option<UnclickOption>(("Colors"), nullptr, [] {});
-		sub->draw_option<number<std::uint8_t>>("R1", nullptr, &g_Render->m_HeaderGradientColorLeft.r, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("G1", nullptr, &g_Render->m_HeaderGradientColorLeft.g, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("B1", nullptr, &g_Render->m_HeaderGradientColorLeft.b, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("A1", nullptr, &g_Render->m_HeaderGradientColorLeft.a, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("R2", nullptr, &g_Render->m_HeaderGradientColorRight.r, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("G2", nullptr, &g_Render->m_HeaderGradientColorRight.g, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("B2", nullptr, &g_Render->m_HeaderGradientColorRight.b, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("A2", nullptr, &g_Render->m_HeaderGradientColorRight.a, '\0', static_cast<std::uint8_t>(255));
+		sub->draw_option<number<std::int32_t>>("R1", nullptr, &g_Render->m_HeaderGradientColorLeft.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("G1", nullptr, &g_Render->m_HeaderGradientColorLeft.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("B1", nullptr, &g_Render->m_HeaderGradientColorLeft.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("A1", nullptr, &g_Render->m_HeaderGradientColorLeft.a, 0, 255);
+		sub->draw_option<number<std::int32_t>>("R2", nullptr, &g_Render->m_HeaderGradientColorRight.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("G2", nullptr, &g_Render->m_HeaderGradientColorRight.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("B2", nullptr, &g_Render->m_HeaderGradientColorRight.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("A2", nullptr, &g_Render->m_HeaderGradientColorRight.a, 0, 255);
 			});
 
 		g_Render->draw_submenu<sub>("Header Text", SubmenuSettingsHeaderText, [](sub* sub)
@@ -5073,10 +5247,10 @@ namespace Saint
 		}
 		sub->draw_option<number<float>>("Size", nullptr, &g_Render->m_HeaderTextSize, 0.1f, 2.f, 0.01f, 2);
 		sub->draw_option<UnclickOption>(("Colors"), nullptr, [] {});
-		sub->draw_option<number<std::uint8_t>>("R", nullptr, &g_Render->m_HeaderTextColor.r, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("G", nullptr, &g_Render->m_HeaderTextColor.g, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("B", nullptr, &g_Render->m_HeaderTextColor.b, '\0', static_cast<std::uint8_t>(255));
-		sub->draw_option<number<std::uint8_t>>("A", nullptr, &g_Render->m_HeaderTextColor.a, '\0', static_cast<std::uint8_t>(255));
+		sub->draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_HeaderTextColor.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_HeaderTextColor.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_HeaderTextColor.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_HeaderTextColor.a, 0, 255);
 			});
 
 		g_Render->draw_submenu<sub>("Description", SubmenuSettingsDescription, [](sub* sub)

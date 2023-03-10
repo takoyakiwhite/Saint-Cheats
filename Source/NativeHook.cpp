@@ -9,6 +9,7 @@ namespace Saint
 	NativeHooks::NativeHooks()
 	{
 		AddNativeDetour("SGI", Joaat("main_persistent"), 0x767FBC2AC802EF3D, Hooks::GetStatInt);
+		AddNativeDetour("GNI", Joaat("maintransition"), 0x6F3D4ED9BEE4E61D, Hooks::NETWORK_SESSION_HOST);
 		AddNativeDetour("GED", 0x2902843FCD2B2D79, Hooks::GetEventData2);
 
 		for (auto& entry : *g_GameVariables->m_ScriptProgramTable)

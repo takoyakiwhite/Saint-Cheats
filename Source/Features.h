@@ -15,10 +15,12 @@
 #include "Hooking.hpp"
 #include "Render.h"
 #include "Hotkeys.h"
+#include "hex_memory.h"
 namespace Saint {
 	inline std::string handlingBuffer = "";
+	inline std::string VehNameBuffer = "";
 	inline std::string ridBuffer = "";
-	inline int selected_rid = 0;
+	inline uint64_t selected_rid = 0;
 
 	inline std::string replaceTextBuffer = "";
 	inline std::string replaceTextBuffer2 = "";
@@ -531,10 +533,55 @@ namespace Saint {
 		int boost_speed = 150;
 		bool disable_lock_on = false;
 		bool aim_tracer = false;
+		bool walk_underwater = false;
+		bool push_water_away = false;
 		bool is_free_aiming() {
 			return PED::GET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 78, true);
 		}
 		void init() {
+			if (walk_underwater)
+			{
+				if (ENTITY::IS_ENTITY_IN_WATER(PLAYER::PLAYER_PED_ID()))
+				{
+					PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 65, false);
+					PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 66, false);
+					PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 168, false);
+
+					NativeVector3 PlayerPos = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 0);
+					
+
+					if (PED::IS_PED_JUMPING(PLAYER::PLAYER_PED_ID()))
+					{
+						ENTITY::APPLY_FORCE_TO_ENTITY(PLAYER::PLAYER_PED_ID(), true, 0, 0, 0.7f, 0, 0, 0, true, true, true, true, false, true);
+					}
+
+					if (ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(PLAYER::PLAYER_PED_ID()) > 1)
+					{
+						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 60, false);
+						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 61, false);
+						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 104, false);
+						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 276, false);
+						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 76, true);
+						ENTITY::APPLY_FORCE_TO_ENTITY(PLAYER::PLAYER_PED_ID(), true, 0, 0, -0.7f, 0, 0, 0, true, true, true, true, false, true);
+					}
+
+					if (TASK::GET_IS_TASK_ACTIVE(PLAYER::PLAYER_PED_ID(), 281) || PED::IS_PED_SWIMMING(PLAYER::PLAYER_PED_ID()) || PED::IS_PED_SWIMMING_UNDER_WATER(PLAYER::PLAYER_PED_ID()))
+					{
+						TASK::CLEAR_PED_TASKS_IMMEDIATELY(PLAYER::PLAYER_PED_ID());
+					}
+				}
+			}
+			if (push_water_away)
+			{
+				NativeVector3 Coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+				for (int i = -8; i <= 15; i++)
+				{
+					for (int j = -8; j <= 15; j++)
+					{
+						WATER::MODIFY_WATER(Coords.x + i, Coords.y + j, -8, 8);
+					}
+				}
+			}
 			if (aim_tracer) {
 				Vector3 minV, maxV;
 					Hash weapHash;
@@ -1138,51 +1185,42 @@ namespace Saint {
 				return true;
 			}
 		}
-		bool is_modding(int i) {
-			auto player = g_GameVariables->m_net_game_player(i)->m_player_info->m_ped;
-
-			uint32_t ped_damage_bits = 0;
-			uint32_t ped_task_flag = 0;
-			if (CPed* ped = g_GameVariables->m_net_game_player(i)->m_player_info->m_ped; ped != nullptr)
-			{
-				ped_task_flag = ped->m_ped_task_flag;
-				ped_damage_bits = ped->m_damage_bits;
-
-			}
-			if (player->m_weapon_manager->m_weapon_info->m_wheel_slot != eWeaponWheelSlot::UnarmedMelee) {
-				if (ped_task_flag & (uint8_t)1 << 6) {
-
-				}
-				else {
-					if (player->m_inventory->m_infinite_ammo) {
-						return true;
-					}
-					if (player->m_inventory->m_infinite_clip) {
-						return true;
-					}
-				}
-			}
-			if (ped_damage_bits & (uint32_t)1 << 8) {
-				if (ready_for_godmode(i, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))) {
-					return true;
-				}
-			}
-
-			if (player->m_player_info->m_run_speed > 1.80f) {
-
+		bool is_modding(int slot) {
+			if (cheater[slot] == true) {
 				return true;
 			}
 		}
 		bool cheater[32];
-		void flag_as_modder(int slot, int slot2) {
-			if (cheater[slot] == true) {
+		bool excluded[32];
+		bool excludethatuck = false;
+		void exclude_player(int slot) {
+			excluded[slot] = true;
+		}
+		void remove_exclude(int slot) {
+			excluded[slot] = false;
+		}
+		void flag_as_modder(int slot, int slot2, bool manual = false) {
+			if (excluded[slot]) {
 
 			}
 			else {
-				char input2[64];
-				sprintf(input2, "%s marked as cheater", g_GameVariables->m_net_game_player(slot2)->m_player_info->m_net_player_data.m_name);
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, input2 });
-				cheater[slot] = true;
+				if (cheater[slot] == true) {
+
+				}
+				else {
+					if (manual) {
+						char input2[64];
+						sprintf(input2, "%s was manually marked as cheater", g_GameVariables->m_net_game_player(slot2)->m_player_info->m_net_player_data.m_name);
+						Noti::InsertNotification({ ImGuiToastType_None, 2000, input2 });
+						cheater[slot] = true;
+					}
+					else {
+						char input2[64];
+						sprintf(input2, "%s marked as cheater", g_GameVariables->m_net_game_player(slot2)->m_player_info->m_net_player_data.m_name);
+						Noti::InsertNotification({ ImGuiToastType_None, 2000, input2 });
+						cheater[slot] = true;
+					}
+				}
 			}
 		}
 		void remove_as_modder(int slot) {
@@ -1229,8 +1267,14 @@ namespace Saint {
 						}
 						bool godmodec = false;
 
-
-
+						if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+							if (all_players.get_player_info(i)->m_run_speed > 1.50) {
+								flag_as_modder(all_players.get_id(i), i);
+							}
+							if (all_players.get_ped(i)->m_weapon_manager->m_weapon_info->m_bullets_in_batch > 8) {
+								flag_as_modder(all_players.get_id(i), i);
+							}
+						}
 
 
 
@@ -1871,7 +1915,7 @@ namespace Saint {
 		int spawnb2 = 0;
 		const char* fade_speed[2] = {"Fast", "Slow"};
 		std::size_t fade_speed_i = 0;
-		void spawn(Hash hash) {
+		void spawn(Hash hash, Vehicle* buffer) {
 			*script_global(4540726).as<bool*>() = true;
 			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
 				{
@@ -1886,6 +1930,7 @@ namespace Saint {
 			NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::PLAYER_PED_ID(), { 0.f, dellast ? 0.f : 8.0f, (VEHICLE::IS_THIS_MODEL_A_PLANE(hash) && spawninair || VEHICLE::IS_THIS_MODEL_A_HELI(hash) && spawninair) ? 1.0f + heightmulti : 1.0f });
 			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 			Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
+			*buffer = vehicle;
 			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 			DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
 			auto networkId = NETWORK::VEH_TO_NET(vehicle);
@@ -3363,7 +3408,8 @@ namespace Saint {
 			std::string MenuFolderPath = AppDataPath + "\\Saint\\Vehicles\\";
 			if (VehicleIniExist((MenuFolderPath + "Saved.ini").c_str())) {
 				Ini* ColorIni = new Ini(MenuFolderPath + "Saved.ini");
-				veh_spawner.spawn(ColorIni->GetInt("Info", "hash"));
+				Vehicle spawned;
+				veh_spawner.spawn(ColorIni->GetInt("Info", "hash"), &spawned);
 			}
 		}
 	};
@@ -3444,8 +3490,175 @@ namespace Saint {
 		}
 	};
 	inline ThemeLoading* g_ThemeLoading;
+	class SaveHandling {
+	public:
+		bool DoesIniExists(const char* path)
+		{
+
+			struct stat buffer;
+			return (stat(path, &buffer) == 0);
+
+		}
+		void save(std::string name) {
+			auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+			std::string MenuFolderPath = "C:\\Saint\\Handling\\";
+			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+			ColorIni->WriteFloat(handling->m_acceleration, "Handling", "m_acceleration");
+			ColorIni->WriteFloat(handling->m_mass, "Handling", "m_mass");
+			ColorIni->WriteFloat(handling->m_buoyancy, "Handling", "m_buoyancy");
+			ColorIni->WriteFloat(handling->m_brake_force, "Handling", "m_brake_force");
+			ColorIni->WriteFloat(handling->m_traction_bias_front, "Handling", "m_traction_bias_front");
+			ColorIni->WriteFloat(handling->m_traction_bias_rear, "Handling", "m_traction_bias_rear");
+			ColorIni->WriteFloat(handling->m_traction_curve_min, "Handling", "m_traction_curve_min");
+			ColorIni->WriteFloat(handling->m_traction_curve_max, "Handling", "m_traction_curve_max");
+			ColorIni->WriteFloat(handling->m_centre_of_mass.x, "Handling", "m_centre_of_mass_x");
+			ColorIni->WriteFloat(handling->m_centre_of_mass.y, "Handling", "m_centre_of_mass_y");
+			ColorIni->WriteFloat(handling->m_centre_of_mass.z, "Handling", "m_centre_of_mass_z");
+			ColorIni->WriteFloat(handling->m_drive_bias_front, "Handling", "m_drive_bias_front");
+			ColorIni->WriteFloat(handling->m_drive_bias_rear, "Handling", "m_drive_bias_rear");
+			ColorIni->WriteFloat(handling->m_drive_inertia, "Handling", "m_drive_inertia");
+			ColorIni->WriteFloat(handling->m_inertia_mult.x, "Handling", "m_inertia_mult_x");
+			ColorIni->WriteFloat(handling->m_inertia_mult.y, "Handling", "m_inertia_mult_y");
+			ColorIni->WriteFloat(handling->m_inertia_mult.z, "Handling", "m_inertia_mult_z");
+			ColorIni->WriteFloat(handling->m_steering_lock, "Handling", "m_steering_lock");
+			ColorIni->WriteFloat(handling->m_traction_curve_lateral, "Handling", "m_traction_curve_lateral");
+			ColorIni->WriteFloat(handling->m_traction_curve_ratio, "Handling", "m_traction_curve_ratio");
+			ColorIni->WriteFloat(handling->m_low_speed_traction_loss_mult, "Handling", "m_low_speed_traction_loss_mult");
+			ColorIni->WriteFloat(handling->m_traction_spring_delta_max, "Handling", "m_traction_spring_delta_max");
+			ColorIni->WriteFloat(handling->m_traction_spring_delta_max_ratio, "Handling", "m_traction_spring_delta_max_ratio");
+		}
+		void load(std::string name) {
+			std::string MenuFolderPath = "C:\\Saint\\Handling\\";
+			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
+				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+				handling->m_acceleration = ColorIni->GetFloat("Handling", "m_acceleration");
+				handling->m_mass = ColorIni->GetFloat("Handling", "m_mass");
+				handling->m_buoyancy = ColorIni->GetFloat("Handling", "m_buoyancy");
+				handling->m_brake_force = ColorIni->GetFloat("Handling", "m_brake_force");
+				handling->m_traction_bias_front = ColorIni->GetFloat("Handling", "m_traction_bias_front");
+				handling->m_traction_bias_rear = ColorIni->GetFloat("Handling", "m_traction_bias_rear");
+				handling->m_traction_curve_min = ColorIni->GetFloat("Handling", "m_traction_curve_min");
+				handling->m_traction_curve_max = ColorIni->GetFloat("Handling", "m_traction_curve_max");
+				handling->m_centre_of_mass.x = ColorIni->GetFloat("Handling", "m_centre_of_mass_x");
+				handling->m_centre_of_mass.y = ColorIni->GetFloat("Handling", "m_centre_of_mass_y");
+				handling->m_centre_of_mass.z = ColorIni->GetFloat("Handling", "m_centre_of_mass_z");
+				handling->m_drive_bias_front = ColorIni->GetFloat("Handling", "m_drive_bias_front");
+				handling->m_drive_bias_rear = ColorIni->GetFloat("Handling", "m_drive_bias_rear");
+				handling->m_drive_inertia = ColorIni->GetFloat("Handling", "m_drive_inertia");
+				handling->m_inertia_mult.x = ColorIni->GetFloat("Handling", "m_inertia_mult_x");
+				handling->m_inertia_mult.y = ColorIni->GetFloat("Handling", "m_inertia_mult_y");
+				handling->m_inertia_mult.z = ColorIni->GetFloat("Handling", "m_inertia_mult_z");
+				handling->m_steering_lock = ColorIni->GetFloat("Handling", "m_steering_lock");
+				handling->m_traction_curve_lateral = ColorIni->GetFloat("Handling", "m_traction_curve_lateral");
+				handling->m_traction_curve_ratio = ColorIni->GetFloat("Handling", "m_traction_curve_ratio");
+				handling->m_low_speed_traction_loss_mult = ColorIni->GetFloat("Handling", "m_low_speed_traction_loss_mult");
+				handling->m_traction_spring_delta_max = ColorIni->GetFloat("Handling", "m_traction_spring_delta_max");
+				handling->m_traction_spring_delta_max_ratio = ColorIni->GetFloat("Handling", "m_traction_spring_delta_max_ratio");
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Loaded '%s'", name});
 
 
+
+
+			}
+		}
+	};
+	inline SaveHandling m_handling;
+	class VehicleLoad {
+	public:
+
+		bool DoesIniExists(const char* path)
+		{
+
+			struct stat buffer;
+			return (stat(path, &buffer) == 0);
+
+		}
+		void save(std::string name) {
+			
+			std::string MenuFolderPath = "C:\\Saint\\Vehicles\\";
+			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+			int r, g, b;
+			VEHICLE::GET_VEHICLE_CUSTOM_SECONDARY_COLOUR(veh, &r, &g, &b);
+			int r2, g2, b2;
+			VEHICLE::GET_VEHICLE_CUSTOM_PRIMARY_COLOUR(veh, &r2, &g2, &b2);
+			int hash = ENTITY::GET_ENTITY_MODEL(veh);
+			int primaryColor, secondaryColor;
+			VEHICLE::GET_VEHICLE_COLOURS(veh, &primaryColor, &secondaryColor);
+			ColorIni->WriteString(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(veh)), "Info", "Name");
+			ColorIni->WriteInt(r, "Color", "R");
+			ColorIni->WriteInt(g, "Color", "G");
+			ColorIni->WriteInt(b, "Color", "B");
+			ColorIni->WriteInt(r2, "Color", "R2");
+			ColorIni->WriteInt(g2, "Color", "G2");
+			ColorIni->WriteInt(b2, "Color", "B2");
+			ColorIni->WriteInt(VEHICLE::GET_VEHICLE_WHEEL_TYPE(veh), "wheel", "type");
+			ColorIni->WriteInt(VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(veh), "plate", "index");
+			ColorIni->WriteString(VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(veh), "plate", "text");
+			ColorIni->WriteInt(VEHICLE::GET_VEHICLE_MOD(veh, MOD_LIVERY), "upgrades", "livery");
+			ColorIni->WriteInt(VEHICLE::GET_VEHICLE_MOD(veh, MOD_SPOILER), "upgrades", "spoiler");
+			ColorIni->WriteInt(primaryColor, "Color1", "index");
+			ColorIni->WriteInt(secondaryColor, "Color2", "index");
+			for (int i = 0; i < 50; i++)
+			{
+				char input2[64];
+				sprintf(input2, "index_%i", i);
+				ColorIni->WriteInt(VEHICLE::GET_VEHICLE_MOD(veh, i), "upgrades", input2);
+				
+			}
+			
+		}
+		void load(std::string name) {
+			std::string MenuFolderPath = "C:\\Saint\\Vehicles\\";
+			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
+				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+				
+				
+				
+				*script_global(4540726).as<bool*>() = true;
+				Hash hash = MISC::GET_HASH_KEY(ColorIni->GetString("Info", "Name").c_str());
+				g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
+					{
+						
+				
+
+
+						NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::PLAYER_PED_ID(), { 0.f, 0.f, 1.0f });
+						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+						Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
+						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+						DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+						auto networkId = NETWORK::VEH_TO_NET(vehicle);
+						if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
+							NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+						VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+						PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
+						VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(vehicle, ColorIni->GetInt("Color", "R"), ColorIni->GetInt("Color", "G"), ColorIni->GetInt("Color", "B"));
+						VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, ColorIni->GetInt("Color", "R2"), ColorIni->GetInt("Color", "G2"), ColorIni->GetInt("Color", "B2"));
+						VEHICLE::SET_VEHICLE_MOD_KIT(vehicle, 0);
+						VEHICLE::SET_VEHICLE_WHEEL_TYPE(vehicle, ColorIni->GetInt("wheel", "type"));
+						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(vehicle, ColorIni->GetInt("plate", "index"));
+						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(vehicle, ColorIni->GetString("plate", "text").c_str());
+						VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_LIVERY, ColorIni->GetInt("upgrades", "livery"), false);
+						VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_SPOILER, ColorIni->GetInt("upgrades", "spoiler"), false);
+						VEHICLE::SET_VEHICLE_COLOURS(vehicle, ColorIni->GetInt("Color1", "index"), ColorIni->GetInt("Color2", "index"));
+						for (int i = 0; i < 50; i++)
+						{
+							char input2[64];
+							sprintf(input2, "index_%i", i);
+							VEHICLE::SET_VEHICLE_MOD(vehicle, i, ColorIni->GetInt("upgrades", input2), false);
+						}
+				
+				
+					});
+				
+
+
+			}
+		}
+	};
+	inline VehicleLoad m_VehicleLoad;
 	class Scripts {
 	public:
 		void load(fs::path asi_path) {
@@ -4167,11 +4380,288 @@ namespace Saint {
 	};
 	inline HandTrail g_HandTrails;
 	inline std::string LiscenePlate;
-	inline void FeatureInitalize() {
+	inline void controlid(Entity netid)
+	{
+		int tick = 0;
 
+		while (!NETWORK::NETWORK_HAS_CONTROL_OF_NETWORK_ID(netid) && tick <= 25)
+		{
+			NETWORK::NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(netid);
+			tick++;
+		}
+	}
+	inline void control(Entity entity)
+	{
+		int tick = 0;
+		while (!NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(entity) && tick <= 25)
+		{
+			NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(entity);
+			tick++;
+		}
+		if (NETWORK::NETWORK_IS_SESSION_STARTED())
+		{
+			int netID = NETWORK::NETWORK_GET_NETWORK_ID_FROM_ENTITY(entity);
+			controlid(netID);
+			NETWORK::SET_NETWORK_ID_CAN_MIGRATE(netID, 1);
+		}
+	}
+	class SavedPlayers {
+	public:
+		bool DoesIniExists(const char* path)
+		{
+
+			struct stat buffer;
+			return (stat(path, &buffer) == 0);
+
+		}
+		
+		
+		void delete_all() {
+
+		}
+		void add(Player player) {
+			std::string name = PLAYER::GET_PLAYER_NAME(player);
+			int netHandle[13];
+			NETWORK::NETWORK_HANDLE_FROM_PLAYER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player), netHandle, 13);
+			std::string MenuFolderPath = "C:\\Saint\\Players\\";
+			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s is already saved!", name});
+			}
+			else {
+				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+				ColorIni->WriteString(name, "Info", "Name");
+				ColorIni->WriteString(NETWORK::NETWORK_MEMBER_ID_FROM_GAMER_HANDLE(&netHandle[0]), "Info", "RID");
+			}
+		}
+	};
+	inline SavedPlayers m_saved_players;
+	class RIDToolkit {
+	public:
+		
+		void join_type(eSessionType session)
+		{
+			*script_global(2695915).as<int*>() = (session == eSessionType::SC_TV ? 1 : 0); // If SC TV Then Enable Spectator Mode
+
+			if (session == eSessionType::LEAVE_ONLINE)
+				*script_global(1574589).at(2).as<int*>() = -1;
+			else
+				*script_global(1575017).as<int*>() = (int)session;
+
+			*script_global(1574589).as<int*>() = 1;
+			fbr::cur()->wait(200ms);
+			*script_global(1574589).as<int*>() = 0;
+		}
+
+		void join_session(const rage::rlSessionInfo& info)
+		{
+			join_queue = true;
+			g_Session_info = info;
+			join_type({ eSessionType::NEW_PUBLIC });
+			if (SCRIPT::GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(rage::joaat("maintransition")) == 0)
+			{
+				join_queue = false;
+				
+			}
+			return;
+		}
+
+		void join(uint64_t rid)
+		{
+			if (SCRIPT::GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(rage::joaat("maintransition")) != 0 ||
+				STREAMING::IS_PLAYER_SWITCH_IN_PROGRESS())
+			{
+				
+				return;
+			}
+
+			rage::rlGamerHandle player_handle(rid);
+			rage::rlSessionByGamerTaskResult result;
+			bool success = false;
+			rage::rlTaskStatus state{};
+
+			if (g_GameFunctions->m_start_get_session_by_gamer_handle(0, &player_handle, 1, &result, 1, &success, &state))
+			{
+				while (state.status == 1)
+					fbr::cur()->wait();
+
+				if (state.status == 3 && success)
+				{
+					join_session(result.m_session_info);
+					return;
+				}
+			}
+
+			Noti::InsertNotification({ ImGuiToastType_None, 2000, "Player is offline." });
+		}
+	};
+	inline RIDToolkit rid_toolkit;
+	class Skip {
+	public:
+		
+	};
+	class WalkStyles {
+	public:
+		
+		const char* get_name[45] = {
+			"Ballistic",
+			 "Lemar Alley",
+			 "Fast Turn/Trash",
+			 "Fast Runner",
+			 "Garbage Man",
+			 "Franklin",
+			 "Jimmy",
+			 "Michael",
+			 "Flee",
+			 "Scared",
+			 "Sexy",
+			 "Lester",
+			 "Injured",
+			 "Lester (Caneup)",
+			 "Bag",
+			 "Bond Not Tazered",
+			 "Bond Tazered",
+			 "Brave",
+			 "Casual",
+			 "Moderate Drunk",
+			 "Moderate Drunk 2",
+			 "Moderate Drunk 3",
+			 "Slightly Drunk",
+			 "Very Drunk",
+			 "Fire",
+			 "Gangster 1",
+			 "Gangster 2",
+			 "Gangster 3",
+			 "Jog",
+			 "Prison Gaurd",
+			 "One",
+			 "Briefcase",
+			 "Janitor",
+			 "Slow",
+			 "Bucket",
+			 "Crouched",
+			 "Mop",
+			 "Femme",
+			 "Femme 2",
+			 "Gangster 4",
+			 "Gangster 5",
+			 "Posh",
+			 "Posh 2",
+			 "Tough Guy",
+			 "Tough Guy 2",
+		};
+		const char* type[45] = { "ANIM_GROUP_MOVE_BALLISTIC",
+				 "ANIM_GROUP_MOVE_LEMAR_ALLEY",
+				 "clipset@move@trash_fast_turn",
+				 "FEMALE_FAST_RUNNER",
+				 "missfbi4prepp1_garbageman",
+				 "move_characters@franklin@fire",
+				 "move_characters@Jimmy@slow@",
+				 "move_characters@michael@fire",
+				 "move_f@flee@a",
+				 "move_f@scared",
+				 "move_f@sexy@a",
+				 "move_heist_lester",
+				 "move_injured_generic",
+				 "move_lester_CaneUp",
+				 "move_m@bag",
+				 "MOVE_M@BAIL_BOND_NOT_TAZERED",
+				 "MOVE_M@BAIL_BOND_TAZERED",
+				 "move_m@brave",
+				 "move_m@casual@d",
+				 "move_m@drunk@moderatedrunk",
+				 "MOVE_M@DRUNK@MODERATEDRUNK",
+				 "MOVE_M@DRUNK@MODERATEDRUNK_HEAD_UP",
+				 "MOVE_M@DRUNK@SLIGHTLYDRUNK",
+				 "MOVE_M@DRUNK@VERYDRUNK",
+				 "move_m@fire",
+				 "move_m@gangster@var_e",
+				 "move_m@gangster@var_f",
+				 "move_m@gangster@var_i",
+				 "move_m@JOG@",
+				 "MOVE_M@PRISON_GAURD",
+				 "MOVE_P_M_ONE",
+				 "MOVE_P_M_ONE_BRIEFCASE",
+				 "move_p_m_zero_janitor",
+				 "move_p_m_zero_slow",
+				 "move_ped_bucket",
+				 "move_ped_crouched",
+				 "move_ped_mop",
+				 "MOVE_M@FEMME@",
+				 "MOVE_F@FEMME@",
+				 "MOVE_M@GANGSTER@NG",
+				 "MOVE_F@GANGSTER@NG",
+				 "MOVE_M@POSH@",
+				 "MOVE_F@POSH@",
+				 "MOVE_M@TOUGH_GUY@",
+				 "MOVE_F@TOUGH_GUY@"
+		};
+		std::size_t size;
+		void change(const char* name) {
+			
+			g_CallbackScript->AddCallback<WalkStyleCallback>(name, [=] {
+				PED::SET_PED_MOVEMENT_CLIPSET(PLAYER::PLAYER_PED_ID(), name, 2.0f);
+				});
+		}
+		
+	};
+	inline WalkStyles* walk_style;
+	class GetModelInfo {
+	public:
+		bool width = false;
+		bool height = false;
+		float widthm = 1.0f;
+		float heightm = 1.0f;
+		void init() {
+			
+		}
+	};
+	inline GetModelInfo get_model_info;
+	class parachute {
+	public:
+		bool enabled = false;
+		void init() {
+			Memory::set_value<int>({ 0x8, 0xD10, 0x20, 0x58C }, static_cast<int>(true));
+				VEHICLE::VEHICLE_START_PARACHUTING(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true);
+			
+		}
+	};
+	inline parachute m_parachute;
+	inline void FeatureInitalize() {
+		get_model_info.init();
+	
 		if (mark_as_Saint) {
 			PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 109, true);
 
+		}
+		if (protections.m_entities.cage) {
+			static int timer;
+			if ((GetTickCount() - timer) > 200) {
+
+				Ped playerPed = PLAYER::PLAYER_PED_ID();
+				NativeVector3 pos = ENTITY::GET_ENTITY_COORDS(playerPed, 0);
+				const char* cages[47] = { "bkr_prop_cashtrolley_01a", "p_cablecar_s_door_r", "p_cablecar_s_door_l", "p_cablecar_s_door_l" ,"p_cablecar_s", "prop_rub_cage01a", "prop_gold_cont_01", "prop_gold_cont_01b", "prop_dog_cage_01", "prop_dog_cage_02", "stt_prop_stunt_tube_l", "stt_prop_stunt_tube_crn2", "stt_prop_stunt_tube_crn", "stt_prop_stunt_tube_crn2", "stt_prop_stunt_tube_crn_15d", "stt_prop_stunt_tube_crn_30d", "stt_prop_stunt_tube_crn_5d", "stt_prop_stunt_tube_cross", "stt_prop_stunt_tube_end", "stt_prop_stunt_tube_xs", "stt_prop_stunt_tube_xxs", "stt_prop_stunt_tube_speeda", "stt_prop_stunt_tube_qg", "stt_prop_stunt_tube_s", "stt_prop_stunt_tube_m", "stt_prop_stunt_tube_l", "stt_prop_stunt_tube_jmp2", "stt_prop_stunt_tube_jmp", "stt_prop_stunt_tube_hg", "stt_prop_stunt_tube_gap_03", "stt_prop_stunt_tube_gap_02", "stt_prop_stunt_tube_gap_01", "stt_prop_stunt_tube_fork", "stt_prop_stunt_tube_fn_05", "stt_prop_stunt_tube_fn_04", "stt_prop_stunt_tube_fn_03", "stt_prop_stunt_tube_fn_02", "stt_prop_stunt_tube_fn_01", "stt_prop_stunt_tube_ent", "bkr_prop_biker_tube_gap_02", "bkr_prop_biker_tube_gap_01", "bkr_prop_biker_tube_xs", "bkr_prop_biker_tube_s", "bkr_prop_biker_tube_m", "bkr_prop_biker_tube_l", "bkr_prop_biker_tube_gap_03", "prop_fnclink_05crnr1" };
+				for (int i = 0; i < 47; i++)
+				{
+					Object cage = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(pos.x, pos.y, pos.z, 15.0f, MISC::GET_HASH_KEY(cages[i]), 0, 0, 1);
+					if (ENTITY::DOES_ENTITY_EXIST(cage))
+					{
+						if (!PED::IS_PED_IN_ANY_VEHICLE(playerPed, 0))
+						{
+							ENTITY::SET_ENTITY_COLLISION(cage, false, true);
+							ENTITY::SET_ENTITY_ALPHA(cage, 0, true);
+							ENTITY::SET_ENTITY_VISIBLE(cage, false, false);
+							NativeVector3 objcoords = ENTITY::GET_ENTITY_COORDS(cage, false);
+							STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(MISC::GET_HASH_KEY(cages[i]));
+							control(cage);
+							ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&cage);
+							ENTITY::DELETE_ENTITY(&cage);
+							MISC::CLEAR_AREA(objcoords.x, objcoords.y, objcoords.z, 15.0f, 0, 0, 0, 0);
+						}
+					}
+				}
+				timer = GetTickCount();
+			}
+		
 		}
 		g_HandTrails.init();
 		m_shotgun.init();
