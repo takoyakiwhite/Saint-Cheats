@@ -1725,7 +1725,19 @@ namespace Saint {
 	inline int testm = 0;
 	inline int testn = 0;
 	inline int testo = 0;
+
+	inline int hatDrawable = 0;
+	inline int hatTexture = 0;
+	inline int glassesDrawable = 0;
+	inline int glassesTexture = 0;
+	inline int earsDrawable = 0;
+	inline int earsTexture = 0;
+	inline int watchesDrawable = 0;
+	inline int watchesTexture = 0;
+	inline int braceDrawable = 0;
+	inline int braceTexture = 0;
 	inline std::string ModelInput;
+	inline std::string messageFriendInput = "";
 	class Owned_explosion {
 	public:
 		bool blame_enabled = false;
@@ -3932,77 +3944,127 @@ namespace Saint {
 	}
 	class OutfitLoader {
 	public:
-		std::string nameBuffer;
-		std::string nameBuffer2 = "Fortnitefr";
-		void save(std::string name) {
-			std::string iniPath = "C:\\Saint\\Outfits\\" + name + ".ini";
+		std::string buffer;
+		bool DoesIniExists(const char* path)
+		{
 
-			WritePrivateProfileStringA("Outfit", "Face", std::to_string(testa).c_str(), iniPath.c_str());
-			WritePrivateProfileStringA("Outfit", "Head", std::to_string(testb).c_str(), iniPath.c_str());
-			WritePrivateProfileStringA("Outfit", "Hair", std::to_string(testc).c_str(), iniPath.c_str());
-			WritePrivateProfileStringA("Outfit", "Torso", std::to_string(testd).c_str(), iniPath.c_str());
-			WritePrivateProfileStringA("Outfit", "Legs", std::to_string(testl).c_str(), iniPath.c_str());
-			WritePrivateProfileStringA("Outfit", "Hands", std::to_string(teste).c_str(), iniPath.c_str());
-			WritePrivateProfileStringA("Outfit", "Feet", std::to_string(testf).c_str(), iniPath.c_str());
-			WritePrivateProfileStringA("Outfit", "Eyes", std::to_string(testg).c_str(), iniPath.c_str());
-			WritePrivateProfileStringA("Outfit", "Accessories", std::to_string(testh).c_str(), iniPath.c_str());
-			WritePrivateProfileStringA("Outfit", "Tasks", std::to_string(testi).c_str(), iniPath.c_str());
-			WritePrivateProfileStringA("Outfit", "Textures", std::to_string(testj).c_str(), iniPath.c_str());
-			WritePrivateProfileStringA("Outfit", "Torso2", std::to_string(testk).c_str(), iniPath.c_str());
-			WritePrivateProfileStringA("Outfit", "HeadProp", std::to_string(testm).c_str(), iniPath.c_str());
+			struct stat buffer;
+			return (stat(path, &buffer) == 0);
 
 		}
-		void load(std::string name)
-		{
-			std::string iniPath = "C:\\Saint\\Outfits\\" + name + ".ini";
-			char o1[255];
-			char o2[255];
-			char o3[255];
-			char o4[255];
-			char o5[255];
-			char o6[255];
-			char o7[255];
-			char o8[255];
-			char o9[255];
-			char o10[255];
-			char o11[255];
-			char o12[255];
-			char o13[255];
-			char o14[255];
-			char o15[255];
-			GetPrivateProfileStringA("Outfit", "Face", "", o1, 255, iniPath.c_str());
-			GetPrivateProfileStringA("Outfit", "Head", "", o2, 255, iniPath.c_str());
-			GetPrivateProfileStringA("Outfit", "Hair", "", o3, 255, iniPath.c_str());
-			GetPrivateProfileStringA("Outfit", "Torso", "", o4, 255, iniPath.c_str());
-			GetPrivateProfileStringA("Outfit", "Legs", "", o5, 255, iniPath.c_str());
-			GetPrivateProfileStringA("Outfit", "Hands", "", o6, 255, iniPath.c_str());
-			GetPrivateProfileStringA("Outfit", "Feet", "", o7, 255, iniPath.c_str());
-			GetPrivateProfileStringA("Outfit", "Eyes", "", o8, 255, iniPath.c_str());
-			GetPrivateProfileStringA("Outfit", "Accessories", "", o9, 255, iniPath.c_str());
-			GetPrivateProfileStringA("Outfit", "Tasks", "", o10, 255, iniPath.c_str());
-			GetPrivateProfileStringA("Outfit", "Textures", "", o11, 255, iniPath.c_str());
-			GetPrivateProfileStringA("Outfit", "Torso2", "", o12, 255, iniPath.c_str());
-			GetPrivateProfileStringA("Outfit", "HeadProp", "", o13, 255, iniPath.c_str());
-			GetPrivateProfileStringA("Outfit", "EarProp", "", o15, 255, iniPath.c_str());
+		void save(std::string name) {
+			auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+			std::string MenuFolderPath = "C:\\Saint\\Outfits\\";
+			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+			
 
-			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 0, atoi(o1), 0, 0);
-			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 1, atoi(o2), 0, 0);
-			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 2, atoi(o3), 0, 0);
-			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 3, atoi(o4), 0, 0);
-			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 4, atoi(o5), 0, 0);
-			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 5, atoi(o6), 0, 0);
-			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 6, atoi(o7), 0, 0);
-			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 7, atoi(o8), 0, 0);
-			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 8, atoi(o9), 0, 0);
-			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 9, atoi(o10), 0, 0);
-			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 10, atoi(o11), 0, 0);
-			PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 11, atoi(o12), 0, 0);
-			PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 1, atoi(o13), 0, 0);
-			//PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 2, atoi(o14), 0, 0);
-			PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 3, atoi(o15), 0, 0);
+			ColorIni->WriteInt(testb, "Head", "index");
+			ColorIni->WriteInt(facetexture1, "Head", "texture");
+
+			
+
+			ColorIni->WriteInt(testd, "Torso", "index");
+			ColorIni->WriteInt(facetexture3, "Torso", "texture");
+
+			ColorIni->WriteInt(testl, "Tops", "index");
+			ColorIni->WriteInt(facetexture4, "Tops", "texture");
+
+			ColorIni->WriteInt(teste, "Legs", "index");
+			ColorIni->WriteInt(facetexture5, "Legs", "texture");
+
+			ColorIni->WriteInt(testf, "Hands", "index");
+			ColorIni->WriteInt(facetexture6, "Hands", "texture");
+
+			ColorIni->WriteInt(testg, "Feet", "index");
+			ColorIni->WriteInt(facetexture7, "Feet", "texture");
+
+			ColorIni->WriteInt(testh, "Chains", "index");
+			ColorIni->WriteInt(facetexture8, "Chains", "texture");
+
+			ColorIni->WriteInt(testi, "Accessories", "index");
+			ColorIni->WriteInt(facetexture9, "Accessories", "texture");
+
+			ColorIni->WriteInt(testj, "Vests", "index");
+			ColorIni->WriteInt(facetexture10, "Vests", "texture");
+
+			ColorIni->WriteInt(testk, "Decals", "index");
+			ColorIni->WriteInt(facetexture11, "Decals", "texture");
+
+			ColorIni->WriteInt(hatDrawable, "Hats", "index");
+			ColorIni->WriteInt(hatTexture, "Hats", "texture");
+
+			ColorIni->WriteInt(glassesDrawable, "Glasses", "index");
+			ColorIni->WriteInt(glassesTexture, "Glasses", "texture");
+
+			ColorIni->WriteInt(earsDrawable, "Ears", "index");
+			ColorIni->WriteInt(earsTexture, "Ears", "texture");
+
+			ColorIni->WriteInt(watchesDrawable, "Watches", "index");
+			ColorIni->WriteInt(watchesTexture, "Watches", "texture");
+
+			ColorIni->WriteInt(braceDrawable, "Bracelets", "index");
+			ColorIni->WriteInt(braceTexture, "Bracelets", "texture");
+
+			
+		}
+		void load(std::string name) {
+			std::string MenuFolderPath = "C:\\Saint\\Outfits\\";
+			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
+				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+				testb = ColorIni->GetInt("Head", "index");
+				facetexture1 = ColorIni->GetInt("Head", "texture");
+
+				testd = ColorIni->GetInt("Torso", "index");
+				facetexture3 = ColorIni->GetInt("Torso", "texture");
+
+				testl = ColorIni->GetInt("Tops", "index");
+				facetexture4 = ColorIni->GetInt("Tops", "texture");
+
+				teste = ColorIni->GetInt("Legs", "index");
+				facetexture5 = ColorIni->GetInt("Legs", "texture");
+
+				testf = ColorIni->GetInt("Hands", "index");
+				facetexture6 = ColorIni->GetInt("Hands", "texture");
+
+				testg = ColorIni->GetInt("Feet", "index");
+				facetexture7 = ColorIni->GetInt("Feet", "texture");
+
+				testh = ColorIni->GetInt("Chains", "index");
+				facetexture8 = ColorIni->GetInt("Chains", "texture");
+
+				testi = ColorIni->GetInt("Accessories", "index");
+				facetexture9 = ColorIni->GetInt("Accessories", "texture");
+
+				testj = ColorIni->GetInt("Vests", "index");
+				facetexture10 = ColorIni->GetInt("Vests", "texture");
+
+				testk = ColorIni->GetInt("Decals", "index");
+				facetexture11 = ColorIni->GetInt("Decals", "texture");
+
+				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 1, ColorIni->GetInt("Head", "index"), ColorIni->GetInt("Head", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 3, ColorIni->GetInt("Torso", "index"), ColorIni->GetInt("Torso", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 11, ColorIni->GetInt("Tops", "index"), ColorIni->GetInt("Tops", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 4, ColorIni->GetInt("Legs", "index"), ColorIni->GetInt("Legs", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 5, ColorIni->GetInt("Hands", "index"), ColorIni->GetInt("Hands", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 6, ColorIni->GetInt("Feet", "index"), ColorIni->GetInt("Feet", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 7, ColorIni->GetInt("Chains", "index"), ColorIni->GetInt("Chains", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 8, ColorIni->GetInt("Accessories", "index"), ColorIni->GetInt("Accessories", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 9, ColorIni->GetInt("Vests", "index"), ColorIni->GetInt("Vests", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 10, ColorIni->GetInt("Decals", "index"), ColorIni->GetInt("Decals", "texture"), 0);
+				PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 0, ColorIni->GetInt("Hats", "index"), ColorIni->GetInt("Hats", "texture"), 0);
+				PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 1, ColorIni->GetInt("Glasses", "index"), ColorIni->GetInt("Glasses", "texture"), 0);
+				PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 2, ColorIni->GetInt("Ears", "index"), ColorIni->GetInt("Ears", "texture"), 0);
+				PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 6, ColorIni->GetInt("Watches", "index"), ColorIni->GetInt("Watches", "texture"), 0);
+				PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 7, ColorIni->GetInt("Bracelets", "index"), ColorIni->GetInt("Bracelets", "texture"), 0);
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Loaded '%s'", name });
+
+
+
+
+			}
 		}
 	};
-	inline OutfitLoader* g_Outfits;
+	inline OutfitLoader g_Outfits;
 	class FrameFlags {
 	public:
 		bool m_fire = false;
@@ -4342,6 +4404,8 @@ namespace Saint {
 	inline ShotGunMode m_shotgun;
 	class HandTrail {
 	public:
+		const char* type[2] = { "Normal", "Sphere" };
+		std::size_t size = 0;
 		bool enabled = false;
 		bool rainbow = false;
 		int r = 255;
@@ -4363,9 +4427,24 @@ namespace Saint {
 						b--;
 					}
 				}
-				g_CallbackScript->AddCallback<PTFXCallback>("scr_indep_fireworks", [=] {
+				if (size == 0) {
+					g_CallbackScript->AddCallback<PTFXCallback>("scr_minigametennis", [=] {
 
-					GRAPHICS::USE_PARTICLE_FX_ASSET("scr_indep_fireworks");
+						GRAPHICS::USE_PARTICLE_FX_ASSET("scr_minigametennis");
+					int handle = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("scr_tennis_ball_trail", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 28422, 0.5f, 0, 0, 0);
+					
+
+
+
+					GRAPHICS::USE_PARTICLE_FX_ASSET("scr_minigametennis");
+					int handle1 = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("scr_tennis_ball_trail", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 60309, 0.5f, 0, 0, 0);
+					
+						});
+				}
+				if (size == 1) {
+					g_CallbackScript->AddCallback<PTFXCallback>("scr_indep_fireworks", [=] {
+
+						GRAPHICS::USE_PARTICLE_FX_ASSET("scr_indep_fireworks");
 					int handle = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("scr_indep_firework_sparkle_spawn", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 28422, 0.5f, 0, 0, 0);
 					GRAPHICS::SET_PARTICLE_FX_NON_LOOPED_COLOUR(r, g, b);
 
@@ -4374,7 +4453,8 @@ namespace Saint {
 					GRAPHICS::USE_PARTICLE_FX_ASSET("scr_indep_fireworks");
 					int handle1 = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("scr_indep_firework_sparkle_spawn", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 60309, 0.5f, 0, 0, 0);
 					GRAPHICS::SET_PARTICLE_FX_NON_LOOPED_COLOUR(r, g, b);
-				});
+						});
+				}
 			}
 		}
 	};
@@ -4459,6 +4539,7 @@ namespace Saint {
 			join_type({ eSessionType::NEW_PUBLIC });
 			if (SCRIPT::GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(rage::joaat("maintransition")) == 0)
 			{
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Unknown error" });
 				join_queue = false;
 				
 			}
@@ -4467,10 +4548,9 @@ namespace Saint {
 
 		void join(uint64_t rid)
 		{
-			if (SCRIPT::GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(rage::joaat("maintransition")) != 0 ||
-				STREAMING::IS_PLAYER_SWITCH_IN_PROGRESS())
+			if (SCRIPT::GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(rage::joaat("maintransition")) != 0 || STREAMING::IS_PLAYER_SWITCH_IN_PROGRESS())
 			{
-				
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Unknown error" });
 				return;
 			}
 
@@ -4495,6 +4575,7 @@ namespace Saint {
 		}
 	};
 	inline RIDToolkit rid_toolkit;
+	
 	class Skip {
 	public:
 		
@@ -4626,6 +4707,158 @@ namespace Saint {
 		}
 	};
 	inline parachute m_parachute;
+	inline int SelectedFriend;
+	inline std::string getFriendStateStr(int state, bool joinable) {
+		switch (state) {
+		case -1: return "~g~[Online]"; break;
+		case 1: return "~g~[Online]"; break;
+		case 2: return "~b~[Multiplayer]"; break;
+		case 3: return joinable ? "~b~[Multiplayer]" : "~m~[Story]"; break;
+		default: return "~m~[Offline]";
+		}
+		return "null";
+	}
+	class Bits {
+	public:
+		void clear_bit(int* address, int pos)
+		{
+			*address &= ~(1 << pos);
+		}
+
+		void clear_bits(int* address, int bits)
+		{
+			*address &= ~(bits);
+		}
+
+		bool has_bit_set(int* address, int pos)
+		{
+			return *address & 1 << pos;
+		}
+
+		template<typename T>
+		bool has_bits_set(T* address, T bits)
+		{
+			return (*address & bits) == bits;
+		}
+
+		bool has_bits_set(int* address, int bits)
+		{
+			return (*address & bits) == bits;
+		}
+
+		void set_bit(int* address, int pos)
+		{
+			*address |= 1 << pos;
+		}
+
+		void set_bits(int* address, int bits)
+		{
+			*address |= bits;
+		}
+	};
+	inline Bits m_GetBits;
+	inline script_global vehicle_global = script_global(1586468);
+	class GetVehicles {
+	public:
+		bool fix_index(int veh_idx, bool spawn_veh = false)
+		{
+			bool can_be_fixed = m_GetBits.has_bits_set(vehicle_global.at(veh_idx, 142).at(103).as<int*>(), eVehicleFlags::DESTROYED | eVehicleFlags::HAS_INSURANCE);
+
+			if (can_be_fixed)
+			{
+				m_GetBits.clear_bits(vehicle_global.at(veh_idx, 142).at(103).as<int*>(), eVehicleFlags::DESTROYED | eVehicleFlags::IMPOUNDED | eVehicleFlags::UNK2);
+
+				if (spawn_veh)
+				{
+					m_GetBits.set_bits(vehicle_global.at(veh_idx, 142).at(103).as<int*>(), eVehicleFlags::TRIGGER_SPAWN_TOGGLE | eVehicleFlags::SPAWN_AT_MORS_MUTUAL);
+				}
+			}
+			return can_be_fixed;
+		}
+
+		int fix_all()
+		{
+			int fixed_count = 0;
+
+			const int arr_size = *vehicle_global.as<int*>();
+			for (int i = 0; i < arr_size; i++)
+				if (fix_index(i, true))
+					fixed_count++;
+
+			return fixed_count;
+		}
+	};
+	class PersonalVehicle {
+	public:
+		const char* type[2] = {"Normal", "Spawn Into"};
+		std::size_t size;
+		void fix_all() {
+			GetVehicles get;
+			get.fix_all();
+		}
+		inline Vehicle get()
+		{
+			script_global mechanic_global = script_global(2793046);
+			return *mechanic_global.at(299).as<Vehicle*>();
+		}
+	};
+	inline PersonalVehicle personal_vehicle;
+	struct get_model_changer_hash {
+		const char* name;
+		const char* model;
+	};
+	class GetClasses {
+	public:
+		int size = 1;
+		std::map<int, get_model_changer_hash> all_models = {
+			{0, {"Beach 1", "a_f_m_beach_01"}},
+			{0, {"Fortnite", "hey"}}
+		};
+	};
+	class ModelChanger {
+	public:
+		GetClasses get_classes;
+		const char* pointer = "P2 4C 3B CA ?? 8D 15 55";
+		int selected_class = 0;
+		const char* get_class_name(int index) {
+			switch (index) {
+			case 0:
+				return "Ambient Female";
+				break;
+			case 1:
+				return "Ambient Male";
+				break;
+			case 2:
+				return "Animal";
+				break;
+			case 3:
+				return "Cutscene";
+				break;
+			case 4:
+				return "Gang Female";
+				break;
+			case 5:
+				return "Gang Male";
+				break;
+			case 6:
+				return "Multiplayer";
+				break;
+			case 7:
+				return "Scenario Female";
+				break;
+				
+			}
+		}
+		void change_model(const char* model_name) {
+			g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(model_name), [=] {
+				PLAYER::SET_PLAYER_MODEL(PLAYER::PLAYER_ID(), MISC::GET_HASH_KEY(model_name));
+				PED::SET_PED_DEFAULT_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID());
+				STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(MISC::GET_HASH_KEY(model_name));
+			});
+		}
+		
+	};
+	inline ModelChanger m_ModelChanger;
 	inline void FeatureInitalize() {
 		get_model_info.init();
 	

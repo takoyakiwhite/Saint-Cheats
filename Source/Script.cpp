@@ -292,6 +292,18 @@ namespace Saint
 		SubmenuStreamerMode,
 
 		SubmenuWalkStyles,
+
+		SubmenuGameEvents,
+
+		SubmenuFriends,
+		SubmenuSelectedFriend,
+
+		SubmenuSocialClub,
+
+		SubmenuPersonalVehicle,
+
+		SubmenuModelChanger,
+		SubmenuSelectedModelChanger,
 	};
 
 	bool MainScript::IsInitialized()
@@ -331,6 +343,7 @@ namespace Saint
 		sub->draw_option<submenu>("Invisible", nullptr, SubmenuInvisible);
 		sub->draw_option<submenu>("Super Jump", nullptr, SubmenuSuperjump);
 		sub->draw_option<submenu>("Multipliers", nullptr, SubmenuMultipliers);
+		sub->draw_option<submenu>("Model Changer", nullptr, SubmenuModelChanger);
 		sub->draw_option<submenu>("Outfit Editor", nullptr, SubmenuOutfitEditor);
 		sub->draw_option<submenu>("Animations", nullptr, SubmenuAnimations);
 		sub->draw_option<submenu>("Hand Trails", nullptr, HandTrails);
@@ -455,62 +468,116 @@ namespace Saint
 				
 				
 			});
+		g_Render->draw_submenu<sub>(("Model Changer"), SubmenuModelChanger, [](sub* sub)
+			{
+				for (std::int32_t i = 0; i < 8; i++) {
+					sub->draw_option<submenu>(m_ModelChanger.get_class_name(i), nullptr, SubmenuSelectedModelChanger, [=]
+						{
+							m_ModelChanger.selected_class = i;
+						});
+
+				}
+			});
+		g_Render->draw_submenu<sub>((m_ModelChanger.get_class_name(m_ModelChanger.selected_class)), SubmenuSelectedModelChanger, [](sub* sub)
+			{
+				switch (m_ModelChanger.selected_class) {
+				case 0:
+					sub->draw_option<RegularOption>("Beach 1", nullptr, [=]
+						{
+
+							m_ModelChanger.change_model("a_f_m_beach_01");
+						});
+					break;
+				case 1:
+					sub->draw_option<RegularOption>("Beach", nullptr, [=]
+						{
+
+							m_ModelChanger.change_model("a_f_m_beach_01");
+						});
+					break;
+				}
+				
+				
+			});
 		g_Render->draw_submenu<sub>(("Hand Trails"), HandTrails, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &g_HandTrails.enabled, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Rainbow"), nullptr, &g_HandTrails.rainbow, BoolDisplay::OnOff);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &g_HandTrails.type, &g_HandTrails.size);
 			});
 		g_Render->draw_submenu<sub>(("Outfit Editor"), SubmenuOutfitEditor, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Load", nullptr, SubmenuOutfitLoader);
-		sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &Lists::HeaderTypesFrontend2, &Lists::HeaderTypesPosition2, true, -1, [] {
+		sub->draw_option<ChooseOption<const char*, std::size_t>>("Component", nullptr, &Lists::HeaderTypesFrontend2, &Lists::HeaderTypesPosition2, true, -1, [] {
 			g_Render->outfits = Lists::HeaderTypesBackend2[Lists::HeaderTypesPosition2];
 			});
 		switch (g_Render->outfits) {
 		case Outfits::Face:
-			sub->draw_option<number<std::int32_t>>("Prop", "Sets face variation.", &testa, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 0), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 0, testa, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Drawable", "Sets face variation.", &testa, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 0), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 0, testa, 0, 0); });
 			sub->draw_option<number<std::int32_t>>("Texture", "Sets face texture variation.", &facetexture, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 0, testa), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 0, testa, facetexture, 0); }); break;
 		case Outfits::Head:
-			sub->draw_option<number<std::int32_t>>("Prop", "Sets head variation.", &testb, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 1), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 1, testb, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Drawable", "Sets head variation.", &testb, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 1), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 1, testb, 0, 0); });
 			sub->draw_option<number<std::int32_t>>("Texture", "Sets head texture variation.", &facetexture1, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 1, testb), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 1, testb, facetexture1, 0); }); break;
 		case Outfits::Hair:
-			sub->draw_option<number<std::int32_t>>("Prop", "Sets hair variation.", &testc, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 2), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 2, testc, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Drawable", "Sets hair variation.", &testc, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 2), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 2, testc, 0, 0); });
 			sub->draw_option<number<std::int32_t>>("Texture", "Sets hair texture variation.", &facetexture2, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 2, testc), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 2, testc, facetexture2, 0); }); break;
 		case Outfits::Torso:
-			sub->draw_option<number<std::int32_t>>("Prop", "Sets torso variation.", &testd, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 3), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 3, testd, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Drawable", "Sets torso variation.", &testd, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 3), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 3, testd, 0, 0); });
 			sub->draw_option<number<std::int32_t>>("Texture", "Sets torso texture variation.", &facetexture3, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 3, testd), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 3, testd, facetexture3, 0); }); break;
 		case Outfits::Torso2:
-			sub->draw_option<number<std::int32_t>>("Prop", "Sets torso 2 variation.", &testl, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 11), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 11, testl, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Drawable", "Sets torso 2 variation.", &testl, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 11), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 11, testl, 0, 0); });
 			sub->draw_option<number<std::int32_t>>("Texture", "Sets torso 2 texture variation.", &facetexture4, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 11, testl), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 11, testl, facetexture4, 0); }); break;
 		case Outfits::Legs:
-			sub->draw_option<number<std::int32_t>>("Prop", "Sets leg variation.", &teste, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 4), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 4, teste, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Drawable", "Sets leg variation.", &teste, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 4), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 4, teste, 0, 0); });
 			sub->draw_option<number<std::int32_t>>("Texture", "Sets leg texture variation.", &facetexture5, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 4, teste), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 4, teste, facetexture5, 0); }); break;
 		case Outfits::Hands:
-			sub->draw_option<number<std::int32_t>>("Prop", "Sets hand variation.", &testf, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 5), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 5, testf, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Drawable", "Sets hand variation.", &testf, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 5), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 5, testf, 0, 0); });
 			sub->draw_option<number<std::int32_t>>("Texture", "Sets hand texture variation.", &facetexture6, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 5, testf), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 5, testf, facetexture6, 0); }); break;
 		case Outfits::Feet:
-			sub->draw_option<number<std::int32_t>>("Prop", "Sets feet variation.", &testg, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 6), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 6, testg, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Drawable", "Sets feet variation.", &testg, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 6), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 6, testg, 0, 0); });
 			sub->draw_option<number<std::int32_t>>("Texture", "Sets feet texture variation.", &facetexture7, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 6, testg), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 6, testg, facetexture7, 0); }); break;
 		case Outfits::Eyes:
-			sub->draw_option<number<std::int32_t>>("Prop", "Sets eye variation.", &testh, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 7), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 7, testh, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Drawable", "Sets eye variation.", &testh, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 7), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 7, testh, 0, 0); });
 			sub->draw_option<number<std::int32_t>>("Texture", "Sets eyes texture variation.", &facetexture8, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 7, testh), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 7, testh, facetexture8, 0); }); break;
 		case Outfits::Accessories:
 
-			sub->draw_option<number<std::int32_t>>("Prop", "Sets accessories variation.", &testi, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 8), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 8, testi, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Drawable", "Sets accessories variation.", &testi, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 8), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 8, testi, 0, 0); });
 			sub->draw_option<number<std::int32_t>>("Texture", "Sets accessories texture variation.", &facetexture9, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 8, testi), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 8, testi, facetexture9, 0); }); break;
 		case Outfits::Vests:
 
-			sub->draw_option<number<std::int32_t>>("Prop", "Sets vest variation.", &testj, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 9), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 9, testj, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Drawable", "Sets vest variation.", &testj, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 9), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 9, testj, 0, 0); });
 			sub->draw_option<number<std::int32_t>>("Texture", "Sets vests texture variation.", &facetexture10, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 9, testj), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 9, testj, facetexture10, 0); }); break;
 		case Outfits::Decals:
 
-			sub->draw_option<number<std::int32_t>>("Prop", "Sets texture variation.", &testk, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 10), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 10, testk, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Drawable", "Sets texture variation.", &testk, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 10), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 10, testk, 0, 0); });
 			sub->draw_option<number<std::int32_t>>("Texture", "Sets decals texture variation.", &facetexture11, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 10, testk), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 10, testk, facetexture11, 0); }); break;
-		case Outfits::HeadProps:
-
-			sub->draw_option<number<std::int32_t>>("Prop", "Sets head props", &testm, 0, 255, 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 1, testm, 0, 0); });
-			sub->draw_option<number<std::int32_t>>("Texture", "Sets head props texture variation.", &facetexture12, 0, PED::GET_PED_PROP_TEXTURE_INDEX(PLAYER::PLAYER_PED_ID(), 1), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 1, testm, facetexture12, 0); }); break;
 		}
+		sub->draw_option<ChooseOption<const char*, std::size_t>>("Props", nullptr, &Lists::HeaderTypesFrontend3, &Lists::HeaderTypesPosition3, true, -1, [] {
+			g_Render->props = Lists::HeaderTypesBackend3[Lists::HeaderTypesPosition3];
+			});
+		switch (g_Render->props) {
+		case Props::Hats:
+			sub->draw_option<number<std::int32_t>>("Drawable", "", &hatDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 0), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 0, hatDrawable, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Texture", "", &hatTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 0, hatDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 0, hatDrawable, hatTexture, 0); }); break;
+			break;
+		case Props::Glasses:
+			sub->draw_option<number<std::int32_t>>("Drawable", "", &glassesDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 1), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 1, glassesDrawable, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Texture", "", &glassesTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 1, glassesDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 1, glassesDrawable, glassesTexture, 0); }); break;
+			break;
+		case Props::Ears:
+			sub->draw_option<number<std::int32_t>>("Drawable", "", &earsDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 2), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 2, earsDrawable, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Texture", "", &earsTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 2, earsDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 2, earsDrawable, earsTexture, 0); }); break;
+			break;
+		case Props::Watches:
+			sub->draw_option<number<std::int32_t>>("Drawable", "", &watchesDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 6), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 6, watchesDrawable, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Texture", "", &watchesTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 6, watchesDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 6, watchesDrawable, watchesTexture, 0); }); break;
+			break;
+		case Props::Bracelets:
+			sub->draw_option<number<std::int32_t>>("Drawable", "", &braceDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 7), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 7, braceDrawable, 0, 0); });
+			sub->draw_option<number<std::int32_t>>("Texture", "", &braceTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 7, braceDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 7, braceDrawable, braceTexture, 0); }); break;
+			break;
+		}
+
 			});
 		g_Render->draw_submenu<sub>(("Animations"), SubmenuAnimations, [](sub* sub)
 			{
@@ -577,19 +644,13 @@ namespace Saint
 			{
 				sub->draw_option<RegularOption>(("Save"), nullptr, [=]
 					{
-						showKeyboard("Enter Something", "", 25, &g_Outfits->nameBuffer2, [] {});
-
+						showKeyboard("Enter Something", "", 25, &g_Outfits.buffer, [] {
+						g_Outfits.save(g_Outfits.buffer);
+							});
+						
 
 					});
-		sub->draw_option<RegularOption>(("Save"), nullptr, [=]
-			{
-
-
-				g_Outfits->save(g_Outfits->nameBuffer2);
-
-
-
-			});
+		
 		sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 		namespace fs = std::filesystem;
 		fs::directory_iterator dirIt{ "C:\\Saint\\Outfits\\" };
@@ -602,12 +663,12 @@ namespace Saint
 				{
 					if (path.extension() == ".ini")
 					{
-						OutfitList();
+						
 						char nigger[64];
 						sprintf(nigger, "%s", path.stem().u8string().c_str());
 						sub->draw_option<RegularOption>(nigger, nullptr, [=]
 							{
-								g_Outfits->load(nigger);
+								g_Outfits.load(nigger);
 							});
 
 					}
@@ -702,6 +763,7 @@ namespace Saint
 		sub->draw_option<submenu>("Upgrades", nullptr, Submenu::SubmenuUpgrades);
 		sub->draw_option<submenu>("LSC", nullptr, Submenu::SubmenuCustomize);
 		sub->draw_option<submenu>("Color", nullptr, Submenu::SubmenuChangeVehicleColor);
+		sub->draw_option<submenu>("Personal", nullptr, Submenu::SubmenuPersonalVehicle);
 		sub->draw_option<toggle<bool>>(("Godmode"), "Prevents your vehicle from taking damage.", &features.vehicle_godmode, BoolDisplay::OnOff, false, [] {
 			if (!features.vehicle_godmode) {
 				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
@@ -749,6 +811,42 @@ namespace Saint
 					g_local_player->m_vehicle->m_is_targetable = true;
 			}
 			});
+			});
+		g_Render->draw_submenu<sub>(("Personal"), SubmenuPersonalVehicle, [](sub* sub)
+			{
+				sub->draw_option<submenu>("Garage", nullptr, Submenu::SubmenuPersonalVehicles);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Teleport To You", nullptr, &personal_vehicle.type, &personal_vehicle.size, false, -1, [] {
+
+						if (personal_vehicle.size == 0) {
+							Vehicle veh = personal_vehicle.get();
+							NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(veh, coords.x, coords.y, coords.z, false, false, false);
+					
+						}
+						if (personal_vehicle.size == 1) {
+							Vehicle veh = personal_vehicle.get();
+							NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(veh, coords.x, coords.y, coords.z, false, false, false);
+							PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), veh, -1);
+						}
+
+				});
+				sub->draw_option<RegularOption>(("Despawn"), nullptr, [=]
+						{
+									int get_current_personal_vehicle = *script_global(2359296).at(0, 5568).at(681).at(2).as<int*>();
+									
+									m_GetBits.clear_bits(vehicle_global.at(get_current_personal_vehicle, 142).at(103).as<int*>(), eVehicleFlags::TRIGGER_SPAWN_TOGGLE);
+
+								});
+				
+				});
+		g_Render->draw_submenu<sub>(("Garage"), SubmenuPersonalVehicles, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>(("Fix All"), nullptr, [=]
+					{
+						personal_vehicle.fix_all();
+
+					});
 			});
 		g_Render->draw_submenu<sub>(("Invisible"), SubmenuVehicleInvis, [](sub* sub)
 			{
@@ -3235,6 +3333,7 @@ namespace Saint
 				sub->draw_option<submenu>("Player List", nullptr, SubmenuPlayerList);
 		sub->draw_option<submenu>("Modder Detection", nullptr, SubmenuAntiCheat);
 		sub->draw_option<submenu>("Spoofing", nullptr, SubmenuSpoofing);
+		sub->draw_option<submenu>("Friends", nullptr, SubmenuFriends);
 		sub->draw_option<submenu>("Recovery", nullptr, SubmenuRecovery);
 		sub->draw_option<submenu>("Requests", nullptr, SubmenuRequests);
 		sub->draw_option<submenu>("Session Starter", nullptr, SubmenuSesStart);
@@ -3245,13 +3344,38 @@ namespace Saint
 		sub->draw_option<submenu>("Off The Radar", nullptr, SubmenuOffRadar);
 		sub->draw_option<submenu>("Heist Control", nullptr, HeistControl);
 			});
-		g_Render->draw_submenu<sub>("Streamer Mode", SubmenuStreamerMode, [](sub* sub)
+		g_Render->draw_submenu<sub>("Friends", SubmenuFriends, [](sub* sub)
 			{
+				static auto friendReg = g_GameVariables->m_friendRegistry;
 				
-				sub->draw_option<KeyboardOption>(("Name"), nullptr, streamer_mode_name, []
-					{
-						showKeyboard("Enter Something", "", 4, &streamer_mode_name, [] {});
+
+
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+
+				for (int32_t i = 0; i < friendReg->m_friend_count; i++) 
+				{
+					if (sub->GetSelectedOption() == sub->GetNumOptions()) {
+						g_players.draw_friend_info(i);
+					}
+					if (friendReg->m_friends[i]->m_name != " ") {
+						char make[128];
+						sprintf(make, "%s %s", friendReg->m_friends[i]->m_name, getFriendStateStr(friendReg->m_friends[i]->m_friend_state, friendReg->m_friends[i]->m_is_joinable).c_str());
+						sub->draw_option<submenu>(make, nullptr, SubmenuSelectedFriend, [=]
+						{
+									SelectedFriend = i;
+						});
+
+					}
+
+				}
+
+			});
+		g_Render->draw_submenu<sub>(g_GameVariables->m_friendRegistry->m_friends[SelectedFriend]->m_name, SubmenuSelectedFriend, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>("Join", "", [] {
+				rid_toolkit.join(g_GameVariables->m_friendRegistry->m_friends[SelectedFriend]->m_rockstar_id);
 					});
+
 
 			});
 		g_Render->draw_submenu<sub>("Heist Control", HeistControl, [](sub* sub)
@@ -3440,6 +3564,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Notifications", SubmenuNotifcations, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Joining & Leaving", nullptr, SubmenuPlayerJoining);
+				
 
 
 			});
@@ -3841,6 +3966,7 @@ namespace Saint
 		sub->draw_option<submenu>("Teleport", nullptr, SubmenuPlayerTeleport);
 		sub->draw_option<submenu>("Spawner", nullptr, SubmenuSelectedSpawner);
 		sub->draw_option<submenu>("Removals", nullptr, SubmenuRemoval);
+		sub->draw_option<submenu>("Social Club", nullptr, SubmenuSocialClub);
 		sub->draw_option<submenu>("Detections", nullptr, SubmenuSelectedDetections);
 		if (g_SelectedPlayer != PLAYER::PLAYER_ID()) {
 			sub->draw_option<toggle<bool>>(("Spectate"), nullptr, &features.spectate, BoolDisplay::OnOff, false, [] {
@@ -3898,6 +4024,25 @@ namespace Saint
 
 
 			});
+		g_Render->draw_submenu<sub>("Social Club", SubmenuSocialClub, [](sub* sub)
+			{
+				sub->draw_option<KeyboardOption>(("Send Friend Request"), nullptr, messageFriendInput, []
+					{
+
+						showKeyboard("Enter Something", "", 25, &messageFriendInput, [] {
+							int handle[76];
+							NETWORK::NETWORK_HANDLE_FROM_PLAYER(g_SelectedPlayer, &handle[0], 13);
+							NETWORK::NETWORK_ADD_FRIEND(&handle[0], messageFriendInput.c_str());
+						});
+					});
+				sub->draw_option<RegularOption>("Show Profile", nullptr, [=]
+					{
+						int handle[76];
+						NETWORK::NETWORK_HANDLE_FROM_PLAYER(g_SelectedPlayer, &handle[0], 13);
+						NETWORK::NETWORK_SHOW_PROFILE_UI(&handle[0]);
+
+					});
+			});
 		g_Render->draw_submenu<sub>("Detections", SubmenuSelectedDetections, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Exclude"), nullptr, &antiCheat.excludethatuck, BoolDisplay::OnOff, false, [] {
@@ -3949,6 +4094,19 @@ namespace Saint
 						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false))) {
 
 							ENTITY::APPLY_FORCE_TO_ENTITY(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false), 1, 0, 0, 300, 0, 0, 0, 1, false, true, true, true, true);
+						}
+
+					});
+				sub->draw_option<RegularOption>("Downgrade", nullptr, [=]
+					{
+						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false))) {
+
+							for (int i = 0; i < 50; i++)
+							{
+
+								Vehicle vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+								VEHICLE::REMOVE_VEHICLE_MOD(vehicle, i);
+							}
 						}
 
 					});
@@ -4540,9 +4698,15 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Protection"), SubmenuProtections, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Script Events", nullptr, SubmenuScriptEvents);
+				sub->draw_option<submenu>("Game Events", nullptr, SubmenuGameEvents);
 				sub->draw_option<submenu>("Entities", nullptr, SubmenuEntities);
 				sub->draw_option<submenu>("Crash", nullptr, SubmenuProtCrash);
 				sub->draw_option<toggle<bool>>(("Reports"), nullptr, &protections.block_reports, BoolDisplay::OnOff);
+
+			});
+		g_Render->draw_submenu<sub>(("Game Events"), SubmenuGameEvents, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Cage"), nullptr, &protections.m_entities.cage, BoolDisplay::OnOff);
 
 			});
 		g_Render->draw_submenu<sub>(("Entities"), SubmenuEntities, [](sub* sub)

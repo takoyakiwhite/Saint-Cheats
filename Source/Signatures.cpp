@@ -23,6 +23,7 @@ namespace Saint
 		set_scene_element_lighting(Signature("48 8B C4 48 89 58 10 48 89 70 18 57 48 83 EC 30 48 83 B9").Scan().As<decltype(set_scene_element_lighting)>()),
 		get_scene_preset(Signature("0F B7 81 10 08 00 00").Scan().As<decltype(get_scene_preset)>()),
 		m_is_session_started(Signature("40 38 35 ? ? ? ? 75 0E 4C 8B C3 49 8B D7 49 8B CE").Scan().Add(3).Rip().As<bool*>()),
+		m_friendRegistry(Signature("3B 0D ? ? ? ? 73 17").Scan().Add(2).Rip().As<FriendRegistry*>()),
 		m_ModelSpawnBypass(Signature("48 8B C8 FF 52 30 84 C0 74 05 48").Scan().Add(8).As<decltype(m_ModelSpawnBypass)>())
 	{
 		char* c_location = nullptr;
@@ -37,6 +38,7 @@ namespace Saint
 	}
 
 	GameFunctions::GameFunctions() :
+		m_GetScriptEvent(Signature("48 85 C0 74 14 4C 8B 10").Scan().Sub(28).As<decltype(m_GetScriptEvent)>()),
 		m_GetLabelText(Signature("48 89 5C 24 ? 57 48 83 EC 20 48 8B DA 48 8B F9 48 85 D2 75 44 E8").Scan().As<decltype(m_GetLabelText)>()),
 		m_WndProc(Signature("44 8B E2 4C 8B E9 3B D0").Scan().Sub(52).As<decltype(m_WndProc)>()),
 		m_GetNativeHandler(Signature("48 8D 0D ? ? ? ? 48 8B 14 FA E8 ? ? ? ? 48 85 C0 75 0A").Scan().Add(12).Rip().As<decltype(m_GetNativeHandler)>()),
@@ -63,12 +65,12 @@ namespace Saint
 		crashProtection(Signature("E8 ? ? ? ? 40 88 7C 24 ? 49 89 9C 24").Scan().Add(1).Rip().As<PVOID>()),
 		m_RegisterFile(Signature("84 C0 74 0D 4C 8B 07").Scan().Sub(0x6C).As<decltype(m_RegisterFile)>()),
 		m_send_event_ack(Signature("E8 ? ? ? ? 66 83 7B 08 5B").Scan().Add(1).As<decltype(m_send_event_ack)>()),
-		m_received_event(Signature("66 41 83 F9 ? 0F 83").Scan().As<PVOID>()),
 		m_pickup_creation(Signature("48 8B EC 48 83 EC 20 80 B9 C0 00 00 00 00").Scan().As<PVOID>()),
 		m_start_get_session_by_gamer_handle(Signature("E8 ? ? ? ? 84 C0 0F 84 ? ? ? ? 8B 05 ? ? ? ? 48 8D 4C 24").Scan().Add(1).Rip().As<decltype(m_start_get_session_by_gamer_handle)>()),
 		m_join_session_by_info(Signature("E8 ? ? ? ? 0F B6 CB 84 C0 41 0F 44 CD").Scan().Add(1).Rip().As<decltype(m_join_session_by_info)>()),
 		m_network(Signature("48 8B 0D ? ? ? ? 48 8B D7 E8 ? ? ? ? 84 C0 75 17 48 8B 0D ? ? ? ? 48 8B D7").Scan().Add(3).Rip().As<Network**>()),
-		
+		m_NetworkEvents(Signature("66 41 83 F9 5B 0F 83 34").Scan().As<decltype(m_NetworkEvents)>()),
+		//m_get_network_event_data(Signature("53 43 52 49 50 54 5F 4E 45 54 57 4F 52 4B").Scan().Sub(0x38).As<PVOID*>()),
 		should_sync_money_rewards(Signature("40 8A 2D ? ? ? ? 48 83 64 24 40 00").Scan().Add(3).Rip().As<decltype(should_sync_money_rewards)>())
 
 	{

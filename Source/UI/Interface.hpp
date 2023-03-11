@@ -29,7 +29,15 @@ namespace Saint::UserInterface
 		Accessories = 9,
 		Vests = 10,
 		Decals = 11,
-		HeadProps = 12,
+	};
+	enum class Props : std::int32_t
+	{
+		Hats = 0,
+		Glasses = 1,
+		Ears = 2,
+		Watches = 3,
+		Bracelets = 4,
+
 	};
 	enum class HeaderType : std::int32_t
 	{
@@ -195,6 +203,8 @@ namespace Saint::UserInterface
 		};
 		std::size_t HeaderFontIterator = 3;
 		Outfits outfits = Outfits::Face;
+
+		Props props = Props::Hats;
 
 
 		// Options

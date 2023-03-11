@@ -30,8 +30,8 @@ namespace Saint::Lists
 		UserInterface::Outfits::Accessories,
 		UserInterface::Outfits::Vests,
 		UserInterface::Outfits::Decals,
-		UserInterface::Outfits::HeadProps,
 	};
+
 	inline std::size_t HeaderTypesPosition2 = 0;
 	inline const char* HeaderTypesFrontend2[]
 	{
@@ -39,15 +39,31 @@ namespace Saint::Lists
 		"Head",
 		"Hair",
 		"Torso",
-		"Torso 2",
+		"Tops",
 		"Legs",
 		"Hands",
 		"Feet",
-		"Eyes",
+		"Chains",
 		"Accessories",
 		"Vests",
 		"Decals",
-		"Head Props"
+	};
+	inline std::size_t HeaderTypesPosition3 = 0;
+	inline const char* HeaderTypesFrontend3[]
+	{
+		"Hats",
+		"Glasses",
+		"Ears",
+		"Watches",
+		"Bracelets"
+	};
+	inline UserInterface::Props HeaderTypesBackend3[]
+	{
+		UserInterface::Props::Hats,
+		UserInterface::Props::Glasses,
+		UserInterface::Props::Ears,
+		UserInterface::Props::Watches,
+		UserInterface::Props::Bracelets,
 	};
 	inline std::size_t MatchPos = 1;
 	inline const char* DemoList[10]

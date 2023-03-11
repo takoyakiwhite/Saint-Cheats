@@ -11,6 +11,14 @@ namespace Saint {
 		bool request_control = true;
 		bool request_pickup = true;
 		bool give_weapons = true;
+		bool clear_ped_tasks = true;
+		bool remove_weapons = true;
+		bool play_sound = true;
+		bool remove_sound = true;
+		bool explosion = true;
+		bool fire = true;
+		bool give_pickup_rewards = false;
+		bool votekick = true;
 		
 	};
 	class Entites {

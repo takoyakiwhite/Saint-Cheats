@@ -18,6 +18,7 @@
 #include <GTAV-Classes/rage/rlQueryPresenceAttributesContext.hpp>
 #include <GTAV-Classes/rage/rlTaskStatus.hpp>
 #include <GTAV-Classes/network/Network.hpp>
+#include <GTAV-Classes/socialclub/FriendRegistry.hpp>
 namespace Saint
 {
 
@@ -80,6 +81,8 @@ namespace Saint
 
 		uint64_t m_WorldPtr;
 
+		FriendRegistry* m_friendRegistry;
+
 
 	};
 
@@ -92,6 +95,10 @@ namespace Saint
 		GameFunctions(GameFunctions&&) = delete;
 		GameFunctions& operator=(GameFunctions const&) = delete;
 		GameFunctions& operator=(GameFunctions&&) = delete;
+
+		using NetworkHandler = void(__int64 a1, __int64 a2, __int64 a3, unsigned __int16 a4, int a5, int a6, __int64 a7, __int64 a8);
+		NetworkHandler* m_NetworkEvents;
+
 
 		
 
@@ -174,6 +181,23 @@ namespace Saint
 		Network** m_network;
 		using join_session_by_info = bool (*)(Network* network, rage::rlSessionInfo* info, int unk, int flags, rage::rlGamerHandle* handles, int handlecount);
 		join_session_by_info m_join_session_by_info;
+
+		PVOID m_get_network_event_data;
+
+		
+		using GetNetworkData = bool(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount);
+		GetNetworkData* m_GetScriptEvent;
+
+
+		void* m_data; //0x0000
+		uint32_t m_bitOffset; //0x0008
+		uint32_t m_maxBit; //0x000C
+		uint32_t m_bitsRead; //0x0010
+		uint32_t m_curBit; //0x0014
+		uint32_t m_highestBitsRead; //0x0018
+		uint8_t m_flagBits; //0x001C
+
+		
 
 		
 

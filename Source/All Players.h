@@ -7,6 +7,8 @@ namespace Saint {
 	class Notifications {
 	public:
 		bool leaving_and_joining = true;
+		bool respawning_players = true;
+		bool anti_cheat_triggered = true;
 		bool log = false;
 		bool log_ips = false;
 		bool log_rid = false;

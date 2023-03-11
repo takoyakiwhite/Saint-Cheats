@@ -90,6 +90,7 @@ namespace Saint
 			for (std::uint32_t i = 0; i < argCount; ++i)
 				g_Logger->Info("Script event args[%u] : %" PRIi64, i, args[i]);
 		}
+		
 		src->set_return_value(SCRIPT::GET_EVENT_DATA(eventGroup, eventIndex, args, argCount));
 	}
 	void Hooks::SET_CURRENT_PED_WEAPON(rage::scrNativeCallContext* src)
@@ -492,6 +493,26 @@ namespace Saint
 		
 		return result;
 	}
+	void Hooks::NetworkEventHandler(__int64 networkMgr, CNetGamePlayer* source, CNetGamePlayer* target, unsigned __int16 event_id, int event_index, int event_bitset, __int64 buffer_size, __int64 buffer)
+	{
+		switch (static_cast<eNetworkEvents>(event_id))
+		{
+		case eNetworkEvents::CRemoveAllWeaponsEvent:
+			char name1[64];
+			sprintf(name1, "Remove weapons from %s blocked.", "hi");
+			protections.push_notification(name1);
+			break;
+		case eNetworkEvents::CRequestControlEvent:
+			char name[64];
+			sprintf(name, "Request Control from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+			protections.push_notification(name);
+			return;
+			break;
+		}
+
+		return static_cast<decltype(&NetworkEventHandler)>(g_Hooking->m_OriginalNetworkHandler)(networkMgr, source, target, event_id, event_index, event_bitset, buffer_size, buffer);
+	}
+	 
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
@@ -509,6 +530,9 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_AssignPhysicalIndexHandler, &Hooks::AssignNewPhysicalIndexHandler, &m_OriginalAssignPhysicalIndex);
 		MH_CreateHook(g_GameFunctions->crashProtection, &Hooks::InvalidModsCrashPatch, &m_OriginalModCrash);
 		MH_CreateHook(g_GameFunctions->m_pickup_creation, &Hooks::pickup_creation_node, &m_OriginalPickupNode);
+		MH_CreateHook(g_GameFunctions->m_NetworkEvents, &Hooks::NetworkEventHandler, &m_OriginalNetworkHandler);
+		//MH_CreateHook(g_GameFunctions->m_GetScriptEvent, &Hooks::NetworkEventHandler, &m_OriginalNetworkHandler);
+		//MH_CreateHook(g_GameFunctions->m_get_network_event_data, &Hooks::GetNetworkEventData, &originalDetection);
 		//MH_CreateHook(g_GameFunctions->m_received_event, &Hooks::GameEvent, &OriginalRecivied);
 		m_D3DHook.Hook(&Hooks::Present, Hooks::PresentIndex);
 		m_D3DHook.Hook(&Hooks::ResizeBuffers, Hooks::ResizeBuffersIndex);
@@ -530,6 +554,9 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->m_AssignPhysicalIndexHandler);
 		MH_RemoveHook(g_GameFunctions->crashProtection);
 		MH_RemoveHook(g_GameFunctions->m_pickup_creation);
+		MH_RemoveHook(g_GameFunctions->m_NetworkEvents);
+		//MH_RemoveHook(g_GameFunctions->m_GetScriptEvent);
+		//MH_RemoveHook(g_GameFunctions->m_get_network_event_data);
 		//MH_RemoveHook(g_GameFunctions->m_received_event);
 		//MH_RemoveHook(g_GameFunctions->m_GetEventData);
 		MH_Uninitialize();

@@ -1,6 +1,6 @@
 #pragma once
 
-enum class eRemoteEvent
+enum eRemoteEvent
 {
 	Bounty = 1459520933,// (137, "FM_TXT_BNTY0", iVar1, PLAYER::GET_PLAYER_NAME(Var2.f_1), "", 5000, Var2.f_6);
 	CeoBan = 1517094008,// mpply_vipgameplaydisabledtimer
@@ -47,6 +47,25 @@ enum class eRemoteEvent
 
 	StartScriptBegin = -95341040,
 	StartScriptProceed = 1742713914
+};
+enum eVehicleFlags
+{
+	TRIGGER_SPAWN_TOGGLE = 1 << 0,
+	DESTROYED = 1 << 1,
+	HAS_INSURANCE = 1 << 2,
+	UNK0 = 1 << 3,
+	IMPOUNDED = 1 << 6,
+	UNK1 = 1 << 10,
+	SPAWN_AT_MORS_MUTUAL = 1 << 11,
+	UNK2 = 1 << 16
+};
+enum eBusySpinnerType
+{
+	BUSY_SPINNER_LEFT,
+	BUSY_SPINNER_LEFT_2,
+	BUSY_SPINNER_LEFT_3,
+	BUSY_SPINNER_SAVE,
+	BUSY_SPINNER_RIGHT,
 };
 enum class eNetworkEvents : uint16_t
 {
