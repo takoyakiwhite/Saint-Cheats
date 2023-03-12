@@ -35,7 +35,6 @@ namespace Saint
 		static __int64 CPlayerListMenuConstructor(__int64 a1, __int64 a2, __int64 a3);
 
 		static bool GetScriptEvent(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount);
-		static void GetEventData2(rage::scrNativeCallContext* src);
 		static void NETWORK_SESSION_HOST(rage::scrNativeCallContext* src);
 		static void DISABLE_CONTROL_ACTION(rage::scrNativeCallContext* src);
 		static void HUD_FORCE_WEAPON_WHEEL(rage::scrNativeCallContext* src);
@@ -59,6 +58,8 @@ namespace Saint
 		static bool pickup_creation_node(CPickupCreationDataNode* node, rage::netObject* obj);
 
 		static void NetworkEventHandler(__int64 networkMgr, CNetGamePlayer* source, CNetGamePlayer* target, unsigned __int16 event_id, int event_index, int event_bitset, __int64 buffer_size, __int64 buffer);
+
+		static bool GetEventData(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount);
 
 		
 
@@ -92,7 +93,6 @@ namespace Saint
 		VMTHook m_D3DHook;
 		void* m_OriginalRIDFunction{};
 		void* m_OriginalJoinSessionHook{};
-		void* m_OriginalGetEventData{};
 		void* m_OriginalIncrementStatEvent{};
 
 		void* m_Original_write_player_game_state_data_node{};
@@ -110,6 +110,8 @@ namespace Saint
 		void* m_OriginalNetworkHandler{};
 
 		void* originalDetection{};
+
+		void* m_OriginalGetEventData{};
 
 
 	};

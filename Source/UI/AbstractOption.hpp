@@ -19,6 +19,7 @@ namespace Saint::UserInterface
 		ChooseBool = (1 << 5),
 		Choose = (1 << 6),
 		Keyboard = (1 << 7),
+		PlayerSub = (1 << 8),
 	};
 
 	class AbstractOption

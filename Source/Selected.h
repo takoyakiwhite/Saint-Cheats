@@ -112,9 +112,12 @@ namespace Saint {
                 g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << all_players.get_id(g_SelectedPlayer));
             }
             else {
-                g_Notifcations->add("Please start a session.");
+                g_NotificationManager->add("Please start a session.");
 
             }
+           
+        }
+        void send_to_tutorial(int scriptId) {
            
         }
         void kick_from_vehicle() {

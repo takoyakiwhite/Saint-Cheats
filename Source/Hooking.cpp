@@ -75,24 +75,7 @@ namespace Saint
 			src->set_return_value<BOOL>(NETWORK::NETWORK_SESSION_HOST(src->get_arg<int>(0), src->get_arg<int>(1), src->get_arg<BOOL>(2)));
 		}
 	}
-	void Hooks::GetEventData2(rage::scrNativeCallContext* src)
-	{
-		const auto eventGroup = src->get_arg<int>(0);
-		const auto eventIndex = src->get_arg<int>(1);
-		const auto args = src->get_arg<Any*>(2);
-		const auto argCount = src->get_arg<Hash>(3);
-
-		if (g_LogScriptEvents)
-		{
-			g_Logger->Info("Script event group: %i", eventGroup);
-			g_Logger->Info("Script event index: %i", eventIndex);
-			g_Logger->Info("Script event argcount: %i", argCount);
-			for (std::uint32_t i = 0; i < argCount; ++i)
-				g_Logger->Info("Script event args[%u] : %" PRIi64, i, args[i]);
-		}
-		
-		src->set_return_value(SCRIPT::GET_EVENT_DATA(eventGroup, eventIndex, args, argCount));
-	}
+	
 	void Hooks::SET_CURRENT_PED_WEAPON(rage::scrNativeCallContext* src)
 	{
 		const auto ped = src->get_arg<Ped>(0);
@@ -451,7 +434,7 @@ namespace Saint
 
 	void Hooks::InvalidModsCrashPatch(std::int64_t a1, std::int64_t a2, int a3, char a4)
 	{
-		if (protections.crash.vehicle) {
+		if (protections.Crashes.vehicle) {
 			if (!*(int64_t*)(a1 + 0xD8)) {
 				protections.push_notification2("Blocked crash.");
 				return;
@@ -479,40 +462,466 @@ namespace Saint
 		}
 		return false;
 	}
-	bool Hooks::pickup_creation_node(CPickupCreationDataNode* node, rage::netObject* obj)
-	{
-		auto result = static_cast<decltype(&pickup_creation_node)>(g_Hooking->m_OriginalPickupNode)(node, obj);
-
-		if (crash_model_check(node->m_custom_model) || crash_model_check(node->m_pickup_hash)) {
-			if (protections.m_entities.invalid_pickups) {
-				Noti::InsertNotification({ ImGuiToastType_None, 2600, "Blocked Invalid Pickup" });
-				return true;
-			}
-		}
-
-		
-		return result;
-	}
+	 
 	void Hooks::NetworkEventHandler(__int64 networkMgr, CNetGamePlayer* source, CNetGamePlayer* target, unsigned __int16 event_id, int event_index, int event_bitset, __int64 buffer_size, __int64 buffer)
 	{
+		if (event_id > 91u)
+		{
+			
+
+			return;
+		}
+
+		const auto event_name = *(char**)((DWORD64)networkMgr + 8i64 * event_id + 243376);
+		if (event_name == nullptr || target == nullptr || source->m_player_id < 0 || source->m_player_id >= 32)
+		{
+		
+			return;
+		}
 		switch (static_cast<eNetworkEvents>(event_id))
 		{
-		case eNetworkEvents::CRemoveAllWeaponsEvent:
-			char name1[64];
-			sprintf(name1, "Remove weapons from %s blocked.", "hi");
-			protections.push_notification(name1);
-			break;
-		case eNetworkEvents::CRequestControlEvent:
-			char name[64];
-			sprintf(name, "Request Control from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-			protections.push_notification(name);
-			return;
-			break;
+			case eNetworkEvents::CRemoveAllWeaponsEvent: {
+				if (protections.GameEvents.remove_all_weapons) {
+					char name1[64];
+					sprintf(name1, "Remove weapons from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+					g_NotificationManager->add(name1, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CRequestControlEvent: {
+				if (protections.GameEvents.request_control) {
+					char name[64];
+					sprintf(name, "Request control from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+					g_NotificationManager->add(name, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CNetworkPlaySoundEvent: {
+				if (protections.GameEvents.play_sound) {
+					char name2[64];
+					sprintf(name2, "Play sound from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(name2, 2000, 1);
+
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CAlterWantedLevelEvent: {
+				if (protections.GameEvents.alter_wanted_level) {
+					char name23245[64];
+					sprintf(name23245, "Alter wanted level from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(name23245, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CExplosionEvent: {
+				if (protections.GameEvents.explosion) {
+					char name2324[64];
+					sprintf(name2324, "Explosion from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(name2324, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CFireEvent: {
+				if (protections.GameEvents.fire_event) {
+					char name2324545[64];
+					sprintf(name2324545, "Fire from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(name2324545, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CGiveWeaponEvent: {
+				if (protections.GameEvents.give_weapons) {
+					char name2324545645[64];
+					sprintf(name2324545645, "Give weapon from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(name2324545645, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CNetworkClearPedTasksEvent: {
+				if (protections.GameEvents.freeze) {
+					char g_Freeze[64];
+					sprintf(g_Freeze, "Freeze from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_Freeze, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CNetworkPtfxEvent: {
+				if (protections.GameEvents.particle_spam) {
+					char g_PTFX[64];
+					sprintf(g_PTFX, "Particle spam from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_PTFX, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CRemoveWeaponEvent: {
+				if (protections.GameEvents.remove_weapon) {
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, "Remove weapon from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CRagdollRequestEvent: {
+				if (protections.GameEvents.ragdoll_request) {
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, "Ragdoll from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CRequestPickupEvent: {
+				if (protections.GameEvents.request_pickup) {
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, "Request pickup from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CGivePickupRewardsEvent: {
+				if (protections.GameEvents.give_pickup_rewards) {
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, "Give pickup rewards from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CRequestMapPickupEvent: {
+				if (protections.GameEvents.request_map_pickup) {
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, "Request map pickup from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CRemoveStickyBombEvent: {
+				if (protections.GameEvents.remove_sticky_bomb) {
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, "Remove sticky bomb from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+					return;
+				}
+				break;
+			}
+			
+			case eNetworkEvents::CWeaponDamageEvent: {
+				if (protections.GameEvents.weapon_damage) {
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, "Weapon damage from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CVehicleComponentControlEvent: {
+				if (protections.GameEvents.vehicle_component_control) {
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, "Component control from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CChangeRadioStationEvent: {
+				if (protections.GameEvents.chnage_radio_station) {
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, "Change radio station from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+					return;
+				}
+				break;
+			}
+			
+			case eNetworkEvents::CKickVotesEvent: {
+				if (protections.GameEvents.vote_kick) {
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, "Vote kick from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+					return;
+				}
+				break;
+			}
+			case eNetworkEvents::CBlowUpVehicleEvent: {
+				if (protections.GameEvents.blow_up_vehicle) {
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, "Blow up vehicle from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+					return;
+				}
+				break;
+			}
 		}
 
 		return static_cast<decltype(&NetworkEventHandler)>(g_Hooking->m_OriginalNetworkHandler)(networkMgr, source, target, event_id, event_index, event_bitset, buffer_size, buffer);
 	}
-	 
+	bool Hooks::GetEventData(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount)
+	{
+		auto result = static_cast<decltype(&GetEventData)>(g_Hooking->m_OriginalGetEventData)(eventGroup, eventIndex, args, argCount);
+		if (NETWORK::NETWORK_IS_SESSION_ACTIVE())
+		{
+			if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(args[1]))
+			{
+				if (ENTITY::DOES_ENTITY_EXIST(ped))
+				{
+
+					
+					
+					switch (static_cast<eRemoteEvent>(args[0]))
+					{
+					case eRemoteEvent::SendToLocation:
+						if (protections.send_to_location) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Send to location from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::SendToCayoPerico:
+						if (protections.send_to_location) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Send to location from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::TeleportToWarehouse:
+						if (protections.send_to_location) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Send to location from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::MCTeleport:
+						if (protections.send_to_location) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Send to location from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::InteriorControl:
+						if (protections.send_to_location) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Send to location from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::Teleport:
+						if (protections.send_to_location) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Send to location from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::RemoteOffradar:
+						if (protections.ScriptEvents.globals) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Off the radar from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::SoundSpam:
+						if (protections.GameEvents.play_sound) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Off the radar from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::Notification:
+						if (protections.ScriptEvents.notifications) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Notification from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::NotificationMoneyBanked:
+						if (protections.ScriptEvents.notifications) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Notification from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::NotificationMoneyRemoved:
+						if (protections.ScriptEvents.notifications) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Notification from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::NotificationMoneyStolen:
+						if (protections.ScriptEvents.notifications) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Notification from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::DestroyPersonalVehicle:
+						if (protections.ScriptEvents.destroy_personal_vehicle) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Destroy personal vehicle from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::PersonalVehicleDestroyed:
+						if (protections.ScriptEvents.destroy_personal_vehicle) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Destroy personal vehicle from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::Bounty:
+						if (protections.ScriptEvents.bounty) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Bounty from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::TriggerCEORaid:
+						if (protections.ScriptEvents.ceo_events) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "CEO Event from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::CeoKick:
+						if (protections.ScriptEvents.ceo_events) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "CEO Event from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::CeoBan:
+						if (protections.ScriptEvents.ceo_events) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "CEO Event from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::CeoMoney:
+						if (protections.ScriptEvents.ceo_events) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "CEO Event from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::SMS:
+						if (protections.ScriptEvents.text_messages) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Text message from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::SendTextLabelSMS:
+						if (protections.ScriptEvents.text_messages) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Text message from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::Crash1:
+						if (protections.Crashes.loading_screen) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Crash from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::Crash2:
+						if (protections.Crashes.loading_screen) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Crash from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					case eRemoteEvent::Crash3:
+						if (protections.Crashes.loading_screen) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Crash from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+							args[0] = 1234;
+							return false;
+						}
+						break;
+					}
+				
+				}
+			}
+		}
+		return result;
+	}
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
@@ -529,8 +938,9 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_send_chat_message, &Hooks::send_chat_message, &m_OriginalChatSend);
 		MH_CreateHook(g_GameFunctions->m_AssignPhysicalIndexHandler, &Hooks::AssignNewPhysicalIndexHandler, &m_OriginalAssignPhysicalIndex);
 		MH_CreateHook(g_GameFunctions->crashProtection, &Hooks::InvalidModsCrashPatch, &m_OriginalModCrash);
-		MH_CreateHook(g_GameFunctions->m_pickup_creation, &Hooks::pickup_creation_node, &m_OriginalPickupNode);
+	
 		MH_CreateHook(g_GameFunctions->m_NetworkEvents, &Hooks::NetworkEventHandler, &m_OriginalNetworkHandler);
+		MH_CreateHook(g_GameFunctions->m_GetEventData, &Hooks::GetEventData, &m_OriginalGetEventData);
 		//MH_CreateHook(g_GameFunctions->m_GetScriptEvent, &Hooks::NetworkEventHandler, &m_OriginalNetworkHandler);
 		//MH_CreateHook(g_GameFunctions->m_get_network_event_data, &Hooks::GetNetworkEventData, &originalDetection);
 		//MH_CreateHook(g_GameFunctions->m_received_event, &Hooks::GameEvent, &OriginalRecivied);
@@ -553,8 +963,9 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->m_send_chat_message);
 		MH_RemoveHook(g_GameFunctions->m_AssignPhysicalIndexHandler);
 		MH_RemoveHook(g_GameFunctions->crashProtection);
-		MH_RemoveHook(g_GameFunctions->m_pickup_creation);
+		//MH_RemoveHook(g_GameFunctions->m_pickup_creation);
 		MH_RemoveHook(g_GameFunctions->m_NetworkEvents);
+		MH_RemoveHook(g_GameFunctions->m_GetEventData);
 		//MH_RemoveHook(g_GameFunctions->m_GetScriptEvent);
 		//MH_RemoveHook(g_GameFunctions->m_get_network_event_data);
 		//MH_RemoveHook(g_GameFunctions->m_received_event);

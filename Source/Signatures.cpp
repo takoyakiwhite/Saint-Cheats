@@ -1,6 +1,7 @@
 #include "Signatures.hpp"
 #include "Invoker.hpp"
 #include "hex_memory.h"
+#include "ClassHelper.h"
 namespace Saint
 {
 
@@ -38,7 +39,7 @@ namespace Saint
 	}
 
 	GameFunctions::GameFunctions() :
-		m_GetScriptEvent(Signature("48 85 C0 74 14 4C 8B 10").Scan().Sub(28).As<decltype(m_GetScriptEvent)>()),
+		//m_GetScriptEvent(Signature("48 85 C0 74 14 4C 8B 10").Scan().Sub(28).As<decltype(m_GetScriptEvent)>()),
 		m_GetLabelText(Signature("48 89 5C 24 ? 57 48 83 EC 20 48 8B DA 48 8B F9 48 85 D2 75 44 E8").Scan().As<decltype(m_GetLabelText)>()),
 		m_WndProc(Signature("44 8B E2 4C 8B E9 3B D0").Scan().Sub(52).As<decltype(m_WndProc)>()),
 		m_GetNativeHandler(Signature("48 8D 0D ? ? ? ? 48 8B 14 FA E8 ? ? ? ? 48 85 C0 75 0A").Scan().Add(12).Rip().As<decltype(m_GetNativeHandler)>()),
@@ -50,7 +51,7 @@ namespace Saint
 		m_PlayerGUIOptions(Signature("75 29 48 85 C0 0F").Scan().Sub(65).As<decltype(m_PlayerGUIOptions)>()),
 		m_PlayerWildcard(Signature("75 1C E8 ? ? ? ? 48 85").Scan().Sub(11).As<decltype(m_PlayerWildcard)>()),
 		m_PlayerListMenuConstructor(Signature("75 1B 48 8D 4F").Scan().Sub(248).As<decltype(m_PlayerListMenuConstructor)>()),
-		//m_GetEventData(Signature("48 85 C0 74 14 4C 8B 10").Scan().Sub(28).As<decltype(m_GetEventData)>()),
+		m_GetEventData(Signature("48 85 C0 74 14 4C 8B 10").Scan().Sub(28).As<decltype(m_GetEventData)>()),
 		m_remote_increment(Signature("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC 20 49 8B F0 8B EA 8B F9 E8").Scan().As<decltype(m_remote_increment)>()),
 		m_IncrementStatEvent(Signature("48 89 5C 24 ? 48 89 74 24 ? 55 57 41 55 41 56 41 57 48 8B EC 48 83 EC 60 8B 79 30").Scan().As<decltype(m_IncrementStatEvent)>()),
 		get_chat_sender(Signature("E8 ? ? ? ? 83 BD ? ? ? ? ? 48 8B D8 0F 8D ? ? ? ? 48 8B ? ? ?").Scan().Add(0x1).Rip().As<decltype(get_chat_sender)>()),
@@ -66,7 +67,7 @@ namespace Saint
 		m_RegisterFile(Signature("84 C0 74 0D 4C 8B 07").Scan().Sub(0x6C).As<decltype(m_RegisterFile)>()),
 		m_send_event_ack(Signature("E8 ? ? ? ? 66 83 7B 08 5B").Scan().Add(1).As<decltype(m_send_event_ack)>()),
 		m_pickup_creation(Signature("48 8B EC 48 83 EC 20 80 B9 C0 00 00 00 00").Scan().As<PVOID>()),
-		m_start_get_session_by_gamer_handle(Signature("E8 ? ? ? ? 84 C0 0F 84 ? ? ? ? 8B 05 ? ? ? ? 48 8D 4C 24").Scan().Add(1).Rip().As<decltype(m_start_get_session_by_gamer_handle)>()),
+		m_start_get_session_by_gamer_handle(Signature("E8 ? ? ? ? 84 C0 0F 84 ? ? ? ? 8B 05 ? ? ? ? 48 8D 4C 24").Scan().Add(1).Rip().As<start_get_session_by_gamer_handle>()),
 		m_join_session_by_info(Signature("E8 ? ? ? ? 0F B6 CB 84 C0 41 0F 44 CD").Scan().Add(1).Rip().As<decltype(m_join_session_by_info)>()),
 		m_network(Signature("48 8B 0D ? ? ? ? 48 8B D7 E8 ? ? ? ? 84 C0 75 17 48 8B 0D ? ? ? ? 48 8B D7").Scan().Add(3).Rip().As<Network**>()),
 		m_NetworkEvents(Signature("66 41 83 F9 5B 0F 83 34").Scan().As<decltype(m_NetworkEvents)>()),

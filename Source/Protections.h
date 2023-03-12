@@ -5,21 +5,43 @@ namespace Saint {
 	class Crash {
 	public:
 		bool vehicle = true;
+		bool loading_screen = true;
 	};
 	class GameEvents {
 	public:
+		bool remove_sticky_bomb = false;
+		bool request_map_pickup = true;
+		bool give_pickup_rewards = true;
+		bool ragdoll_request = true;
+		bool remove_weapon = true;
+		bool remove_all_weapons = true;
+		bool particle_spam = true;
+		bool freeze = true;
+		bool give_weapons = true;
+		bool fire_event = true;
+		bool explosion = true;
+		bool alter_wanted_level = true;
+		bool play_sound = true;
 		bool request_control = true;
 		bool request_pickup = true;
-		bool give_weapons = true;
-		bool clear_ped_tasks = true;
-		bool remove_weapons = true;
-		bool play_sound = true;
-		bool remove_sound = true;
-		bool explosion = true;
-		bool fire = true;
-		bool give_pickup_rewards = false;
-		bool votekick = true;
+		bool clear_area = true;
+		bool weapon_damage = false;
+		bool vehicle_component_control = false;
+		bool chnage_radio_station = false;
+		bool car_horn = true;
+		bool vote_kick = true;
+		bool blow_up_vehicle = true;
 		
+	};
+	class ScriptEvents {
+	public:
+		bool bounty = false;
+		bool globals = true;
+		bool vehicle_kick = true;
+		bool text_messages = true;
+		bool notifications = true;
+		bool destroy_personal_vehicle = true;
+		bool ceo_events = true;
 	};
 	class Entites {
 	public:
@@ -31,9 +53,10 @@ namespace Saint {
 	};
 	class Protections {
 	public:
-		Crash crash;
-		GameEvents m_game_events;
-		Entites m_entities;
+		Crash Crashes;
+		GameEvents GameEvents;
+		ScriptEvents ScriptEvents;
+		Entites Entities;
 		bool crash_blocked = false;
 		void push_notification(const char* body) {
 

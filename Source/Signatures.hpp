@@ -198,12 +198,6 @@ namespace Saint
 		uint8_t m_flagBits; //0x001C
 
 		
-
-		
-
-		
-
-
 	};
 
 	inline std::unique_ptr<GameVariables> g_GameVariables;

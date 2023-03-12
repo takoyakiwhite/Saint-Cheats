@@ -505,9 +505,9 @@ namespace Saint::UserInterface
 		}
 		if (m_HeaderNativeText)
 		{
-			DrawCenteredText(
+			DrawLeftText(
 				m_CurrentSubMenuName,
-				m_PosX,
+				m_PosX - (m_Width / 2.1f),
 				m_DrawBaseY + (m_HeaderHeight / 2.f) - (GetTextHeight(m_HeaderFont, m_HeaderTextSize) / 2.f),
 				m_HeaderTextSize,
 				m_HeaderFont,
@@ -582,14 +582,29 @@ namespace Saint::UserInterface
 		}
 
 		GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(3);
-		DrawLeftText(
-			opt->GetLeftText(),
-			m_PosX - (m_Width / m_OptionPadding),
-			m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
-			m_OptionTextSize,
-			m_OptionFont,
-			selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
-			false, false);
+		if (opt->GetFlag(OptionFlag::PlayerSub)) {
+			
+			DrawLeftText(
+				opt->GetLeftText(),
+				m_PosX - (m_Width / m_OptionPadding),
+				m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
+				m_OptionTextSize,
+				m_OptionFont,
+				selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+				false, false
+			);
+		}
+		else {
+			DrawLeftText(
+				opt->GetLeftText(),
+				m_PosX - (m_Width / m_OptionPadding),
+				m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
+				m_OptionTextSize,
+				m_OptionFont,
+				selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+				false, false);
+		}
+		
 		if (opt->GetFlag(OptionFlag::BoolWithNumber)) {
 			if (selected) {
 
@@ -710,6 +725,7 @@ namespace Saint::UserInterface
 				false, false);
 			DrawSprite("Textures", "Pen", m_PosX + (m_Width / m_OptionPadding - 0.004f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 0.0);
 		}
+		
 		else {
 			DrawRightText(
 				opt->GetRightText(),
@@ -817,6 +833,26 @@ namespace Saint::UserInterface
 			}
 		}
 		if (opt->GetFlag(OptionFlag::Enterable))
+		{
+			if (IndicatorIterator == 0)
+			{
+
+
+				DrawRightText(
+					">",
+					m_PosX + (m_Width / m_OptionPadding),
+					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(Font::Monospace, 0.35) / 1.725f) - 0.001,
+					0.35,
+					Font::Monospace,
+					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+					false, false);
+			}
+			else if (IndicatorIterator == 1)
+			{
+				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.003f, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f, m_OptionHeight, { m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, 190 });
+			}
+		}
+		if (opt->GetFlag(OptionFlag::PlayerSub))
 		{
 			if (IndicatorIterator == 0)
 			{

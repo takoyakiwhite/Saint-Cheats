@@ -184,9 +184,6 @@
     <ClInclude Include="OTR.h">
       <Filter>Core\Features\Network\Players\Selected</Filter>
     </ClInclude>
-    <ClInclude Include="Protections.h">
-      <Filter>Core\Features\Protections</Filter>
-    </ClInclude>
     <ClInclude Include="Queue.h">
       <Filter>Utility</Filter>
     </ClInclude>
@@ -240,6 +237,15 @@
     </ClInclude>
     <ClInclude Include="MemoryEdit.h">
       <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="ClassHelper.h">
+      <Filter>Hooking\ClassHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerSub.hpp">
+      <Filter>Interface\Option</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections.h">
+      <Filter>Core\Features\Protections</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -321,6 +327,9 @@
     </ClCompile>
     <ClCompile Include="hex_memory.cpp">
       <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="ClassHelper.cpp">
+      <Filter>Hooking\ClassHelper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -440,6 +449,9 @@
     </Filter>
     <Filter Include="Core\Hotkeys">
       <UniqueIdentifier>{4fd2ef2d-02c9-4793-bcb8-2e983863f6cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooking\ClassHelper">
+      <UniqueIdentifier>{1555835b-d2e1-40a5-b5ec-45d35b4f0f1d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

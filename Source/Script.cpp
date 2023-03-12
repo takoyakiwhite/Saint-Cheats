@@ -16,6 +16,7 @@
 #include "UI/RegularSubmenu.hpp"
 #include "BoolWithChoose.h"
 #include "UI/PlayerSubmenu.hpp"
+#include "PlayerSub.hpp"
 #include "FiberHelper.hpp"
 #include "Features.h"
 #include "Enums.h"
@@ -326,6 +327,7 @@ namespace Saint
 
 		g_Render->draw_submenu<sub>("Saint", SubmenuHome, [](sub* sub)
 			{
+				
 				sub->draw_option<submenu>("Player", nullptr, SubmenuSelf);
 		sub->draw_option<submenu>("Network", nullptr, SubmenuNetwork);
 		sub->draw_option<submenu>("Protections", nullptr, SubmenuProtections);
@@ -790,7 +792,7 @@ namespace Saint
 			});
 		sub->draw_option<toggle<bool>>(("Keep Engine On"), "Prevents your vehicle's engine from being turned off when exiting.", &features.keep_engine_on, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("No Plane Turbulence"), "Removes your plane's turbulance. When turning off, it can make turbulance levels a little messed up.", &NoPlaneTurbulance, BoolDisplay::OnOff);
-		sub->draw_option<toggle<bool>>(("Auto-Repair"), nullptr, &features.auto_repair, BoolDisplay::OnOff);
+		sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Auto-Repair", nullptr, &features.auto_repair, &features.auto_repair_type, &features.get_repair_type);
 		sub->draw_option<toggle<bool>>(("Remove Deformation"), nullptr, &features.remove_def, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Stick To Ground"), nullptr, &features.stick_to_ground, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Burned"), nullptr, &features.burned, BoolDisplay::OnOff, false, [] {
@@ -3455,18 +3457,25 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Recovery", SubmenuRecovery, [](sub* sub)
 			{
+				
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Character", nullptr, &g_RecoveryManager.get_char_name, &g_RecoveryManager.selected, false, -1, [] {});
 				sub->draw_option<submenu>("Level", nullptr, SubmenuRP);
 				sub->draw_option<submenu>("Unlocks", nullptr, SubmenuUnlocks);
 				sub->draw_option<RegularOption>("1bil Hangar Sell", "", []
 					{
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_PROP_HANGAR_VALUE"), 1999000000, true);
-
-				STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_PROP_HANGAR_VALUE"), 1999000000, true);
-
-				*script_global(262145 + 1574918).as<int*>() = 1999000000;
+						switch (g_RecoveryManager.selected) {
+						case 0:
+							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_PROP_HANGAR_VALUE"), 1999000000, true);
+							break;
+						case 1:
+							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_PROP_HANGAR_VALUE"), 1999000000, true);
+							break;
+						}
+						*script_global(262145 + 1574918).as<int*>() = 1999000000;
 
 
 					});
+				
 
 
 				
@@ -3920,7 +3929,7 @@ namespace Saint
 
 
 				if (p_filter.data_i == 0) {
-					sub->draw_option<submenu>(name.c_str(), nullptr, SubmenuSelectedPlayer, [=]
+					sub->draw_option<playersubmenu>(name.c_str(), nullptr, SubmenuSelectedPlayer, [=]
 						{
 							g_SelectedPlayer = i;
 						});
@@ -3928,7 +3937,7 @@ namespace Saint
 				}
 				if (p_filter.data_i == 1) {
 					if (PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
-						sub->draw_option<submenu>(name.c_str(), nullptr, SubmenuSelectedPlayer, [=]
+						sub->draw_option<playersubmenu>(name.c_str(), nullptr, SubmenuSelectedPlayer, [=]
 							{
 								g_SelectedPlayer = i;
 							});
@@ -3936,7 +3945,7 @@ namespace Saint
 				}
 				if (p_filter.data_i == 2) {
 					if (INTERIOR::GET_INTERIOR_FROM_ENTITY(ped) != 0) {
-						sub->draw_option<submenu>(name.c_str(), nullptr, SubmenuSelectedPlayer, [=]
+						sub->draw_option<playersubmenu>(name.c_str(), nullptr, SubmenuSelectedPlayer, [=]
 							{
 								g_SelectedPlayer = i;
 							});
@@ -3944,7 +3953,7 @@ namespace Saint
 				}
 				if (p_filter.data_i == 3) {
 					if (!PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
-						sub->draw_option<submenu>(name.c_str(), nullptr, SubmenuSelectedPlayer, [=]
+						sub->draw_option<playersubmenu>(name.c_str(), nullptr, SubmenuSelectedPlayer, [=]
 							{
 								g_SelectedPlayer = i;
 							});
@@ -3995,7 +4004,7 @@ namespace Saint
 						copytoclipboard(all_players.get_player_info(g_SelectedPlayer)->m_net_player_data.m_name);
 					}
 					else {
-						g_Notifcations->add("Please start a session.");
+						g_NotificationManager->add("Please start a session.");
 
 					}
 					break;
@@ -4011,7 +4020,7 @@ namespace Saint
 						
 					}
 					else {
-						g_Notifcations->add("Please start a session.");
+						g_NotificationManager->add("Please start a session.");
 					}
 					break;
 				}
@@ -4706,17 +4715,37 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Game Events"), SubmenuGameEvents, [](sub* sub)
 			{
-				sub->draw_option<toggle<bool>>(("Cage"), nullptr, &protections.m_entities.cage, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Freeze"), nullptr, &protections.GameEvents.freeze, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Remove Weapon"), nullptr, &protections.GameEvents.remove_weapon, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Remove All Weapons"), nullptr, &protections.GameEvents.remove_all_weapons, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("PTFX"), nullptr, &protections.GameEvents.particle_spam, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Give Weapons"), nullptr, &protections.GameEvents.give_weapons, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Fire"), nullptr, &protections.GameEvents.fire_event, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Explosion"), nullptr, &protections.GameEvents.explosion, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Alter Wanted Level"), nullptr, &protections.GameEvents.alter_wanted_level, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Play Sound"), nullptr, &protections.GameEvents.play_sound, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Request Control"), nullptr, &protections.GameEvents.request_control, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Remove Sticky Bomb"), nullptr, &protections.GameEvents.remove_sticky_bomb, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Request Map Pickup"), nullptr, &protections.GameEvents.request_map_pickup, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Give Pickup Rewards"), nullptr, &protections.GameEvents.give_pickup_rewards, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Request Pickup"), nullptr, &protections.GameEvents.request_pickup, BoolDisplay::OnOff);
+				//sub->draw_option<toggle<bool>>(("Clear Area"), nullptr, &protections.GameEvents.clear_area, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Weapon Damage"), nullptr, &protections.GameEvents.weapon_damage, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Vehicle Component Control"), nullptr, &protections.GameEvents.vehicle_component_control, BoolDisplay::OnOff);
+				//sub->draw_option<toggle<bool>>(("Vehicle Horn"), nullptr, &protections.GameEvents.car_horn, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Vote Kick"), nullptr, &protections.GameEvents.vote_kick, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Blow Up Vehicle"), nullptr, &protections.GameEvents.blow_up_vehicle, BoolDisplay::OnOff);
+				
 
 			});
 		g_Render->draw_submenu<sub>(("Entities"), SubmenuEntities, [](sub* sub)
 			{
-				sub->draw_option<toggle<bool>>(("Cage"), nullptr, &protections.m_entities.cage, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Cage"), nullptr, &protections.Entities.cage, BoolDisplay::OnOff);
 
 			});
 		g_Render->draw_submenu<sub>(("Crash"), SubmenuProtCrash, [](sub* sub)
 			{
-				sub->draw_option<toggle<bool>>(("Vehicle"), nullptr, &protections.crash.vehicle, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Vehicle"), nullptr, &protections.Crashes.vehicle, BoolDisplay::OnOff);
 
 			});
 		g_Render->draw_submenu<sub>(("Script Events"), SubmenuScriptEvents, [](sub* sub)
@@ -4989,7 +5018,7 @@ namespace Saint
 			});
 		sub->draw_option<RegularOption>("Load Theme", "", []
 			{
-				g_ThemeLoading->load();
+				g_NotificationManager->add("Test", 2000, 1);
 			});
 
 		sub->draw_option<RegularOption>("Unload", nullptr, []

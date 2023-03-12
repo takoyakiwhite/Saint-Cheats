@@ -520,6 +520,8 @@ namespace Saint {
 		bool no_recoil = false;
 		bool keep_engine_on = false;
 		bool auto_repair = false;
+		const char* auto_repair_type[2] = {"Smart", "Normal"};
+		std::size_t get_repair_type = 0;
 		bool match = false;
 		bool bypass_c4_limit = false;
 		bool remove_def = false;
@@ -688,12 +690,28 @@ namespace Saint {
 				}
 			}
 			if (auto_repair) {
-				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
-				{
-					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-					VEHICLE::SET_VEHICLE_FIXED(playerVehicle);
-					VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
-					VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, false);
+				if (get_repair_type == 0) {
+
+					if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+					{
+						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						if (VEHICLE::GET_DOES_VEHICLE_HAVE_DAMAGE_DECALS(playerVehicle)) {
+							VEHICLE::SET_VEHICLE_FIXED(playerVehicle);
+							VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
+							VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, false);
+						}
+						
+					}
+					
+				}
+				if (get_repair_type == 1) {
+					if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+					{
+						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						VEHICLE::SET_VEHICLE_FIXED(playerVehicle);
+						VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
+						VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, false);
+					}
 				}
 
 			}
@@ -4859,14 +4877,21 @@ namespace Saint {
 		
 	};
 	inline ModelChanger m_ModelChanger;
+	class Recovery {
+	public:
+		const char* get_char_name[2] = { "Loading", "Loading"};
+		std::size_t selected = 0;
+	};
+	inline Recovery g_RecoveryManager;
 	inline void FeatureInitalize() {
+		
 		get_model_info.init();
 	
 		if (mark_as_Saint) {
 			PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 109, true);
 
 		}
-		if (protections.m_entities.cage) {
+		if (protections.Entities.cage) {
 			static int timer;
 			if ((GetTickCount() - timer) > 200) {
 
