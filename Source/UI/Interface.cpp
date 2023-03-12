@@ -7,6 +7,7 @@
 #include "../Features.h"
 #include "../ImGui/imgui.h"
 #include "../D3DRenderer.hpp"
+#include "../ImGui/imgui_internal.h"
 
 #define VERSION 4
 #define DEV_MODE
@@ -473,17 +474,17 @@ namespace Saint::UserInterface
 		m_LeftKeyPressed = false;
 		m_RightKeyPressed = false;
 	}
-
+	
+	
 	void UIManager::DrawHeader()
 	{
+		ImDrawList* draw_list = ImGui::GetForegroundDrawList();
 		switch (m_HeaderType)
 		{
 		case HeaderType::Static:
-			DrawRect(
-				m_PosX,
-				m_DrawBaseY + (m_HeaderHeight / 2.f), m_Width,
-				m_HeaderHeight,
-				m_HeaderBackgroundColor);
+			
+			
+			
 			break;
 		case HeaderType::YTD:
 			for (std::size_t i = 0; i < (m_HeaderGradientTransparent ? 1 : 20); ++i)

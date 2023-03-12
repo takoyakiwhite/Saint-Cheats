@@ -154,7 +154,7 @@ namespace Saint
 		using send_event_ack = void(*)(rage::netEventMgr* event_manager, CNetGamePlayer* source_player, CNetGamePlayer* target_player, int event_index, int event_handled_bitset);
 		send_event_ack m_send_event_ack{};
 
-		using GetEventData = bool(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount);
+		using GetEventData = bool(*)(int32_t eventGroup, int32_t eventIndex, int64_t* args, uint32_t argCount);
 		GetEventData* m_GetEventData;
 
 		using IncrementStatEvent = int(__int64 neteventsclass, CNetGamePlayers* targetPlayer);

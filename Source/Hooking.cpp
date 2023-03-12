@@ -509,16 +509,7 @@ namespace Saint
 				}
 				break;
 			}
-			case eNetworkEvents::CAlterWantedLevelEvent: {
-				if (protections.GameEvents.alter_wanted_level) {
-					char name23245[64];
-					sprintf(name23245, "Alter wanted level from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-					g_NotificationManager->add(name23245, 2000, 1);
-					return;
-				}
-				break;
-			}
+			
 			case eNetworkEvents::CExplosionEvent: {
 				if (protections.GameEvents.explosion) {
 					char name2324[64];
@@ -529,16 +520,7 @@ namespace Saint
 				}
 				break;
 			}
-			case eNetworkEvents::CFireEvent: {
-				if (protections.GameEvents.fire_event) {
-					char name2324545[64];
-					sprintf(name2324545, "Fire from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-					g_NotificationManager->add(name2324545, 2000, 1);
-					return;
-				}
-				break;
-			}
+			
 			case eNetworkEvents::CGiveWeaponEvent: {
 				if (protections.GameEvents.give_weapons) {
 					char name2324545645[64];
@@ -685,240 +667,22 @@ namespace Saint
 
 		return static_cast<decltype(&NetworkEventHandler)>(g_Hooking->m_OriginalNetworkHandler)(networkMgr, source, target, event_id, event_index, event_bitset, buffer_size, buffer);
 	}
-	bool Hooks::GetEventData(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount)
+	bool Hooks::GetEventData(int32_t eventGroup, int32_t eventIndex, int64_t* args, uint32_t argCount)
 	{
 		auto result = static_cast<decltype(&GetEventData)>(g_Hooking->m_OriginalGetEventData)(eventGroup, eventIndex, args, argCount);
-		if (NETWORK::NETWORK_IS_SESSION_ACTIVE())
-		{
-			if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(args[1]))
-			{
-				if (ENTITY::DOES_ENTITY_EXIST(ped))
-				{
+	
+		if (result && *g_GameVariables->m_is_session_started) {
+			auto sender = g_GameVariables->m_net_game_player(args[1]);
+			for (auto& evnt : m_scriptEvents) {
+				if (args[0] == evnt.eventHash && *evnt.eventBlockToggle) {
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, "%s has tried to send the event '%s'", sender->get_name(), evnt.eventName);
 
-					
-					
-					switch (static_cast<eRemoteEvent>(args[0]))
-					{
-					case eRemoteEvent::SendToLocation:
-						if (protections.send_to_location) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Send to location from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::SendToCayoPerico:
-						if (protections.send_to_location) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Send to location from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::TeleportToWarehouse:
-						if (protections.send_to_location) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Send to location from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::MCTeleport:
-						if (protections.send_to_location) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Send to location from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::InteriorControl:
-						if (protections.send_to_location) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Send to location from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::Teleport:
-						if (protections.send_to_location) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Send to location from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::RemoteOffradar:
-						if (protections.ScriptEvents.globals) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Off the radar from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::SoundSpam:
-						if (protections.GameEvents.play_sound) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Off the radar from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::Notification:
-						if (protections.ScriptEvents.notifications) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Notification from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::NotificationMoneyBanked:
-						if (protections.ScriptEvents.notifications) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Notification from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::NotificationMoneyRemoved:
-						if (protections.ScriptEvents.notifications) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Notification from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::NotificationMoneyStolen:
-						if (protections.ScriptEvents.notifications) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Notification from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::DestroyPersonalVehicle:
-						if (protections.ScriptEvents.destroy_personal_vehicle) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Destroy personal vehicle from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::PersonalVehicleDestroyed:
-						if (protections.ScriptEvents.destroy_personal_vehicle) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Destroy personal vehicle from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::Bounty:
-						if (protections.ScriptEvents.bounty) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Bounty from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::TriggerCEORaid:
-						if (protections.ScriptEvents.ceo_events) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "CEO Event from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::CeoKick:
-						if (protections.ScriptEvents.ceo_events) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "CEO Event from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::CeoBan:
-						if (protections.ScriptEvents.ceo_events) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "CEO Event from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::CeoMoney:
-						if (protections.ScriptEvents.ceo_events) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "CEO Event from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::SMS:
-						if (protections.ScriptEvents.text_messages) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Text message from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::SendTextLabelSMS:
-						if (protections.ScriptEvents.text_messages) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Text message from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::Crash1:
-						if (protections.Crashes.loading_screen) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Crash from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::Crash2:
-						if (protections.Crashes.loading_screen) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Crash from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					case eRemoteEvent::Crash3:
-						if (protections.Crashes.loading_screen) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Crash from %s blocked.", PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1])));
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							args[0] = 1234;
-							return false;
-						}
-						break;
-					}
-				
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+					return false;
 				}
 			}
+			
 		}
 		return result;
 	}

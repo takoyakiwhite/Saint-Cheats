@@ -7,7 +7,7 @@
 #include "ImGui/imgui_impl_win32.h"
 #include "D3DRenderer.hpp"
 #include "ImGui/imgui_internal.h"
-
+#include "UI/Interface.hpp"
 namespace Saint
 {
 	bool LogScript::IsInitialized()
@@ -28,7 +28,25 @@ namespace Saint
 	void LogScript::Destroy()
 	{
 	}
+	ImVec2 addDX(ImVec2* vectorA, ImVec2* vectorB) {
+		ImVec2 result;
+		result.x = vectorA->x;
+		result.y = vectorA->y;
+		result.x += vectorB->x;
+		result.y += vectorB->y;
 
+		return result;
+	}
+	void DrawRect2(ImU32 Color, ImVec2 Pos, ImVec2 Size, bool Filled, ImDrawList* draw_list)
+	{
+		ImVec2 m_Position = { 0, 0 };
+		ImVec2 size = ImGui::CalcItemSize(ImVec2(Size.x, Size.y), 0.0f, 0.0f);
+		ImVec2 poss = ImVec2(Pos.x + m_Position.x, Pos.y + m_Position.y);
+		const ImRect c_IM(ImVec2(Pos.x + m_Position.x, Pos.y + m_Position.y), addDX(&poss, &size));
+
+		if (!Filled) draw_list->AddRectFilled(c_IM.Max, c_IM.Min, ImGui::GetColorU32(Color));
+		else draw_list->AddRectFilledMultiColor(c_IM.Max, c_IM.Min, ImGui::GetColorU32(Color), ImGui::GetColorU32(Color), ImGui::GetColorU32(Color), ImGui::GetColorU32(Color));
+	}
 	namespace
 	{
 		std::size_t s_LastLogCount = 0;
@@ -54,6 +72,7 @@ namespace Saint
 					ImGui::SetWindowSize(ImGui::GetIO().DisplaySize);
 					ImGui::PushFont(g_D3DRenderer->m_HeaderFont);
 					auto DrawList = ImGui::GetWindowDrawList();
+					DrawRect2(ImColor(0, 0, 0, 255), ImVec2(g_Render->m_PosX, g_Render->m_PosY + (g_Render->m_HeaderHeight / 2.f)), ImVec2(g_Render->m_Width, 110.f), false, DrawList); // HEADER
 					DrawList->AddText(ImVec2(m_XPosition, m_YPosition), ImColor(g_Render->m_HeaderTextColor.r, g_Render->m_HeaderTextColor.g, g_Render->m_HeaderTextColor.b, g_Render->m_HeaderTextColor.a), g_Render->m_CurrentSubMenuName);
 					ImGui::PopFont();
 				}

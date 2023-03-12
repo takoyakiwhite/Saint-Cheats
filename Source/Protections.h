@@ -51,12 +51,25 @@ namespace Saint {
 			
 		}
 	};
+	class eventHandler {
+	public:
+		eventHandler(int64_t hash, std::string name, bool* toggle) {
+			eventHash = hash;
+			eventName = name;
+			eventBlockToggle = toggle;
+		}
+	public:
+		std::string eventName;
+		int64_t eventHash;
+		bool* eventBlockToggle;
+	};
 	class Protections {
 	public:
 		Crash Crashes;
 		GameEvents GameEvents;
 		ScriptEvents ScriptEvents;
 		Entites Entities;
+		
 		bool crash_blocked = false;
 		void push_notification(const char* body) {
 
@@ -76,4 +89,7 @@ namespace Saint {
 		
 	};
 	inline Protections protections;
+	inline std::vector<eventHandler> m_scriptEvents = {
+			{ -1603050746, "Vehicle Kick", &protections.ScriptEvents.vehicle_kick },
+	};
 }

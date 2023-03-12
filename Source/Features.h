@@ -4833,46 +4833,100 @@ namespace Saint {
 			{0, {"Fortnite", "hey"}}
 		};
 	};
+	enum ModelClass {
+		AmbientFemale,
+		AmbientMale,
+		Animal,
+		Cutscene,
+		GangFemale,
+		GangMale,
+		Multiplayer,
+		ScenarioFemale,
+		Emergency,
+		Players,
+	};
+	class modelHandler {
+	public:
+		modelHandler(std::string model_name, std::string name, ModelClass get_class) {
+			m_model = model_name;
+			m_name = name;
+			m_class = get_class;
+		}
+	public:
+		std::string m_model;
+		std::string m_name;
+		int m_class = 0;
+	};
 	class ModelChanger {
 	public:
+		std::vector<modelHandler> m_GetModels = {
+			{ "a_m_m_acult_01", "Cult", ModelClass::AmbientMale },
+			{ "a_m_m_afriamer_01", "Friamer", ModelClass::AmbientMale },
+
+			//Emergency
+			{ "s_m_y_cop_01", "Cop (Male)", ModelClass::Emergency },
+			{ "s_f_y_cop_01", "Cop (Female)", ModelClass::Emergency },
+			{ "mp_m_fibsec_01", "FIB", ModelClass::Emergency },
+			{ "mp_s_m_armoured_01", "Guard", ModelClass::Emergency },
+			{ "mp_m_exarmy_01", "Ex-Army", ModelClass::Emergency },
+			{ "s_f_y_sheriff_01", "Sheriff (Female)", ModelClass::Emergency },
+
+			{ "player_one", "Franklin", ModelClass::Players },
+			{ "player_zero", "Michael", ModelClass::Players },
+			{ "player_two", "Trevor", ModelClass::Players },
+		};
 		GetClasses get_classes;
-		const char* pointer = "P2 4C 3B CA ?? 8D 15 55";
 		int selected_class = 0;
-		const char* get_class_name(int index) {
-			switch (index) {
-			case 0:
-				return "Ambient Female";
-				break;
-			case 1:
-				return "Ambient Male";
-				break;
-			case 2:
-				return "Animal";
-				break;
-			case 3:
-				return "Cutscene";
-				break;
-			case 4:
-				return "Gang Female";
-				break;
-			case 5:
-				return "Gang Male";
-				break;
-			case 6:
-				return "Multiplayer";
-				break;
-			case 7:
-				return "Scenario Female";
-				break;
-				
+		int size = 10;
+		const char* get_class_name[10] = {"Ambient Female", "Ambient Male", "Animal", "Cutscene", "Gang Female", "Gang Male", "Multiplayer", "Scenario Female", "Emergency", "Player"};
+		
+		void change(const char* To_Change)
+		{
+			Hash Model_To_Change = rage::joaat(To_Change);
+			{
+
+				NativeVector3 Coordinates = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+				if (STREAMING::IS_MODEL_IN_CDIMAGE(Model_To_Change))
+				{
+					g_CallbackScript->AddCallback<ModelCallback>(Model_To_Change, [=] {
+						
+						
+
+						if (STREAMING::IS_MODEL_VALID(Model_To_Change))
+						{
+							Ped PED_Spawn = PED::CREATE_PED(26, Model_To_Change, Coordinates.x, Coordinates.y, Coordinates.z, 0, true, true);
+
+							
+
+
+							STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(Model_To_Change);
+							if (*g_GameVariables->m_is_session_started) {
+								NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(PED_Spawn);
+								auto NET_ID = NETWORK::PED_TO_NET(PED_Spawn);
+								DECORATOR::DECOR_SET_INT(PED_Spawn, (char*)"MPBitset", 0);
+								NETWORK::NETWORK_REGISTER_ENTITY_AS_NETWORKED(PED_Spawn);
+								if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(PED_Spawn))
+									NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(NET_ID, true);
+								ENTITY::SET_ENTITY_AS_MISSION_ENTITY(PED_Spawn, true, true);
+								NETWORK::SET_NETWORK_ID_CAN_MIGRATE(NETWORK::PED_TO_NET(PED_Spawn), TRUE);
+
+								if (!DECORATOR::DECOR_EXIST_ON(PED_Spawn, "MissionType"))
+								{
+									DECORATOR::DECOR_REGISTER("MissionType", 3);
+									DECORATOR::DECOR_SET_INT(PED_Spawn, "MissionType", 0);
+
+								}
+							}
+
+							Ped PED_TO_DELETE = PLAYER::PLAYER_PED_ID();
+							PLAYER::CHANGE_PLAYER_PED(PLAYER::PLAYER_ID(), PED_Spawn, true, true);
+							ENTITY::SET_ENTITY_ALPHA(PED_Spawn, 255, 0);
+							ENTITY::SET_ENTITY_VISIBLE(PED_Spawn, true, 1);
+							ENTITY::DELETE_ENTITY(&PED_TO_DELETE);
+						}
+					});
+				}
 			}
-		}
-		void change_model(const char* model_name) {
-			g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(model_name), [=] {
-				PLAYER::SET_PLAYER_MODEL(PLAYER::PLAYER_ID(), MISC::GET_HASH_KEY(model_name));
-				PED::SET_PED_DEFAULT_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID());
-				STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(MISC::GET_HASH_KEY(model_name));
-			});
 		}
 		
 	};

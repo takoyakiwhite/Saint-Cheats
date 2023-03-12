@@ -59,7 +59,7 @@ namespace Saint
 
 		static void NetworkEventHandler(__int64 networkMgr, CNetGamePlayer* source, CNetGamePlayer* target, unsigned __int16 event_id, int event_index, int event_bitset, __int64 buffer_size, __int64 buffer);
 
-		static bool GetEventData(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount);
+		static bool GetEventData(int32_t eventGroup, int32_t eventIndex, int64_t* args, uint32_t argCount);
 
 		
 

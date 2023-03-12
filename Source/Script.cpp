@@ -472,31 +472,25 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Model Changer"), SubmenuModelChanger, [](sub* sub)
 			{
-				for (std::int32_t i = 0; i < 8; i++) {
-					sub->draw_option<submenu>(m_ModelChanger.get_class_name(i), nullptr, SubmenuSelectedModelChanger, [=]
+				for (std::int32_t i = 0; i < m_ModelChanger.size; i++) {
+					sub->draw_option<submenu>(m_ModelChanger.get_class_name[i], nullptr, SubmenuSelectedModelChanger, [=]
 						{
 							m_ModelChanger.selected_class = i;
 						});
 
 				}
 			});
-		g_Render->draw_submenu<sub>((m_ModelChanger.get_class_name(m_ModelChanger.selected_class)), SubmenuSelectedModelChanger, [](sub* sub)
+		g_Render->draw_submenu<sub>((m_ModelChanger.get_class_name[m_ModelChanger.selected_class]), SubmenuSelectedModelChanger, [](sub* sub)
 			{
-				switch (m_ModelChanger.selected_class) {
-				case 0:
-					sub->draw_option<RegularOption>("Beach 1", nullptr, [=]
-						{
+				for (auto& model : m_ModelChanger.m_GetModels) {
+					if (m_ModelChanger.selected_class == model.m_class) {
+						sub->draw_option<RegularOption>(model.m_name.c_str(), nullptr, [=]
+							{
 
-							m_ModelChanger.change_model("a_f_m_beach_01");
-						});
-					break;
-				case 1:
-					sub->draw_option<RegularOption>("Beach", nullptr, [=]
-						{
+								m_ModelChanger.change(model.m_model.c_str());
 
-							m_ModelChanger.change_model("a_f_m_beach_01");
-						});
-					break;
+							});
+					}
 				}
 				
 				

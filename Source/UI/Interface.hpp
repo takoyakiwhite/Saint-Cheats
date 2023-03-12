@@ -280,7 +280,7 @@ namespace Saint::UserInterface
 		bool m_AnimationCheck = false;
 		void DrawRect(float x, float y, float width, float height, Color color);
 		void DrawRightText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow);
-
+		float m_DrawBaseY{};
 		
 
 		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
@@ -297,7 +297,7 @@ namespace Saint::UserInterface
 		void HandleInput();
 		void ResetInput();
 
-		float m_DrawBaseY{};
+		
 		void DrawHeader();
 		void drawstring(char* text, float X, float Y);
 		void setupdraw(bool outline);
