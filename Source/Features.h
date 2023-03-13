@@ -4937,6 +4937,79 @@ namespace Saint {
 		std::size_t selected = 0;
 	};
 	inline Recovery g_RecoveryManager;
+	class boolOption {
+	public:
+		boolOption(const char* m_name, const char* m_description, bool m_buffer) {
+			name = m_name;
+			description = m_description;
+			buffer = m_buffer;
+		}
+	public:
+		const char* name;
+		const char* description;
+		bool buffer;
+	};
+	class intOption {
+	public:
+		intOption(const char* m_name, const char* m_description, int m_min, int m_max, int m_step) {
+			name = m_name;
+			description = m_description;
+			min = m_min;
+			max = m_max;
+			step = m_step;
+		}
+	public:
+		const char* name;
+		const char* description;
+		int min;
+		int max;
+		int step;
+	};
+	inline boolOption auto_repair = { "Auto-Repair", "Repairs your vehicle.", features.auto_repair };
+	inline intOption rainbow_delay = { "Example", "This is an example.", 0, 5000, 50 };
+	class p_cha {
+	public:
+		std::string text;
+		rage::rlGamerInfo* get_selected_net_data() const
+		{
+			return g_GameVariables->m_net_game_player(g_SelectedPlayer) == nullptr ? nullptr : g_GameVariables->m_net_game_player(g_SelectedPlayer)->get_net_data();
+		}
+		const char* get_name() const
+		{
+			return g_GameVariables->m_net_game_player(g_SelectedPlayer) == nullptr ? "" : g_GameVariables->m_net_game_player(g_SelectedPlayer)->get_name();
+		}
+		void add_message(const char* msg, const char* player_name, bool is_team)
+		{
+			if (Hooks::send_chat_message(*g_GameFunctions->m_send_chat_ptr, get_selected_net_data(), msg, false)) {
+				g_GameFunctions->m_send_chat_ptr, get_selected_net_data(), msg, false;
+				int scaleform = GRAPHICS::REQUEST_SCALEFORM_MOVIE("MULTIPLAYER_CHAT");
+				GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(scaleform, "ADD_MESSAGE");
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING(player_name); // player name
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_LITERAL_STRING(msg); // content
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(is_team ? "MP_CHAT_TEAM" : "MP_CHAT_ALL")); // scope
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_BOOL(false); // teamOnly
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0); // eHudColour
+				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+				GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(scaleform, "SET_FOCUS");
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(1); // VISIBLE_STATE_DEFAULT
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0); // scopeType (unused)
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0); // scope (unused)
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING(player_name); // player
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0); // eHudColour
+				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+				GRAPHICS::DRAW_SCALEFORM_MOVIE_FULLSCREEN(scaleform, 255, 255, 255, 255, 0);
+			}
+
+		}
+		void send_once() {
+			static int timer;
+			if ((GetTickCount() - timer) > 500) {
+				add_message(text.c_str(), get_name(), false);
+				timer = GetTickCount();
+			}
+		}
+	};
+	inline p_cha p_chat;
 	inline void FeatureInitalize() {
 		
 		get_model_info.init();

@@ -305,6 +305,9 @@ namespace Saint
 
 		SubmenuModelChanger,
 		SubmenuSelectedModelChanger,
+
+		SubmenuSelectedChat,
+		SubmenuSelectedChatPresets,
 	};
 
 	bool MainScript::IsInitialized()
@@ -786,7 +789,7 @@ namespace Saint
 			});
 		sub->draw_option<toggle<bool>>(("Keep Engine On"), "Prevents your vehicle's engine from being turned off when exiting.", &features.keep_engine_on, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("No Plane Turbulence"), "Removes your plane's turbulance. When turning off, it can make turbulance levels a little messed up.", &NoPlaneTurbulance, BoolDisplay::OnOff);
-		sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Auto-Repair", nullptr, &features.auto_repair, &features.auto_repair_type, &features.get_repair_type);
+		sub->draw_option<BoolChoose<const char*, std::size_t, bool>>(auto_repair.name, nullptr, &features.auto_repair, &features.auto_repair_type, &features.get_repair_type);
 		sub->draw_option<toggle<bool>>(("Remove Deformation"), nullptr, &features.remove_def, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Stick To Ground"), nullptr, &features.stick_to_ground, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Burned"), nullptr, &features.burned, BoolDisplay::OnOff, false, [] {
@@ -956,7 +959,7 @@ namespace Saint
 
 					});
 		sub->draw_option<toggle<bool>>(("Include Secondary"), nullptr, &changeVehicleColor.rainbow.change_secondary, BoolDisplay::OnOff);
-		sub->draw_option<number<std::int32_t>>("Delay", nullptr, &changeVehicleColor.rainbow.delay, 0, 5000, 50);
+		sub->draw_option<number<std::int32_t>>("Delay", nullptr, &changeVehicleColor.rainbow.delay, rainbow_delay.min, rainbow_delay.max, rainbow_delay.step);
 
 
 
@@ -3969,6 +3972,7 @@ namespace Saint
 		sub->draw_option<submenu>("Teleport", nullptr, SubmenuPlayerTeleport);
 		sub->draw_option<submenu>("Spawner", nullptr, SubmenuSelectedSpawner);
 		sub->draw_option<submenu>("Removals", nullptr, SubmenuRemoval);
+		sub->draw_option<submenu>("Chat", nullptr, SubmenuSelectedChat);
 		sub->draw_option<submenu>("Social Club", nullptr, SubmenuSocialClub);
 		sub->draw_option<submenu>("Detections", nullptr, SubmenuSelectedDetections);
 		if (g_SelectedPlayer != PLAYER::PLAYER_ID()) {
@@ -4026,6 +4030,30 @@ namespace Saint
 			});
 
 
+			});
+		g_Render->draw_submenu<sub>("Chat", SubmenuSelectedChat, [](sub* sub)
+			{
+				sub->draw_option<submenu>("Presets", nullptr, SubmenuSelectedChatPresets);
+				sub->draw_option<KeyboardOption>(("Text"), nullptr, p_chat.text.c_str(), []
+					{
+						showKeyboard("Enter Something", "", 35, &p_chat.text, [] {});
+
+
+
+					});
+				sub->draw_option<RegularOption>(("Send Once"), nullptr, []
+					{
+						p_chat.send_once();
+					});
+		});
+		g_Render->draw_submenu<sub>("Presets", SubmenuSelectedChatPresets, [](sub* sub)
+			{
+				sub->draw_option<RegularOption>(("Hello, My IP is {ip}"), nullptr, []
+					{
+						std::string get_ip_text = std::format("Hello, My IP is {0}.{1}.{2}.{3}", g_players.get_ip_address(g_SelectedPlayer).m_field1, g_players.get_ip_address(g_SelectedPlayer).m_field2, g_players.get_ip_address(g_SelectedPlayer).m_field3, g_players.get_ip_address(g_SelectedPlayer).m_field4);
+						p_chat.text = get_ip_text;
+					});
+		
 			});
 		g_Render->draw_submenu<sub>("Social Club", SubmenuSocialClub, [](sub* sub)
 			{

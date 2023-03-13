@@ -71,6 +71,13 @@ namespace Saint
 		m_join_session_by_info(Signature("E8 ? ? ? ? 0F B6 CB 84 C0 41 0F 44 CD").Scan().Add(1).Rip().As<decltype(m_join_session_by_info)>()),
 		m_network(Signature("48 8B 0D ? ? ? ? 48 8B D7 E8 ? ? ? ? 84 C0 75 17 48 8B 0D ? ? ? ? 48 8B D7").Scan().Add(3).Rip().As<Network**>()),
 		m_NetworkEvents(Signature("66 41 83 F9 5B 0F 83 34").Scan().As<decltype(m_NetworkEvents)>()),
+		m_get_connection_peer(Signature("8D 42 FF 83 F8 FD 77 3D").Scan().Add(23).Rip().As<get_connection_peer>()),
+		m_get_net_object(Signature("4C 8B FA 41 0F B7 D1").Scan().Add(0x76).Rip().As<decltype(m_get_net_object)>()),
+		m_received_clone_sync(Signature("4C 8B FA 41 0F B7 D1").Scan().Sub(0x1D).Rip().As<decltype(m_received_clone_sync)>()),
+		m_fragment_physics_crash(Signature("E8 ? ? ? ? 44 8B 4D 1C").Scan().Add(1).Rip().As<PVOID>()),
+		m_fragment_physics_crash_2(Signature("E8 ? ? ? ? 84 C0 75 0B 41 FF CF").Scan().Add(1).Rip().As<PVOID>()),
+		m_received_clone_create(Signature("48 8B C4 66 44 89 48").Scan().As<PVOID>()),
+		m_constraint_attachment_crash(Signature("40 53 48 83 EC 20 48 8B D9 48 8B 49 38 48 8B 01").Scan().As<PVOID>()),
 		//m_get_network_event_data(Signature("53 43 52 49 50 54 5F 4E 45 54 57 4F 52 4B").Scan().Sub(0x38).As<PVOID*>()),
 		should_sync_money_rewards(Signature("40 8A 2D ? ? ? ? 48 83 64 24 40 00").Scan().Add(3).Rip().As<decltype(should_sync_money_rewards)>())
 

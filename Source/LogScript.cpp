@@ -72,7 +72,7 @@ namespace Saint
 					ImGui::SetWindowSize(ImGui::GetIO().DisplaySize);
 					ImGui::PushFont(g_D3DRenderer->m_HeaderFont);
 					auto DrawList = ImGui::GetWindowDrawList();
-					DrawRect2(ImColor(0, 0, 0, 255), ImVec2(g_Render->m_PosX, g_Render->m_PosY + (g_Render->m_HeaderHeight / 2.f)), ImVec2(g_Render->m_Width, 110.f), false, DrawList); // HEADER
+					
 					DrawList->AddText(ImVec2(m_XPosition, m_YPosition), ImColor(g_Render->m_HeaderTextColor.r, g_Render->m_HeaderTextColor.g, g_Render->m_HeaderTextColor.b, g_Render->m_HeaderTextColor.a), g_Render->m_CurrentSubMenuName);
 					ImGui::PopFont();
 				}

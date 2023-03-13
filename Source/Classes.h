@@ -214,7 +214,7 @@ namespace rage {
 }
 
 namespace Saint {
-	
+	class CNetworkObjectMgr;
 #pragma pack(push, 8)
 	class CPickupCreationDataNode
 	{
@@ -291,17 +291,7 @@ namespace Saint {
 		std::uint32_t m_bitset;   // 0x220
 		std::uint32_t m_args_size;// 0x224
 	};
-	union netAddress
-	{
-		uint32_t m_raw;
-		struct
-		{
-			uint8_t m_field4;
-			uint8_t m_field3;
-			uint8_t m_field2;
-			uint8_t m_field1;
-		};
-	};
+	
 	class netPlayerData
 	{
 	public:

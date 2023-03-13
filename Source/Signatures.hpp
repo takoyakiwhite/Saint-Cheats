@@ -197,6 +197,19 @@ namespace Saint
 		uint32_t m_highestBitsRead; //0x0018
 		uint8_t m_flagBits; //0x001C
 
+		using get_connection_peer = netConnectionPeer* (*)(rage::netConnectionManager* manager, int peer_id);
+		get_connection_peer m_get_connection_peer{};
+
+		using get_net_object = rage::netObject* (*)(CNetworkObjectMgr* mgr, int16_t id, bool can_delete_be_pending);
+		get_net_object m_get_net_object{};
+
+		PVOID m_received_clone_sync;
+		PVOID m_received_clone_create;
+		PVOID m_constraint_attachment_crash{};
+
+		PVOID m_fragment_physics_crash;
+		PVOID m_fragment_physics_crash_2;
+
 		
 	};
 

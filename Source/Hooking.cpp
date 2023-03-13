@@ -436,7 +436,7 @@ namespace Saint
 	{
 		if (protections.Crashes.vehicle) {
 			if (!*(int64_t*)(a1 + 0xD8)) {
-				protections.push_notification2("Blocked crash.");
+				protections.push_notification2("Prevented Crash (Vehicle Mods)");
 				return;
 			}
 		}
@@ -686,6 +686,62 @@ namespace Saint
 		}
 		return result;
 	}
+	//crash protection
+	bool Hooks::fragment_physics_crash(uintptr_t a1, uint32_t a2, uintptr_t a3, uintptr_t a4, uintptr_t a5)
+	{
+		if (auto ptr = *reinterpret_cast<uintptr_t*>(a5 + 0x70); ptr)
+			if (auto ptr2 = *reinterpret_cast<uintptr_t*>(ptr + 8 * a2); !ptr2) {
+				protections.push_notification2("Prevented Crash (Fragment)");
+				return false;
+			}
+
+		return static_cast<decltype(&fragment_physics_crash)>(g_Hooking->m_OriginalFragmentCrash)(a1, a2, a3, a4, a5);
+	}
+	std::int64_t Hooks::constraint_attachment_crash(std::uintptr_t a1)
+	{
+		if (!*reinterpret_cast<void**>(a1 + 0x38)) {
+			protections.push_notification2("Prevented Crash (Train)");
+			return 0;
+		}
+		return static_cast<decltype(&constraint_attachment_crash)>(g_Hooking->AttachmentCrash)(a1);
+	}
+	bool Hooks::received_clone_create(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, eNetObjType object_type, int32_t object_id, int32_t object_flag, rage::datBitBuffer* buffer, int32_t timestamp)
+	{
+		if (object_type < eNetObjType::NET_OBJ_TYPE_AUTOMOBILE || object_type > eNetObjType::NET_OBJ_TYPE_TRAIN)
+		{
+			protections.push_notification2("Invalid clone");
+			return true;
+		}
+
+		m_syncing_player = src;
+		return static_cast<decltype(&received_clone_create)>(g_Hooking->InvalidObjectCrash2)(mgr, src, dst, object_type, object_id, object_flag, buffer, timestamp);
+	}
+	eAckCode Hooks::received_clone_sync(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, eNetObjType object_type, uint16_t object_id, rage::datBitBuffer* buffer, uint16_t unk, uint32_t timestamp)
+	{
+		if (object_type < eNetObjType::NET_OBJ_TYPE_AUTOMOBILE || object_type > eNetObjType::NET_OBJ_TYPE_TRAIN)
+		{
+			protections.push_notification2("Invalid Object");
+			return eAckCode::ACKCODE_FAIL;
+		}
+
+		if (auto net_obj = g_GameFunctions->m_get_net_object(mgr, object_id, true); net_obj && net_obj->m_object_type != (int16_t)object_type)
+		{
+			protections.push_notification2("Invalid Object");
+			return eAckCode::ACKCODE_FAIL;
+		}
+
+		m_syncing_player = src;
+		return static_cast<decltype(&received_clone_sync)>(g_Hooking->InvalidObjectCrash)(mgr, src, dst, object_type, object_id, buffer, unk, timestamp);
+	}
+	bool Hooks::fragment_physics_crash_2(float* a1, float* a2)
+	{
+		if (!a1 || !a2) {
+			protections.push_notification2("Prevented Crash (Fragment)");
+			return false;
+		}
+
+		return static_cast<decltype(&fragment_physics_crash_2)>(g_Hooking->m_OriginalFragmentCrash2)(a1, a2);
+	}
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
@@ -705,6 +761,11 @@ namespace Saint
 	
 		MH_CreateHook(g_GameFunctions->m_NetworkEvents, &Hooks::NetworkEventHandler, &m_OriginalNetworkHandler);
 		MH_CreateHook(g_GameFunctions->m_GetEventData, &Hooks::GetEventData, &m_OriginalGetEventData);
+		MH_CreateHook(g_GameFunctions->m_fragment_physics_crash, &Hooks::fragment_physics_crash, &m_OriginalFragmentCrash);
+		MH_CreateHook(g_GameFunctions->m_fragment_physics_crash_2, &Hooks::fragment_physics_crash_2, &m_OriginalFragmentCrash2);
+		MH_CreateHook(g_GameFunctions->m_received_clone_sync, &Hooks::received_clone_sync, &InvalidObjectCrash);
+		MH_CreateHook(g_GameFunctions->m_received_clone_create, &Hooks::received_clone_create, &InvalidObjectCrash2);
+		MH_CreateHook(g_GameFunctions->m_constraint_attachment_crash, &Hooks::constraint_attachment_crash, &AttachmentCrash);
 		//MH_CreateHook(g_GameFunctions->m_GetScriptEvent, &Hooks::NetworkEventHandler, &m_OriginalNetworkHandler);
 		//MH_CreateHook(g_GameFunctions->m_get_network_event_data, &Hooks::GetNetworkEventData, &originalDetection);
 		//MH_CreateHook(g_GameFunctions->m_received_event, &Hooks::GameEvent, &OriginalRecivied);
@@ -730,6 +791,11 @@ namespace Saint
 		//MH_RemoveHook(g_GameFunctions->m_pickup_creation);
 		MH_RemoveHook(g_GameFunctions->m_NetworkEvents);
 		MH_RemoveHook(g_GameFunctions->m_GetEventData);
+		MH_RemoveHook(g_GameFunctions->m_fragment_physics_crash);
+		MH_RemoveHook(g_GameFunctions->m_fragment_physics_crash_2);
+		MH_RemoveHook(g_GameFunctions->m_received_clone_sync);
+		MH_RemoveHook(g_GameFunctions->m_received_clone_create);
+		MH_RemoveHook(g_GameFunctions->m_constraint_attachment_crash);
 		//MH_RemoveHook(g_GameFunctions->m_GetScriptEvent);
 		//MH_RemoveHook(g_GameFunctions->m_get_network_event_data);
 		//MH_RemoveHook(g_GameFunctions->m_received_event);
