@@ -108,6 +108,27 @@ namespace Saint
 		SubmenuTest,
 		SubmenuToggles,
 		SubmenuTogglesColor,
+		SubmenuColors,
+		Customization,
+		CustomizationSubheader,
+		CustomizationToggles,
+		CustomizationBase,
+		CustomizationHeader,
+		Positions,
+		PositionsMenu,
+		PositionsGlobe,
+		//COLORS
+		SubmenuHeaderColor,
+		SubmenuHeaderText,
+		SubmenuOptionSelectedBackground,
+		SubmenuOptionUnselectedBackground,
+		OptionTextSelected,
+		OptionTextUnselected,
+		FooterBackground,
+		FooterSprite,
+		SubheaderBackground,
+		SubheaderTextLeft,
+		SubheaderTextRight,
 		//WORLD
 		SubmenuWorld,
 		SubmeuWeather,
@@ -263,6 +284,7 @@ namespace Saint
 		NearbyManager,
 		SubmenuVehParticles,
 		SubmenuUnlocks2,
+		SubmenuSelectedVehicleColor,
 
 		//Handling
 		HandlingMisc,
@@ -328,7 +350,7 @@ namespace Saint
 		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_JOINING"), "Loading GTA Online with " BIGBASE_NAME "...");
 
 
-		g_Render->draw_submenu<sub>("Saint", SubmenuHome, [](sub* sub)
+		g_Render->draw_submenu<sub>("Main Menu", SubmenuHome, [](sub* sub)
 			{
 				
 				sub->draw_option<submenu>("Player", nullptr, SubmenuSelf);
@@ -720,19 +742,15 @@ namespace Saint
 						(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_swim_speed = 1.0f;
 					}
 					});
-				sub->draw_option<toggle_number_option<float, bool>>("Width", nullptr, &get_model_info.width, &get_model_info.widthm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
+				sub->draw_option<toggle_number_option<float, bool>>("Width", nullptr, &get_model_info.width, &get_model_info.widthm, 0.1f, 10.f, 0.01f, 2, true, "", "", [] {
 					
-					if (get_model_info.width) {
-						Memory::set_value<float>({ 0x08, 0x0064 }, get_model_info.widthm);
-					}
+					
 					if (!get_model_info.width) {
 						Memory::set_value<float>({ 0x08, 0x0064 }, 1.0f);
 					}
 					});
-				sub->draw_option<toggle_number_option<float, bool>>("Height", nullptr, &get_model_info.height, &get_model_info.heightm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
-					if (get_model_info.height) {
-						Memory::set_value<float>({ 0x08, 0x88 }, get_model_info.heightm);
-					}
+				sub->draw_option<toggle_number_option<float, bool>>("Height", nullptr, &get_model_info.height, &get_model_info.heightm, 0.1f, 10.f, 0.01f, 2, true, "", "", [] {
+					
 					if (!get_model_info.height) {
 						Memory::set_value<float>({ 0x08, 0x88 }, 1.0f);
 					}
@@ -743,7 +761,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Super Jump"), SubmenuSuperjump, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &superjump.enabled, BoolDisplay::OnOff);
-		sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &superjump.Jump_Type, &superjump.Jump_Int);
+		sub->draw_option<ChooseOption<const char*, std::size_t>>("Animation", nullptr, &superjump.Jump_Type, &superjump.Jump_Int);
 			});
 		g_Render->draw_submenu<sub>(("Vehicle"), SubmenuVehicle, [](sub* sub)
 			{
@@ -1213,10 +1231,14 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Max (Loop)"), SubmenuUpgradeLoop, [](sub* sub)
 			{
+				sub->draw_option<submenu>("Color", nullptr, Submenu::SubmenuSelectedVehicleColor);
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &max_loop.enabled, BoolDisplay::OnOff);
-		sub->draw_option<toggle<bool>>(("Randomize Primary"), nullptr, &max_loop.randomizeprimary, BoolDisplay::OnOff);
-		sub->draw_option<toggle<bool>>(("Randomize Secondary"), nullptr, &max_loop.randomizesecondary, BoolDisplay::OnOff);
-		sub->draw_option<number<std::int32_t>>("Delay", nullptr, &max_loop.delay, 0, 5000, 50);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &max_loop.delay, 0, 5000, 50);
+			});
+		g_Render->draw_submenu<sub>(("Color"), SubmenuSelectedVehicleColor, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Randomize Primary"), nullptr, &max_loop.randomizeprimary, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Randomize Secondary"), nullptr, &max_loop.randomizesecondary, BoolDisplay::OnOff);
 			});
 		g_Render->draw_submenu<sub>(("Auto-Pilot"), SubmenuAutoPilot, [](sub* sub)
 			{
@@ -2984,7 +3006,7 @@ namespace Saint
 		sub->draw_option<toggle<bool>>(("Disable When Reloading"), nullptr, &triggerbot.d2, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Exclude Friends"), nullptr, &triggerbot.exclude_friends, BoolDisplay::OnOff);
 		sub->draw_option<ChooseOption<const char*, std::size_t>>("Filter", nullptr, &triggerbot.filter, &triggerbot.filter_i);
-		sub->draw_option<ChooseOption<const char*, std::size_t>>("Bone", nullptr, &triggerbot.shoot_coords, &triggerbot.scoords_i);
+		sub->draw_option<ChooseOption<const char*, std::size_t>>("Redirect To Bone", nullptr, &triggerbot.shoot_coords, &triggerbot.scoords_i);
 		sub->draw_option<number<std::int32_t>>("Delay", nullptr, &triggerbot.delay, 0, 5000);
 
 
@@ -5013,26 +5035,19 @@ namespace Saint
 
 		g_Render->draw_submenu<sub>("Settings", SubmenuSettings, [](sub* sub)
 			{
-				sub->draw_option<submenu>("Header", nullptr, SubmenuSettingsHeader);
-		sub->draw_option<submenu>("Footer Text", nullptr, SubmenuSettingsSubmenuBar);
-		sub->draw_option<submenu>("Options", nullptr, SubmenuSettingsOption);
-		sub->draw_option<submenu>("Footer", nullptr, SubmenuSettingsFooter);
-		sub->draw_option<submenu>("Toggles", nullptr, SubmenuToggles);
-		sub->draw_option<submenu>("Description", nullptr, SubmenuSettingsDescription);
-		sub->draw_option<submenu>("Input", nullptr, SubmenuSettingsInput);
-		sub->draw_option<submenu>("Themes", nullptr, SubmenuThemes);
-		//sub->draw_option<submenu>("Discord RPC", nullptr, DiscordRPC);
-		//sub->draw_option<submenu>("Scripts", nullptr, SubmenuScripts);
-		//sub->draw_option<submenu>("Demo", nullptr, SubmenuTest);
+				sub->draw_option<submenu>("Customization", nullptr, Customization);
+				sub->draw_option<submenu>("Positions", nullptr, Positions);
+				sub->draw_option<submenu>("Colors", nullptr, SubmenuColors);
+				sub->draw_option<submenu>("Themes", nullptr, SubmenuThemes);
 		
-		sub->draw_option<number<float>>("X Position", nullptr, &g_Render->m_PosX, 0.f, 1.f, 0.01f, 2);
-		sub->draw_option<number<float>>("Y Position", nullptr, &g_Render->m_PosY, 0.f, 1.f, 0.01f, 2);
-		sub->draw_option<number<float>>("Glare X Offset", nullptr, &g_Render->glare_x_offset, -1000.f, 1000.f, 0.002f, 3);
-		sub->draw_option<number<float>>("Width", nullptr, &g_Render->m_Width, 0.01f, 1.f, 0.01f, 2);
-		sub->draw_option<toggle<bool>>("Sounds", nullptr, &g_Render->m_Sounds, BoolDisplay::OnOff);
-		sub->draw_option<toggle<bool>>("Submenu Bar", nullptr, &g_Render->submenu_enabled, BoolDisplay::OnOff);
+		
+		
+		
+		
+		
+		
 		sub->draw_option<ChooseOption<const char*, std::size_t>>(("Submenu Indicators"), nullptr, &g_Render->IndicatorList, &g_Render->IndicatorIterator);
-		sub->draw_option<toggle<bool>>("Glare", nullptr, &g_Render->m_render_glare, BoolDisplay::OnOff);
+		
 		sub->draw_option<toggle<bool>>("Log Script Events", nullptr, &g_LogScriptEvents, BoolDisplay::OnOff);
 		sub->draw_option<RegularOption>("Save Theme", "", []
 			{
@@ -5048,9 +5063,188 @@ namespace Saint
 				g_Running = false;
 			});
 			});
-		g_Render->draw_submenu<sub>(("Discord RPC"), DiscordRPC, [](sub* sub)
+		g_Render->draw_submenu<sub>(("Positions"), Positions, [](sub* sub)
 			{
+
+				sub->draw_option<submenu>("Base", nullptr, PositionsMenu);
+				sub->draw_option<submenu>("Globe", nullptr, PositionsGlobe);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Base"), PositionsMenu, [](sub* sub)
+			{
+
+				sub->draw_option<number<float>>("X", nullptr, &g_Render->m_PosX, 0.f, 1.f, 0.01f, 2);
+				sub->draw_option<number<float>>("Y", nullptr, &g_Render->m_PosY, 0.f, 1.f, 0.01f, 2);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Globe"), PositionsGlobe, [](sub* sub)
+			{
+
+				sub->draw_option<number<float>>("X Offset", nullptr, &g_Render->glare_x_offset, -1000.f, 1000.f, 0.002f, 3);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Customization"), Customization, [](sub* sub)
+			{
+				sub->draw_option<submenu>("Base", nullptr, CustomizationBase);
+				sub->draw_option<submenu>("Header", nullptr, CustomizationHeader);
+				sub->draw_option<submenu>("Subheader", nullptr, CustomizationSubheader);
+				sub->draw_option<submenu>("Toggles", nullptr, CustomizationToggles);
+				sub->draw_option<number<float>>("Text Size", nullptr, &g_Render->m_OptionTextSize, 0.01f, 1.f, 0.01f, 2);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Toggles"), CustomizationToggles, [](sub* sub)
+			{
+				sub->draw_option<ChooseOption<const char*, std::size_t>>(("Icon"), nullptr, &g_Render->ToggleList, &g_Render->ToggleIterator);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Subheader"), CustomizationSubheader, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>("Enabled", nullptr, &g_Render->submenu_enabled, BoolDisplay::OnOff);
+				sub->draw_option<number<float>>("Height", nullptr, &g_Render->m_SubheaderHeight, 0.01f, 0.2f, 0.001f, 3);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Base"), CustomizationBase, [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>("Glare", nullptr, &g_Render->m_render_glare, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>("Sounds", nullptr, &g_Render->m_Sounds, BoolDisplay::OnOff);
+				sub->draw_option<number<float>>("Width", nullptr, &g_Render->m_Width, 0.01f, 1.f, 0.01f, 2);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Header"), CustomizationHeader, [](sub* sub)
+			{
+				sub->draw_option<KeyboardOption>(("Text"), nullptr, g_Render->header_name, []
+					{
+						showKeyboard("Enter Something", "", 25, &g_Render->header_name, [] {});
+					});
+				sub->draw_option<number<float>>("Height", nullptr, &g_Render->m_HeaderHeight, 0.01f, 0.2f, 0.001f, 3);
+
+
+			});
+		g_Render->draw_submenu<sub>(("Colors"), SubmenuColors, [](sub* sub)
+			{
+
+				//sub->draw_option<submenu>("Header", nullptr, SubmenuSettingsHeader);
+				//sub->draw_option<submenu>("Footer Text", nullptr, SubmenuSettingsSubmenuBar);
+				//sub->draw_option<submenu>("Options", nullptr, SubmenuSettingsOption);
+				//sub->draw_option<submenu>("Footer", nullptr, SubmenuSettingsFooter);
+				//sub->draw_option<submenu>("Toggles", nullptr, SubmenuToggles);
+				//sub->draw_option<submenu>("Description", nullptr, SubmenuSettingsDescription);
+				sub->draw_option<submenu>("Header Background", nullptr, SubmenuHeaderColor);
+				sub->draw_option<submenu>("Header Text", nullptr, SubmenuHeaderText);
+				sub->draw_option<submenu>("Background Selected", nullptr, SubmenuOptionSelectedBackground);
+				sub->draw_option<submenu>("Background Unselected", nullptr, SubmenuOptionUnselectedBackground);
+				sub->draw_option<submenu>("Text Selected", nullptr, OptionTextSelected);
+				sub->draw_option<submenu>("Text Unselected", nullptr, OptionTextUnselected);
+				sub->draw_option<submenu>("Footer Background", nullptr, FooterBackground);
+				sub->draw_option<submenu>("Footer Sprite", nullptr, FooterSprite);
+				sub->draw_option<submenu>("Subheader Background", nullptr, SubheaderBackground);
+				sub->draw_option<submenu>("Subheader Text Left", nullptr, SubheaderTextLeft);
+				sub->draw_option<submenu>("Subheader Text Right", nullptr, SubheaderTextRight);
 				
+
+			});
+		g_Render->draw_submenu<sub>(("Subheader Background"), SubheaderBackground, [](sub* sub)
+			{
+
+				sub->draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_SubheaderBackground.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_SubheaderBackground.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_SubheaderBackground.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_SubheaderBackground.a, 0, 255);
+
+			});
+		g_Render->draw_submenu<sub>(("Subheader Text Left"), SubheaderTextLeft, [](sub* sub)
+			{
+
+				sub->draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_SubheaderText.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_SubheaderText.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_SubheaderText.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_SubheaderText.a, 0, 255);
+
+			});
+		g_Render->draw_submenu<sub>(("Subheader Text Right"), SubheaderTextRight, [](sub* sub)
+			{
+
+				sub->draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_SubheaderTextRight.r, 0, 255);
+		sub->draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_SubheaderTextRight.g, 0, 255);
+		sub->draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_SubheaderTextRight.b, 0, 255);
+		sub->draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_SubheaderTextRight.a, 0, 255);
+
+			});
+		g_Render->draw_submenu<sub>(("Header Background"), SubmenuHeaderColor, [](sub* sub)
+			{
+
+				sub->draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_HeaderBackgroundColor.r, 0, 255);
+				sub->draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_HeaderBackgroundColor.g, 0, 255);
+				sub->draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_HeaderBackgroundColor.b, 0, 255);
+				sub->draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_HeaderBackgroundColor.a, 0, 255);
+
+			});
+		g_Render->draw_submenu<sub>(("Header Text"), SubmenuHeaderText, [](sub* sub)
+			{
+
+				sub->draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_HeaderTextColor.r, 0, 255);
+				sub->draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_HeaderTextColor.g, 0, 255);
+				sub->draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_HeaderTextColor.b, 0, 255);
+				sub->draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_HeaderTextColor.a, 0, 255);
+
+			});
+		g_Render->draw_submenu<sub>(("Background Selected"), SubmenuOptionSelectedBackground, [](sub* sub)
+			{
+
+				sub->draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_OptionSelectedBackgroundColor.r, 0, 255);
+				sub->draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_OptionSelectedBackgroundColor.g, 0, 255);
+				sub->draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_OptionSelectedBackgroundColor.b, 0, 255);
+				sub->draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_OptionSelectedBackgroundColor.a, 0, 255);
+
+			});
+		g_Render->draw_submenu<sub>(("Background Unselected"), SubmenuOptionUnselectedBackground, [](sub* sub)
+			{
+
+				sub->draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.r, 0, 255);
+				sub->draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.g, 0, 255);
+				sub->draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.b, 0, 255);
+				sub->draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.a, 0, 255);
+
+			});
+		g_Render->draw_submenu<sub>(("Text Selected"), OptionTextSelected, [](sub* sub)
+			{
+				sub->draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_OptionSelectedTextColor.r, 0, 255);
+				sub->draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_OptionSelectedTextColor.g, 0, 255);
+				sub->draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_OptionSelectedTextColor.b, 0, 255);
+				sub->draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_OptionSelectedTextColor.a, 0, 255);
+
+			});
+		g_Render->draw_submenu<sub>(("Text Unselected"), OptionTextUnselected, [](sub* sub)
+			{
+				sub->draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_OptionUnselectedTextColor.r, 0, 255);
+				sub->draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_OptionUnselectedTextColor.g, 0, 255);
+				sub->draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_OptionUnselectedTextColor.b, 0, 255);
+				sub->draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_OptionUnselectedTextColor.a, 0, 255);
+
+			});
+		g_Render->draw_submenu<sub>(("Footer Background"), FooterBackground, [](sub* sub)
+			{
+
+				sub->draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_FooterBackgroundColor.r, 0, 255);
+				sub->draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_FooterBackgroundColor.g, 0, 255);
+				sub->draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_FooterBackgroundColor.b, 0, 255);
+				sub->draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_FooterBackgroundColor.a, 0, 255);
+
+			});
+		g_Render->draw_submenu<sub>(("Footer Sprite"), FooterSprite, [](sub* sub)
+			{
+
+				sub->draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_FooterSpriteColor.r, 0, 255);
+				sub->draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_FooterSpriteColor.g, 0, 255);
+				sub->draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_FooterSpriteColor.b, 0, 255);
+				sub->draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_FooterSpriteColor.a, 0, 255);
 
 			});
 		g_Render->draw_submenu<sub>(("Toggles"), SubmenuToggles, [](sub* sub)

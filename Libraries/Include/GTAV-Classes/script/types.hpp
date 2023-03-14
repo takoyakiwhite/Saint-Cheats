@@ -7,21 +7,8 @@
 #endif
 
 using Void = void;
-using Any = int;
-using Hash = std::uint32_t;
-using Entity = std::int32_t;
-using Player = std::int32_t;
-using FireId = std::int32_t;
-using Interior = std::int32_t;
-using Ped = Entity;
-using Vehicle = Entity;
-using Cam = std::int32_t;
-using Object = Entity;
-using Pickup = Object;
-using Blip = std::int32_t;
 using Camera = Entity;
 using ScrHandle = Entity;
-using Vector3 = rage::scrVector;
 
 #define PLAYER_INDEX alignas(8) Player
 #define ENTITY_INDEX alignas(8) Entity
@@ -34,7 +21,7 @@ using Vector3 = rage::scrVector;
 #define SCR_INT alignas(8) int
 #define SCR_BOOL alignas(8) BOOL
 #define SCR_FLOAT alignas(8) float
-#define SCR_VEC3 Vector3
+#define SCR_VEC3 NativeVector3
 
 template <int SIZE>
 struct SCR_TEXT_LABEL

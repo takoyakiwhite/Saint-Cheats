@@ -209,7 +209,7 @@ namespace Saint::UserInterface
 
 		// Options
 		float m_OptionHeight = 0.0315f;
-		float m_OptionTextSize = 0.29f;
+		float m_OptionTextSize = 0.27f;
 		Font m_OptionFont = Font::ChaletLondon;
 		Font m_SeperatorFont = Font::HouseScript;
 		float m_OptionPadding = 2.1f;
@@ -220,6 +220,11 @@ namespace Saint::UserInterface
 
 		//submenubar
 		bool submenu_enabled = false;
+
+		Color m_SubheaderBackground{ 0, 0, 0, 255 };
+		Color m_SubheaderText{ 255,255,255, 255 };
+		Color m_SubheaderTextRight{ 255,255,255, 255 };
+		float m_SubheaderHeight = 0.03f;
 
 		bool animation_enabled = false;
 
@@ -252,11 +257,12 @@ namespace Saint::UserInterface
 		Color m_ToggleOnColor{ 130, 214, 157, 255 };
 		Color m_ToggleOffColor{ 200, 55, 80, 255 };
 		Color m_ToggleCheckColor{ 255,255,255, 255 };
-		const char* ToggleList[3]
+		const char* ToggleList[4]
 		{
 			"Buttons",
 			"Checkmarks",
-			"None"
+			"None",
+			"Checkmarks",
 		};
 		std::size_t ToggleIterator = 0;
 

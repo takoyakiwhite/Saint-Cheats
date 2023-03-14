@@ -529,29 +529,31 @@ namespace Saint::UserInterface
 			char rightText[32] = {};
 			std::snprintf(rightText, sizeof(rightText) - 1, "%zu / %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
 
-
+			
 
 			DrawRect(
 				m_PosX,
-				m_DrawBaseY + (0.03f / 2.f),
-				m_Width, 0.03f,
-				m_FooterBackgroundColor);
+				m_DrawBaseY + (m_SubheaderHeight / 2.f),
+				m_Width, m_SubheaderHeight,
+				m_SubheaderBackground);
 
 
 			DrawLeftText(
 				&leftText[0],
-				m_PosX - (m_Width / 2.1f),
-				m_DrawBaseY + (0.03f / 2.f) - (GetTextHeight(Font::ChaletLondon, 0.28f) / 1.5f),
-				0.28f, Font::ChaletLondon,
-				{ 255, 255, 255, 255 },
+				m_PosX - (m_Width / m_OptionPadding) - 0.002f,
+				m_DrawBaseY + (0.03f / 2.f) - (GetTextHeight(Font::ChaletLondon, 0.25f) / 1.5f),
+				0.25f, Font::ChaletLondon,
+				m_SubheaderText,
 				false, true);
 			DrawRightText(
 				&rightText[0],
 				m_PosX + (m_Width / 2.1f),
-				m_DrawBaseY + (0.03f / 2.f) - (GetTextHeight(Font::ChaletLondon, 0.28f) / 1.5f),
-				0.28f, Font::ChaletLondon,
-				{ 255, 255, 255, 255 },
+				m_DrawBaseY + (0.03f / 2.f) - (GetTextHeight(Font::ChaletLondon, 0.25f) / 1.5f),
+				0.25f, Font::ChaletLondon,
+				m_SubheaderTextRight,
 				false, true);
+
+			GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (0.0005f / 2.0f) + 0.031, m_Width, 0.0018f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
 
 
 
@@ -561,6 +563,17 @@ namespace Saint::UserInterface
 
 
 
+	}
+	void drawSprite(const char* dict, const char* texture, float x, float y, float width, float height, Color color, float rotation)
+	{
+		if (GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(dict))
+		{
+			GRAPHICS::DRAW_SPRITE(dict, texture, x, y, width, height, rotation, color.r, color.g, color.b, color.a, 0, -1);
+		}
+		else
+		{
+			GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(dict, false);
+		}
 	}
 	void UIManager::DrawOption(AbstractOption* opt, bool selected)
 	{
@@ -588,7 +601,7 @@ namespace Saint::UserInterface
 			
 			DrawLeftText(
 				opt->GetLeftText(),
-				m_PosX - (m_Width / m_OptionPadding),
+				m_PosX - (m_Width / m_OptionPadding) - 0.002f,
 				m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
 				m_OptionTextSize,
 				m_OptionFont,
@@ -599,7 +612,7 @@ namespace Saint::UserInterface
 		else {
 			DrawLeftText(
 				opt->GetLeftText(),
-				m_PosX - (m_Width / m_OptionPadding),
+				m_PosX - (m_Width / m_OptionPadding) - 0.002f,
 				m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
 				m_OptionTextSize,
 				m_OptionFont,
@@ -789,6 +802,22 @@ namespace Saint::UserInterface
 						, res2.x, res2.y, 0.0, m_ToggleCheckColor.r, m_ToggleCheckColor.g, m_ToggleCheckColor.b, m_ToggleCheckColor.a, false, false);
 				}
 			}
+			else if (ToggleIterator == 3) {
+				if (ToggledOn)
+				{
+					drawSprite("commonmenu", "shop_tick_icon", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), 0.36f * 0.036, 0.35f * 0.070f, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 5.0f);
+
+				}
+				else if (!ToggledOn)
+				{
+					
+					
+					drawSprite("shared", "menuplus_32", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), 0.023f - 0.001f, 0.038 - 0.001f, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 45.000);
+					
+					
+				}
+				
+			}
 		}
 		if (opt->GetFlag(OptionFlag::BoolWithNumber) || opt->GetFlag(OptionFlag::ChooseBool))
 		{
@@ -832,6 +861,22 @@ namespace Saint::UserInterface
 							, g_Render->m_OptionTextSize) / 1.5f) + 0.014f
 						, res2.x, res2.y, 0.0, m_ToggleCheckColor.r, m_ToggleCheckColor.g, m_ToggleCheckColor.b, m_ToggleCheckColor.a, false, false);
 				}
+			}
+			else if (ToggleIterator == 3) {
+				if (ToggledOn)
+				{
+					drawSprite("commonmenu", "shop_tick_icon", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), 0.36f * 0.036, 0.35f * 0.070f, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 5.0f);
+
+				}
+				else if (!ToggledOn)
+				{
+
+
+					drawSprite("shared", "menuplus_32", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), 0.023f - 0.001f, 0.038 - 0.001f, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 45.000);
+
+
+				}
+
 			}
 		}
 		if (opt->GetFlag(OptionFlag::Enterable))
@@ -999,7 +1044,7 @@ namespace Saint::UserInterface
 					m_FooterTextColor,
 					false, true);
 			}
-
+			GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (0.001f / 2.0f), m_Width, 0.0018f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
 			m_DrawBaseY += m_FooterHeight;
 		}
 	}
@@ -1027,7 +1072,7 @@ namespace Saint::UserInterface
 
 
 		GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (m_DescriptionHeight / 2.f), m_Width, m_DescriptionHeight, m_OptionUnselectedBackgroundColor.r, m_OptionUnselectedBackgroundColor.g, m_OptionUnselectedBackgroundColor.b, m_OptionUnselectedBackgroundColor.a, 0);
-		GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (m_DescriptionHeight / 2.f) - 0.029, m_Width, 0.003f, m_DescriptionBackgroundColor.r, m_DescriptionBackgroundColor.g, m_DescriptionBackgroundColor.b, m_DescriptionBackgroundColor.a, 0);
+		GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (m_DescriptionHeight / 2.f) - 0.029, m_Width, 0.003f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
 		HUD::SET_TEXT_WRAP(m_PosX, m_PosX + m_Width / 2);
 		DrawLeftText(
 			description,

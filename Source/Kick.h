@@ -7,9 +7,9 @@ namespace Saint {
 	class Kicks {
 	public:
 
-		const char* Menu[2]
+		const char* Menu[3]
 		{
-			"Kiddions", "Rebound"
+			"Kiddions", "Rebound", "All"
 		};
 
 		std::size_t Menu_Data = 0;
@@ -65,6 +65,26 @@ namespace Saint {
 			spawn_for_ped2(0x6838FC1D, &crash);
 
 		}
+		Network* get_network()
+		{
+			return *g_GameFunctions->m_network;
+		}
+		rage::rlGamerInfo* get_net_data() const
+		{
+			return g_GameVariables->m_net_game_player(g_SelectedPlayer) == nullptr ? nullptr : g_GameVariables->m_net_game_player(g_SelectedPlayer)->get_net_data();
+		}
+		rage::snPeer* get_session_peer()
+		{
+			for (std::uint32_t i = 0; i < get_network()->m_game_session_ptr->m_peer_count; i++)
+			{
+				if (get_network()->m_game_session_ptr->m_peers[i]->m_peer_data.m_gamer_handle.m_rockstar_id == get_net_data()->m_gamer_handle.m_rockstar_id)
+				{
+					return get_network()->m_game_session_ptr->m_peers[i];
+				}
+			}
+
+			return nullptr;
+		}
 		void remove() {
 			if (Menu_Data == 0) {
 				const size_t arg_count = 15;
@@ -94,6 +114,10 @@ namespace Saint {
 					});
 
 				m_queue.add(18s, "Removing player..", [] {});
+			}
+			if (Menu_Data == 2) {
+
+				
 			}
 		}
 	};

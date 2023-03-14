@@ -247,7 +247,7 @@ namespace Saint {
 		bool enabled = false;
 		bool smooth = false;
 		bool onlyOnGround = false;
-		const char* Boost_Type[2] = { "Boost", "Jump" };
+		const char* Boost_Type[2] = { "Forward", "Jump" };
 		std::size_t Boost_Int = 0;
 		int speed = 0;
 		float boost_power = 1.0f;
@@ -4711,7 +4711,12 @@ namespace Saint {
 		float widthm = 1.0f;
 		float heightm = 1.0f;
 		void init() {
-			
+			if (width) {
+				Memory::set_value<float>({ 0x08, 0x0064 }, widthm);
+			}
+			if (height) {
+				Memory::set_value<float>({ 0x08, 0x88 }, heightm);
+			}
 		}
 	};
 	inline GetModelInfo get_model_info;
@@ -5025,6 +5030,8 @@ namespace Saint {
 				Ped playerPed = PLAYER::PLAYER_PED_ID();
 				NativeVector3 pos = ENTITY::GET_ENTITY_COORDS(playerPed, 0);
 				const char* cages[47] = { "bkr_prop_cashtrolley_01a", "p_cablecar_s_door_r", "p_cablecar_s_door_l", "p_cablecar_s_door_l" ,"p_cablecar_s", "prop_rub_cage01a", "prop_gold_cont_01", "prop_gold_cont_01b", "prop_dog_cage_01", "prop_dog_cage_02", "stt_prop_stunt_tube_l", "stt_prop_stunt_tube_crn2", "stt_prop_stunt_tube_crn", "stt_prop_stunt_tube_crn2", "stt_prop_stunt_tube_crn_15d", "stt_prop_stunt_tube_crn_30d", "stt_prop_stunt_tube_crn_5d", "stt_prop_stunt_tube_cross", "stt_prop_stunt_tube_end", "stt_prop_stunt_tube_xs", "stt_prop_stunt_tube_xxs", "stt_prop_stunt_tube_speeda", "stt_prop_stunt_tube_qg", "stt_prop_stunt_tube_s", "stt_prop_stunt_tube_m", "stt_prop_stunt_tube_l", "stt_prop_stunt_tube_jmp2", "stt_prop_stunt_tube_jmp", "stt_prop_stunt_tube_hg", "stt_prop_stunt_tube_gap_03", "stt_prop_stunt_tube_gap_02", "stt_prop_stunt_tube_gap_01", "stt_prop_stunt_tube_fork", "stt_prop_stunt_tube_fn_05", "stt_prop_stunt_tube_fn_04", "stt_prop_stunt_tube_fn_03", "stt_prop_stunt_tube_fn_02", "stt_prop_stunt_tube_fn_01", "stt_prop_stunt_tube_ent", "bkr_prop_biker_tube_gap_02", "bkr_prop_biker_tube_gap_01", "bkr_prop_biker_tube_xs", "bkr_prop_biker_tube_s", "bkr_prop_biker_tube_m", "bkr_prop_biker_tube_l", "bkr_prop_biker_tube_gap_03", "prop_fnclink_05crnr1" };
+				const char* cage_name[47] = { "Trolly", "Cablecar Door", "Cablecar Door 2", "Cablecar Door 3" ,"Cablecar", "Stunt Tube", "Normal", "Normal 2", "Dog Cage", "Dog Cage 2", "Stunt Tube (L)", "Stunt Tube (Crn)", "Stunt Tube (Crn 2)", "Stunt Tube (Crn 3)", "Stunt Tube (15D)", "Stunt Tube (30D)", "Stunt Tube (5D)", "Stunt Tube (Cross)", "Stunt Tube (End)", "Stunt Tube (XS)", "Stunt Tube (XXS)", "Stunt Tube (Speed)", "Stunt Tube (qg)", "Stunt Tube (S)", "Stunt Tube (M)", "Stunt Tube (L)", "Stunt Tube (Jump)", "Stunt Tube (Jump 2)", "Stunt Tube (HG)", "Stunt Tube (Gap)", "Stunt Tube (Gap 2)", "Stunt Tube (Gap 3)", "Stunt Tube (Fork)", "Stunt Tube (FN5)", "Stunt Tube (FN4)", "Stunt Tube (FN3)", "Stunt Tube (FN2)", "Stunt Tube (FN1)", "Stunt Tube (Ent)", "Stunt Tube (Gap 4)", "Stunt Tube (Gap 5)", "Stunt Tube (Biker XS)", "Stunt Tube (Biker S)", "Stunt Tube (Biker M)", "Stunt Tube (Biker L)", "Stunt Tube (Gap 6)", "Stunt Tube (Clink)" };
+
 				for (int i = 0; i < 47; i++)
 				{
 					Object cage = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(pos.x, pos.y, pos.z, 15.0f, MISC::GET_HASH_KEY(cages[i]), 0, 0, 1);
@@ -5040,6 +5047,7 @@ namespace Saint {
 							control(cage);
 							ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&cage);
 							ENTITY::DELETE_ENTITY(&cage);
+							Noti::InsertNotification({ ImGuiToastType_None, 2000, "Deleted cage, type: '%s'", cage_name[i]});
 							MISC::CLEAR_AREA(objcoords.x, objcoords.y, objcoords.z, 15.0f, 0, 0, 0, 0);
 						}
 					}
