@@ -13,6 +13,7 @@
 #include "Script.h"
 #include "Render.h"
 #include "Discord/DiscordHandler.hpp"
+#define MENU_VERSION "1.12.1"
 BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 {
 	using namespace Saint;
@@ -22,7 +23,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 		CreateThread(nullptr, 0, [](LPVOID) -> DWORD
 		{
 			g_Logger = std::make_unique<Logger>();
-			g_Logger->Info("Saint Version V2.5.");
+			g_Logger->Info("Saint Version 1.12.1");
 			g_Logger->Info("This build was compiled at " __DATE__ ", " __TIME__ ".");
 
 			g_FiberPool.registerFbrPool();
@@ -35,58 +36,8 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 			g_GameVariables = std::make_unique<GameVariables>();
 
 			//Game Functions
-			if (*g_GameFunctions->m_WndProc)
-			{
-				g_Logger->Debug("Scanned WndProc.");
-			}
-			if (*g_GameFunctions->m_GetLabelText)
-			{
-				g_Logger->Debug("Scanned Label Text.");
-			}
-			if (*g_GameFunctions->m_GetNativeHandler)
-			{
-				g_Logger->Debug("Scanned Native Handler.");
-			}
-			if (*g_GameFunctions->m_FixVectors)
-			{
-				g_Logger->Debug("Scanned Fix Vectors.");
-			}
-			g_Logger->Debug("Game Functions Finished Scanning.");
-			//patek learning how to do github fr no cap on god 100% luna better than ozark paragon exit scam nigger menu
-			//Game Variables
-			if (*g_GameVariables->m_GameState)
-			{
-				g_Logger->Debug("Scanned Game State.");
-			}
-			if (*g_GameVariables->m_FrameCount)
-			{
-				g_Logger->Debug("Scanned Frame Count.");
-			}
-			if (g_GameVariables->m_Swapchain)
-			{
-				g_Logger->Debug("Scanned Swapchain.");
-			}
-			if (g_GameVariables->m_ScriptProgramTable)
-			{
-				g_Logger->Debug("Scanned Script Program Table.");
-			}
-			if (g_GameVariables->m_NativeRegistrations)
-			{
-				g_Logger->Debug("Scanned Native Registrations.");
-			}
-			if (g_GameVariables->m_NativeReturnAddress)
-			{
-				g_Logger->Debug("Scanned Native Return Address.");
-			}
-			if (g_GameVariables->m_GlobalBase)
-			{
-				g_Logger->Debug("Scanned Global Base.");
-			}
-			if (g_GameVariables->m_ModelSpawnBypass)
-			{
-				g_Logger->Debug("Scanned Model Spawn Bypass.");
-			}
-			g_Logger->Debug("Game Variables Finished Scanning.");
+			
+			
 
 			// Wait for the game to load
 			while (*g_GameVariables->m_GameState != 0)
@@ -120,9 +71,6 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 			g_Hooking->Hook();
 			auto g_NativeHook = std::make_unique<NativeHooks>();
 			g_Discord->Init();
-
-			g_Logger->Info("Game Version %s", g_GameVariables->m_GameBuild);
-			g_Logger->Info("Finished Injecting Have A Fun Time!");
 			g_Render->m_HeaderBackgroundColor = { 108, 60, 175, 255 };
 
 			//Footer

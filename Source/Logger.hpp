@@ -2,6 +2,12 @@
 
 namespace Saint
 {
+	enum LogFlag {
+		Info,
+		Success,
+		Error,
+		Warning,
+	};
 	class Logger
 	{
 	public:
@@ -21,6 +27,8 @@ namespace Saint
 		void Info(const char* format, ...);
 		void Theme(const char* format, ...);
 		void Debug(const char* format, ...);
+
+		void Push(LogFlag flag, const char* format, ...);
 
 
 		/**

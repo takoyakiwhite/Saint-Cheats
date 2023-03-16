@@ -228,7 +228,7 @@ namespace Saint::UserInterface
 	void UIManager::CheckForInput()
 	{
 		ResetInput();
-		m_OpenKeyPressed = IsKeyPressed(VK_F4);
+		m_OpenKeyPressed = IsKeyPressed(open_key);
 		m_OpenKeyPressed2 = IsKeyPressed(VK_INSERT);
 		m_BackKeyPressed = IsKeyPressed(VK_BACK);
 		m_EnterKeyPressed = IsKeyPressed(VK_RETURN);
@@ -319,10 +319,8 @@ namespace Saint::UserInterface
 				PAD::DISABLE_CONTROL_ACTION(2, 0, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 19, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 140, true);
-				//CONTROLS::DISABLE_CONTROL_ACTION(2, INPUT_MELEE_ATTACK_HEAVY, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 20, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 27, true);
-				//CONTROLS::DISABLE_CONTROL_ACTION(2, INPUT_MELEE_ATTACK_ALTERNATE, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 80, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 337, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 27, true);
@@ -1192,5 +1190,9 @@ namespace Saint::UserInterface
 		GetCursorPos(&point);
 
 		return Vector2{ static_cast<float>(point.x), static_cast<float>(point.y) };
+	}
+	void UIManager::SetMousePos(int x, int y)
+	{
+		SetCursorPos(x, y);
 	}
 }

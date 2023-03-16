@@ -44,7 +44,7 @@
       <Filter>Hooking</Filter>
     </ClInclude>
     <ClInclude Include="Signatures.hpp">
-      <Filter>Memory\Signatures</Filter>
+      <Filter>Interface\Memory\Signatures</Filter>
     </ClInclude>
     <ClInclude Include="FiberHelper.hpp">
       <Filter>Fiber</Filter>
@@ -122,19 +122,19 @@
       <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="Memory.hpp">
-      <Filter>Memory</Filter>
+      <Filter>Interface\Memory</Filter>
     </ClInclude>
     <ClInclude Include="Script.hpp">
-      <Filter>Memory\Script</Filter>
+      <Filter>Interface\Memory\Script</Filter>
     </ClInclude>
     <ClInclude Include="ScriptCallback.hpp">
-      <Filter>Memory\Script\Callback</Filter>
+      <Filter>Interface\Memory\Script\Callback</Filter>
     </ClInclude>
     <ClInclude Include="ScriptManager.hpp">
-      <Filter>Memory\Script\Manager</Filter>
+      <Filter>Interface\Memory\Script\Manager</Filter>
     </ClInclude>
     <ClInclude Include="ScriptGlobal.hpp">
-      <Filter>Memory\Script\Global</Filter>
+      <Filter>Interface\Memory\Script\Global</Filter>
     </ClInclude>
     <ClInclude Include="Natives.hpp">
       <Filter>Natives</Filter>
@@ -233,10 +233,10 @@
       <Filter>Hooking</Filter>
     </ClInclude>
     <ClInclude Include="hex_memory.h">
-      <Filter>Memory</Filter>
+      <Filter>Interface\Memory</Filter>
     </ClInclude>
     <ClInclude Include="MemoryEdit.h">
-      <Filter>Memory</Filter>
+      <Filter>Interface\Memory</Filter>
     </ClInclude>
     <ClInclude Include="ClassHelper.h">
       <Filter>Hooking\ClassHelper</Filter>
@@ -289,7 +289,7 @@
       <Filter>Hooking</Filter>
     </ClCompile>
     <ClCompile Include="Signatures.cpp">
-      <Filter>Memory\Signatures</Filter>
+      <Filter>Interface\Memory\Signatures</Filter>
     </ClCompile>
     <ClCompile Include="Invoker.cpp">
       <Filter>Utility\Invoker</Filter>
@@ -307,17 +307,17 @@
       <Filter>Hooking\Native Hooking</Filter>
     </ClCompile>
     <ClCompile Include="ScriptCallback.cpp">
-      <Filter>Memory\Script\Callback</Filter>
+      <Filter>Interface\Memory\Script\Callback</Filter>
     </ClCompile>
     <ClCompile Include="ScriptManager.cpp">
-      <Filter>Memory\Script\Manager</Filter>
+      <Filter>Interface\Memory\Script\Manager</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Script.cpp">
       <Filter>Core\Script</Filter>
     </ClCompile>
     <ClCompile Include="ScriptGlobal.cpp">
-      <Filter>Memory\Script\Global</Filter>
+      <Filter>Interface\Memory\Script\Global</Filter>
     </ClCompile>
     <ClCompile Include="Render.cpp">
       <Filter>Core\Notifications</Filter>
@@ -326,7 +326,7 @@
       <Filter>Discord</Filter>
     </ClCompile>
     <ClCompile Include="hex_memory.cpp">
-      <Filter>Memory</Filter>
+      <Filter>Interface\Memory</Filter>
     </ClCompile>
     <ClCompile Include="ClassHelper.cpp">
       <Filter>Hooking\ClassHelper</Filter>
@@ -354,23 +354,8 @@
     <Filter Include="Utility">
       <UniqueIdentifier>{67b873d4-c87a-4fe3-8af6-04eda1c4368f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Memory">
-      <UniqueIdentifier>{83dbf882-eb72-4bca-bd52-307d3fd04d29}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Utility\Invoker">
       <UniqueIdentifier>{aba1df7f-1f4b-4aa0-bd68-a6c011b51606}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Memory\Script">
-      <UniqueIdentifier>{5b3703cc-0f04-4b4e-930e-b00dd3726138}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Memory\Script\Callback">
-      <UniqueIdentifier>{fab63c25-6919-4196-bac6-97d941fd1310}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Memory\Script\Manager">
-      <UniqueIdentifier>{ebfd8be3-ad18-4d71-ac52-4e6e1b2a4564}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Memory\Script\Global">
-      <UniqueIdentifier>{29d7e79d-e5ff-49c9-8449-a8d4b4f669b4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Interface">
       <UniqueIdentifier>{77afe01f-1408-49bd-a88b-21e856118c7f}</UniqueIdentifier>
@@ -380,9 +365,6 @@
     </Filter>
     <Filter Include="Natives\CrossMap">
       <UniqueIdentifier>{12d1c62e-b9ef-4e16-8bce-0ef2f035cc66}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Memory\Signatures">
-      <UniqueIdentifier>{2acff691-fff2-476d-93f2-c0f08715c478}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utility\Common">
       <UniqueIdentifier>{61e19d42-51da-492b-904c-436ef713a743}</UniqueIdentifier>
@@ -452,6 +434,24 @@
     </Filter>
     <Filter Include="Hooking\ClassHelper">
       <UniqueIdentifier>{1555835b-d2e1-40a5-b5ec-45d35b4f0f1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Memory">
+      <UniqueIdentifier>{83dbf882-eb72-4bca-bd52-307d3fd04d29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Memory\Script">
+      <UniqueIdentifier>{5b3703cc-0f04-4b4e-930e-b00dd3726138}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Memory\Script\Callback">
+      <UniqueIdentifier>{fab63c25-6919-4196-bac6-97d941fd1310}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Memory\Script\Manager">
+      <UniqueIdentifier>{ebfd8be3-ad18-4d71-ac52-4e6e1b2a4564}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Memory\Script\Global">
+      <UniqueIdentifier>{29d7e79d-e5ff-49c9-8449-a8d4b4f669b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Memory\Signatures">
+      <UniqueIdentifier>{2acff691-fff2-476d-93f2-c0f08715c478}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

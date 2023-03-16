@@ -44,7 +44,7 @@ namespace Saint::UserInterface
 		Static = 0,
 		YTD = 1
 	};
-
+	
 	struct Rectangle
 	{
 		Vector2 m_Center;
@@ -136,9 +136,8 @@ namespace Saint::UserInterface
 		std::int32_t m_VerticalDelay = 120;
 		std::int32_t m_HorizontalDelay = 120;
 
-
-
-		//ToolTip
+		int open_key = 0x73;
+		//ToolTi
 		void RenderToolTip();
 		RGBA m_ToolTipColor = RGBA{ 255, 255, 255, 255 };
 		Font m_ToolTipFont = Font::ChaletLondon;
@@ -287,7 +286,8 @@ namespace Saint::UserInterface
 		void DrawRect(float x, float y, float width, float height, Color color);
 		void DrawRightText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow);
 		float m_DrawBaseY{};
-		
+		Vector2 GetMousePos();
+		void SetMousePos(int x, int y);
 
 		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
 	private:
@@ -323,7 +323,7 @@ namespace Saint::UserInterface
 
 		bool IsMouseLocked();
 		Rectangle GetMenuRect();
-		Vector2 GetMousePos();
+		
 
 		std::vector<std::unique_ptr<AbstractSubmenu>> m_AllSubmenus;
 

@@ -34,6 +34,8 @@ namespace Saint
 		FreeConsole();
 	}
 
+	
+
 	void Logger::Info(const char* format, ...)
 	{
 		std::va_list args{};
@@ -66,6 +68,29 @@ namespace Saint
 		std::va_list args{};
 		va_start(args, format);
 		Log("Error", format, args);
+		va_end(args);
+		g_Running = false;
+	}
+
+	void Logger::Push(LogFlag flag, const char* format, ...)
+	{
+		switch (flag) {
+		case LogFlag::Warning:
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+			break;
+		case LogFlag::Info:
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+			break;
+		case LogFlag::Error:
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+			break;
+		case LogFlag::Success:
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
+			break;
+		}
+		std::va_list args{};
+		va_start(args, format);
+		Log("Log", format, args);
 		va_end(args);
 		g_Running = false;
 	}

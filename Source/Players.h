@@ -309,9 +309,6 @@ namespace Saint {
 			g_Render->DrawRect(PosX, PosY + 0.28, 0.25f, 0.125, m_InfoBG);//draw geo info rect
 			g_Render->DrawRect(PosX, PosY + 0.31 - 0.09375, 0.25f, 0.002f, g_Render->m_HeaderBackgroundColor);//draw geo info top bar 
 
-			script_global gpbd_fm_1(1853910);
-			auto& stats = gpbd_fm_1.as<GPBD_FM*>()->Entries[all_players.get_id(player)].PlayerStats;
-
 			Ped ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player);
 			//std::string Health = ("%s", std::to_string(GetHealth(ped)));
 			//std::string Armor = ("%s", std::to_string(GetArmor(ped, player)));
@@ -336,13 +333,7 @@ namespace Saint {
 			std::string Speed = std::to_string(GetSpeed(ped));
 			std::string passive = PLAYER::IS_PLAYER_BATTLE_AWARE(ped) ? "Yes" : "No";
 			std::string rockstar = NETWORK::NETWORK_PLAYER_IS_ROCKSTAR_DEV(ped) ? "Yes" : "No";
-			std::string public_ip = std::format("{0}.{1}.{2}.{3}", get_ip_address(player).m_field1, get_ip_address(player).m_field2, get_ip_address(player).m_field3, get_ip_address(player).m_field4);
-			std::string local_ip = std::format("{0}.{1}.{2}.{3}", 1, 2, 3, 4);
 
-			std::string total_money = std::format("{}", stats.Money);
-			std::string favorite_vehicle = std::format("{}", stats.FavoriteVehicle);
-			std::string rank = std::format("{}", stats.Rank);
-			
 			const char* playerstate2 = "None / If you see this, buy a lottery ticket!";
 			const char* parachutestate2 = "None";
 			Ped playerPed = ped;
@@ -363,7 +354,7 @@ namespace Saint {
 			{
 				parachutestate2 = "Falling To Death";
 			}
-			
+
 
 			if (PED::IS_PED_RAGDOLL(playerPed))
 			{
@@ -466,66 +457,12 @@ namespace Saint {
 			Text("Speed", { m_white }, { SeperatorX - 0.048f, TextY + 0.26f }, { 0.23f, 0.23f }, false);
 			g_Render->DrawRightText(Speed.c_str(), RTextX2, TextY + 0.26f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			Text("Public Ip", { m_white }, { LTextX, TextY + 0.285f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Currently Being Fixed.", SeperatorX - 0.0523f, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.295f, 0.001f, 0.015f, m_white);
-			Text("Money", { m_white }, { SeperatorX - 0.048f, TextY + 0.285f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(total_money.c_str(), RTextX2, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			Text("Rank", { m_white }, { LTextX, TextY + 0.31f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(std::to_string(stats.Rank).c_str(), SeperatorX - 0.0523f, TextY + 0.31f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.32f, 0.001f, 0.015f, m_white);
-			Text("Favorite Vehicle", { m_white }, { SeperatorX - 0.048f, TextY + 0.31f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(stats.FavoriteVehicle)), RTextX2, TextY + 0.31f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("RP", { m_white }, { LTextX, TextY + 0.335f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(std::to_string(stats.GlobalRP).c_str(), SeperatorX - 0.0523f, TextY + 0.335f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.345f, 0.001f, 0.015f, m_white);
-			Text("Script Host", { m_white }, { SeperatorX - 0.048f, TextY + 0.335f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", RTextX2, TextY + 0.335f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("Peer", { m_white }, { LTextX, TextY + 0.36f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", SeperatorX - 0.0523f, TextY + 0.36f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.37f, 0.001f, 0.015f, m_white);
-			Text("Token", { m_white }, { SeperatorX - 0.048f, TextY + 0.36f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", RTextX2, TextY + 0.36f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			Text("Scid", { m_white }, { LTextX, TextY + 0.385f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", SeperatorX - 0.0523f, TextY + 0.385f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			
-
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.395f, 0.001f, 0.015f, m_white);
-			Text("Slot", { m_white }, { SeperatorX - 0.048f, TextY + 0.385f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", RTextX2, TextY + 0.385f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-
-			Text("Passive", { m_white }, { LTextX, TextY + 0.41f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(passive.c_str(), SeperatorX - 0.0523f, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.42f, 0.001f, 0.015f, m_white);
-			Text("Rockstar", { m_white }, { SeperatorX - 0.048f, TextY + 0.41f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(rockstar.c_str(), RTextX2, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("Zip", { m_white }, { LTextX, TextY + 0.445f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", SeperatorX - 0.0523f, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.455f, 0.001f, 0.015f, m_white);
-			Text("Region", { m_white }, { SeperatorX - 0.048f, TextY + 0.445f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", RTextX2, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("City", { m_white }, { LTextX, TextY + 0.47f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", SeperatorX - 0.0523f, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.48f, 0.001f, 0.015f, m_white);
-			Text("Country", { m_white }, { SeperatorX - 0.048f, TextY + 0.47f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", RTextX2, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("Timezone", { m_white }, { LTextX, TextY + 0.495f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", RTextX2, TextY + 0.495f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("Isp", { m_white }, { LTextX, TextY + 0.52f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", RTextX2, TextY + 0.52f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("Org", { m_white }, { LTextX, TextY + 0.545f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", RTextX2, TextY + 0.545f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			Text("Passive", { m_white }, { LTextX, TextY + 0.44f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(passive.c_str(), SeperatorX - 0.0523f, TextY + 0.44f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.45f, 0.001f, 0.015f, m_white);
+			Text("Rockstar", { m_white }, { SeperatorX - 0.048f, TextY + 0.44f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(rockstar.c_str(), RTextX2, TextY + 0.44f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 
 
@@ -555,9 +492,9 @@ namespace Saint {
 					}
 				}
 			}
-			
-			
-			
+
+
+
 
 		}
 	};

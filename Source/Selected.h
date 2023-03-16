@@ -180,8 +180,7 @@ namespace Saint {
         }
 		void init() {
             if (freeze) {
-                CPed* ped = all_players.get_player_info(g_SelectedPlayer)->m_ped;
-                g_GameFunctions->m_clear_ped_tasks_network(ped, true);
+                g_GameFunctions->m_clear_ped_tasks_network(all_players.get_ped(g_SelectedPlayer), true);
             }
             explosiveAmmo.init();
 			flash_blip.init();
