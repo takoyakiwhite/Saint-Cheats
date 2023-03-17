@@ -33,6 +33,7 @@
 #include "hex_memory.h"
 namespace Saint
 {
+
 	enum Submenu : std::uint32_t
 	{
 		SubmenuCustomFlags,
@@ -382,20 +383,20 @@ namespace Saint
 
 			}
 			});
-		sub->draw_option<toggle<bool>>(("Never Wanted"), nullptr, &neverWantedBool, BoolDisplay::OnOff, false, [] {
+		sub->draw_option<toggle<bool>>(("Never Wanted"), "Disables the wanted level system.", &neverWantedBool, BoolDisplay::OnOff, false, [] {
 			if (!neverWantedBool) {
 				PLAYER::SET_MAX_WANTED_LEVEL(5);
 			}
 			});
-		sub->draw_option<toggle<bool>>(("Auto Parachute"), "Automaticly pulls you're parachite", &features.auto_parachute, BoolDisplay::OnOff);
-		sub->draw_option<toggle<bool>>(("Seatbelt"), nullptr, &features.seatbelt, BoolDisplay::OnOff, false, [] {
+		sub->draw_option<toggle<bool>>(("Auto Parachute"), "Automaticly pulls you're parachute.", &features.auto_parachute, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>(("Seatbelt"), "Click you're seatbelt so you don't fly out of the vehicle.", &features.seatbelt, BoolDisplay::OnOff, false, [] {
 			if (!features.seatbelt) {
 				PED::SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(PLAYER::PLAYER_PED_ID(), false);
 				PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 32, true);
 			}
 			});
-		sub->draw_option<toggle<bool>>(("Explosive Melee"), nullptr, &m_frame_flags.m_explosive_melee, BoolDisplay::OnOff);
-		sub->draw_option<toggle<bool>>(("No Ragdoll"), nullptr, &features.no_ragdoll, BoolDisplay::OnOff, false, [] {
+		sub->draw_option<toggle<bool>>(("Explosive Melee"), "Allows you have the ability from director mode.", &m_frame_flags.m_explosive_melee, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>(("No Ragdoll"), "Disables ragdolls.", &features.no_ragdoll, BoolDisplay::OnOff, false, [] {
 			if (!features.no_ragdoll)
 			{
 				PED::SET_PED_RAGDOLL_ON_COLLISION(PLAYER::PLAYER_PED_ID(), true);
@@ -403,40 +404,40 @@ namespace Saint
 				PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(PLAYER::PLAYER_PED_ID(), true);
 			}
 			});
-		sub->draw_option<toggle<bool>>(("Pickup Entities"), nullptr, &features.pickup_mode, BoolDisplay::OnOff);
-		sub->draw_option<toggle<bool>>(("Auto Clean"), nullptr, &features.autoclean, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>(("Pickup Entities"), "Allows you to pickup & throw entities and players.", &features.pickup_mode, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>(("Auto Clean"), "Automaticly cleans you're ped from visual damage.", &features.autoclean, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Swim Anywhere"), nullptr, &features.swim_anywhere, BoolDisplay::OnOff, false, [] {
 			if (!features.swim_anywhere)
 			{
 				PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 65, false);
 			}
 			});
-		sub->draw_option<toggle<bool>>(("Tiny Ped"), "We can turn into ron height", &features.tiny_ped, BoolDisplay::OnOff, false, [] {
+		sub->draw_option<toggle<bool>>(("Tiny Ped"), "Shrinks you're ped.", &features.tiny_ped, BoolDisplay::OnOff, false, [] {
 			if (!features.tiny_ped)
 			{
 				PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 223, false);
 			}
 			});
-		sub->draw_option<toggle<bool>>(("Unlimited Special Ability"), nullptr, &features.unlim, BoolDisplay::OnOff);
-		sub->draw_option<toggle<bool>>(("Attack Friendly"), nullptr, &features.attack_friendly, BoolDisplay::OnOff, false, [] {
+		sub->draw_option<toggle<bool>>(("Unlimited Special Ability"), "Automaticly refills your special ability bar.", &features.unlim, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>(("Attack Friendly"), "Allows you to shoot teammates.", &features.attack_friendly, BoolDisplay::OnOff, false, [] {
 			if (!features.attack_friendly)
 			{
 				PED::SET_CAN_ATTACK_FRIENDLY(PLAYER::PLAYER_PED_ID(), false, true);
 			}
 			});
-		sub->draw_option<toggle<bool>>(("Reduced Collision"), nullptr, &features.reduced, BoolDisplay::OnOff, false, [] {
+		sub->draw_option<toggle<bool>>(("Reduced Collision"), "Allows you to walk through walls and such.", &features.reduced, BoolDisplay::OnOff, false, [] {
 			if (!features.reduced)
 			{
 				PED::SET_PED_CAPSULE(PLAYER::PLAYER_PED_ID(), false);
 			}
 			});
-		sub->draw_option<toggle<bool>>(("Bound Ankles"), nullptr, &features.bound_ankles, BoolDisplay::OnOff, false, [] {
+		sub->draw_option<toggle<bool>>(("Bound Ankles"), "Makes it so when you ragdoll, You cannot get up.", &features.bound_ankles, BoolDisplay::OnOff, false, [] {
 			if (!features.bound_ankles)
 			{
 				PED::SET_ENABLE_BOUND_ANKLES(PLAYER::PLAYER_PED_ID(), false);
 			}
 			});
-		sub->draw_option<toggle<bool>>(("Ignored By Peds"), nullptr, &features.ignored, BoolDisplay::OnOff, false, [] {
+		sub->draw_option<toggle<bool>>(("Ignored By Peds"), "Makes pedestrains around you ignore your actions.", &features.ignored, BoolDisplay::OnOff, false, [] {
 			if (!features.ignored)
 			{
 				PLAYER::SET_POLICE_IGNORE_PLAYER(PLAYER::PLAYER_ID(), false);
@@ -446,7 +447,7 @@ namespace Saint
 
 			}
 			});
-		sub->draw_option<toggle<bool>>(("Drugs"), nullptr, &features.drugs, BoolDisplay::OnOff, false, [] {
+		sub->draw_option<toggle<bool>>(("Drugs"), "Recreates the micheal strangers & things mission.", &features.drugs, BoolDisplay::OnOff, false, [] {
 			if (!features.drugs)
 			{
 				GRAPHICS::ENABLE_ALIEN_BLOOD_VFX(false);
@@ -456,7 +457,7 @@ namespace Saint
 			}
 			});
 
-		sub->draw_option<toggle<bool>>(("Blink"), nullptr, &blink.enabled, BoolDisplay::OnOff, false, [] {
+		sub->draw_option<toggle<bool>>(("Blink"), "Like a freecam but you teleport to the end, And you can control you're ped.", &blink.enabled, BoolDisplay::OnOff, false, [] {
 			if (!blink.enabled)
 			{
 				NativeVector3 c = CAM::GET_CAM_COORD(blink.freecamCamera);
@@ -470,8 +471,8 @@ namespace Saint
 
 			}
 			});
-		sub->draw_option<toggle<bool>>(("Walk Underwater"), nullptr, &features.walk_underwater, BoolDisplay::OnOff);
-		sub->draw_option<toggle<bool>>(("Push Water Away"), nullptr, &features.push_water_away, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>(("Walk Underwater"), "Disables the swimming animation.", &features.walk_underwater, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>(("Push Water Away"), "Pushes water away from you.", &features.push_water_away, BoolDisplay::OnOff);
 		sub->draw_option<number<std::int32_t>>("Wanted Level", nullptr, &i_hate_niggers, 0, 5, 1, 3, true, "", "", [] {
 			(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_wanted_level = i_hate_niggers;
 			});
@@ -807,10 +808,10 @@ namespace Saint
 			});
 		sub->draw_option<toggle<bool>>(("Keep Engine On"), "Prevents your vehicle's engine from being turned off when exiting.", &features.keep_engine_on, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("No Plane Turbulence"), "Removes your plane's turbulance. When turning off, it can make turbulance levels a little messed up.", &NoPlaneTurbulance, BoolDisplay::OnOff);
-		sub->draw_option<BoolChoose<const char*, std::size_t, bool>>(auto_repair.name, nullptr, &features.auto_repair, &features.auto_repair_type, &features.get_repair_type);
-		sub->draw_option<toggle<bool>>(("Remove Deformation"), nullptr, &features.remove_def, BoolDisplay::OnOff);
-		sub->draw_option<toggle<bool>>(("Stick To Ground"), nullptr, &features.stick_to_ground, BoolDisplay::OnOff);
-		sub->draw_option<toggle<bool>>(("Burned"), nullptr, &features.burned, BoolDisplay::OnOff, false, [] {
+		sub->draw_option<BoolChoose<const char*, std::size_t, bool>>(auto_repair.name, "Automaticly repairs you're vehicle.", &features.auto_repair, &features.auto_repair_type, &features.get_repair_type);
+		sub->draw_option<toggle<bool>>(("Remove Deformation"), "Removes deformation from you're vehicle.", &features.remove_def, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>(("Stick To Ground"), "Creates a weird wheel effect, and makes it so you're vehicle stays on the ground.", &features.stick_to_ground, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>(("Burned"), "Displays you're vehicle as destroyed like you blew it up.", &features.burned, BoolDisplay::OnOff, false, [] {
 			if (!features.burned) {
 				ENTITY::SET_ENTITY_RENDER_SCORCHED(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false);
 			}
@@ -821,7 +822,7 @@ namespace Saint
 				m_vehicle.bypass_max_speed.disable(); //trying something new
 			}
 			});
-		sub->draw_option<toggle<bool>>(("Disable Lock-On"), "Allows you to exceed the maximum speed limit your current vehicle.", &features.disable_lock_on, BoolDisplay::OnOff, false, [] {
+		sub->draw_option<toggle<bool>>(("Disable Lock-On"), "Disables other players & entities from locking on to you're vehicle.", &features.disable_lock_on, BoolDisplay::OnOff, false, [] {
 			if (!features.disable_lock_on) {
 				auto g_local_player = (*g_GameFunctions->m_pedFactory)->m_local_ped;
 				if (g_local_player && g_local_player->m_vehicle)
@@ -875,7 +876,7 @@ namespace Saint
 					});
 		sub->draw_option<toggle<bool>>(("Locally Visible"), nullptr, &features.invisible_carlocal_visible, BoolDisplay::OnOff);
 			});
-		g_Render->draw_submenu<sub>(("Parachte"), SubmenuParachute, [](sub* sub)
+		g_Render->draw_submenu<sub>(("Parachute"), SubmenuParachute, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &features.invisible_carlocal_visible, BoolDisplay::OnOff);
 			});
@@ -4794,7 +4795,35 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Script Events"), SubmenuScriptEvents, [](sub* sub)
 			{
+				sub->draw_option<submenu>("Teleport", nullptr, rage::joaat("ProtectionsTeleport"));
+				sub->draw_option<submenu>("CEO", nullptr, rage::joaat("ProtectionsCEO"));
+				sub->draw_option<submenu>("Text Message", nullptr, rage::joaat("ProtectionsSMS"));
+				sub->draw_option<toggle<bool>>(("Vehicle Kick"), nullptr, &protections.ScriptEvents.vehicle_kick, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Rotate Camera"), nullptr, &protections.ScriptEvents.rotate_cam, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Tutorial"), nullptr, &protections.ScriptEvents.tutorial, BoolDisplay::OnOff);
+
+			});
+		g_Render->draw_submenu<sub>(("Text Message"), rage::joaat("ProtectionsSMS"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Regular"), nullptr, &protections.ScriptEvents.text_messages, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Attachments"), nullptr, &protections.sms_with_attachment, BoolDisplay::OnOff);
+			});
+		g_Render->draw_submenu<sub>(("CEO"), rage::joaat("ProtectionsCEO"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Kick"), nullptr, &protections.ceo_kick, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Ban"), nullptr, &protections.ceo_ban, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Money"), nullptr, &protections.ceo_money, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Raid"), nullptr, &protections.ceo_raid, BoolDisplay::OnOff);
+			});
+		g_Render->draw_submenu<sub>(("Teleport"), rage::joaat("ProtectionsTeleport"), [](sub* sub)
+			{
 				sub->draw_option<toggle<bool>>(("Send To Location"), nullptr, &protections.send_to_location, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Motorcycle Club"), nullptr, &protections.mc_teleport, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Regular"), nullptr, &protections.teleport, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Interior"), nullptr, &protections.Interior, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Cayo Perico"), nullptr, &protections.cayo_perico, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Warehouse"), nullptr, &protections.warehouse, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Mission"), nullptr, &protections.mission, BoolDisplay::OnOff);
 
 			});
 		g_Render->draw_submenu<sub>(("Teleport"), SubmenuTeleport, [](sub* sub)
@@ -4816,7 +4845,71 @@ namespace Saint
 				//sub->draw_option<submenu>("Peds", nullptr, SubmenuPeds);
 				sub->draw_option<submenu>("Weather", nullptr, SubmeuWeather);
 				sub->draw_option<submenu>("Nearby Manager", nullptr, NearbyManager);
+				sub->draw_option<submenu>("Creator", nullptr, rage::joaat("Creator"));
 		
+
+			});
+		g_Render->draw_submenu<sub>(("Creator"), rage::joaat("Creator"), [](sub* sub)
+			{
+				sub->draw_option<submenu>("Object", nullptr, rage::joaat("Objects"));
+				sub->draw_option<toggle<bool>>(("Enabled"), "", &m_creator.enabled, BoolDisplay::OnOff, false, [] {
+					if (!m_creator.enabled)
+					{
+						NativeVector3 c = CAM::GET_CAM_COORD(m_creator.creator_cam);
+						NativeVector3 rot = CAM::GET_CAM_ROT(m_creator.creator_cam, 2);
+						CAM::RENDER_SCRIPT_CAMS(false, true, 700, true, true, true);
+						CAM::SET_CAM_ACTIVE(m_creator.creator_cam, false);
+						CAM::DESTROY_CAM(m_creator.creator_cam, true);
+						PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), true);
+						ENTITY::FREEZE_ENTITY_POSITION(PLAYER::PLAYER_PED_ID(), false);
+
+						
+
+					}
+					});
+				sub->draw_option<toggle<bool>>(("Frozen"), "", &m_creator.frozen, BoolDisplay::OnOff, false, [] {});
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				for (auto& object : m_creator.m_Objects) {
+					sub->draw_option<RegularOption>(object.m_model.c_str(), nullptr, [=]
+						{
+
+							m_creator.m_selected = object.m_model;
+
+
+						});
+
+				}
+				
+					
+
+
+			});
+		g_Render->draw_submenu<sub>(("Object"), rage::joaat("Objects"), [](sub* sub)
+			{
+				
+				sub->draw_option<KeyboardOption>(("Add To List"), nullptr, m_creator.selected_object_name, []
+					{
+						showKeyboard("Enter Something", "", 25, &m_creator.selected_buffer, [] {
+							Hash hash = MISC::GET_HASH_KEY(m_creator.selected_buffer.c_str());
+							if (STREAMING::IS_MODEL_VALID(hash) && !STREAMING::IS_MODEL_A_PED(hash) && !STREAMING::IS_MODEL_A_VEHICLE(hash)) {
+								m_creator.m_Objects.push_back({ m_creator.selected_buffer });
+								
+								m_creator.selected_object_name = "~g~" + m_creator.selected_buffer;
+								
+							}
+							else {
+								
+								m_creator.selected_object_name = "~r~" + m_creator.selected_buffer;
+							}
+						});
+					});
+				sub->draw_option<UnclickOption>(("Delete"), nullptr, [] {});
+				sub->draw_option<RegularOption>("Clear", nullptr, [=]
+						{
+								m_creator.m_Objects.clear();
+						});
+
+				
 
 			});
 		g_Render->draw_submenu<sub>(("Nearby Manager"), NearbyManager, [](sub* sub)
@@ -5049,19 +5142,51 @@ namespace Saint
 		sub->draw_option<ChooseOption<const char*, std::size_t>>(("Submenu Indicators"), nullptr, &g_Render->IndicatorList, &g_Render->IndicatorIterator);
 		
 		sub->draw_option<toggle<bool>>("Log Script Events", nullptr, &g_LogScriptEvents, BoolDisplay::OnOff);
-		sub->draw_option<RegularOption>("Save Theme", "", []
-			{
-				g_ThemeLoading->save();
-			});
-		sub->draw_option<RegularOption>("Load Theme", "", []
-			{
-				g_NotificationManager->add("Test", 2000, 1);
-			});
-
+		
 		sub->draw_option<RegularOption>("Unload", nullptr, []
 			{
 				g_Running = false;
 			});
+			});
+		g_Render->draw_submenu<sub>(("Themes"), SubmenuThemes, [](sub* sub)
+			{
+
+				sub->draw_option<RegularOption>(("Save"), nullptr, [=]
+					{
+						showKeyboard("Enter Something", "", 25, &g_ThemeLoading.buffer, [] {
+							g_ThemeLoading.save(g_ThemeLoading.buffer);
+							});
+
+
+					});
+
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				namespace fs = std::filesystem;
+				fs::directory_iterator dirIt{ "C:\\Saint\\Themes\\" };
+				for (auto&& dirEntry : dirIt)
+				{
+					if (dirEntry.is_regular_file())
+					{
+						auto path = dirEntry.path();
+						if (path.has_filename())
+						{
+							if (path.extension() == ".ini")
+							{
+
+								char nigger[64];
+								sprintf(nigger, "%s", path.stem().u8string().c_str());
+								sub->draw_option<RegularOption>(nigger, nullptr, [=]
+									{
+										g_ThemeLoading.load(nigger);
+									});
+
+							}
+
+						}
+					}
+				}
+
+
 			});
 		g_Render->draw_submenu<sub>(("Positions"), Positions, [](sub* sub)
 			{

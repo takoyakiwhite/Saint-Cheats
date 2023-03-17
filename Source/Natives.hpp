@@ -3611,13 +3611,7 @@ namespace NETWORK
 
 namespace OBJECT
 {
-	static Object CREATE_OBJECT(Hash modelHash, float x, float y, float z, BOOL isNetwork, BOOL bScriptHostObj, BOOL dynamic)
-	{ 
-		*(unsigned short*)Saint::g_GameVariables->m_ModelSpawnBypass = 0x9090;
-		auto temp = Invoke<Object>(0x509D5878EB39E842, modelHash, x, y, z, isNetwork, bScriptHostObj, dynamic); 
-		*(unsigned short*)Saint::g_GameVariables->m_ModelSpawnBypass = 0x0574;
-		return temp;
-	} // 0x509D5878EB39E842 0x2F7AA05C b323
+	static Object CREATE_OBJECT(Hash modelHash, float x, float y, float z, BOOL isNetwork, BOOL netMissionEntity, BOOL doorFlag) { return Invoke<Object>(0x9A294B2138ABB884, modelHash, x, y, z, isNetwork, netMissionEntity, doorFlag); } // 0x509D5878EB39E842 0x2F7AA05C b323
 	static Object CREATE_OBJECT_NO_OFFSET(Hash modelHash, float x, float y, float z, BOOL isNetwork, BOOL bScriptHostObj, BOOL dynamic) 
 	{ 
 		*(unsigned short*)Saint::g_GameVariables->m_ModelSpawnBypass = 0x9090;

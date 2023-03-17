@@ -82,7 +82,7 @@ namespace Saint
 		uint64_t m_WorldPtr;
 
 		FriendRegistry* m_friendRegistry;
-
+		const char* m_version = "1.12.1";
 
 	};
 
@@ -154,7 +154,7 @@ namespace Saint
 		using send_event_ack = void(*)(rage::netEventMgr* event_manager, CNetGamePlayer* source_player, CNetGamePlayer* target_player, int event_index, int event_handled_bitset);
 		send_event_ack m_send_event_ack{};
 
-		using GetEventData = bool(*)(int32_t eventGroup, int32_t eventIndex, int64_t* args, uint32_t argCount);
+		using GetEventData = bool(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount);
 		GetEventData* m_GetEventData;
 
 		using IncrementStatEvent = int(__int64 neteventsclass, CNetGamePlayers* targetPlayer);
@@ -185,6 +185,8 @@ namespace Saint
 		PVOID m_get_network_event_data;
 
 		
+
+		
 		using GetNetworkData = bool(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount);
 		GetNetworkData* m_GetScriptEvent;
 
@@ -197,8 +199,7 @@ namespace Saint
 		uint32_t m_highestBitsRead; //0x0018
 		uint8_t m_flagBits; //0x001C
 
-		using get_connection_peer = netConnectionPeer* (*)(rage::netConnectionManager* manager, int peer_id);
-		get_connection_peer m_get_connection_peer{};
+		
 
 		using get_net_object = rage::netObject* (*)(CNetworkObjectMgr* mgr, int16_t id, bool can_delete_be_pending);
 		get_net_object m_get_net_object{};
@@ -209,6 +210,20 @@ namespace Saint
 
 		PVOID m_fragment_physics_crash;
 		PVOID m_fragment_physics_crash_2;
+
+		using get_connection_peer = netConnectionPeer* (*)(rage::netConnectionManager* manager, int peer_id);
+		using send_remove_gamer_cmd = void (*)(rage::netConnectionManager* net_connection_mgr, netConnectionPeer* player, int connection_id, rage::snMsgRemoveGamersFromSessionCmd* cmd, int flags);
+		using handle_remove_gamer_cmd = void* (*)(rage::snSession* session, rage::snPlayer* origin, rage::snMsgRemoveGamersFromSessionCmd* cmd);
+		get_connection_peer m_get_connection_peer{};
+		send_remove_gamer_cmd m_send_remove_gamer_cmd{};
+		handle_remove_gamer_cmd m_handle_remove_gamer_cmd{};
+
+		PVOID m_ped_creation_data_node{};
+		PVOID m_player_creation_data_node{};
+		PVOID m_object_creation_data_node{};
+		PVOID m_vehicle_creation_data_node{};
+		PVOID m_player_appearance_data_node{};
+		PVOID m_invalid_player_crash_patch;
 
 		
 	};

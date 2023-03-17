@@ -4,17 +4,7 @@ namespace Saint
 {
 	Logger::Logger()
 	{
-		try
-		{
-			m_FilePath.append(std::getenv("appdata"));
-			m_FilePath.append(BIGBASE_NAME);
-			if (!fs::exists(m_FilePath))
-				fs::create_directory(m_FilePath);
-			m_FilePath.append(BIGBASE_NAME ".log");
-		}
-		catch (fs::filesystem_error const&)
-		{
-		}
+		
 
 		if (!AttachConsole(GetCurrentProcessId()))
 			AllocConsole();

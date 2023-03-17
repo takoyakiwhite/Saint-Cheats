@@ -247,6 +247,9 @@
     <ClInclude Include="Protections.h">
       <Filter>Core\Features\Protections</Filter>
     </ClInclude>
+    <ClInclude Include="Hooks.h">
+      <Filter>Hooking\Hooks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">
@@ -452,6 +455,9 @@
     </Filter>
     <Filter Include="Interface\Memory\Signatures">
       <UniqueIdentifier>{2acff691-fff2-476d-93f2-c0f08715c478}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooking\Hooks">
+      <UniqueIdentifier>{5ef4e094-62f5-4c46-b005-c590f82c4987}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

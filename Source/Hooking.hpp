@@ -5,6 +5,9 @@
 #include "../Libraries/Include/GTAV-Classes/network/CNetworkPlayerMgr.hpp"
 #include "../Libraries/Include/GTAV-Classes/network/CNetGamePlayer.hpp"
 #include "Enums.h"
+#include <GTAV-Classes/netsync/nodes/object/CObjectCreationDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/ped/CPedCreationDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/vehicle/CVehicleCreationDataNode.hpp>
 namespace Saint
 {
 	
@@ -60,13 +63,21 @@ namespace Saint
 
 		static void NetworkEventHandler(__int64 networkMgr, CNetGamePlayer* source, CNetGamePlayer* target, unsigned __int16 event_id, int event_index, int event_bitset, __int64 buffer_size, __int64 buffer);
 
-		static bool GetEventData(int32_t eventGroup, int32_t eventIndex, int64_t* args, uint32_t argCount);
+		static bool GetEventData(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount, int64_t sender);
 
+		//crashes
 		static bool received_clone_create(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, eNetObjType object_type, int32_t object_id, int32_t object_flag, rage::datBitBuffer* buffer, int32_t timestamp);
 		static eAckCode received_clone_sync(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, eNetObjType object_type, uint16_t object_id, rage::datBitBuffer* bufer, uint16_t unk, uint32_t timestamp);
 		static std::int64_t constraint_attachment_crash(std::uintptr_t a1);
 		static bool fragment_physics_crash(uintptr_t a1, uint32_t a2, uintptr_t a3, uintptr_t a4, uintptr_t a5);
 		static bool fragment_physics_crash_2(float* a1, float* a2);
+
+		static void invalid_player_crash(uint64_t a1, uint64_t a2);
+		static bool object_creation_data_node(CObjectCreationDataNode* node, rage::netObject* obj);
+		static bool hk_ped_creation_data_node(CPedCreationDataNode* node);
+		static bool hk_vehicle_creation_data_node(CVehicleCreationDataNode* node);
+
+		
 
 		
 
@@ -124,6 +135,11 @@ namespace Saint
 		void* AttachmentCrash{};
 		void* InvalidObjectCrash{};
 		void* InvalidObjectCrash2{};
+
+		void* m_OriginalInvalidPlayer{};
+		void* m_OriginalInvalidPlayer222{};
+		void* ped_creation{};
+		void* vehicle_creation{};
 
 
 	};

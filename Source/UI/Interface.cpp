@@ -991,7 +991,7 @@ namespace Saint::UserInterface
 			}
 			if (RightFooterText) {
 				DrawRightText(
-					&rightText[0],
+					g_GameVariables->m_version,
 					m_PosX + (m_Width / m_FooterTextPadding),
 					m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
 					m_FooterTextSize, m_FooterTextFont,
@@ -1026,7 +1026,7 @@ namespace Saint::UserInterface
 
 			if (LeftFooterText) {
 				DrawLeftText(
-					"Saint Private",
+					"Saint Free",
 					m_PosX - (m_Width / m_FooterTextPadding),
 					m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
 					m_FooterTextSize, m_FooterTextFont,
@@ -1035,7 +1035,7 @@ namespace Saint::UserInterface
 			}
 			if (RightFooterText) {
 				DrawRightText(
-					&rightText[0],
+					g_GameVariables->m_version,
 					m_PosX + (m_Width / m_FooterTextPadding),
 					m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
 					m_FooterTextSize, m_FooterTextFont,

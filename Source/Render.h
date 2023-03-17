@@ -284,8 +284,6 @@ namespace Saint {
 
 
 
-
-
 				//ImGui::PushStyleColor(ImGuiCol_Text, text_color);
 
 				ImGui::SetNextWindowBgAlpha(opacity);

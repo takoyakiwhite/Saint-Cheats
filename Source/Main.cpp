@@ -13,7 +13,7 @@
 #include "Script.h"
 #include "Render.h"
 #include "Discord/DiscordHandler.hpp"
-#define MENU_VERSION "1.12.1"
+
 BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 {
 	using namespace Saint;

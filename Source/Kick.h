@@ -2,7 +2,8 @@
 
 #include "Natives.hpp"
 #include "Queue.h"
-
+#include "All Players.h"
+#include "FiberHelper.hpp"
 namespace Saint {
 	class Kicks {
 	public:
@@ -61,8 +62,33 @@ namespace Saint {
 				});
 		}
 		void crash() {
-			Vehicle crash;
-			spawn_for_ped2(0x6838FC1D, &crash);
+			auto Ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
+			NativeVector3 pos = ENTITY::GET_ENTITY_COORDS(Ped, 1);
+			auto Crash1 = MISC::GET_HASH_KEY("mp_m_freemode_01");
+			auto Crash2 = MISC::GET_HASH_KEY("mp_f_freemode_01");
+			g_CallbackScript->AddCallback<ModelCallback>(Crash1, [=] {
+				
+
+				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x9090;
+				auto Male = PED::CREATE_PED(2, Crash1, pos.x, pos.y, pos.z, 0.f, TRUE, TRUE);
+				PED::SET_PED_COMPONENT_VARIATION(Male, 0, 393, 0, 0);
+				PED::SET_PED_COMPONENT_VARIATION(Male, 4, 144, 0, 0);
+				PED::SET_PED_COMPONENT_VARIATION(Male, 6, 102, 0, 0);
+
+				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+			});
+			g_CallbackScript->AddCallback<ModelCallback>(Crash2, [=] {
+
+
+				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x9090;
+
+				auto Female = PED::CREATE_PED(1, Crash2, pos.x, pos.y, pos.z, 0.f, TRUE, TRUE);
+				PED::SET_PED_COMPONENT_VARIATION(Female, 0, 415, 0, 0);
+				PED::SET_PED_COMPONENT_VARIATION(Female, 4, 151, 0, 0);
+				PED::SET_PED_COMPONENT_VARIATION(Female, 6, 106, 0, 0);
+				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+				});
+			
 
 		}
 		Network* get_network()
@@ -82,6 +108,44 @@ namespace Saint {
 					return get_network()->m_game_session_ptr->m_peers[i];
 				}
 			}
+
+			return nullptr;
+		}
+		bool is_host() const
+		{
+			return  g_GameVariables->m_net_game_player(g_SelectedPlayer) == nullptr ? false : g_GameVariables->m_net_game_player(g_SelectedPlayer)->is_host();
+		}
+		bool is_host2(int p) const
+		{
+			return  g_GameVariables->m_net_game_player(p) == nullptr ? false : g_GameVariables->m_net_game_player(p)->is_host();
+		}
+		rage::snPlayer* pget_session_player()
+		{
+			for (std::uint32_t i = 0; i < get_network()->m_game_session_ptr->m_player_count; i++)
+			{
+				if (get_network()->m_game_session_ptr->m_players[i]->m_player_data.m_host_token == get_net_data()->m_host_token)
+				{
+					return get_network()->m_game_session_ptr->m_players[i];
+				}
+			}
+
+			if (get_network()->m_game_session_ptr->m_local_player.m_player_data.m_host_token == get_net_data()->m_host_token)
+				return &get_network()->m_game_session_ptr->m_local_player;
+
+			return nullptr;
+		}
+		rage::snPlayer* pget_session_player2(int p)
+		{
+			for (std::uint32_t i = 0; i < get_network()->m_game_session_ptr->m_player_count; i++)
+			{
+				if (get_network()->m_game_session_ptr->m_players[p]->m_player_data.m_host_token == get_net_data()->m_host_token)
+				{
+					return get_network()->m_game_session_ptr->m_players[p];
+				}
+			}
+
+			if (get_network()->m_game_session_ptr->m_local_player.m_player_data.m_host_token == get_net_data()->m_host_token)
+				return &get_network()->m_game_session_ptr->m_local_player;
 
 			return nullptr;
 		}
@@ -116,7 +180,48 @@ namespace Saint {
 				m_queue.add(18s, "Removing player..", [] {});
 			}
 			if (Menu_Data == 2) {
+				rage::snMsgRemoveGamersFromSessionCmd cmd{};
+				cmd.m_session_id = get_network()->m_game_session_ptr->m_rline_session.m_session_id;
+				cmd.m_num_peers = 1;
+				cmd.m_peer_ids[0] = get_session_peer()->m_peer_data.m_peer_id_2;
 
+				cmd.m_unk = 19;
+
+				if (get_network()->m_game_session.is_host())
+				{
+					g_GameFunctions->m_handle_remove_gamer_cmd(get_network()->m_game_session_ptr, pget_session_player(), &cmd);
+				}
+				else if (is_host())
+				{
+					for (std::uint32_t i = 0; i < PLAYER::GET_NUMBER_OF_PLAYERS(); ++i) {
+						if (all_players.get_id(i) != all_players.get_id(g_SelectedPlayer))
+							g_GameFunctions->m_send_remove_gamer_cmd(get_network()->m_game_session_ptr->m_net_connection_mgr,
+								g_GameFunctions->m_get_connection_peer(get_network()->m_game_session_ptr->m_net_connection_mgr,
+									(int)pget_session_player2(i)->m_player_data.m_peer_id_2),
+								get_network()->m_game_session_ptr->m_connection_identifier,
+								&cmd,
+								0x1000000);
+					}
+					
+
+					g_GameFunctions->m_handle_remove_gamer_cmd(get_network()->m_game_session_ptr, pget_session_player(), &cmd);
+				}
+				else
+				{
+					for (std::uint32_t i = 0; i < PLAYER::GET_NUMBER_OF_PLAYERS(); ++i) {
+						if (is_host2(i)) {
+							g_GameFunctions->m_send_remove_gamer_cmd(get_network()->m_game_session_ptr->m_net_connection_mgr,
+								g_GameFunctions->m_get_connection_peer(get_network()->m_game_session_ptr->m_net_connection_mgr,
+									(int)pget_session_player2(i)->m_player_data.m_peer_id_2),
+								get_network()->m_game_session_ptr->m_connection_identifier,
+								&cmd,
+								0x1000000);
+
+							break;
+						}
+					}
+					
+				}
 				
 			}
 		}

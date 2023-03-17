@@ -34,6 +34,7 @@
     <ClInclude Include="FiberHelper.hpp" />
     <ClInclude Include="Flash Blip.h" />
     <ClInclude Include="hex_memory.h" />
+    <ClInclude Include="Hooks.h" />
     <ClInclude Include="Hotkeys.h" />
     <ClInclude Include="Images.h" />
     <ClInclude Include="Jets.h" />

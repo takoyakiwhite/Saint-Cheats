@@ -26,7 +26,18 @@ namespace Saint {
 	inline std::string replaceTextBuffer2 = "";
 	inline bool replaced = false;
 	inline bool replaced2 = false;
-
+	inline bool raycast_with_cam(Cam cam, NativeVector3& raycastHitCoords) {
+		bool raycastHit;
+		NativeVector3 surfaceNormal;
+		Entity raycastHitEntity;
+		NativeVector3 camCoords = CAM::GET_CAM_COORD(cam);
+		NativeVector3 cameraDirection = RotationToDirection(CAM::GET_CAM_ROT(cam, 0));
+		NativeVector3 cameraMultiply = multiply(&cameraDirection, 1999999.0f);
+		NativeVector3 farCoords = addn(&camCoords, &cameraMultiply);
+		int ray = SHAPETEST::START_EXPENSIVE_SYNCHRONOUS_SHAPE_TEST_LOS_PROBE(camCoords.x, camCoords.y, camCoords.z, farCoords.x, farCoords.y, farCoords.z, -1, PLAYER::PLAYER_PED_ID(), 7);
+		SHAPETEST::GET_SHAPE_TEST_RESULT(ray, &raycastHit, &raycastHitCoords, &surfaceNormal, &raycastHitEntity);
+		return raycastHit;
+	}
 	inline bool raycast(NativeVector3& raycastHitCoords) {
 		bool raycastHit;
 		NativeVector3 surfaceNormal;
@@ -3446,80 +3457,48 @@ namespace Saint {
 	inline VehicleLoading* g_VehicleLoading;
 	class ThemeLoading {
 	public:
-		bool ColorIniExist(const char* path)
+		std::string buffer;
+		bool DoesIniExists(const char* path)
 		{
 
 			struct stat buffer;
 			return (stat(path, &buffer) == 0);
 
 		}
-		void save() {
-			std::string AppDataPath = getenv("APPDATA");
-			std::string MenuFolderPath = AppDataPath + "\\Saint\\";
-			Ini* ColorIni = new Ini(MenuFolderPath + "Colors.ini");
+		void save(std::string name) {
+			auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+			std::string MenuFolderPath = "C:\\Saint\\Themes\\";
+			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
 
-			ColorIni->WriteInt(g_Render->ThemeIterator, "Themes", "get_current");
-			//ColorIni->WriteBool(g_Render->submenu_enabled, "Themes", "submenu_enabled");
-			//footer
-			ColorIni->WriteInt(g_Render->m_FooterBackgroundColor.r, "Footer", "r");
-			ColorIni->WriteInt(g_Render->m_FooterBackgroundColor.g, "Footer", "g");
-			ColorIni->WriteInt(g_Render->m_FooterBackgroundColor.b, "Footer", "b");
-			ColorIni->WriteInt(g_Render->m_FooterBackgroundColor.a, "Footer", "a");
-			//option
-			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.r, "option", "selected_background_r");
-			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.g, "option", "selected_background_g");
-			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.b, "option", "selected_background_b");
-			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.a, "option", "selected_background_a");
-			//selected
-			ColorIni->WriteInt(g_Render->m_OptionSelectedTextColor.r, "option", "selected_test_r");
-			ColorIni->WriteInt(g_Render->m_OptionSelectedTextColor.g, "option", "selected_test_g");
-			ColorIni->WriteInt(g_Render->m_OptionSelectedTextColor.b, "option", "selected_test_b");
-			ColorIni->WriteInt(g_Render->m_OptionSelectedTextColor.a, "option", "selected_test_a");
 
-			//ColorIni->WriteString(g_Render->header_name, "header", "name");
-			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.r, "header", "r");
-			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.g, "header", "g");
-			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.b, "header", "b");
-			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.a, "header", "b");
+			ColorIni->WriteString(g_Render->header_name, "Header", "text");
+			ColorIni->WriteInt(g_Render->ToggleIterator, "Toggles", "icon");
+			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.r, "Background Unselected", "r");
+			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.g, "Background Unselected", "g");
+			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.b, "Background Background", "b");
+			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.a, "Background Background", "a");
+
+
 		}
-		void load() {
-			std::string AppDataPath = getenv("APPDATA");
-			std::string MenuFolderPath = AppDataPath + "\\Saint\\";
-			if (ColorIniExist((MenuFolderPath + "Colors.ini").c_str())) {
-				Ini* ColorIni = new Ini(MenuFolderPath + "Colors.ini");
-				g_Render->ThemeIterator = ColorIni->GetInt("Themes", "get_current");
-				//g_Render->submenu_enabled = ColorIni->GetBool("Themes", "submenu_enabled");
-
-				g_Render->m_FooterBackgroundColor.r = ColorIni->GetInt("Footer", "r");
-				g_Render->m_FooterBackgroundColor.g = ColorIni->GetInt("Footer", "g");
-				g_Render->m_FooterBackgroundColor.b = ColorIni->GetInt("Footer", "b");
-				g_Render->m_FooterBackgroundColor.a = ColorIni->GetInt("Footer", "a");
-
-				g_Render->m_OptionSelectedBackgroundColor.r = ColorIni->GetInt("option", "selected_background_r");
-				g_Render->m_OptionSelectedBackgroundColor.g = ColorIni->GetInt("option", "selected_background_g");
-				g_Render->m_OptionSelectedBackgroundColor.b = ColorIni->GetInt("option", "selected_background_b");
-				g_Render->m_OptionSelectedBackgroundColor.a = ColorIni->GetInt("option", "selected_background_a");
-
-				g_Render->m_OptionSelectedTextColor.r = ColorIni->GetInt("option", "selected_text_r");
-				g_Render->m_OptionSelectedTextColor.g = ColorIni->GetInt("option", "selected_text_g");
-				g_Render->m_OptionSelectedTextColor.b = ColorIni->GetInt("option", "selected_text_b");
-				g_Render->m_OptionSelectedTextColor.a = ColorIni->GetInt("option", "selected_text_a");
-
-				//g_Render->header_name = ColorIni->GetString("header", "name");
+		void load(std::string name) {
+			std::string MenuFolderPath = "C:\\Saint\\Themes\\";
+			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
+				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+				g_Render->header_name = ColorIni->GetString("Header", "text");
+				g_Render->ToggleIterator = ColorIni->GetInt("Toggles", "icon");
+				g_Render->m_OptionUnselectedBackgroundColor.r = ColorIni->GetInt("Background Unselected", "r");
+				g_Render->m_OptionUnselectedBackgroundColor.g = ColorIni->GetInt("Background Unselected", "g");
+				g_Render->m_OptionUnselectedBackgroundColor.b = ColorIni->GetInt("Background Unselected", "b");
+				g_Render->m_OptionUnselectedBackgroundColor.a = ColorIni->GetInt("Background Unselected", "a");
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Loaded '%s'", name });
 
 
-				g_Render->m_HeaderBackgroundColor.r = ColorIni->GetInt("header", "r");
-				g_Render->m_HeaderBackgroundColor.g = ColorIni->GetInt("header", "g");
-				g_Render->m_HeaderBackgroundColor.b = ColorIni->GetInt("header", "b");
-				g_Render->m_HeaderBackgroundColor.a = ColorIni->GetInt("header", "a");
 
-			
 
-				
 			}
 		}
 	};
-	inline ThemeLoading* g_ThemeLoading;
+	inline ThemeLoading g_ThemeLoading;
 	class SaveHandling {
 	public:
 		bool DoesIniExists(const char* path)
@@ -4862,6 +4841,91 @@ namespace Saint {
 		std::string m_name;
 		int m_class = 0;
 	};
+	class CreatorHandler {
+	public:
+		CreatorHandler(std::string model_name) {
+			m_model = model_name;
+			
+		}
+	public:
+		std::string m_model;
+	};
+	class Creator {
+	public:
+		bool enabled = false;
+		Entity selected_object;
+		std::string selected_object_name = "apa_mp_h_yacht_sofa_01";
+		std::string selected_buffer;
+		std::vector<CreatorHandler> m_Objects = {
+			{ "prop_box_wood02a"},
+			{ "prop_air_woodsteps"},
+			{"apa_mp_h_bed_with_table_02"},
+		};
+		std::string m_selected = "prop_dog_cage_02";
+		Cam creator_cam;
+		Object preview;
+		bool frozen = false;
+		void init() {
+			if (enabled) {
+				ENTITY::FREEZE_ENTITY_POSITION(PLAYER::PLAYER_PED_ID(), true);
+				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+
+				if (!CAM::DOES_CAM_EXIST(creator_cam)) {
+					creator_cam = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", true);
+					CAM::SET_CAM_ROT(creator_cam, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+					CAM::SET_CAM_COORD(creator_cam, CAM::GET_GAMEPLAY_CAM_COORD());
+				}
+
+				NativeVector3 get_coords;
+				if (raycast_with_cam(creator_cam, get_coords)) {
+					GRAPHICS::DRAW_MARKER(25, get_coords.x, get_coords.y, get_coords.z + 0.1f, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0, 2.0, 255, 0, 0, 255, false, false, 2, false, NULL, NULL, true);
+				}
+				
+				CAM::RENDER_SCRIPT_CAMS(true, true, 700, true, true, true);
+				CAM::SET_CAM_ACTIVE(creator_cam, true);
+				CAM::SET_CAM_ROT(creator_cam, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+
+				PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), true);
+				HUD::HIDE_HUD_AND_RADAR_THIS_FRAME();
+				PAD::DISABLE_CONTROL_ACTION(2, 8, true);
+				PAD::DISABLE_CONTROL_ACTION(2, 32, true);
+				PAD::DISABLE_CONTROL_ACTION(2, 34, true);
+
+				NativeVector3 freecamCoords = CAM::GET_CAM_COORD(creator_cam);
+				NativeVector3 cameraDirection = RotationToDirection(CAM::GET_GAMEPLAY_CAM_ROT(0));
+				NativeVector3 accelerateCoords = multiply(&cameraDirection, 0.2f);
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 8)) {
+
+					NativeVector3 newCoords = addn(&freecamCoords, &accelerateCoords);
+					CAM::SET_CAM_COORD(creator_cam, newCoords);
+				}
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 32)) {
+					NativeVector3 newCoords = addn(&freecamCoords, &accelerateCoords);
+					CAM::SET_CAM_COORD(creator_cam, newCoords);
+				}
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 34)) {
+					CAM::SET_CAM_ROT(creator_cam, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+				}
+
+				
+				if (!g_Render->m_Opened) {
+					if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, 18)) {
+						NativeVector3 get_coords55;
+						if (raycast_with_cam(creator_cam, get_coords55)) {
+							AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+							Hash hash = MISC::GET_HASH_KEY(m_selected.c_str());
+
+							Object cage = OBJECT::CREATE_OBJECT_NO_OFFSET(hash, get_coords55.x, get_coords55.y, get_coords55.z, true, false, false);
+							if (frozen) {
+								ENTITY::FREEZE_ENTITY_POSITION(cage, true);
+							}
+						}
+					}
+				}
+			}
+		}
+	};
+	inline Creator m_creator;
 	class ModelChanger {
 	public:
 		std::vector<modelHandler> m_GetModels = {
@@ -5056,6 +5120,7 @@ namespace Saint {
 			}
 		
 		}
+		m_creator.init();
 		g_HandTrails.init();
 		m_shotgun.init();
 		m_fx.init();
