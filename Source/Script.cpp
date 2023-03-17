@@ -3918,70 +3918,46 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Player List", SubmenuPlayerList, [](sub* sub)
 			{
 				sub->draw_option<submenu>("All", nullptr, SubmenuAllPlayers);
-		sub->draw_option<submenu>("Saved", nullptr, SubmenuSavedPlayers);
-		sub->draw_option<ChooseOption<const char*, std::size_t>>("Filter", nullptr, &p_filter.data, &p_filter.data_i);
+				sub->draw_option<submenu>("Saved", nullptr, SubmenuSavedPlayers);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Filter", nullptr, &p_filter.data, &p_filter.data_i);
+
+
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+
+				for (std::uint32_t i = 0; i < 32; ++i)
+				{
+
+
+					if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))
+					{
+						if (sub->GetSelectedOption() == sub->GetNumOptions()) {
+							g_players.draw_info(i);
+						}
+						std::string name = PLAYER::GET_PLAYER_NAME(i);
+						if (i == PLAYER::PLAYER_ID())
+							name.append(" ~p~[Self]");
+						if (PED::GET_PED_CONFIG_FLAG(ped, 109, true)) {
+							name.append(" ~b~[Saint]");
+						}
+						if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+							if (antiCheat.cheater[g_GameVariables->m_net_game_player(i)->m_player_id] == true) {
+								name.append(" ~r~[Modder]");
+							}
+						}
+
+
+
+						sub->draw_option<playersubmenu>(name.c_str(), nullptr, SubmenuSelectedPlayer, [=]
+							{
+								g_SelectedPlayer = i;
+							});
+
+
+					}
+				
+
+				}
 		
-		
-		sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
-
-		for (std::uint32_t i = 0; i < 32; ++i)
-		{
-			if (sub->GetSelectedOption() == sub->GetNumOptions()) {
-				g_players.draw_info(i);
-			}
-
-			if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))
-			{
-
-				std::string name = PLAYER::GET_PLAYER_NAME(i);
-				if (i == PLAYER::PLAYER_ID())
-					name.append(" ~p~[Self]");
-				if (PED::GET_PED_CONFIG_FLAG(ped, 109, true)) {
-					name.append(" ~b~[Saint]");
-				}
-				if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
-					if (antiCheat.cheater[g_GameVariables->m_net_game_player(i)->m_player_id] == true) {
-						name.append(" ~r~[Modder]");
-					}
-				}
-
-
-
-
-				if (p_filter.data_i == 0) {
-					sub->draw_option<playersubmenu>(name.c_str(), nullptr, SubmenuSelectedPlayer, [=]
-						{
-							g_SelectedPlayer = i;
-						});
-
-				}
-				if (p_filter.data_i == 1) {
-					if (PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
-						sub->draw_option<playersubmenu>(name.c_str(), nullptr, SubmenuSelectedPlayer, [=]
-							{
-								g_SelectedPlayer = i;
-							});
-					}
-				}
-				if (p_filter.data_i == 2) {
-					if (INTERIOR::GET_INTERIOR_FROM_ENTITY(ped) != 0) {
-						sub->draw_option<playersubmenu>(name.c_str(), nullptr, SubmenuSelectedPlayer, [=]
-							{
-								g_SelectedPlayer = i;
-							});
-					}
-				}
-				if (p_filter.data_i == 3) {
-					if (!PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
-						sub->draw_option<playersubmenu>(name.c_str(), nullptr, SubmenuSelectedPlayer, [=]
-							{
-								g_SelectedPlayer = i;
-							});
-					}
-				}
-
-			}
-		}
 			});
 
 		g_Render->draw_submenu<PlayerSubmenu>(&g_SelectedPlayer, SubmenuSelectedPlayer, [](PlayerSubmenu* sub)
@@ -4751,11 +4727,19 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Protection"), SubmenuProtections, [](sub* sub)
 			{
+				sub->draw_option<submenu>("Excludes", nullptr, rage::joaat("ExcludesFromScripts"));
 				sub->draw_option<submenu>("Script Events", nullptr, SubmenuScriptEvents);
 				sub->draw_option<submenu>("Game Events", nullptr, SubmenuGameEvents);
 				sub->draw_option<submenu>("Entities", nullptr, SubmenuEntities);
 				sub->draw_option<submenu>("Crash", nullptr, SubmenuProtCrash);
 				sub->draw_option<toggle<bool>>(("Reports"), nullptr, &protections.block_reports, BoolDisplay::OnOff);
+
+			});
+		g_Render->draw_submenu<sub>(("Excludes"), rage::joaat("ExcludesFromScripts"), [](sub* sub)
+			{
+				
+				sub->draw_option<toggle<bool>>(("Friends"), nullptr, &protections.exclude_friends, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Self"), nullptr, &protections.exclude_self, BoolDisplay::OnOff);
 
 			});
 		g_Render->draw_submenu<sub>(("Game Events"), SubmenuGameEvents, [](sub* sub)
@@ -4798,10 +4782,19 @@ namespace Saint
 				sub->draw_option<submenu>("Teleport", nullptr, rage::joaat("ProtectionsTeleport"));
 				sub->draw_option<submenu>("CEO", nullptr, rage::joaat("ProtectionsCEO"));
 				sub->draw_option<submenu>("Text Message", nullptr, rage::joaat("ProtectionsSMS"));
+				sub->draw_option<submenu>("Notifications", nullptr, rage::joaat("ProtectionsNOTI"));
 				sub->draw_option<toggle<bool>>(("Vehicle Kick"), nullptr, &protections.ScriptEvents.vehicle_kick, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Rotate Camera"), nullptr, &protections.ScriptEvents.rotate_cam, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Tutorial"), nullptr, &protections.ScriptEvents.tutorial, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Sound Spam"), nullptr, &protections.sound_spam, BoolDisplay::OnOff);
 
+			});
+		g_Render->draw_submenu<sub>(("Notifications"), rage::joaat("ProtectionsNOTI"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Regular"), nullptr, &protections.regular_noti, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Money Stolen"), nullptr, &protections.moneystolen, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Money Removed"), nullptr, &protections.moneyremoved, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Money Banked"), nullptr, &protections.moneybanked, BoolDisplay::OnOff);
 			});
 		g_Render->draw_submenu<sub>(("Text Message"), rage::joaat("ProtectionsSMS"), [](sub* sub)
 			{

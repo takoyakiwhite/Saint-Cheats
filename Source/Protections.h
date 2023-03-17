@@ -94,7 +94,7 @@ namespace Saint {
 		}
 		bool send_to_location = false;
 		bool mc_teleport = true;
-		bool sound_spam = false;
+		bool sound_spam = true;
 		bool block_reports = false;
 		//teleports
 		bool teleport = true;
@@ -112,6 +112,17 @@ namespace Saint {
 		bool kick = true;
 		//Activity
 		bool activity = true;
+
+		bool exclude_self = true;
+		bool exclude_friends = false;
+
+		//Misc
+		
+		//Notifcations
+		bool regular_noti = true;
+		bool moneybanked = true;
+		bool moneystolen = true;
+		bool moneyremoved = true;
 		
 	};
 	inline Protections protections;
@@ -150,5 +161,11 @@ namespace Saint {
 			{ 1017995959, "Kick", &protections.kick},
 			//Msc
 			{ 1104117595, "Activity", &protections.activity},
+			{ 36077543, "Sound Spam", &protections.sound_spam},
+			//Notifcations
+			{ 2041805809, "Notification", &protections.regular_noti},
+			{ 276906331, "Money Banked", &protections.moneybanked},
+			{ 82080686, "Money Stolen", &protections.moneystolen},
+			{ 853249803, "Money Removed", &protections.moneyremoved},
 	};
 }

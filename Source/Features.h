@@ -1024,8 +1024,8 @@ namespace Saint {
 		const char* rp_model[8] = { "Alien", "Beast", "Impotent Rage", "Pogo", "Princess Bubblegum", "Ranger", "Generic", "Sasquatch"};
 		const char* rp_model_init[8] = { "vw_prop_vw_colle_alien", "vw_prop_vw_colle_beast", "vw_prop_vw_colle_imporage", "vw_prop_vw_colle_pogo", "vw_prop_vw_colle_prbubble", "vw_prop_vw_colle_rsrcomm", "vw_prop_vw_colle_rsrgeneric", "vw_prop_vw_colle_sasquatch"};
 		std::size_t rp_model_data = 0;
-		const char* money_model[2] = { "Store Bag", "Bank Bag", };
-		int money_model_init[2] = { -1666779307, 289396019 };
+		const char* money_model[3] = { "Store Bag", "Bank Bag", "Single Stack"};
+		int money_model_init[3] = { -1666779307, 289396019, 1282927707 };
 		std::size_t money_model_data = 0;
 		std::int32_t model_delay = 550;
 		void init() {
@@ -1296,14 +1296,7 @@ namespace Saint {
 						}
 						bool godmodec = false;
 
-						if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
-							if (all_players.get_player_info(i)->m_run_speed > 1.50) {
-								flag_as_modder(all_players.get_id(i), i);
-							}
-							if (all_players.get_ped(i)->m_weapon_manager->m_weapon_info->m_bullets_in_batch > 8) {
-								flag_as_modder(all_players.get_id(i), i);
-							}
-						}
+						
 
 
 
@@ -3418,7 +3411,7 @@ namespace Saint {
 		{
 			WriteString(std::to_string(value), app, key);
 		}
-		float GetBool(std::string app, std::string key)
+		bool GetBool(std::string app, std::string key)
 		{
 			std::string Fetched = GetString(app, key);
 			bool returned = (Fetched == "True");
@@ -3473,10 +3466,11 @@ namespace Saint {
 
 			ColorIni->WriteString(g_Render->header_name, "Header", "text");
 			ColorIni->WriteInt(g_Render->ToggleIterator, "Toggles", "icon");
-			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.r, "Background Unselected", "r");
-			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.g, "Background Unselected", "g");
-			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.b, "Background Background", "b");
-			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.a, "Background Background", "a");
+			ColorIni->WriteBool(g_Render->submenu_enabled, "Subheader", "enabled");
+			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.r, "BackgroundUnselected", "r");
+			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.g, "BackgroundUnselected", "g");
+			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.b, "BackgroundUnselected", "b");
+			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.a, "BackgroundUnselected", "a");
 
 
 		}
@@ -3486,10 +3480,11 @@ namespace Saint {
 				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
 				g_Render->header_name = ColorIni->GetString("Header", "text");
 				g_Render->ToggleIterator = ColorIni->GetInt("Toggles", "icon");
-				g_Render->m_OptionUnselectedBackgroundColor.r = ColorIni->GetInt("Background Unselected", "r");
-				g_Render->m_OptionUnselectedBackgroundColor.g = ColorIni->GetInt("Background Unselected", "g");
-				g_Render->m_OptionUnselectedBackgroundColor.b = ColorIni->GetInt("Background Unselected", "b");
-				g_Render->m_OptionUnselectedBackgroundColor.a = ColorIni->GetInt("Background Unselected", "a");
+				g_Render->submenu_enabled = ColorIni->GetBool("Subheader", "enabled");
+				g_Render->m_OptionUnselectedBackgroundColor.r = ColorIni->GetInt("BackgroundUnselected", "r");
+				g_Render->m_OptionUnselectedBackgroundColor.g = ColorIni->GetInt("BackgroundUnselected", "g");
+				g_Render->m_OptionUnselectedBackgroundColor.b = ColorIni->GetInt("BackgroundUnselected", "b");
+				g_Render->m_OptionUnselectedBackgroundColor.a = ColorIni->GetInt("BackgroundUnselected", "a");
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Loaded '%s'", name });
 
 

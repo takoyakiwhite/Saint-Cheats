@@ -22,6 +22,7 @@ namespace Saint
 	inline bool join_queue = false;
 	inline CNetGamePlayer* m_syncing_player = nullptr;
 	inline rage::rlSessionInfo g_Session_info;
+	
 	struct Hooks
 	{
 		static void GetStatInt(rage::scrNativeCallContext* src);

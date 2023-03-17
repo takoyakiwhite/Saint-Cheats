@@ -500,10 +500,6 @@ namespace Saint
 			}
 			case eNetworkEvents::CNetworkPlaySoundEvent: {
 				if (protections.GameEvents.play_sound) {
-					char name2[64];
-					sprintf(name2, "Play sound from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-					g_NotificationManager->add(name2, 2000, 1);
 
 					return;
 				}
@@ -643,6 +639,7 @@ namespace Saint
 				}
 				break;
 			}
+			
 			case eNetworkEvents::CBlowUpVehicleEvent: {
 				if (protections.GameEvents.blow_up_vehicle) {
 					char g_RemoveWeapons[64];
@@ -661,11 +658,24 @@ namespace Saint
 	{
 		bool dontreturn = false;
 		auto result = static_cast<decltype(&GetEventData)>(g_Hooking->m_OriginalGetEventData)(eventGroup, eventIndex, args, argCount, sender);
-		auto sender_id = *reinterpret_cast<std::int8_t*>(sender + 0x2D);
+		auto sender_id = static_cast<std::int32_t>(args[1]);
 		const char* sender_name = PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1]));
+		if (protections.exclude_friends) {
+			int netHandle[13];
+			NETWORK::NETWORK_HANDLE_FROM_PLAYER(static_cast<std::int32_t>(args[1]), netHandle, 13);
+			if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
+				return result;
+			}
+		}
+		if (protections.exclude_self) {
+			if (PLAYER::PLAYER_ID() == sender_id) {
+				return result;
+			}
+		}
 		for (auto evnt : m_scriptEvents) {
 			if (evnt.toggled) {
 				if (evnt.hash == args[0]) {
+					
 					char g_RemoveWeapons[64];
 					sprintf(g_RemoveWeapons, "%s tried to send the event '%s'", sender_name, evnt.name.c_str());
 					g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
@@ -673,7 +683,7 @@ namespace Saint
 					case 0:
 						break;
 					case 1:
-						NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(sender_id), false);
+						NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(static_cast<std::int32_t>(args[1])), false);
 
 						Object cage = OBJECT::CREATE_OBJECT(MISC::GET_HASH_KEY("prop_gold_cont_01"), c.x, c.y, c.z - 1.f, true, false, false);
 						break;
