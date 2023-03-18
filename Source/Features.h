@@ -3472,6 +3472,16 @@ namespace Saint {
 			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.b, "BackgroundUnselected", "b");
 			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.a, "BackgroundUnselected", "a");
 
+			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.r, "BackgroundSelected", "r");
+			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.g, "BackgroundSelected", "g");
+			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.b, "BackgroundSelected", "b");
+			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.a, "BackgroundSelected", "a");
+
+			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.r, "HeaderBackground", "r");
+			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.g, "HeaderBackground", "g");
+			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.b, "HeaderBackground", "b");
+			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.a, "HeaderBackground", "a");
+
 
 		}
 		void load(std::string name) {
@@ -3485,6 +3495,16 @@ namespace Saint {
 				g_Render->m_OptionUnselectedBackgroundColor.g = ColorIni->GetInt("BackgroundUnselected", "g");
 				g_Render->m_OptionUnselectedBackgroundColor.b = ColorIni->GetInt("BackgroundUnselected", "b");
 				g_Render->m_OptionUnselectedBackgroundColor.a = ColorIni->GetInt("BackgroundUnselected", "a");
+
+				g_Render->m_OptionSelectedBackgroundColor.r = ColorIni->GetInt("BackgroundSelected", "r");
+				g_Render->m_OptionSelectedBackgroundColor.g = ColorIni->GetInt("BackgroundSelected", "g");
+				g_Render->m_OptionSelectedBackgroundColor.b = ColorIni->GetInt("BackgroundSelected", "b");
+				g_Render->m_OptionSelectedBackgroundColor.a = ColorIni->GetInt("BackgroundSelected", "a");
+
+				g_Render->m_HeaderBackgroundColor.r = ColorIni->GetInt("HeaderBackground", "r");
+				g_Render->m_HeaderBackgroundColor.g = ColorIni->GetInt("HeaderBackground", "g");
+				g_Render->m_HeaderBackgroundColor.b = ColorIni->GetInt("HeaderBackground", "b");
+				g_Render->m_HeaderBackgroundColor.a = ColorIni->GetInt("HeaderBackground", "a");
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Loaded '%s'", name });
 
 

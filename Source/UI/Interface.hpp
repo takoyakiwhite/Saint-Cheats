@@ -168,6 +168,10 @@ namespace Saint::UserInterface
 		float m_FooterTextPadding = 2.1f;
 		Color m_FooterTextColor{ 255,255,255, 255 };
 
+		//enables
+		bool footer_enabled = true;
+		bool lines_enabled = true;
+
 		// Smooth Scrolling
 		float lerp(float a, float b, float t)
 		{

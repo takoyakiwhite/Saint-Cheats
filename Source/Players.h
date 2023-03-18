@@ -277,6 +277,37 @@ namespace Saint {
 
 			return { 0 };
 		}
+		uint16_t get_port(std::uint32_t player)
+		{
+
+			if (player == PLAYER::PLAYER_ID())
+				return (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_net_player_data.m_external_port;
+
+			if (auto session_player = get_session_player(player))
+				if (auto peer = g_GameFunctions->m_get_connection_peer(get_network()->m_game_session_ptr->m_net_connection_mgr, (int)get_session_player(player)->m_player_data.m_peer_id_2))
+					return ((netConnectionPeer*)peer)->m_external_port;
+				
+
+			return { 0 };
+		}
+		std::string separateByCommas(int num) {
+			std::string numStr = std::to_string(num);
+			std::string result;
+			int count = 0;
+
+			// Iterate through the string from the right and add commas
+			for (int i = numStr.size() - 1; i >= 0; i--) {
+				result = numStr[i] + result;
+				count++;
+				if (count == 3 && i != 0) {
+					result = "," + result;
+					count = 0;
+				}
+			}
+
+			return result;
+		}
+		
 		void draw_info(std::uint32_t player) {
 			Color m_InfoBG{ 0, 0, 0, 190 };
 			float x = g_Render->m_PosX;
@@ -343,7 +374,7 @@ namespace Saint {
 			const char* playerstate2 = "None / If you see this, buy a lottery ticket!";
 			const char* parachutestate2 = "None";
 			Ped playerPed = ped;
-			std::string total_money = std::format("{}", stats.Money);
+			std::string total_money = std::format("${}", separateByCommas(stats.Money));
 			if (PED::GET_PED_PARACHUTE_STATE(playerPed) == 0)
 			{
 				parachutestate2 = "Wearing";
@@ -466,11 +497,11 @@ namespace Saint {
 
 
 			
-			std::string get_wallet_and_bank = std::format("{} | {}", stats.WalletBalance, stats.Money - stats.WalletBalance);
+			std::string get_wallet_and_bank = std::format("${} | ${}", separateByCommas(stats.WalletBalance), separateByCommas(stats.Money - stats.WalletBalance));
 			Text("Wallet & Bank", { m_white }, { LTextX, TextY + 0.285f }, { 0.23f, 0.23f }, false);
 			g_Render->DrawRightText(get_wallet_and_bank.c_str(), SeperatorX - 0.0523f, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.295f, 0.001f, 0.015f, m_white);
-			Text("Money", { m_white }, { SeperatorX - 0.048f, TextY + 0.285f }, { 0.23f, 0.23f }, false);
+			Text("Total Money", { m_white }, { SeperatorX - 0.048f, TextY + 0.285f }, { 0.23f, 0.23f }, false);
 			g_Render->DrawRightText(total_money.c_str(), RTextX2, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			Text("Rank", { m_white }, { LTextX, TextY + 0.31f }, { 0.23f, 0.23f }, false);
@@ -482,8 +513,8 @@ namespace Saint {
 			Text("RP", { m_white }, { LTextX, TextY + 0.335f }, { 0.23f, 0.23f }, false);
 			g_Render->DrawRightText(std::to_string(stats.GlobalRP).c_str(), SeperatorX - 0.0523f, TextY + 0.335f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.345f, 0.001f, 0.015f, m_white);
-			Text("Kill Streak", { m_white }, { SeperatorX - 0.048f, TextY + 0.335f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(std::to_string(stats1.KillStreak).c_str(), RTextX2, TextY + 0.335f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			Text("Yacht Name", { m_white }, { SeperatorX - 0.048f, TextY + 0.335f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(stats3.YachtData.Appearance.Name, RTextX2, TextY + 0.335f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			Text("CEO Name", { m_white }, { LTextX, TextY + 0.36f }, { 0.23f, 0.23f }, false);
 			g_Render->DrawRightText(stats2.BossGoon.GangName, SeperatorX - 0.0523f, TextY + 0.36f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
@@ -509,31 +540,29 @@ namespace Saint {
 			g_Render->DrawRightText(std::format("{}.{}.{}.{}", get_ip_address(player).m_field1, get_ip_address(player).m_field2, get_ip_address(player).m_field3, get_ip_address(player).m_field4).c_str(), SeperatorX - 0.0523f, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.455f, 0.001f, 0.015f, m_white);
-			Text("Region", { m_white }, { SeperatorX - 0.048f, TextY + 0.445f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", RTextX2, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			Text("Port", { m_white }, { SeperatorX - 0.048f, TextY + 0.445f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(std::to_string(get_port(player)).c_str(), RTextX2, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			Text("City", { m_white }, { LTextX, TextY + 0.47f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", SeperatorX - 0.0523f, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			Text("Crew Name", { m_white }, { LTextX, TextY + 0.47f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(get_net_player(player)->m_clan_data.m_clan_name, SeperatorX - 0.0523f, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.48f, 0.001f, 0.015f, m_white);
-			Text("Country", { m_white }, { SeperatorX - 0.048f, TextY + 0.47f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", RTextX2, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			Text("Crew Tata", { m_white }, { SeperatorX - 0.048f, TextY + 0.47f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(get_net_player(player)->m_clan_data.m_clan_tag, RTextX2, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			Text("Timezone", { m_white }, { LTextX, TextY + 0.495f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", RTextX2, TextY + 0.495f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			Text("Crew ID", { m_white }, { LTextX, TextY + 0.495f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(std::to_string(get_net_player(player)->m_clan_data.m_clan_id).c_str(), RTextX2, TextY + 0.495f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			Text("Isp", { m_white }, { LTextX, TextY + 0.52f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", RTextX2, TextY + 0.52f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			Text("Crew Members", { m_white }, { LTextX, TextY + 0.52f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(std::to_string(get_net_player(player)->m_clan_data.m_clan_member_count).c_str(), RTextX2, TextY + 0.52f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			Text("Org", { m_white }, { LTextX, TextY + 0.545f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText("Placeholder", RTextX2, TextY + 0.545f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			Text("Crew Color", { m_white }, { LTextX, TextY + 0.545f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(std::to_string(get_net_player(player)->m_clan_data.m_clan_color).c_str(), RTextX2, TextY + 0.545f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 
 
-			//draw_info_text("Clan Name", g_GameVariables->m_net_game_player(player)->m_clan_data.m_clan_name, 2, 0);
-
-			//CNetGamePlayer* g_player = g_GameVariables->m_net_game_player(player);
-			rage::joaat_t scene_hash = 0x390DCCF5;//0xAD197067, 0x390DCCF5, 0x3D8F5C29, 0x5ADFAFD0
+			
+			rage::joaat_t scene_hash = 0x390DCCF5;
 			rage::joaat_t element = 0;
 			CPed* local_ped = NETWORK::NETWORK_IS_SESSION_STARTED() ? all_players.get_ped(player) : (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_ped;
 			uintptr_t ui_3d_draw_manager = *(uint64_t*)(g_GameVariables->ui_3d_draw_manager);

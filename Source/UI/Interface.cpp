@@ -551,7 +551,9 @@ namespace Saint::UserInterface
 				m_SubheaderTextRight,
 				false, true);
 
-			GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (0.0005f / 2.0f) + 0.031, m_Width, 0.0018f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
+			if (lines_enabled) {
+				GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (0.0005f / 2.0f) + 0.031, m_Width, 0.0018f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
+			}
 
 
 
@@ -935,115 +937,119 @@ namespace Saint::UserInterface
 
 	void UIManager::DrawFooter()
 	{
-		float size = m_FooterSpriteSize;
-		float rotation = 0.f;
-		const char* texture = "shop_arrows_upanddown";
-		auto sub = m_SubmenuStack.top();
+		if (footer_enabled) {
+			float size = m_FooterSpriteSize;
+			float rotation = 0.f;
+			const char* texture = "shop_arrows_upanddown";
+			auto sub = m_SubmenuStack.top();
 
-		if (!m_SubmenuStack.empty())
-		{
-			if (sub->GetSelectedOption() == 0)
+			if (!m_SubmenuStack.empty())
 			{
-				rotation = 90.f;
-				texture = "arrowright";
-				size *= 0.8f;
-			}
-			else if (sub->GetSelectedOption() + 1 == sub->GetNumOptions())
-			{
-				rotation = 270.f;
-				texture = "arrowright";
-				size *= 0.8f;
-			}
-		}
-
-		if (sub->GetNumOptions() >= m_OptionsPerPage && m_dynamic_footer) {
-
-			auto sizee = GetSpriteScale(size);
-
-			DrawRect(
-				m_PosX,
-				m_DrawBaseY + (m_FooterHeight / 2.f),
-				m_Width,
-				m_FooterHeight,
-				m_FooterBackgroundColor);
-
-			DrawSprite(
-				"commonmenu",
-				texture,
-				m_PosX,
-				m_DrawBaseY + (m_FooterHeight / 2.f),
-				sizee.x,
-				sizee.y,
-				m_FooterSpriteColor,
-				rotation);
-
-			char rightText[32] = {};
-			std::snprintf(rightText, sizeof(rightText) - 1, "%zu ~s~&#8226; %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
-
-			if (LeftFooterText) {
-				DrawLeftText(
-					VERSION_TYPE,
-					m_PosX - (m_Width / m_FooterTextPadding),
-					m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
-					m_FooterTextSize, m_FooterTextFont,
-					m_FooterTextColor,
-					false, true);
-			}
-			if (RightFooterText) {
-				DrawRightText(
-					g_GameVariables->m_version,
-					m_PosX + (m_Width / m_FooterTextPadding),
-					m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
-					m_FooterTextSize, m_FooterTextFont,
-					m_FooterTextColor,
-					false, true);
+				if (sub->GetSelectedOption() == 0)
+				{
+					rotation = 90.f;
+					texture = "arrowright";
+					size *= 0.8f;
+				}
+				else if (sub->GetSelectedOption() + 1 == sub->GetNumOptions())
+				{
+					rotation = 270.f;
+					texture = "arrowright";
+					size *= 0.8f;
+				}
 			}
 
-			m_DrawBaseY += m_FooterHeight;
-		}
-		else if (!m_dynamic_footer) {
-			auto sizee = GetSpriteScale(size);
+			if (sub->GetNumOptions() >= m_OptionsPerPage && m_dynamic_footer) {
 
-			DrawRect(
-				m_PosX,
-				m_DrawBaseY + (m_FooterHeight / 2.f),
-				m_Width,
-				m_FooterHeight,
-				m_FooterBackgroundColor);
+				auto sizee = GetSpriteScale(size);
 
-			DrawSprite(
-				"commonmenu",
-				texture,
-				m_PosX,
-				m_DrawBaseY + (m_FooterHeight / 2.f),
-				sizee.x,
-				sizee.y,
-				m_FooterSpriteColor,
-				rotation);
+				DrawRect(
+					m_PosX,
+					m_DrawBaseY + (m_FooterHeight / 2.f),
+					m_Width,
+					m_FooterHeight,
+					m_FooterBackgroundColor);
 
-			char rightText[32] = {};
-			std::snprintf(rightText, sizeof(rightText) - 1, "%zu ~s~&#8226; %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
+				DrawSprite(
+					"commonmenu",
+					texture,
+					m_PosX,
+					m_DrawBaseY + (m_FooterHeight / 2.f),
+					sizee.x,
+					sizee.y,
+					m_FooterSpriteColor,
+					rotation);
 
-			if (LeftFooterText) {
-				DrawLeftText(
-					"Saint Free",
-					m_PosX - (m_Width / m_FooterTextPadding),
-					m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
-					m_FooterTextSize, m_FooterTextFont,
-					m_FooterTextColor,
-					false, true);
+				char rightText[32] = {};
+				std::snprintf(rightText, sizeof(rightText) - 1, "%zu ~s~&#8226; %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
+
+				if (LeftFooterText) {
+					DrawLeftText(
+						VERSION_TYPE,
+						m_PosX - (m_Width / m_FooterTextPadding),
+						m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
+						m_FooterTextSize, m_FooterTextFont,
+						m_FooterTextColor,
+						false, true);
+				}
+				if (RightFooterText) {
+					DrawRightText(
+						g_GameVariables->m_version,
+						m_PosX + (m_Width / m_FooterTextPadding),
+						m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
+						m_FooterTextSize, m_FooterTextFont,
+						m_FooterTextColor,
+						false, true);
+				}
+
+				m_DrawBaseY += m_FooterHeight;
 			}
-			if (RightFooterText) {
-				DrawRightText(
-					g_GameVariables->m_version,
-					m_PosX + (m_Width / m_FooterTextPadding),
-					m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
-					m_FooterTextSize, m_FooterTextFont,
-					m_FooterTextColor,
-					false, true);
+			else if (!m_dynamic_footer) {
+				auto sizee = GetSpriteScale(size);
+
+				DrawRect(
+					m_PosX,
+					m_DrawBaseY + (m_FooterHeight / 2.f),
+					m_Width,
+					m_FooterHeight,
+					m_FooterBackgroundColor);
+
+				DrawSprite(
+					"commonmenu",
+					texture,
+					m_PosX,
+					m_DrawBaseY + (m_FooterHeight / 2.f),
+					sizee.x,
+					sizee.y,
+					m_FooterSpriteColor,
+					rotation);
+
+				char rightText[32] = {};
+				std::snprintf(rightText, sizeof(rightText) - 1, "%zu ~s~&#8226; %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
+
+				if (LeftFooterText) {
+					DrawLeftText(
+						"Saint Free",
+						m_PosX - (m_Width / m_FooterTextPadding),
+						m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
+						m_FooterTextSize, m_FooterTextFont,
+						m_FooterTextColor,
+						false, true);
+				}
+				if (RightFooterText) {
+					DrawRightText(
+						g_GameVariables->m_version,
+						m_PosX + (m_Width / m_FooterTextPadding),
+						m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
+						m_FooterTextSize, m_FooterTextFont,
+						m_FooterTextColor,
+						false, true);
+				}
+				if (lines_enabled) {
+					GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (0.001f / 2.0f), m_Width, 0.0018f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
+				}
+				m_DrawBaseY += m_FooterHeight;
 			}
-			GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (0.001f / 2.0f), m_Width, 0.0018f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
-			m_DrawBaseY += m_FooterHeight;
 		}
 	}
 

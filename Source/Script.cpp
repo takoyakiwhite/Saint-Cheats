@@ -5210,6 +5210,8 @@ namespace Saint
 				sub->draw_option<submenu>("Header", nullptr, CustomizationHeader);
 				sub->draw_option<submenu>("Subheader", nullptr, CustomizationSubheader);
 				sub->draw_option<submenu>("Toggles", nullptr, CustomizationToggles);
+				sub->draw_option<submenu>("Footer", nullptr, SubmenuSettingsFooter);
+				sub->draw_option<toggle<bool>>("Lines", nullptr, &g_Render->lines_enabled, BoolDisplay::OnOff);
 				sub->draw_option<number<float>>("Text Size", nullptr, &g_Render->m_OptionTextSize, 0.01f, 1.f, 0.01f, 2);
 
 
@@ -5680,18 +5682,10 @@ namespace Saint
 
 		g_Render->draw_submenu<sub>("Footer", SubmenuSettingsFooter, [](sub* sub)
 			{
+				sub->draw_option<toggle<bool>>("Enabled", nullptr, &g_Render->footer_enabled, BoolDisplay::OnOff);
 				sub->draw_option<number<float>>("Height", nullptr, &g_Render->m_FooterHeight, 0.01f, 0.1f, 0.001f, 3);
 		sub->draw_option<number<float>>("Sprite Size", nullptr, &g_Render->m_FooterSpriteSize, 0.01f, 1.f, 0.001f, 3);
 		sub->draw_option<toggle<bool>>("Dynamic Footer", nullptr, &g_Render->m_dynamic_footer, BoolDisplay::OnOff);
-		sub->draw_option<UnclickOption>(("Colors"), nullptr, [] {});
-		sub->draw_option<number<std::int32_t>>("Background R", nullptr, &g_Render->m_FooterBackgroundColor.r, 0, 255);
-		sub->draw_option<number<std::int32_t>>("Background G", nullptr, &g_Render->m_FooterBackgroundColor.g, 0, 255);
-		sub->draw_option<number<std::int32_t>>("Background B", nullptr, &g_Render->m_FooterBackgroundColor.b, 0, 255);
-		sub->draw_option<number<std::int32_t>>("Background A", nullptr, &g_Render->m_FooterBackgroundColor.a, 0, 255);
-		sub->draw_option<number<std::int32_t>>("Sprite R", nullptr, &g_Render->m_FooterSpriteColor.r, 0, 255);
-		sub->draw_option<number<std::int32_t>>("Sprite G", nullptr, &g_Render->m_FooterSpriteColor.g, 0, 255);
-		sub->draw_option<number<std::int32_t>>("Sprite B", nullptr, &g_Render->m_FooterSpriteColor.b, 0, 255);
-		sub->draw_option<number<std::int32_t>>("Sprite A", nullptr, &g_Render->m_FooterSpriteColor.a, 0, 255);
 			});
 
 		g_Render->draw_submenu<sub>("Header", SubmenuSettingsHeader, [](sub* sub)

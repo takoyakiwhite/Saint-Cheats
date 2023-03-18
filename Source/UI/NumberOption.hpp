@@ -60,7 +60,6 @@ namespace Saint::UserInterface
 		void HandleAction(OptionAction action) override
 		{
 			
-			
 			if (action == OptionAction::LeftPress)
 			{
 				if (*m_Number - m_Step < m_Min)
