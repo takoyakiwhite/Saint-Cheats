@@ -12,8 +12,23 @@ namespace Saint {
 	public:
 		bool ip = false;
 		bool port = false;
+		bool vehicle = false;
+		bool state = false;
+		bool wanted_level = false;
+		bool all = true;
+		bool ped = true;
+		bool id, parachute_state, standuser, zone, street, coords, heading, distance, speed, walletandbank, totalmoney, rank, favvehicle, rp, yachtname, ceoname, mcname, offtheradar, kd, kills, deaths, ammo = false;
 	};
 	inline hide_informationg hide_information;
+	class tags4 {
+	public:
+		bool self = true;
+		bool saint_user = true;
+		bool interior = true;
+		bool script_host = true;
+		bool modder = true;
+	};
+	inline tags4 tags;
 	class PlayersData {
 	public:
 
@@ -70,7 +85,7 @@ namespace Saint {
 		
 		void draw_info_text(const char* text, const char* text2, int pos, float x_offset, bool first = false) {
 			float x = g_Render->m_PosX;
-			Color col2 = { 255, 255, 255, 190 };
+			Color col2 = { 255, 255, 255, 255 };
 			float offset = 0.02;
 			float xfr = x + 0.205f + offset;
 			if (first) {
@@ -334,22 +349,21 @@ namespace Saint {
 
 			float LeftOffset = SeperatorX - 0.0523f;
 
-			g_Render->DrawRect(PosX, PosY + 0.0202f, 0.25f, 0.375f, m_InfoBG);//draw main info rect
-			g_Render->DrawRect(PosX, PosY - 0.0220f * 7.652f, 0.25f, 0.002f, g_Render->m_HeaderBackgroundColor);//draw main info top bar 
+			g_Render->DrawRect(PosX, PosY + 0.0202f, 0.25f, 0.375f, m_InfoBG); // main
+			g_Render->DrawRect(PosX, PosY - 0.0220f * 7.652f, 0.25f, 0.002f, g_Render->m_HeaderBackgroundColor);
+
+			if (hide_information.ped) {
+				g_Render->DrawRect(PosX + 0.195, PosY + 0.0202f, 0.135f, 0.375f, m_InfoBG);
+				g_Render->DrawRect(PosX + 0.195, PosY - 0.0220f * 7.652f, 0.135f, 0.002f, g_Render->m_HeaderBackgroundColor);
+			}
 
 
-			g_Render->DrawRect(PosX + 0.195, PosY + 0.0202f, 0.135f, 0.375f, m_InfoBG);//draw ped preview rect
-			g_Render->DrawRect(PosX + 0.195, PosY - 0.0220f * 7.652f, 0.135f, 0.002f, g_Render->m_HeaderBackgroundColor);//draw ped preview top bar 
+			
 
-
-			//geo info
-
-			g_Render->DrawRect(PosX, PosY + 0.28, 0.25f, 0.125, m_InfoBG);//draw geo info rect
-			g_Render->DrawRect(PosX, PosY + 0.31 - 0.09375, 0.25f, 0.002f, g_Render->m_HeaderBackgroundColor);//draw geo info top bar 
+			g_Render->DrawRect(PosX, PosY + 0.28, 0.25f, 0.125, m_InfoBG); // second bar
+			g_Render->DrawRect(PosX, PosY + 0.31 - 0.09375, 0.25f, 0.002f, g_Render->m_HeaderBackgroundColor);
 
 			Ped ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player);
-			//std::string Health = ("%s", std::to_string(GetHealth(ped)));
-			//std::string Armor = ("%s", std::to_string(GetArmor(ped, player)));
 
 			NativeVector3 get_coords = ENTITY::GET_ENTITY_COORDS(ped, 0);
 			std::string wantedlvl = GetWanted(player);
@@ -461,86 +475,87 @@ namespace Saint {
 			}
 			float placey = 0.057f;
 			Text("Vehicle", { m_white }, { LTextX, TextY + placey }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText((PED::GET_VEHICLE_PED_IS_IN(ped, false) == 0) ? "N/A" : HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(PED::GET_VEHICLE_PED_IS_IN(playerPed, false)))), RTextX2, TextY + placey, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.vehicle ? "~t~~italic~Hidden" : (PED::GET_VEHICLE_PED_IS_IN(ped, false) == 0) ? "N/A" : HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(PED::GET_VEHICLE_PED_IS_IN(playerPed, false)))), RTextX2, TextY + placey, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			float placey2 = 0.077f;
 			Text("State", { m_white }, { LTextX, TextY + placey2 }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(playerstate2, RTextX2, TextY + placey2, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.vehicle ? "~t~~italic~Hidden" : playerstate2, RTextX2, TextY + placey2, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			Text("Wanted Level", { m_white }, { LTextX, TextY + placey2 + 0.020f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(wantedLevel, RTextX2, TextY + placey2 + 0.020f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.wanted_level ? "~t~~italic~Hidden" : wantedLevel, RTextX2, TextY + placey2 + 0.020f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			Text("ID", { m_white }, { LTextX, TextY + placey2 + 0.040f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(std::to_string(player).c_str(), RTextX2, TextY + placey2 + 0.040f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.id ? "~t~~italic~Hidden" : std::to_string(player).c_str(), RTextX2, TextY + placey2 + 0.040f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			Text("Parachute State", { m_white }, { LTextX, TextY + 0.135f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(parachutestate2, LeftOffset, TextY + 0.135f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			Text("Parachute State", { m_white }, { LTextX, TextY + 0.139f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(hide_information.parachute_state ? "~t~~italic~Hidden" : parachutestate2, LeftOffset, TextY + 0.139f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.145f, 0.001f, 0.015f, m_white);
-			Text("Ammo", { m_white }, { SeperatorX - 0.048f, TextY + 0.135f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(ammo.c_str(), RTextX2, TextY + 0.135f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.148f, 0.001f, 0.015f, m_white);
+			Text("Ammo", { m_white }, { SeperatorX - 0.048f, TextY + 0.139f }, { 0.23f, 0.23f }, false);
+			g_Render->DrawRightText(hide_information.ammo ? "~t~~italic~Hidden" : ammo.c_str(), RTextX2, TextY + 0.148f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			Text("Stand User", { m_white }, { LTextX, TextY + 0.16f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(is_player_stand_user(player) ? "Yes" : "No", RTextX2, TextY + 0.16f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.standuser ? "~t~~italic~Hidden" : is_player_stand_user(player) ? "Yes" : "No", RTextX2, TextY + 0.16f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			Text("Zone", { m_white }, { LTextX, TextY + 0.185f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(Zone.c_str(), RTextX2, TextY + 0.185, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.zone ? "~t~~italic~Hidden" : Zone.c_str(), RTextX2, TextY + 0.185, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			Text("Street", { m_white }, { LTextX, TextY + 0.21f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(Street.c_str(), RTextX2, TextY + 0.21, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.street ? "~t~~italic~Hidden" : Street.c_str(), RTextX2, TextY + 0.21, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			Text("Coords", { m_white }, { LTextX, TextY + 0.235f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(coords.c_str(), SeperatorX - 0.0523f, TextY + 0.235f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.coords ? "~t~~italic~Hidden" : coords.c_str(), SeperatorX - 0.0523f, TextY + 0.235f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.245f, 0.001f, 0.015f, m_white);
 			Text("Heading", { m_white }, { SeperatorX - 0.048f, TextY + 0.235f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(heading.c_str(), RTextX2, TextY + 0.235f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.heading ? "~t~~italic~Hidden" : heading.c_str(), RTextX2, TextY + 0.235f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			Text("Distance", { m_white }, { LTextX, TextY + 0.26f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(Distance.c_str(), SeperatorX - 0.0523f, TextY + 0.26f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.distance ? "~t~~italic~Hidden" : Distance.c_str(), SeperatorX - 0.0523f, TextY + 0.26f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.27f, 0.001f, 0.015f, m_white);
 			Text("Speed", { m_white }, { SeperatorX - 0.048f, TextY + 0.26f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(Speed.c_str(), RTextX2, TextY + 0.26f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.speed ? "~t~~italic~Hidden" : Speed.c_str(), RTextX2, TextY + 0.26f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 
 			
 			std::string get_wallet_and_bank = std::format("${} | ${}", separateByCommas(stats.WalletBalance), separateByCommas(stats.Money - stats.WalletBalance));
 			Text("Wallet & Bank", { m_white }, { LTextX, TextY + 0.285f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(NETWORK::NETWORK_IS_SESSION_STARTED() ? get_wallet_and_bank.c_str() : "~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.walletandbank ? "~t~~italic~Hidden" : NETWORK::NETWORK_IS_SESSION_STARTED() ? get_wallet_and_bank.c_str() : "~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.295f, 0.001f, 0.015f, m_white);
 			Text("Total Money", { m_white }, { SeperatorX - 0.048f, TextY + 0.285f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(total_money.c_str(), RTextX2, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.totalmoney ? "~t~~italic~Hidden" : total_money.c_str(), RTextX2, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			Text("Rank", { m_white }, { LTextX, TextY + 0.31f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(NETWORK::NETWORK_IS_SESSION_STARTED() ? std::to_string(stats.Rank).c_str() : "~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.31f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.rank ? "~t~~italic~Hidden" : NETWORK::NETWORK_IS_SESSION_STARTED() ? std::to_string(stats.Rank).c_str() : "~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.31f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.32f, 0.001f, 0.015f, m_white);
 			Text("Favorite Vehicle", { m_white }, { SeperatorX - 0.048f, TextY + 0.31f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(stats.FavoriteVehicle)), RTextX2, TextY + 0.31f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			const char* fav_veh = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(stats.FavoriteVehicle));
+			g_Render->DrawRightText(hide_information.favvehicle ? "~t~~italic~Hidden" : fav_veh == "NULL" ? "None" : fav_veh, RTextX2, TextY + 0.31f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			Text("RP", { m_white }, { LTextX, TextY + 0.335f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(std::to_string(stats.GlobalRP).c_str(), SeperatorX - 0.0523f, TextY + 0.335f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.rp ? "~t~~italic~Hidden" : std::to_string(stats.GlobalRP).c_str(), SeperatorX - 0.0523f, TextY + 0.335f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.345f, 0.001f, 0.015f, m_white);
 			Text("Yacht Name", { m_white }, { SeperatorX - 0.048f, TextY + 0.335f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(stats3.YachtData.Appearance.Name, RTextX2, TextY + 0.335f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.yachtname ? "~t~~italic~Hidden" : stats3.YachtData.Appearance.Name.Data, RTextX2, TextY + 0.335f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			Text("CEO Name", { m_white }, { LTextX, TextY + 0.36f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(stats2.BossGoon.GangName, SeperatorX - 0.0523f, TextY + 0.36f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.ceoname ? "~t~~italic~Hidden" : stats2.BossGoon.GangName.Data, SeperatorX - 0.0523f, TextY + 0.36f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.37f, 0.001f, 0.015f, m_white);
 			Text("MC Name", { m_white }, { SeperatorX - 0.048f, TextY + 0.36f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(stats2.BossGoon.MCName, RTextX2, TextY + 0.36f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.mcname ? "~t~~italic~Hidden" : stats2.BossGoon.MCName.Data, RTextX2, TextY + 0.36f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 			Text("Off The Radar", { m_white }, { LTextX, TextY + 0.385f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(stats3.OffRadarActive == 1 ? "Yes" : "No", SeperatorX - 0.0523f, TextY + 0.385f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.offtheradar ? "~t~~italic~Hidden" : stats3.OffRadarActive == 1 ? "Yes" : "No", SeperatorX - 0.0523f, TextY + 0.385f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.395f, 0.001f, 0.015f, m_white);
 			Text("KD", { m_white }, { SeperatorX - 0.048f, TextY + 0.385f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(std::to_string(stats1.PlayerStats.KdRatio).c_str(), RTextX2, TextY + 0.385f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.kd ? "~t~~italic~Hidden" : std::to_string(stats1.PlayerStats.KdRatio).c_str(), RTextX2, TextY + 0.385f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 
 			Text("Kills", { m_white }, { LTextX, TextY + 0.41f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(std::to_string(stats1.PlayerStats.DeathsByPlayers).c_str(), SeperatorX - 0.0523f, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.kills ? "~t~~italic~Hidden" : std::to_string(stats1.PlayerStats.DeathsByPlayers).c_str(), SeperatorX - 0.0523f, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.42f, 0.001f, 0.015f, m_white);
 			Text("Deaths", { m_white }, { SeperatorX - 0.048f, TextY + 0.41f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(std::to_string(stats1.PlayerStats.KillsOnPlayers).c_str(), RTextX2, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.deaths ? "~t~~italic~Hidden" : std::to_string(stats1.PlayerStats.KillsOnPlayers).c_str(), RTextX2, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 			if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
 				Text("IP", { m_white }, { LTextX, TextY + 0.445f }, { 0.23f, 0.23f }, false);
 				if (hide_information.ip) {
@@ -602,27 +617,28 @@ namespace Saint {
 
 
 
-			
-			rage::joaat_t scene_hash = 0x390DCCF5;
-			rage::joaat_t element = 0;
-			CPed* local_ped = NETWORK::NETWORK_IS_SESSION_STARTED() ? all_players.get_ped(player) : (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_ped;
-			uintptr_t ui_3d_draw_manager = *(uint64_t*)(g_GameVariables->ui_3d_draw_manager);
+			if (hide_information.ped) {
+				rage::joaat_t scene_hash = 0x390DCCF5;
+				rage::joaat_t element = 0;
+				CPed* local_ped = NETWORK::NETWORK_IS_SESSION_STARTED() ? all_players.get_ped(player) : (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_ped;
+				uintptr_t ui_3d_draw_manager = *(uint64_t*)(g_GameVariables->ui_3d_draw_manager);
 
-			Vector3 pos = { x - pedx, y * 0.8f, pedyy };
+				Vector3 pos = { x - pedx, y * 0.8f, pedyy };
 
-			if (ui_3d_draw_manager) {
+				if (ui_3d_draw_manager) {
 
-				DWORD* preset2 = call<DWORD*>(g_GameVariables->get_scene_preset, ui_3d_draw_manager, &scene_hash);
-				DWORD* preset = preset2 + (0x2A0 * element);
+					DWORD* preset2 = call<DWORD*>(g_GameVariables->get_scene_preset, ui_3d_draw_manager, &scene_hash);
+					DWORD* preset = preset2 + (0x2A0 * element);
 
-				if (preset) {
+					if (preset) {
 
-					*(float*)(preset + 0x12) = 0;
-					*(float*)(preset + 0x9) = -3.8f;//size
-				}
-				if (call<bool>(g_GameVariables->push_scene_preset_manager, ui_3d_draw_manager, &scene_hash)) {
-					if (call<bool>(g_GameVariables->add_element_to_scene, ui_3d_draw_manager, &scene_hash, element, local_ped, pos, 1.0f)) {
-						call<bool>(g_GameVariables->set_scene_element_lighting, ui_3d_draw_manager, &scene_hash, element, 1.6f);
+						*(float*)(preset + 0x12) = 0;
+						*(float*)(preset + 0x9) = -3.8f;
+					}
+					if (call<bool>(g_GameVariables->push_scene_preset_manager, ui_3d_draw_manager, &scene_hash)) {
+						if (call<bool>(g_GameVariables->add_element_to_scene, ui_3d_draw_manager, &scene_hash, element, local_ped, pos, 1.0f)) {
+							call<bool>(g_GameVariables->set_scene_element_lighting, ui_3d_draw_manager, &scene_hash, element, 1.6f);
+						}
 					}
 				}
 			}

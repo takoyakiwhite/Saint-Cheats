@@ -2903,33 +2903,39 @@ namespace Saint {
 		bool spoof_sender = false;
 		void add_message(const char* msg, const char* player_name, bool is_team)
 		{
-			if (Hooks::send_chat_message(*g_GameFunctions->m_send_chat_ptr, g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_net_data(), msg, false)) {
-				g_GameFunctions->m_send_chat_ptr, g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_net_data(), msg, false;
-				int scaleform = GRAPHICS::REQUEST_SCALEFORM_MOVIE("MULTIPLAYER_CHAT");
-				GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(scaleform, "ADD_MESSAGE");
-				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING(player_name); // player name
-				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_LITERAL_STRING(msg); // content
-				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(is_team ? "MP_CHAT_TEAM" : "MP_CHAT_ALL")); // scope
-				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_BOOL(false); // teamOnly
-				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0); // eHudColour
-				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
-				GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(scaleform, "SET_FOCUS");
-				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(1); // VISIBLE_STATE_DEFAULT
-				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0); // scopeType (unused)
-				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0); // scope (unused)
-				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING(player_name); // player
-				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0); // eHudColour
-				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
-				GRAPHICS::DRAW_SCALEFORM_MOVIE_FULLSCREEN(scaleform, 255, 255, 255, 255, 0);
+			if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+				if (Hooks::send_chat_message(*g_GameFunctions->m_send_chat_ptr, g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_net_data(), msg, false)) {
+					g_GameFunctions->m_send_chat_message(*g_GameFunctions->m_send_chat_ptr, g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_net_data(), msg, false);
+					g_GameFunctions->m_send_chat_ptr, g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_net_data(), msg, false;
+					int scaleform = GRAPHICS::REQUEST_SCALEFORM_MOVIE("MULTIPLAYER_CHAT");
+					GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(scaleform, "ADD_MESSAGE");
+					GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING(player_name);
+					GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_LITERAL_STRING(msg);
+					GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(is_team ? "MP_CHAT_TEAM" : "MP_CHAT_ALL"));
+					GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_BOOL(false);
+					GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0);
+					GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+					GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(scaleform, "SET_FOCUS");
+					GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(1);
+					GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0);
+					GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0);
+					GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING(player_name);
+					GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(0);
+					GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+					GRAPHICS::DRAW_SCALEFORM_MOVIE_FULLSCREEN(scaleform, 255, 255, 255, 255, 0);
+				}
 			}
+			
 
 		}
 		void init() {
 			if (spammer) {
-				static int timer;
-				if (timer == 0 || (int)(GetTickCount64() - timer) > delay) {
-					add_message(text.c_str(), g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_name(), false);
-					timer = GetTickCount64();
+				if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+					static int timer;
+					if (timer == 0 || (int)(GetTickCount64() - timer) > delay) {
+						add_message(text.c_str(), g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_name(), false);
+						timer = GetTickCount64();
+					}
 				}
 			}
 			if (team_only) {
@@ -2937,7 +2943,9 @@ namespace Saint {
 			}
 		}
 		void send_once() {
-			add_message(text.c_str(), g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_name(), false);
+			if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+				add_message(text.c_str(), g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_name(), false);
+			}
 		}
 	};
 	inline Chat chat;
@@ -4448,6 +4456,7 @@ namespace Saint {
 					}
 				}
 				if (size == 0) {
+					STREAMING::REQUEST_NAMED_PTFX_ASSET("scr_minigametennis");
 					g_CallbackScript->AddCallback<PTFXCallback>("scr_minigametennis", [=] {
 
 						GRAPHICS::USE_PARTICLE_FX_ASSET("scr_minigametennis");
@@ -4462,17 +4471,19 @@ namespace Saint {
 						});
 				}
 				if (size == 1) {
+					STREAMING::REQUEST_NAMED_PTFX_ASSET("scr_indep_fireworks");
 					g_CallbackScript->AddCallback<PTFXCallback>("scr_indep_fireworks", [=] {
 
 						GRAPHICS::USE_PARTICLE_FX_ASSET("scr_indep_fireworks");
+						
 					int handle = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("scr_indep_firework_sparkle_spawn", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 28422, 0.5f, 0, 0, 0);
-					GRAPHICS::SET_PARTICLE_FX_NON_LOOPED_COLOUR(r, g, b);
+					
 
 
 
 					GRAPHICS::USE_PARTICLE_FX_ASSET("scr_indep_fireworks");
 					int handle1 = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("scr_indep_firework_sparkle_spawn", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 60309, 0.5f, 0, 0, 0);
-					GRAPHICS::SET_PARTICLE_FX_NON_LOOPED_COLOUR(r, g, b);
+					
 						});
 				}
 			}
@@ -4522,7 +4533,7 @@ namespace Saint {
 		void add(Player player) {
 			std::string name = PLAYER::GET_PLAYER_NAME(player);
 			int netHandle[13];
-			NETWORK::NETWORK_HANDLE_FROM_PLAYER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player), netHandle, 13);
+			NETWORK::NETWORK_HANDLE_FROM_PLAYER(player, netHandle, 13);
 			std::string MenuFolderPath = "C:\\Saint\\Players\\";
 			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s is already saved!", name});
@@ -5104,8 +5115,30 @@ namespace Saint {
 	inline p_cha p_chat;
 	inline std::string Bufferfrrrr;
 	inline int boost_power = 150;
+	class rainb3ow_ui {
+	public:
+		bool main = false;
+		void init() {
+			if (main) {
+				if (g_Render->m_HeaderBackgroundColor.r > 0 && g_Render->m_HeaderBackgroundColor.b == 0) {
+					g_Render->m_HeaderBackgroundColor.r--;
+					g_Render->m_HeaderBackgroundColor.g++;
+				}
+				if (g_Render->m_HeaderBackgroundColor.g > 0 && g_Render->m_HeaderBackgroundColor.r == 0) {
+					g_Render->m_HeaderBackgroundColor.g--;
+					g_Render->m_HeaderBackgroundColor.b++;
+				}
+				if (g_Render->m_HeaderBackgroundColor.b > 0 && g_Render->m_HeaderBackgroundColor.g == 0) {
+					g_Render->m_HeaderBackgroundColor.r++;
+					g_Render->m_HeaderBackgroundColor.b--;
+				}
+				
+			}
+		}
+	};
+	inline rainb3ow_ui rainbow_ui;
 	inline void FeatureInitalize() {
-		
+		rainbow_ui.init();
 		get_model_info.init();
 	
 		if (mark_as_Saint) {

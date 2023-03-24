@@ -3763,11 +3763,11 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Chat"), SubmenuChat, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Spammer", nullptr, SubmenuSpammer);
-		sub->draw_option<toggle<bool>>(("Team Only"), nullptr, &chat.team_only, BoolDisplay::OnOff, false, [] {
-			if (!chat.team_only) {
-				NETWORK::NETWORK_SET_TEAM_ONLY_CHAT(false);
-			}
-			});
+				sub->draw_option<toggle<bool>>(("Team Only"), nullptr, &chat.team_only, BoolDisplay::OnOff, false, [] {
+					if (!chat.team_only) {
+						NETWORK::NETWORK_SET_TEAM_ONLY_CHAT(false);
+					}
+					});
 
 
 			});
@@ -3929,12 +3929,50 @@ namespace Saint
 			{
 				sub->draw_option<toggle<bool>>(("IP"), nullptr, &hide_information.ip, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Port"), nullptr, &hide_information.port, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Vehicle"), nullptr, &hide_information.vehicle, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("State"), nullptr, &hide_information.state, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Wanted Level"), nullptr, &hide_information.wanted_level, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("ID"), nullptr, &hide_information.id, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Parachute State"), nullptr, &hide_information.parachute_state, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Ammo"), nullptr, &hide_information.ammo, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Stand User"), nullptr, &hide_information.standuser, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Zone"), nullptr, &hide_information.zone, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Street"), nullptr, &hide_information.street, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Coords"), nullptr, &hide_information.coords, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Distance"), nullptr, &hide_information.distance, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Wallet & Bank"), nullptr, &hide_information.walletandbank, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Total Money"), nullptr, &hide_information.totalmoney, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Heading"), nullptr, &hide_information.heading, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Speed"), nullptr, &hide_information.speed, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Rank"), nullptr, &hide_information.rank, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Favorite Vehicle"), nullptr, &hide_information.favvehicle, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("RP"), nullptr, &hide_information.rp, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Yacht Name"), nullptr, &hide_information.yachtname, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Ceo Name"), nullptr, &hide_information.ceoname, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("MC Name"), nullptr, &hide_information.mcname, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Off The Radar"), nullptr, &hide_information.offtheradar, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("KD"), nullptr, &hide_information.kd, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Kills"), nullptr, &hide_information.kills, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Deaths"), nullptr, &hide_information.deaths, BoolDisplay::OnOff);
+			});
+		g_Render->draw_submenu<sub>("Settings", rage::joaat("PlayerInfoSettings"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Player Information"), nullptr, &hide_information.all, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Ped Preview"), nullptr, &hide_information.ped, BoolDisplay::OnOff);
+				sub->draw_option<UnclickOption>(("Tags"), nullptr, [] {});
+				sub->draw_option<toggle<bool>>(("Self"), nullptr, &tags.self, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Saint"), nullptr, &tags.saint_user, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Interior"), nullptr, &tags.interior, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Modder"), nullptr, &tags.modder, BoolDisplay::OnOff);
+
+				
 			});
 		g_Render->draw_submenu<sub>("Player List", SubmenuPlayerList, [](sub* sub)
 			{
 				sub->draw_option<submenu>("All", nullptr, SubmenuAllPlayers);
 				sub->draw_option<submenu>("Saved", nullptr, SubmenuSavedPlayers);
 				sub->draw_option<submenu>("Hide Information", nullptr, rage::joaat("HideINFO"));
+				sub->draw_option<submenu>("Settings", nullptr, rage::joaat("PlayerInfoSettings"));
 				
 
 
@@ -3947,16 +3985,21 @@ namespace Saint
 					if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))
 					{
 						if (sub->GetSelectedOption() == sub->GetNumOptions()) {
-							g_players.draw_info(i);
+							if (hide_information.all) {
+								g_players.draw_info(i);
+							}
 						}
 						std::string name = PLAYER::GET_PLAYER_NAME(i);
-						if (i == PLAYER::PLAYER_ID())
+						if (i == PLAYER::PLAYER_ID() && tags.self)
 							name.append(" ~p~[Self]");
-						if (PED::GET_PED_CONFIG_FLAG(ped, 109, true)) {
+						if (PED::GET_PED_CONFIG_FLAG(ped, 109, true) && tags.saint_user) {
 							name.append(" ~b~[Saint]");
 						}
+						if (INTERIOR::GET_INTERIOR_FROM_ENTITY(ped) != 0 && tags.interior) {
+							name.append(" ~b~[Interior]");
+						}
 						if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
-							if (antiCheat.cheater[g_GameVariables->m_net_game_player(i)->m_player_id] == true) {
+							if (antiCheat.cheater[g_GameVariables->m_net_game_player(i)->m_player_id] == true && tags.modder) {
 								name.append(" ~r~[Modder]");
 							}
 						}
@@ -4418,9 +4461,35 @@ namespace Saint
 			});
 		sub->draw_option<RegularOption>("Save", nullptr, [=]
 			{
+				bool saved = true;
+				int number_saved = 0;
+				int number_failed = 0;
 				for (std::uint32_t i = 0; i < PLAYER::GET_NUMBER_OF_PLAYERS(); ++i) {
-					m_saved_players.add(i);
+					std::string name = PLAYER::GET_PLAYER_NAME(i);
+					int netHandle[13];
+					NETWORK::NETWORK_HANDLE_FROM_PLAYER(i, netHandle, 13);
+					std::string MenuFolderPath = "C:\\Saint\\Players\\";
+					if (m_saved_players.DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
+						
+						if (number_failed < 2) {
+							Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s is already saved!", name });
+						}
+						if (number_failed > 2 && saved) {
+							
+							Noti::InsertNotification({ ImGuiToastType_None, 2000, "2 or more players are already saved." });
+							saved = false;
+						}
+						number_failed++;
+					}
+					else {
+						Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+						ColorIni->WriteString(name, "Info", "Name");
+						ColorIni->WriteString(NETWORK::NETWORK_MEMBER_ID_FROM_GAMER_HANDLE(&netHandle[0]), "Info", "RID");
+						number_saved++;
+					}
 				}
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Saved a total of %i, and %i already existed.", number_saved, number_failed });
+				saved = true;
 
 			});
 
@@ -5224,14 +5293,24 @@ namespace Saint
 				sub->draw_option<submenu>("Base", nullptr, CustomizationBase);
 				sub->draw_option<submenu>("Header", nullptr, CustomizationHeader);
 				sub->draw_option<submenu>("Subheader", nullptr, CustomizationSubheader);
+				sub->draw_option<submenu>("Option Selected", nullptr, rage::joaat("OptionSele"));
 				sub->draw_option<submenu>("Toggles", nullptr, CustomizationToggles);
 				sub->draw_option<submenu>("Footer", nullptr, SubmenuSettingsFooter);
 				sub->draw_option<submenu>("Break", nullptr, rage::joaat("Break"));
 				sub->draw_option<submenu>("Submenu", nullptr, rage::joaat("SubmenuIndc"));
+				sub->draw_option<submenu>("Rainbow", nullptr, rage::joaat("RainbowGay"));
 				sub->draw_option<toggle<bool>>("Lines", nullptr, &g_Render->lines_enabled, BoolDisplay::OnOff);
 				sub->draw_option<number<float>>("Text Size", nullptr, &g_Render->m_OptionTextSize, 0.01f, 1.f, 0.01f, 2);
 
 
+			});
+		g_Render->draw_submenu<sub>(("Rainbow"), rage::joaat("RainbowGay"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>("Header Background", nullptr, &rainbow_ui.main, BoolDisplay::OnOff);
+			});
+		g_Render->draw_submenu<sub>(("Option Selected"), rage::joaat("OptionSele"), [](sub* sub)
+			{
+				sub->draw_option<number<float>>("Height", nullptr, &g_Render->m_OptionHeight, 0.01f, 0.1f, 0.001f, 3);
 			});
 		g_Render->draw_submenu<sub>(("Submenu"), rage::joaat("SubmenuIndc"), [](sub* sub)
 			{

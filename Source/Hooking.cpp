@@ -66,7 +66,7 @@ namespace Saint
 	{
 		if (join_queue)
 		{
-			g_GameFunctions->m_join_session_by_info(*g_GameFunctions->m_network, &g_Session_info, 1, 1 | 2, nullptr, 0);
+			g_GameFunctions->m_join_session_by_info(*g_GameFunctions->m_network, &g_Session_info, 1, 1 | 2 | 4, nullptr, 0);
 			join_queue = false;
 			src->set_return_value<BOOL>(TRUE);
 		}

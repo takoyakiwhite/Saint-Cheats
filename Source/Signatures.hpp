@@ -106,7 +106,7 @@ namespace Saint
 		clear_ped_tasks_network m_clear_ped_tasks_network;
 
 		int64_t** m_send_chat_ptr{};
-		using chat_message = bool(*)(int64_t* send_chat_ptr, rage::rlGamerInfo* gamer_info, char* message, bool is_team);
+		using chat_message = bool(*)(int64_t* send_chat_ptr, rage::rlGamerInfo* gamer_info, const char* message, bool is_team);
 		chat_message m_send_chat_message{};
 
 		using WndProc = LRESULT(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
