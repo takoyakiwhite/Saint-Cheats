@@ -205,6 +205,7 @@ namespace Saint::UserInterface
 			"Pricedown"
 		};
 		std::size_t HeaderFontIterator = 3;
+		std::size_t HeaderFontIterator2 = 3;
 		Outfits outfits = Outfits::Face;
 
 		Props props = Props::Hats;
@@ -260,14 +261,38 @@ namespace Saint::UserInterface
 		Color m_ToggleOnColor{ 130, 214, 157, 255 };
 		Color m_ToggleOffColor{ 200, 55, 80, 255 };
 		Color m_ToggleCheckColor{ 255,255,255, 255 };
-		const char* ToggleList[4]
+		const char* ToggleList[5]
 		{
 			"Buttons",
-			"Checkmarks",
+			"Checkmarks (Squares)",
 			"None",
 			"Checkmarks",
+			"Custom",
 		};
 		std::size_t ToggleIterator = 0;
+		std::string custom_toggle_dict_on = "commonmenu";
+		std::string custom_toggle_asset_on = "shop_tick_icon";
+		std::string custom_toggle_dict_off = "commonmenu";
+		std::string custom_toggle_asset_off = "shop_tick_icon";
+		float toggle_height = 0.0245f;
+		float toggle_width = 0.01296f;
+		float toggle_height_off = 0.037f;
+		float toggle_width_off = 0.022f;
+		bool toggle_show_on = true;
+		bool toggle_show_off = false;
+		float toggle_on_rotation = 5.0f;
+		float toggle_off_rotation = 45.000;
+
+		//Header
+		float header_x_offset = 0.0f;
+		//smooth scroll
+		float smooth_scroll_speed = 0.15f;
+
+		//break
+		bool break_italic = true;
+
+		//submenu
+		int sub_alpha = 190;
 
 		// Description
 		float m_DescriptionHeightPadding = 0.01f;

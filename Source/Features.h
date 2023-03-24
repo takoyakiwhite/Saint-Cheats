@@ -551,7 +551,13 @@ namespace Saint {
 		bool is_free_aiming() {
 			return PED::GET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 78, true);
 		}
+		bool slide_run = false;
 		void init() {
+			if (slide_run) {
+				if (TASK::IS_PED_RUNNING(PLAYER::PLAYER_PED_ID()) || TASK::IS_PED_SPRINTING(PLAYER::PLAYER_PED_ID()) && !PED::IS_PED_RAGDOLL(PLAYER::PLAYER_PED_ID())) {
+					ENTITY::APPLY_FORCE_TO_ENTITY(PLAYER::PLAYER_PED_ID(), 1, 0.f, 1.5f, 0.f, 0.f, 0.f, 0.f, 1, true, true, true, false, true);
+				}
+			}
 			if (walk_underwater)
 			{
 				if (ENTITY::IS_ENTITY_IN_WATER(PLAYER::PLAYER_PED_ID()))
@@ -3092,19 +3098,21 @@ namespace Saint {
 
 				static bool locked = false;
 				static int zoom = 5;
-				static Entity currEnt{ NULL };
+				static Entity current_entity{ NULL };
 
 				if (locked) {
-					if (IsKeyPressed(VK_RBUTTON))
+					if (PAD::IS_CONTROL_PRESSED(2, 25))
 					{
-						if (currEnt == NULL)
-							PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &currEnt);
+						if (current_entity == NULL) {
+							PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &current_entity);
+						}
 						else
 						{
-							if (ENTITY::IS_ENTITY_A_PED(currEnt) && PED::IS_PED_IN_ANY_VEHICLE(currEnt, true))
-								currEnt = PED::GET_VEHICLE_PED_IS_IN(currEnt, 0);
+							if (ENTITY::IS_ENTITY_A_PED(current_entity) && PED::IS_PED_IN_ANY_VEHICLE(current_entity, true)) {
+								current_entity = PED::GET_VEHICLE_PED_IS_IN(current_entity, 0);
+							}
 
-							take_control_of(currEnt);
+							take_control_of(current_entity);
 
 							NativeVector3 rot = CAM::GET_GAMEPLAY_CAM_ROT(0);
 							NativeVector3 coord = CAM::GET_GAMEPLAY_CAM_COORD();
@@ -3112,32 +3120,32 @@ namespace Saint {
 							NativeVector3 multiplyfr = multiply(&dir, zoom);
 							NativeVector3 spawnPosition = addn(&coord, &multiplyfr);
 
-							NativeVector3 getcoords = ENTITY::GET_ENTITY_COORDS(currEnt, 0);
+							NativeVector3 getcoords = ENTITY::GET_ENTITY_COORDS(current_entity, 0);
 							float getaimcoordsX = GravityGunGoto(spawnPosition.x, getcoords.x);
 							float getaimcoordsY = GravityGunGoto(spawnPosition.y, getcoords.y);
 							float getaimcoordsZ = GravityGunGoto(spawnPosition.z, getcoords.z);
 							if (!PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID())) {
-								ENTITY::SET_ENTITY_VELOCITY(currEnt, getaimcoordsX * 2.0, getaimcoordsY * 2.0, getaimcoordsZ * 2.0);
+								ENTITY::SET_ENTITY_VELOCITY(current_entity, getaimcoordsX * 2.0, getaimcoordsY * 2.0, getaimcoordsZ * 2.0);
 							}
-							//GRAPHICS::DRAW_MARKER(28, spawnPosition.x, spawnPosition.y, spawnPosition.z, 0, 0, 0, 0, 180, 0, 2, 2, 2, 0, 0, 0, 255, 1, 1, 1, 0, 0, 0, 0);
 
-							if (IsKeyPressed(VK_LBUTTON))
+							if (PAD::IS_CONTROL_PRESSED(2, 24))
 							{
 
-								ENTITY::APPLY_FORCE_TO_ENTITY(currEnt, 1, dir.x * m_force, dir.y * m_force, dir.z * m_force, 0.0f, 0.0f, 0.0f, false, false, true, true, false, true);
+								ENTITY::APPLY_FORCE_TO_ENTITY(current_entity, 1, dir.x * m_force, dir.y * m_force, dir.z * m_force, 0.0f, 0.0f, 0.0f, false, false, true, true, false, true);
 								PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_ID(), false);
-								currEnt = NULL;
+								current_entity = NULL;
 								locked = false;
 							}
 
 						}
 
 					}
-					else
-						currEnt = NULL;
+					else {
+						current_entity = NULL;
+					}
 				}
 
-				if (!PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &currEnt)) {
+				if (!PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &current_entity)) {
 					locked = true;
 					PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_ID(), false);
 				}
@@ -5094,6 +5102,8 @@ namespace Saint {
 		}
 	};
 	inline p_cha p_chat;
+	inline std::string Bufferfrrrr;
+	inline int boost_power = 150;
 	inline void FeatureInitalize() {
 		
 		get_model_info.init();

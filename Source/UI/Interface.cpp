@@ -507,7 +507,7 @@ namespace Saint::UserInterface
 		{
 			DrawLeftText(
 				m_CurrentSubMenuName,
-				m_PosX - (m_Width / 2.1f),
+				m_PosX - (m_Width / 2.1f) - header_x_offset,
 				m_DrawBaseY + (m_HeaderHeight / 2.f) - (GetTextHeight(m_HeaderFont, m_HeaderTextSize) / 2.f),
 				m_HeaderTextSize,
 				m_HeaderFont,
@@ -586,7 +586,7 @@ namespace Saint::UserInterface
 			m_OptionUnselectedBackgroundColor);
 		if (selected)
 		{
-			m_CurrentCoord = lerp(m_CurrentCoord, m_DrawBaseY + (m_OptionHeight / 2.f), 0.15f); m_OptionSelectedTextColor;
+			m_CurrentCoord = lerp(m_CurrentCoord, m_DrawBaseY + (m_OptionHeight / 2.f), smooth_scroll_speed); m_OptionSelectedTextColor;
 			GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(2);
 			DrawRect(
 				m_PosX,
@@ -759,67 +759,8 @@ namespace Saint::UserInterface
 			m_SeperatorFont,
 			selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
 			false, false);
-		if (opt->GetFlag(OptionFlag::BoolOption))
-		{
-			auto res = GetSpriteScale(0.025f);
-			auto res2 = GetSpriteScale(0.032f);
-			if (ToggleIterator == 0)
-			{
-				if (ToggledOn)
-				{
-					GRAPHICS::DRAW_SPRITE("CommonMenu", "common_medal", g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f),
-						g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont, g_Render->m_OptionTextSize) / 1.5f) + 0.014f,
-						res.x, res.y,
-						0.0,
-						m_ToggleOnColor.r, m_ToggleOnColor.g, m_ToggleOnColor.b, m_ToggleOnColor.a, false, false);
-				}
-				else if (!ToggledOn)
-				{
-					GRAPHICS::DRAW_SPRITE("CommonMenu", "common_medal",
-						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f)
-						, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont
-							, g_Render->m_OptionTextSize) / 1.5f) + 0.014f
-						, res.x, res.y, 0.0, m_ToggleOffColor.r, m_ToggleOffColor.g, m_ToggleOffColor.b, m_ToggleOffColor.a, false, false);
-				}
-			}
-			else if (ToggleIterator == 1)
-			{
-				if (ToggledOn)
-				{
-					GRAPHICS::DRAW_SPRITE("CommonMenu", "shop_box_tick",
-						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f)
-						, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont
-							, g_Render->m_OptionTextSize) / 1.5f) + 0.014f
-						, res2.x, res2.y, 0.0, m_ToggleCheckColor.r, m_ToggleCheckColor.g, m_ToggleCheckColor.b, m_ToggleCheckColor.a, false, false);
-
-				}
-				else if (!ToggledOn)
-				{
-					GRAPHICS::DRAW_SPRITE("CommonMenu", "shop_box_blank",
-						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f)
-						, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont
-							, g_Render->m_OptionTextSize) / 1.5f) + 0.014f
-						, res2.x, res2.y, 0.0, m_ToggleCheckColor.r, m_ToggleCheckColor.g, m_ToggleCheckColor.b, m_ToggleCheckColor.a, false, false);
-				}
-			}
-			else if (ToggleIterator == 3) {
-				if (ToggledOn)
-				{
-					drawSprite("commonmenu", "shop_tick_icon", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), 0.36f * 0.036, 0.35f * 0.070f, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 5.0f);
-
-				}
-				else if (!ToggledOn)
-				{
-					
-					
-					drawSprite("shared", "menuplus_32", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), 0.023f - 0.001f, 0.038 - 0.001f, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 45.000);
-					
-					
-				}
-				
-			}
-		}
-		if (opt->GetFlag(OptionFlag::BoolWithNumber) || opt->GetFlag(OptionFlag::ChooseBool))
+		
+		if (opt->GetFlag(OptionFlag::BoolWithNumber) || opt->GetFlag(OptionFlag::ChooseBool) || opt->GetFlag(OptionFlag::BoolOption))
 		{
 			auto res = GetSpriteScale(0.025f);
 			auto res2 = GetSpriteScale(0.032f);
@@ -865,14 +806,30 @@ namespace Saint::UserInterface
 			else if (ToggleIterator == 3) {
 				if (ToggledOn)
 				{
-					drawSprite("commonmenu", "shop_tick_icon", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), 0.36f * 0.036, 0.35f * 0.070f, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 5.0f);
+					drawSprite("commonmenu", "shop_tick_icon", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), toggle_width, toggle_height, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, toggle_on_rotation);
 
 				}
 				else if (!ToggledOn)
 				{
 
 
-					drawSprite("shared", "menuplus_32", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), 0.023f - 0.001f, 0.038 - 0.001f, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 45.000);
+					drawSprite("shared", "menuplus_32", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), toggle_width_off, toggle_height_off, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, toggle_off_rotation);
+
+
+				}
+
+			}
+			else if (ToggleIterator == 4) {
+				if (ToggledOn)
+				{
+					drawSprite(custom_toggle_dict_on.c_str(), custom_toggle_asset_on.c_str(), (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), toggle_width, toggle_height, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, toggle_on_rotation);
+
+				}
+				else if (!ToggledOn)
+				{
+
+
+					drawSprite(custom_toggle_dict_off.c_str(), custom_toggle_asset_off.c_str(), (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), toggle_width_off, toggle_height_off, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, toggle_off_rotation);
 
 
 				}
@@ -896,7 +853,7 @@ namespace Saint::UserInterface
 			}
 			else if (IndicatorIterator == 1)
 			{
-				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.003f, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f, m_OptionHeight, { m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, 190 });
+				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.003f, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f, m_OptionHeight, { m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, sub_alpha });
 			}
 		}
 		if (opt->GetFlag(OptionFlag::PlayerSub))
@@ -916,7 +873,7 @@ namespace Saint::UserInterface
 			}
 			else if (IndicatorIterator == 1)
 			{
-				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.003f, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f, m_OptionHeight, { m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, 190 });
+				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.003f, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f, m_OptionHeight, { m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, sub_alpha });
 			}
 		}
 

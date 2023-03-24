@@ -8,6 +8,12 @@
 #include <GTAV-Classes/script/globals/GPBD_FM.hpp>
 #include <GTAV-Classes/script/globals/GPBD_FM_3.hpp>
 namespace Saint {
+	class hide_informationg {
+	public:
+		bool ip = false;
+		bool port = false;
+	};
+	inline hide_informationg hide_information;
 	class PlayersData {
 	public:
 
@@ -499,13 +505,13 @@ namespace Saint {
 			
 			std::string get_wallet_and_bank = std::format("${} | ${}", separateByCommas(stats.WalletBalance), separateByCommas(stats.Money - stats.WalletBalance));
 			Text("Wallet & Bank", { m_white }, { LTextX, TextY + 0.285f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(get_wallet_and_bank.c_str(), SeperatorX - 0.0523f, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(NETWORK::NETWORK_IS_SESSION_STARTED() ? get_wallet_and_bank.c_str() : "~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.295f, 0.001f, 0.015f, m_white);
 			Text("Total Money", { m_white }, { SeperatorX - 0.048f, TextY + 0.285f }, { 0.23f, 0.23f }, false);
 			g_Render->DrawRightText(total_money.c_str(), RTextX2, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			Text("Rank", { m_white }, { LTextX, TextY + 0.31f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(std::to_string(stats.Rank).c_str(), SeperatorX - 0.0523f, TextY + 0.31f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(NETWORK::NETWORK_IS_SESSION_STARTED() ? std::to_string(stats.Rank).c_str() : "~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.31f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.32f, 0.001f, 0.015f, m_white);
 			Text("Favorite Vehicle", { m_white }, { SeperatorX - 0.048f, TextY + 0.31f }, { 0.23f, 0.23f }, false);
 			g_Render->DrawRightText(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(stats.FavoriteVehicle)), RTextX2, TextY + 0.31f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
@@ -535,29 +541,64 @@ namespace Saint {
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.42f, 0.001f, 0.015f, m_white);
 			Text("Deaths", { m_white }, { SeperatorX - 0.048f, TextY + 0.41f }, { 0.23f, 0.23f }, false);
 			g_Render->DrawRightText(std::to_string(stats1.PlayerStats.KillsOnPlayers).c_str(), RTextX2, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+				Text("IP", { m_white }, { LTextX, TextY + 0.445f }, { 0.23f, 0.23f }, false);
+				if (hide_information.ip) {
+					g_Render->DrawRightText("~t~~italic~Hidden", SeperatorX - 0.0523f, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				}
+				else {
+					g_Render->DrawRightText(std::format("{}.{}.{}.{}", get_ip_address(player).m_field1, get_ip_address(player).m_field2, get_ip_address(player).m_field3, get_ip_address(player).m_field4).c_str(), SeperatorX - 0.0523f, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				}
+				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.455f, 0.001f, 0.015f, m_white);
+				Text("Port", { m_white }, { SeperatorX - 0.048f, TextY + 0.445f }, { 0.23f, 0.23f }, false);
+				if (hide_information.port) {
+					g_Render->DrawRightText("~t~~italic~Hidden", RTextX2, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				}
+				else {
+					g_Render->DrawRightText(std::to_string(get_port(player)).c_str(), RTextX2, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				}
+			}
+			else {
+				Text("IP", { m_white }, { LTextX, TextY + 0.445f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText("~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.455f, 0.001f, 0.015f, m_white);
+				Text("Port", { m_white }, { SeperatorX - 0.048f, TextY + 0.445f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			}
+			if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+				Text("Crew Name", { m_white }, { LTextX, TextY + 0.47f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(get_net_player(player)->m_clan_data.m_clan_name, SeperatorX - 0.0523f, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			Text("IP", { m_white }, { LTextX, TextY + 0.445f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(std::format("{}.{}.{}.{}", get_ip_address(player).m_field1, get_ip_address(player).m_field2, get_ip_address(player).m_field3, get_ip_address(player).m_field4).c_str(), SeperatorX - 0.0523f, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.48f, 0.001f, 0.015f, m_white);
+				Text("Crew Tag", { m_white }, { SeperatorX - 0.048f, TextY + 0.47f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(get_net_player(player)->m_clan_data.m_clan_tag, RTextX2, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.455f, 0.001f, 0.015f, m_white);
-			Text("Port", { m_white }, { SeperatorX - 0.048f, TextY + 0.445f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(std::to_string(get_port(player)).c_str(), RTextX2, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				Text("Crew ID", { m_white }, { LTextX, TextY + 0.495f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(std::to_string(get_net_player(player)->m_clan_data.m_clan_id).c_str(), RTextX2, TextY + 0.495f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			Text("Crew Name", { m_white }, { LTextX, TextY + 0.47f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(get_net_player(player)->m_clan_data.m_clan_name, SeperatorX - 0.0523f, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				Text("Crew Member Count", { m_white }, { LTextX, TextY + 0.52f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(std::to_string(get_net_player(player)->m_clan_data.m_clan_member_count).c_str(), RTextX2, TextY + 0.52f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.48f, 0.001f, 0.015f, m_white);
-			Text("Crew Tata", { m_white }, { SeperatorX - 0.048f, TextY + 0.47f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(get_net_player(player)->m_clan_data.m_clan_tag, RTextX2, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				Text("Crew Motto", { m_white }, { LTextX, TextY + 0.545f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(get_net_player(player)->m_clan_data.m_clan_motto, RTextX2, TextY + 0.545f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			}
+			else {
+				Text("Crew Name", { m_white }, { LTextX, TextY + 0.47f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText("~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			Text("Crew ID", { m_white }, { LTextX, TextY + 0.495f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(std::to_string(get_net_player(player)->m_clan_data.m_clan_id).c_str(), RTextX2, TextY + 0.495f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.48f, 0.001f, 0.015f, m_white);
+				Text("Crew Tag", { m_white }, { SeperatorX - 0.048f, TextY + 0.47f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			Text("Crew Members", { m_white }, { LTextX, TextY + 0.52f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(std::to_string(get_net_player(player)->m_clan_data.m_clan_member_count).c_str(), RTextX2, TextY + 0.52f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				Text("Crew ID", { m_white }, { LTextX, TextY + 0.495f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.495f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			Text("Crew Color", { m_white }, { LTextX, TextY + 0.545f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(std::to_string(get_net_player(player)->m_clan_data.m_clan_color).c_str(), RTextX2, TextY + 0.545f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				Text("Crew Member Count", { m_white }, { LTextX, TextY + 0.52f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.52f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+				Text("Crew Motto", { m_white }, { LTextX, TextY + 0.545f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.545f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			}
 
 
 

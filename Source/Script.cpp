@@ -388,6 +388,7 @@ namespace Saint
 				PLAYER::SET_MAX_WANTED_LEVEL(5);
 			}
 			});
+		sub->draw_option<toggle<bool>>(("Slide Run"), "Slides you around the map.", &features.slide_run, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Auto Parachute"), "Automaticly pulls you're parachute.", &features.auto_parachute, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Seatbelt"), "Click you're seatbelt so you don't fly out of the vehicle.", &features.seatbelt, BoolDisplay::OnOff, false, [] {
 			if (!features.seatbelt) {
@@ -829,6 +830,15 @@ namespace Saint
 					g_local_player->m_vehicle->m_is_targetable = true;
 			}
 			});
+		if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false)) {
+			sub->draw_option<KeyboardOption>(("Liscene Plate"), nullptr, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), true)), []
+				{
+					
+					showKeyboard("Enter Something", "", 8, &Bufferfrrrr, [=] {
+						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), true), Bufferfrrrr.c_str());
+						});
+				});
+		}
 			});
 		g_Render->draw_submenu<sub>(("Personal"), SubmenuPersonalVehicle, [](sub* sub)
 			{
@@ -2902,7 +2912,7 @@ namespace Saint
 		sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Teleport", nullptr, &features.teleport_gun, &features.teleport_gun_type, &features.teleport_gun_int);
 		sub->draw_option<toggle<bool>>(("Delete"), nullptr, &features.delete_gun, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Bypass C4 Limit"), nullptr, &features.bypass_c4_limit, BoolDisplay::OnOff);
-		sub->draw_option<toggle<bool>>(("Magnet"), nullptr, &gravity.enabled, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>(("Gravity"), nullptr, &gravity.enabled, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Incendiary"), nullptr, &m_frame_flags.m_fire, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Aim Tracer"), nullptr, &features.aim_tracer, BoolDisplay::OnOff);
 		sub->draw_option<toggle<bool>>(("Shotgun"), nullptr, &m_shotgun.enabled, BoolDisplay::OnOff, false, [] {
@@ -2910,7 +2920,7 @@ namespace Saint
 				m_shotgun.onDisable();
 			}
 			});
-		sub->draw_option<toggle<bool>>(("Weapons In Interior"), nullptr, &weapons_in_int, BoolDisplay::OnOff);
+		//sub->draw_option<toggle<bool>>(("Weapons In Interior"), nullptr, &weapons_in_int, BoolDisplay::OnOff);
 			});
 		g_Render->draw_submenu<sub>(("Entity Shooter"), EntityShooter, [](sub* sub)
 			{
@@ -3915,11 +3925,17 @@ namespace Saint
 			});
 
 			});
+		g_Render->draw_submenu<sub>("Hide Information", rage::joaat("HideINFO"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("IP"), nullptr, &hide_information.ip, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Port"), nullptr, &hide_information.port, BoolDisplay::OnOff);
+			});
 		g_Render->draw_submenu<sub>("Player List", SubmenuPlayerList, [](sub* sub)
 			{
 				sub->draw_option<submenu>("All", nullptr, SubmenuAllPlayers);
 				sub->draw_option<submenu>("Saved", nullptr, SubmenuSavedPlayers);
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Filter", nullptr, &p_filter.data, &p_filter.data_i);
+				sub->draw_option<submenu>("Hide Information", nullptr, rage::joaat("HideINFO"));
+				
 
 
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
@@ -4102,8 +4118,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Vehicle", SubmenuSelectedVehicle, [](sub* sub)
 			{
-				static int boost_power = 150;
-				sub->draw_option<number<std::int32_t>>("Boost", nullptr, &boost_power, 0, 300, 10, 3, false, "", "", [] {
+				sub->draw_option<number<std::int32_t>>("Boost", nullptr, &features.boost_speed, 0, 300, 10, 3, false, "", "", [] {
 								if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false))) {
 
 									Vehicle get_veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
@@ -5132,7 +5147,7 @@ namespace Saint
 		
 		
 		
-		sub->draw_option<ChooseOption<const char*, std::size_t>>(("Submenu Indicators"), nullptr, &g_Render->IndicatorList, &g_Render->IndicatorIterator);
+		
 		
 		sub->draw_option<toggle<bool>>("Log Script Events", nullptr, &g_LogScriptEvents, BoolDisplay::OnOff);
 		
@@ -5211,14 +5226,81 @@ namespace Saint
 				sub->draw_option<submenu>("Subheader", nullptr, CustomizationSubheader);
 				sub->draw_option<submenu>("Toggles", nullptr, CustomizationToggles);
 				sub->draw_option<submenu>("Footer", nullptr, SubmenuSettingsFooter);
+				sub->draw_option<submenu>("Break", nullptr, rage::joaat("Break"));
+				sub->draw_option<submenu>("Submenu", nullptr, rage::joaat("SubmenuIndc"));
 				sub->draw_option<toggle<bool>>("Lines", nullptr, &g_Render->lines_enabled, BoolDisplay::OnOff);
 				sub->draw_option<number<float>>("Text Size", nullptr, &g_Render->m_OptionTextSize, 0.01f, 1.f, 0.01f, 2);
 
 
 			});
+		g_Render->draw_submenu<sub>(("Submenu"), rage::joaat("SubmenuIndc"), [](sub* sub)
+			{
+				sub->draw_option<ChooseOption<const char*, std::size_t>>(("Indicators"), nullptr, &g_Render->IndicatorList, &g_Render->IndicatorIterator);
+				if (g_Render->IndicatorIterator == 1) {
+					sub->draw_option<number<std::int32_t>>("Alpha", nullptr, &g_Render->sub_alpha, 0, 255);
+				}
+			});
+		g_Render->draw_submenu<sub>(("Break"), rage::joaat("Break"), [](sub* sub)
+			{
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Font", nullptr, &g_Render->HeaderFont, &g_Render->HeaderFontIterator2, true, -1, []
+					{
+						if (g_Render->HeaderFontIterator2 == 0) {
+							g_Render->m_SeperatorFont = Font::ChaletLondon;
+						}
+						if (g_Render->HeaderFontIterator2 == 1) {
+							g_Render->m_SeperatorFont = Font::HouseScript;
+						}
+						if (g_Render->HeaderFontIterator2 == 2) {
+							g_Render->m_SeperatorFont = Font::Monospace;
+						}
+						if (g_Render->HeaderFontIterator2 == 3) {
+							g_Render->m_SeperatorFont = Font::Wingdings;
+						}
+						if (g_Render->HeaderFontIterator2 == 4) {
+							g_Render->m_SeperatorFont = Font::ChaletComprimeCologne;
+						}
+						if (g_Render->HeaderFontIterator2 == 5) {
+							g_Render->m_SeperatorFont = Font::Pricedown;
+						}
+					});
+				sub->draw_option<UnclickOption>(("Preview"), nullptr, [] {});
+			});
 		g_Render->draw_submenu<sub>(("Toggles"), CustomizationToggles, [](sub* sub)
 			{
+				g_Render->toggle_show_on = true;
+				g_Render->toggle_show_off = false;
 				sub->draw_option<ChooseOption<const char*, std::size_t>>(("Icon"), nullptr, &g_Render->ToggleList, &g_Render->ToggleIterator);
+				sub->draw_option<UnclickOption>(("On"), nullptr, [] {});
+				sub->draw_option<number<float>>("Height", nullptr, &g_Render->toggle_height, -1000.f, 1000.f, 0.001f);
+				sub->draw_option<number<float>>("Width", nullptr, &g_Render->toggle_width, -1000.f, 1000.f, 0.001f);
+				sub->draw_option<UnclickOption>(("Off"), nullptr, [] {});
+				sub->draw_option<number<float>>("Height", nullptr, &g_Render->toggle_height_off, -1000.f, 1000.f, 0.001f);
+				sub->draw_option<number<float>>("Width", nullptr, &g_Render->toggle_width_off, -1000.f, 1000.f, 0.001f);
+				sub->draw_option<UnclickOption>(("Rotation"), nullptr, [] {});
+				sub->draw_option<number<float>>("On", nullptr, &g_Render->toggle_on_rotation, 0.0f, 360.f, 1, 1);
+				sub->draw_option<number<float>>("Off", nullptr, &g_Render->toggle_off_rotation, 0.0f, 360.f, 1, 1);
+				sub->draw_option<UnclickOption>(("Preview"), nullptr, [] {});
+				sub->draw_option<toggle<bool>>("On", nullptr, &g_Render->toggle_show_on, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>("Off", nullptr, &g_Render->toggle_show_off, BoolDisplay::OnOff);
+				if (g_Render->ToggleIterator == 4) {
+					sub->draw_option<UnclickOption>(("Custom"), nullptr, [] {});
+					sub->draw_option<KeyboardOption>(("Directory"), nullptr, g_Render->custom_toggle_dict_on, []
+						{
+							showKeyboard("Enter Something", "", 25, &g_Render->custom_toggle_dict_on, [] {});
+						});
+					sub->draw_option<KeyboardOption>(("Asset"), nullptr, g_Render->custom_toggle_asset_on, []
+						{
+							showKeyboard("Enter Something", "", 25, &g_Render->custom_toggle_asset_on, [] {});
+						});
+					sub->draw_option<KeyboardOption>(("Directory Off"), nullptr, g_Render->custom_toggle_dict_off, []
+						{
+							showKeyboard("Enter Something", "", 25, &g_Render->custom_toggle_dict_off, [] {});
+						});
+					sub->draw_option<KeyboardOption>(("Asset Off"), nullptr, g_Render->custom_toggle_asset_off, []
+						{
+							showKeyboard("Enter Something", "", 25, &g_Render->custom_toggle_asset_off, [] {});
+						});
+				}
 
 
 			});
@@ -5234,6 +5316,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>("Glare", nullptr, &g_Render->m_render_glare, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>("Sounds", nullptr, &g_Render->m_Sounds, BoolDisplay::OnOff);
 				sub->draw_option<number<float>>("Width", nullptr, &g_Render->m_Width, 0.01f, 1.f, 0.01f, 2);
+				sub->draw_option<number<float>>("Smooth Scroll Speed", nullptr, &g_Render->smooth_scroll_speed, 0.01f, 1.00f, 0.01f, 2);
 
 
 			});
@@ -5244,6 +5327,7 @@ namespace Saint
 						showKeyboard("Enter Something", "", 25, &g_Render->header_name, [] {});
 					});
 				sub->draw_option<number<float>>("Height", nullptr, &g_Render->m_HeaderHeight, 0.01f, 0.2f, 0.001f, 3);
+				sub->draw_option<number<float>>("Text X Offset", nullptr, &g_Render->header_x_offset, -1000.f, 1000.f, 0.001f);
 
 
 			});

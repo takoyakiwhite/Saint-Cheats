@@ -93,7 +93,7 @@ namespace Saint
 		auto tm = std::localtime(&time);
 
 		char prefix[64] = {};
-		std::snprintf(prefix, sizeof(prefix) - 1, "[%02d:%02d:%02d] [%s] ", tm->tm_hour, tm->tm_min, tm->tm_sec, type);
+		std::snprintf(prefix, sizeof(prefix) - 1, "[%02d:%02d:%02d/%s] ", tm->tm_hour, tm->tm_min, tm->tm_sec, type);
 
 		std::size_t messageLength = std::vsnprintf(nullptr, 0, format, args) + 1;
 		auto messageBuffer = std::make_unique<char[]>(messageLength);
