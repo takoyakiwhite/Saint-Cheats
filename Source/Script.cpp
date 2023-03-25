@@ -32,6 +32,7 @@
 #include "Discord/DiscordHandler.hpp"
 #include "hex_memory.h"
 #include "ScriptLocal.h"
+#include "Hotkeys.h"
 namespace Saint
 {
 
@@ -771,6 +772,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Super Jump"), SubmenuSuperjump, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &superjump.enabled, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Add Force"), nullptr, &superjump.add_force, BoolDisplay::OnOff);
 		sub->draw_option<ChooseOption<const char*, std::size_t>>("Animation", nullptr, &superjump.Jump_Type, &superjump.Jump_Int);
 			});
 		g_Render->draw_submenu<sub>(("Vehicle"), SubmenuVehicle, [](sub* sub)
@@ -3973,7 +3975,16 @@ namespace Saint
 				sub->draw_option<submenu>("Saved", nullptr, SubmenuSavedPlayers);
 				sub->draw_option<submenu>("Hide Information", nullptr, rage::joaat("HideINFO"));
 				sub->draw_option<submenu>("Settings", nullptr, rage::joaat("PlayerInfoSettings"));
-				
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Spectate", nullptr, &spectateo.type, &spectateo.pos, false, -1, []
+					{
+						if (spectateo.pos == 0) {
+							spectateo.stop();
+						}
+						if (spectateo.pos == 1) {
+							spectateo.random();
+						}
+						
+					});
 
 
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
@@ -5374,6 +5385,7 @@ namespace Saint
 				sub->draw_option<submenu>("Positions", nullptr, Positions);
 				sub->draw_option<submenu>("Colors", nullptr, SubmenuColors);
 				sub->draw_option<submenu>("Themes", nullptr, SubmenuThemes);
+				sub->draw_option<submenu>("Hotkeys", nullptr, rage::joaat("Hotkeys"));
 		
 		
 		
@@ -5389,6 +5401,20 @@ namespace Saint
 			{
 				g_Running = false;
 			});
+			});
+		g_Render->draw_submenu<sub>(("Hotkeys"), rage::joaat("Hotkeys"), [](sub* sub)
+			{
+				sub->draw_option<RegularOption>("Clear", nullptr, []
+					{
+						m_Hotkeys.clear();
+					});
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				for (auto& hotkey : m_Hotkeys) {
+					sub->draw_option<KeyboardOption>((hotkey.name.c_str()), nullptr, std::to_string(hotkey.key), []
+						{
+							
+						});
+				}
 			});
 		g_Render->draw_submenu<sub>(("Themes"), SubmenuThemes, [](sub* sub)
 			{
@@ -6147,6 +6173,7 @@ namespace Saint
 		while (true) {
 			g_Render->OnTick();
 			FeatureInitalize();
+			hotkey_tick();
 			fbr::cur()->wait();
 		}
 	}

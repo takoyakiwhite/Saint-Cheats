@@ -194,7 +194,7 @@
       <Filter>Core\Features</Filter>
     </ClInclude>
     <ClInclude Include="Spoofing.h">
-      <Filter>Core\Features\Network\Spoofing</Filter>
+      <Filter>Core\Spoofing</Filter>
     </ClInclude>
     <ClInclude Include="BoolWithNumber.hpp">
       <Filter>Interface\Option</Filter>
@@ -432,9 +432,6 @@
     <Filter Include="Core\Features\Protections">
       <UniqueIdentifier>{f64f7b3f-666b-40ea-be2a-6b8c87521cf6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Features\Network\Spoofing">
-      <UniqueIdentifier>{1338ba6a-7a5e-4dee-b66c-e8ef465274ec}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Discord">
       <UniqueIdentifier>{61022400-0f03-44ce-b9a7-f83563a2fd12}</UniqueIdentifier>
     </Filter>
@@ -467,6 +464,9 @@
     </Filter>
     <Filter Include="Interface\Memory\Script\Local">
       <UniqueIdentifier>{b5e597f7-31ab-4c0a-a9cc-a85e67d369dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Spoofing">
+      <UniqueIdentifier>{1338ba6a-7a5e-4dee-b66c-e8ef465274ec}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

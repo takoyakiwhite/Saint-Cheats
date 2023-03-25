@@ -6,7 +6,8 @@ namespace Saint::UserInterface
 	{
 		LeftPress,
 		RightPress,
-		EnterPress
+		EnterPress,
+		HotkeyPress,
 	};
 
 	enum class OptionFlag

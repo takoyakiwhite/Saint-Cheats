@@ -218,91 +218,91 @@ namespace Saint
 			case 0xE7072CD: {
 				char name[64];
 				sprintf(name, "%s reported you for hate", Source->PlayerInfo->m_net_player_data.m_name);
-				protections.push_notification(name);
+				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0xB722D6C0: {
 				char name[64];
 				sprintf(name, "%s reported you for hate", Source->PlayerInfo->m_net_player_data.m_name);
-				protections.push_notification(name);
+				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0x762F9994: {
 				char name[64];
 				sprintf(name, "%s reported you for being annoying", Source->PlayerInfo->m_net_player_data.m_name);
-				protections.push_notification(name);
+				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0x9F79BA0B: {
 				char name[64];
 				sprintf(name, "%s reported you for exploits", Source->PlayerInfo->m_net_player_data.m_name);
-				protections.push_notification(name);
+				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0xCBFD04A4: {
 				char name[64];
 				sprintf(name, "%s reported you for exploits", Source->PlayerInfo->m_net_player_data.m_name);
-				protections.push_notification(name);
+				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0x9C6A0C42: {
 				char name[64];
 				sprintf(name, "%s reported you for griefing", Source->PlayerInfo->m_net_player_data.m_name);
-				protections.push_notification(name);
+				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0x3CDB43E2: {
 				char name[64];
 				sprintf(name, "%s reported you for offensive language", Source->PlayerInfo->m_net_player_data.m_name);
-				protections.push_notification(name);
+				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0xE8FB6DD5: {
 				char name[64];
 				sprintf(name, "%s reported you for offensive tag plate??", Source->PlayerInfo->m_net_player_data.m_name);
-				protections.push_notification(name);
+				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0xF3DE4879: {
 				char name[64];
 				sprintf(name, "%s reported you for ugc??", Source->PlayerInfo->m_net_player_data.m_name);
-				protections.push_notification(name);
+				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0xAA238FF0: {
 				char name[64];
 				sprintf(name, "%s reported you for bad crew name", Source->PlayerInfo->m_net_player_data.m_name);
-				protections.push_notification(name);
+				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0x03511A79: {
 				char name[64];
 				sprintf(name, "%s reported you for bad crew moto", Source->PlayerInfo->m_net_player_data.m_name);
-				protections.push_notification(name);
+				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0x3B566D5C: {
 				char name[64];
 				sprintf(name, "%s reported you for bad crew status", Source->PlayerInfo->m_net_player_data.m_name);
-				protections.push_notification(name);
+				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0x368F6FD9: {
 				char name[64];
 				sprintf(name, "%s reported you for bad crew emblem", Source->PlayerInfo->m_net_player_data.m_name);
-				protections.push_notification(name);
+				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}

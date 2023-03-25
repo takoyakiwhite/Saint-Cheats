@@ -14,7 +14,6 @@
 #include "All Players.h"
 #include "Hooking.hpp"
 #include "Render.h"
-#include "Hotkeys.h"
 #include "hex_memory.h"
 #include "ScriptLocal.h"
 
@@ -303,7 +302,8 @@ namespace Saint {
 	class superJump {
 	public:
 		bool enabled = false;
-		const char* Jump_Type[2] = { "Normal", "Beast" };
+		bool add_force = false;
+		const char* Jump_Type[2] = { "Normal", "Beast"};
 		std::size_t Jump_Int = 0;
 		void init() {
 			if (enabled) {
@@ -314,6 +314,11 @@ namespace Saint {
 					if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false) && !ENTITY::IS_ENTITY_IN_AIR(PLAYER::PLAYER_PED_ID()) && !PED::IS_PED_DOING_A_BEAST_JUMP(PLAYER::PLAYER_PED_ID()))
 						if (PAD::IS_CONTROL_JUST_PRESSED(0, 22))
 							TASK::TASK_JUMP(PLAYER::PLAYER_PED_ID(), true, true, true);
+				}
+				if (add_force) {
+					if (PED::IS_PED_JUMPING(PLAYER::PLAYER_PED_ID()) && !PED::IS_PED_RAGDOLL(PLAYER::PLAYER_PED_ID())) {
+						ENTITY::APPLY_FORCE_TO_ENTITY(PLAYER::PLAYER_PED_ID(), 1, 0.f, 1.5f, 0.f, 0.f, 0.f, 0.f, 1, true, true, true, false, true);
+					}
 				}
 			}
 		}
@@ -5333,8 +5338,53 @@ namespace Saint {
 		return true;
 	}
 	
+	class SpectateOptions {
+	public:
+		const char* type[2] = { "Stop", "Random" };
+		std::size_t pos;
+		int roll = 0;
+		void stop() {
+			features.spectate = false;
+			NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
+			HUD::SET_MINIMAP_IN_SPECTATOR_MODE(false, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
+			NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(roll));
+			HUD::SET_MINIMAP_IN_SPECTATOR_MODE(false, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(roll));
+			STREAMING::SET_FOCUS_ENTITY(PLAYER::PLAYER_PED_ID());
+			ENTITY::FREEZE_ENTITY_POSITION(PLAYER::PLAYER_PED_ID(), false);
+		}
+		void random() {
+			features.spectate = false;
+			roll = MISC::GET_RANDOM_INT_IN_RANGE(0, 32);
+			if (roll == PLAYER::PLAYER_ID()) {
+				roll = MISC::GET_RANDOM_INT_IN_RANGE(0, 32);
+				if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(roll)) {
+					ENTITY::FREEZE_ENTITY_POSITION(PLAYER::PLAYER_PED_ID(), true);
 
+					NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(true, ped);
+					STREAMING::SET_FOCUS_ENTITY(ped);
+					HUD::SET_MINIMAP_IN_SPECTATOR_MODE(true, ped);
+					if (PED::IS_PED_DEAD_OR_DYING(PLAYER::PLAYER_PED_ID(), 1))
+					{
+						NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, PLAYER::PLAYER_PED_ID());
+					}
+				}
+			}
+			if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(roll)) {
+				ENTITY::FREEZE_ENTITY_POSITION(PLAYER::PLAYER_PED_ID(), true);
+
+				NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(true, ped);
+				STREAMING::SET_FOCUS_ENTITY(ped);
+				HUD::SET_MINIMAP_IN_SPECTATOR_MODE(true, ped);
+				if (PED::IS_PED_DEAD_OR_DYING(PLAYER::PLAYER_PED_ID(), 1))
+				{
+					NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, PLAYER::PLAYER_PED_ID());
+				}
+			}
+		}
+	};
+	inline SpectateOptions spectateo;
 	inline void FeatureInitalize() {
+		
 		weather.init2();
 		esp.init();
 		rainbow_ui.init();

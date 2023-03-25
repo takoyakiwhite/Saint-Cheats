@@ -118,7 +118,7 @@ namespace Saint
 			{
 				ImGui::SetNextWindowSize(ImVec2(505, 74), ImGuiCond_Once);
 				ImGui::SetNextWindowPos(ImVec2(967, 244), ImGuiCond_Once);
-				if (ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize | )) {
+				if (ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize)) {
 					ImGui::PushFont(g_D3DRenderer->m_DefaultFont);
 					
 					ImGui::InputText("Command", buf1, 128);

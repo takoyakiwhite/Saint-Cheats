@@ -355,6 +355,12 @@ namespace Saint::UserInterface
 						opt->HandleAction(OptionAction::EnterPress);
 					}
 				}
+				if (GetAsyncKeyState(0x56)) {
+					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+					{
+						opt->HandleAction(OptionAction::HotkeyPress);
+					}
+				}
 				if (PAD::IS_CONTROL_PRESSED(2, 191) && sub->GetNumOptions() != 0 && enterTimer.Update())
 				{
 					if (m_Sounds)
@@ -597,6 +603,9 @@ namespace Saint::UserInterface
 			m_Width,
 			m_OptionHeight,
 			m_OptionUnselectedBackgroundColor);
+		if (selected) {
+			
+		}
 		if (selected)
 		{
 			m_CurrentCoord = lerp(m_CurrentCoord, m_DrawBaseY + (m_OptionHeight / 2.f), smooth_scroll_speed); m_OptionSelectedTextColor;
