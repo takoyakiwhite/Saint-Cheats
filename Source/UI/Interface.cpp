@@ -1145,7 +1145,6 @@ namespace Saint::UserInterface
 		int x;
 		int y;
 		GRAPHICS::GET_ACTUAL_SCREEN_RESOLUTION(&x, &y);
-
 		return { (static_cast<float>(y) / static_cast<float>(x)) * size, size };
 	}
 

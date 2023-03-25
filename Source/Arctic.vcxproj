@@ -33,6 +33,7 @@
     <ClInclude Include="Features.h" />
     <ClInclude Include="FiberHelper.hpp" />
     <ClInclude Include="Flash Blip.h" />
+    <ClInclude Include="HeaderFontData.h" />
     <ClInclude Include="hex_memory.h" />
     <ClInclude Include="Hooks.h" />
     <ClInclude Include="Hotkeys.h" />
