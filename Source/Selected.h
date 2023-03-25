@@ -38,6 +38,22 @@ namespace Saint {
             }
         }
     };
+    class BlockActions {
+    public:
+        bool aiming = false;
+        bool shooting = false;
+        void init() {
+            if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+                if (shooting) {
+                    if (PED::IS_PED_SHOOTING(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer))) {
+                        g_GameFunctions->m_clear_ped_tasks_network(all_players.get_ped(g_SelectedPlayer), true);
+                    }
+                }
+               
+            }
+           
+        }
+    };
 	class GetSelected {
 	public:
         ExplosiveAmmo2 explosiveAmmo;
@@ -48,6 +64,7 @@ namespace Saint {
         bool freeze = false;
         std::string buffer;
         std::uint64_t int_id = 0;
+        BlockActions block_actions;
         
         uint8_t get_id() const
         {
@@ -154,7 +171,6 @@ namespace Saint {
             }
             return true;
         }
-
         void set_wanted_level(int level) {
             PLAYER::REPORT_CRIME(all_players.get_id(g_SelectedPlayer), 8, PLAYER::GET_WANTED_LEVEL_THRESHOLD(level));
         }
@@ -180,11 +196,14 @@ namespace Saint {
         }
 		void init() {
             if (freeze) {
-                g_GameFunctions->m_clear_ped_tasks_network(all_players.get_ped(g_SelectedPlayer), true);
+                if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+                    g_GameFunctions->m_clear_ped_tasks_network(all_players.get_ped(g_SelectedPlayer), true);
+                }
             }
             explosiveAmmo.init();
 			flash_blip.init();
 			otr.init();
+            block_actions.init();
 			
 		}
 	};

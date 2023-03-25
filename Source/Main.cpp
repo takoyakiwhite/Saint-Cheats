@@ -13,7 +13,28 @@
 #include "Script.h"
 #include "Render.h"
 #include "Discord/DiscordHandler.hpp"
+#include <Windows.h>
+#include <ShellAPI.h>
+#include <urlmon.h>
+#pragma comment (lib, "urlmon.lib")  
+#define MENU_VERSION "1.12.1"
+void load_dir() {
+	using namespace Saint;
+	fs::create_directories("C:\\Saint\\");
+	fs::create_directories("C:\\Saint\\Fonts");
 
+	int yes18 = _wmkdir((const wchar_t*)"C:\\Saint\\Fonts\\Chinese-Rocks.ttf");
+	int yes19 = _wmkdir((const wchar_t*)"C:\\Saint\\Textures.ytd");
+
+	std::string path;
+	std::ofstream file;
+	std::string DownloadPP = std::string("C:\\Saint\\Fonts\\Chinese-Rocks.ttf");
+	std::string DownloadPP2 = std::string("C:\\Saint\\Textures.ytd");
+
+
+	URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1060765999600762980/1083080117896622120/Chinese-Rocks.ttf", DownloadPP.c_str(), 0, 0);
+	URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1060765999600762980/1085661840278827138/Textures.ytd", DownloadPP2.c_str(), 0, 0);
+}
 BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 {
 	using namespace Saint;
@@ -21,124 +42,124 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 	{
 		g_Module = hInstance;
 		CreateThread(nullptr, 0, [](LPVOID) -> DWORD
-		{
-			g_Logger = std::make_unique<Logger>();
-			g_Logger->Info("Saint Version 1.12.1");
-			g_Logger->Info("This build was compiled at " __DATE__ ", " __TIME__ ".");
-
-			g_FiberPool.registerFbrPool();
-			g_TranslationManager = std::make_unique<TranslationManager>();
-			g_TranslationManager->LoadTranslations("English");
-			
-			
-
-			g_GameFunctions = std::make_unique<GameFunctions>();
-			g_GameVariables = std::make_unique<GameVariables>();
-
-			//Game Functions
-			
-			
-
-			// Wait for the game to load
-			while (*g_GameVariables->m_GameState != 0)
 			{
-				std::this_thread::sleep_for(3s);
-				std::this_thread::yield();
-			}
+				g_Logger = std::make_unique<Logger>();
+				g_Logger->Info("Saint Version 1.12.1");
+				g_Logger->Info("This build was compiled at " __DATE__ ", " __TIME__ ".");
 
-			//If game not started when injected say "Waitng for game to load" when loaded say "Game loaded" 
-			if (*g_GameVariables->m_GameState = 0)
-			{
-				g_Logger->Info("Waiting For Game To Load.");
-				if (*g_GameVariables->m_GameState = 1)
+				g_FiberPool.registerFbrPool();
+				g_TranslationManager = std::make_unique<TranslationManager>();
+				g_TranslationManager->LoadTranslations("English");
+
+
+
+				g_GameFunctions = std::make_unique<GameFunctions>();
+				g_GameVariables = std::make_unique<GameVariables>();
+
+				//Game Functions
+
+
+
+				// Wait for the game to load
+				while (*g_GameVariables->m_GameState != 0)
 				{
-					g_Logger->Info("Game Loaded.");
+					std::this_thread::sleep_for(3s);
+					std::this_thread::yield();
 				}
-			}
 
-			g_GameVariables->PostInit();
-			g_CustomText = std::make_unique<CustomText>();
-			g_D3DRenderer = std::make_unique<D3DRenderer>();
-			g_Render = std::make_unique<UserInterface::UIManager>();
-			g_ScriptManager = std::make_unique<ScriptManager>();
-			g_MainScript = std::make_shared<MainScript>();
-			g_LogScript = std::make_shared<LogScript>();
-			g_CallbackScript = std::make_shared<CallbackScript>();
-			g_ScriptManager->AddScript(g_LogScript);
-			g_ScriptManager->AddScript(g_CallbackScript);
-			g_FiberManager.add(std::make_unique<fbr>([=] { g_MainScript->Tick(); }), "main_script");
-			g_Hooking = std::make_unique<Hooking>();
-			g_Hooking->Hook();
-			auto g_NativeHook = std::make_unique<NativeHooks>();
-			g_Discord->Init();
-			g_Render->m_HeaderBackgroundColor = { 108, 60, 175, 255 };
+				//If game not started when injected say "Waitng for game to load" when loaded say "Game loaded" 
+				if (*g_GameVariables->m_GameState = 0)
+				{
+					g_Logger->Info("Waiting For Game To Load.");
+					if (*g_GameVariables->m_GameState = 1)
+					{
+						g_Logger->Info("Game Loaded.");
+					}
+				}
 
-			//Footer
+				g_GameVariables->PostInit();
+				g_CustomText = std::make_unique<CustomText>();
+				g_D3DRenderer = std::make_unique<D3DRenderer>();
+				g_Render = std::make_unique<UserInterface::UIManager>();
+				g_ScriptManager = std::make_unique<ScriptManager>();
+				g_MainScript = std::make_shared<MainScript>();
+				g_LogScript = std::make_shared<LogScript>();
+				g_CallbackScript = std::make_shared<CallbackScript>();
+				g_ScriptManager->AddScript(g_LogScript);
+				g_ScriptManager->AddScript(g_CallbackScript);
+				g_FiberManager.add(std::make_unique<fbr>([=] { g_MainScript->Tick(); }), "main_script");
+				g_Hooking = std::make_unique<Hooking>();
+				g_Hooking->Hook();
+				auto g_NativeHook = std::make_unique<NativeHooks>();
+				g_Discord->Init();
+				g_Render->m_HeaderBackgroundColor = { 108, 60, 175, 255 };
 
-			//Footer
-			g_Render->m_FooterBackgroundColor = { 0, 0, 0, 255 };
+				//Footer
 
-			//Option
-			g_Render->m_OptionSelectedBackgroundColor = { 255, 255, 255, 255 };
+				//Footer
+				g_Render->m_FooterBackgroundColor = { 0, 0, 0, 255 };
 
-			//Description
-			//g_Render->m_DescriptionBackgroundColor = { 234, 90, 81, 255 };
+				//Option
+				g_Render->m_OptionSelectedBackgroundColor = { 255, 255, 255, 255 };
 
-			//Background
-			g_Render->m_OptionSelectedTextColor = { 0, 0, 0, 255 };
-			g_Render->m_Width = 0.21;
-			g_Render->glare_x_offset = 0.008;
-			g_Render->header_name = "Saint";
+				//Description
+				//g_Render->m_DescriptionBackgroundColor = { 234, 90, 81, 255 };
 
-			g_Render->m_HeaderText = false;
-			g_Render->m_HeaderNativeText = true;
+				//Background
+				g_Render->m_OptionSelectedTextColor = { 0, 0, 0, 255 };
+				g_Render->m_Width = 0.21;
+				g_Render->glare_x_offset = 0.008;
+				g_Render->header_name = "Saint";
 
-			g_Render->submenu_enabled = true;
+				g_Render->m_HeaderText = false;
+				g_Render->m_HeaderNativeText = true;
 
-			g_Render->IndicatorIterator = 0;
+				g_Render->submenu_enabled = true;
 
-			//registering
-			
-			//Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome %s",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
-			while (g_Running)
-			{
-				if (IsKeyPressed(VK_DELETE))
-					g_Running = false;
-				std::this_thread::sleep_for(3ms);
-				std::this_thread::yield();
-			}
+				g_Render->IndicatorIterator = 0;
 
-			std::this_thread::sleep_for(500ms);
+				//registering
+				load_dir();
+				//Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome %s",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
+				while (g_Running)
+				{
+					if (IsKeyPressed(VK_DELETE))
+						g_Running = false;
+					std::this_thread::sleep_for(3ms);
+					std::this_thread::yield();
+				}
 
-			g_Discord->Shutdown();
+				std::this_thread::sleep_for(500ms);
 
-			g_NativeHook.reset();
+				g_Discord->Shutdown();
 
-			g_Hooking->Unhook();
+				g_NativeHook.reset();
 
-			g_ScriptManager.reset();
-			g_LogScript.reset();
-			g_MainScript.reset();
-			g_CallbackScript.reset();
+				g_Hooking->Unhook();
 
-			g_Render.reset();
-			g_D3DRenderer.reset();
-			g_CustomText.reset();
+				g_ScriptManager.reset();
+				g_LogScript.reset();
+				g_MainScript.reset();
+				g_CallbackScript.reset();
 
-			std::this_thread::sleep_for(500ms);
+				g_Render.reset();
+				g_D3DRenderer.reset();
+				g_CustomText.reset();
 
-			g_Hooking.reset();
+				std::this_thread::sleep_for(500ms);
 
-			g_TranslationManager.reset();
+				g_Hooking.reset();
 
-			g_GameVariables.reset();
-			g_GameFunctions.reset();
-			
-			g_Logger->Info("Come Again!");
-			g_Logger.reset();
+				g_TranslationManager.reset();
 
-			FreeLibraryAndExitThread(g_Module, 0);
-		}, nullptr, 0, nullptr);
+				g_GameVariables.reset();
+				g_GameFunctions.reset();
+
+				g_Logger->Info("Come Again!");
+				g_Logger.reset();
+
+				FreeLibraryAndExitThread(g_Module, 0);
+			}, nullptr, 0, nullptr);
 	}
 
 	return true;

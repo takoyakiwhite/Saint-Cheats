@@ -9,7 +9,7 @@
 #include "UI/Interface.hpp"
 #define NOTIFY_MAX_MSG_LENGTH			4096		// Max message content length
 #define NOTIFY_PADDING_X				5.f		// Bottom-left X padding
-#define NOTIFY_PADDING_Y				1000.f		// Bottom-left Y padding
+#define NOTIFY_PADDING_Y				1330.f		// Bottom-left Y padding
 #define NOTIFY_PADDING_MESSAGE_Y		4.f		// Padding Y between each message
 #define NOTIFY_FADE_IN_OUT_TIME			1050			// Fade in and out duration
 #define NOTIFY_DEFAULT_DISMISS			3000		// Auto dismiss after X ms (default, applied only of no data provided in constructors)

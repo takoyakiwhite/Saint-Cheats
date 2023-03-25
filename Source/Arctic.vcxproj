@@ -49,6 +49,7 @@
     <ClInclude Include="Protections.h" />
     <ClInclude Include="Queue.h" />
     <ClInclude Include="Render.h" />
+    <ClInclude Include="ScriptLocal.h" />
     <ClInclude Include="Selected.h" />
     <ClInclude Include="Signatures.hpp" />
     <ClInclude Include="Hooking.hpp" />
@@ -109,6 +110,7 @@
     <ClCompile Include="hex_memory.cpp" />
     <ClCompile Include="Render.cpp" />
     <ClCompile Include="ScriptGlobal.cpp" />
+    <ClCompile Include="ScriptLocal.cpp" />
     <ClCompile Include="Signatures.cpp" />
     <ClCompile Include="Hooking.cpp" />
     <ClCompile Include="ImGui\imgui.cpp">

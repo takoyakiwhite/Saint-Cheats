@@ -163,7 +163,6 @@ namespace Saint {
 			{ 1104117595, "Activity", &protections.activity},
 			{ 36077543, "Sound Spam", &protections.sound_spam},
 			//Notifcations
-			{ 2041805809, "Notification", &protections.regular_noti},
 			{ 276906331, "Money Banked", &protections.moneybanked},
 			{ 82080686, "Money Stolen", &protections.moneystolen},
 			{ 853249803, "Money Removed", &protections.moneyremoved},

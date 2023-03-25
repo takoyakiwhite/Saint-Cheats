@@ -900,6 +900,7 @@ namespace ENTITY
 	static BOOL GET_ENTITY_COLLISION_DISABLED(Entity entity) { return Invoke<BOOL>(0xCCF1E97BEFDAE480, entity); } // 0xCCF1E97BEFDAE480 0xE8C0C629 b323
 	static void SET_ENTITY_COMPLETELY_DISABLE_COLLISION(Entity entity, BOOL toggle, BOOL keepPhysics) { Invoke<int>(0x9EBC85ED0FFFE51C, entity, toggle, keepPhysics); } // 0x9EBC85ED0FFFE51C 0xBD0D4831 b323
 	static void SET_ENTITY_COORDS(Entity entity, float xPos, float yPos, float zPos, BOOL xAxis, BOOL yAxis, BOOL zAxis, BOOL clearArea) { Invoke<int>(0x06843DA7060A026B, entity, xPos, yPos, zPos, xAxis, yAxis, zAxis, clearArea); } // 0x06843DA7060A026B 0xDF70B41B b323
+	static void SET_ENTITY_COORDS2(Entity entity, NativeVector3 pos, BOOL xAxis, BOOL yAxis, BOOL zAxis, BOOL clearArea) { Invoke<int>(0x06843DA7060A026B, entity, pos.x, pos.y, pos.z, xAxis, yAxis, zAxis, clearArea); } // 0x06843DA7060A026B 0xDF70B41B b323
 	static void SET_ENTITY_COORDS_WITHOUT_PLANTS_RESET(Entity entity, float xPos, float yPos, float zPos, BOOL alive, BOOL deadFlag, BOOL ragdollFlag, BOOL clearArea) { Invoke<int>(0x621873ECE1178967, entity, xPos, yPos, zPos, alive, deadFlag, ragdollFlag, clearArea); } // 0x621873ECE1178967 0x749B282E b323
 	static void SET_ENTITY_COORDS_NO_OFFSET(Entity entity, float xPos, float yPos, float zPos, BOOL xAxis, BOOL yAxis, BOOL zAxis) { Invoke<int>(0x239A3351AC1DA385, entity, xPos, yPos, zPos, xAxis, yAxis, zAxis); } // 0x239A3351AC1DA385 0x4C83DE8D b323
 	static void SET_ENTITY_DYNAMIC(Entity entity, BOOL toggle) { Invoke<int>(0x1718DE8E3F2823CA, entity, toggle); } // 0x1718DE8E3F2823CA 0x236F525B b323
@@ -4662,6 +4663,7 @@ namespace PLAYER
 	static int GET_TIME_SINCE_PLAYER_DROVE_AGAINST_TRAFFIC(Player player) { return Invoke<int>(0xDB89591E290D9182, player); } // 0xDB89591E290D9182 0x9F27D00E b323
 	static BOOL IS_PLAYER_FREE_FOR_AMBIENT_TASK(Player player) { return Invoke<BOOL>(0xDCCFD3F106C36AB4, player); } // 0xDCCFD3F106C36AB4 0x85C7E232 b323
 	static Player PLAYER_ID() { return Invoke<Player>(0x4F8644AF03D0E0D6); } // 0x4F8644AF03D0E0D6 0x8AEA886C b323
+	static uint32_t PLAYER_ID2() { return Invoke<Player>(0x4F8644AF03D0E0D6); } // 0x4F8644AF03D0E0D6 0x8AEA886C b323
 	static Ped PLAYER_PED_ID() { return Invoke<Ped>(0xD80958FC74E988A6); } // 0xD80958FC74E988A6 0xFA92E226 b323
 	static int NETWORK_PLAYER_ID_TO_INT() { return Invoke<int>(0xEE68096F9F37341E); } // 0xEE68096F9F37341E 0x8DD5B838 b323
 	static BOOL HAS_FORCE_CLEANUP_OCCURRED(int cleanupFlags) { return Invoke<BOOL>(0xC968670BFACE42D9, cleanupFlags); } // 0xC968670BFACE42D9 0x4B37333C b323

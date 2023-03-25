@@ -150,8 +150,10 @@ namespace Saint
 
 	void D3DRenderer::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		if (g_Render->m_Opened && msg == WM_KEYUP && wParam == 'X')
+		if (msg == WM_KEYUP && wParam == 'X') {
+			g_Settings.command_window = !g_Settings.command_window;
 			g_Settings.m_LockMouse = !g_Settings.m_LockMouse;
+		}
 
 		if (ImGui::GetCurrentContext())
 			ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);

@@ -16,6 +16,8 @@
 #include "Render.h"
 #include "Hotkeys.h"
 #include "hex_memory.h"
+#include "ScriptLocal.h"
+
 namespace Saint {
 	inline std::string handlingBuffer = "";
 	inline std::string VehNameBuffer = "";
@@ -388,9 +390,24 @@ namespace Saint {
 	class Weather {
 	public:
 		const char* data[14] = { "Extra Sunny", "Clouds", "Smog", "Foggy", "Overcast", "Rain", "Clearing", "Neutral", "Snow", "Blizzard", "Snow (Light)", "Christmas", "Halloween", "Clear" };
+		const char* type[6] = { "BLIZZARD", "CLEAR", "HALLOWEEN", "NEUTRAL", "XMAS", "RAIN"};
 		std::size_t init = 0;
+		bool randomize = false;
+		int randomize_delay = 550;
 		void override(const char* type) {
 			MISC::SET_WEATHER_TYPE_NOW_PERSIST(type);
+		}
+		int delay2 = 0;
+		void init2() {
+			if (randomize) {
+				
+				if (delay2 == 0 || (int)(GetTickCount64() - delay2) > randomize_delay)
+				{
+
+					MISC::SET_WEATHER_TYPE_NOW_PERSIST(type[MISC::GET_RANDOM_INT_IN_RANGE(0, 6)]);
+					delay2 = GetTickCount64();
+				}
+			}
 		}
 	};
 	inline Weather weather;
@@ -531,7 +548,7 @@ namespace Saint {
 		bool no_recoil = false;
 		bool keep_engine_on = false;
 		bool auto_repair = false;
-		const char* auto_repair_type[2] = {"Smart", "Normal"};
+		const char* auto_repair_type[2] = {"Smart", "Constant"};
 		std::size_t get_repair_type = 0;
 		bool match = false;
 		bool bypass_c4_limit = false;
@@ -552,7 +569,27 @@ namespace Saint {
 			return PED::GET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 78, true);
 		}
 		bool slide_run = false;
+		bool force_gun = false;
+		int force_gun_mult = 150;
+		bool move_with_mouse = false;
 		void init() {
+			if (move_with_mouse) {
+				g_Settings.m_LockMouse = true;
+				Vector2 pos = g_Render->GetMousePos();
+				g_Render->m_PosX = pos.x / 2830;
+				g_Render->m_PosY = pos.y / 2370;
+			}
+			if (force_gun) {
+				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+				{
+					Entity hitEntity;
+					if (raycast(hitEntity)) {
+						VEHICLE::SET_VEHICLE_FORWARD_SPEED(hitEntity, force_gun_mult);
+					}
+				}
+				
+				
+			}
 			if (slide_run) {
 				if (TASK::IS_PED_RUNNING(PLAYER::PLAYER_PED_ID()) || TASK::IS_PED_SPRINTING(PLAYER::PLAYER_PED_ID()) && !PED::IS_PED_RAGDOLL(PLAYER::PLAYER_PED_ID())) {
 					ENTITY::APPLY_FORCE_TO_ENTITY(PLAYER::PLAYER_PED_ID(), 1, 0.f, 1.5f, 0.f, 0.f, 0.f, 0.f, 1, true, true, true, false, true);
@@ -3430,8 +3467,13 @@ namespace Saint {
 		bool GetBool(std::string app, std::string key)
 		{
 			std::string Fetched = GetString(app, key);
-			bool returned = (Fetched == "True");
-			return returned;
+			if (Fetched == "1") {
+				return true;
+			}
+			if (Fetched == "0") {
+				return false;
+			}
+			return false;
 		}
 
 	};
@@ -3483,6 +3525,7 @@ namespace Saint {
 			ColorIni->WriteString(g_Render->header_name, "Header", "text");
 			ColorIni->WriteInt(g_Render->ToggleIterator, "Toggles", "icon");
 			ColorIni->WriteBool(g_Render->submenu_enabled, "Subheader", "enabled");
+			ColorIni->WriteBool(g_Render->m_render_glare, "Glare", "enabled");
 			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.r, "BackgroundUnselected", "r");
 			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.g, "BackgroundUnselected", "g");
 			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.b, "BackgroundUnselected", "b");
@@ -3498,6 +3541,25 @@ namespace Saint {
 			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.b, "HeaderBackground", "b");
 			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.a, "HeaderBackground", "a");
 
+			ColorIni->WriteBool(g_Render->m_dynamic_footer, "Footer", "dynamic");
+			ColorIni->WriteBool(g_Render->lines_enabled, "Lines", "enabled");
+
+			//footer
+			ColorIni->WriteFloat(g_Render->m_FooterHeight, "Footer", "height");
+			ColorIni->WriteFloat(g_Render->m_FooterSpriteSize, "Footer", "sprite_size");
+
+			//submenu
+			ColorIni->WriteInt(g_Render->IndicatorIterator, "Submenu", "icon");
+
+			//smooth scroll
+			ColorIni->WriteFloat(g_Render->smooth_scroll_speed, "SmoothScroll", "speed");
+
+			//toggles
+			ColorIni->WriteFloat(g_Render->toggle_height, "Toggles", "on_height");
+			ColorIni->WriteFloat(g_Render->toggle_height_off, "Toggles", "off_height");
+			ColorIni->WriteFloat(g_Render->toggle_width, "Toggles", "on_width");
+			ColorIni->WriteFloat(g_Render->toggle_width_off, "Toggles", "off_width");
+
 
 		}
 		void load(std::string name) {
@@ -3507,6 +3569,7 @@ namespace Saint {
 				g_Render->header_name = ColorIni->GetString("Header", "text");
 				g_Render->ToggleIterator = ColorIni->GetInt("Toggles", "icon");
 				g_Render->submenu_enabled = ColorIni->GetBool("Subheader", "enabled");
+				g_Render->m_render_glare = ColorIni->GetBool("Glare", "enabled");
 				g_Render->m_OptionUnselectedBackgroundColor.r = ColorIni->GetInt("BackgroundUnselected", "r");
 				g_Render->m_OptionUnselectedBackgroundColor.g = ColorIni->GetInt("BackgroundUnselected", "g");
 				g_Render->m_OptionUnselectedBackgroundColor.b = ColorIni->GetInt("BackgroundUnselected", "b");
@@ -3521,6 +3584,26 @@ namespace Saint {
 				g_Render->m_HeaderBackgroundColor.g = ColorIni->GetInt("HeaderBackground", "g");
 				g_Render->m_HeaderBackgroundColor.b = ColorIni->GetInt("HeaderBackground", "b");
 				g_Render->m_HeaderBackgroundColor.a = ColorIni->GetInt("HeaderBackground", "a");
+
+				g_Render->m_dynamic_footer = ColorIni->GetBool("Footer", "dynamic");
+				g_Render->lines_enabled = ColorIni->GetBool("Lines", "enabled");
+
+				//footer
+				g_Render->m_FooterHeight = ColorIni->GetFloat("Footer", "height");
+				g_Render->m_FooterSpriteSize = ColorIni->GetFloat("Footer", "sprite_size");
+
+				//submenu
+				g_Render->IndicatorIterator = ColorIni->GetInt("Submenu", "icon");
+
+				//smooth scroll
+				g_Render->smooth_scroll_speed = ColorIni->GetFloat("SmoothScroll", "speed");
+
+				//toggles
+				g_Render->toggle_height = ColorIni->GetFloat("Toggles", "on_height");
+				g_Render->toggle_height_off = ColorIni->GetFloat("Toggles", "off_height");
+				g_Render->toggle_width = ColorIni->GetFloat("Toggles", "on_width");
+				g_Render->toggle_width_off = ColorIni->GetFloat("Toggles", "off_width");
+
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Loaded '%s'", name });
 
 
@@ -4187,7 +4270,10 @@ namespace Saint {
 		int b = 0;
 		const char* rainbow_type[2] = { "Stop", "Constant"};
 		std::size_t rainbow_int = 0;
+		bool max_loop = false;
+		int max_loop_delay = 250;
 		void init() {
+			
 			if (rainbow_int == 1) {
 				if (r > 0 && b == 0) {
 					r--;
@@ -4233,6 +4319,20 @@ namespace Saint {
 						
 						VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, r, g, b);
 					}
+					if (max_loop) {
+						
+						Vehicle playerVehicle = vehicle;
+						VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
+						for (int i = 0; i < 50; i++)
+						{
+							VEHICLE::SET_VEHICLE_MOD(playerVehicle, i, MISC::GET_RANDOM_INT_IN_RANGE(0, VEHICLE::GET_NUM_VEHICLE_MODS(playerVehicle, i) - 1), false);
+
+						}
+						VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 2));
+						VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+						VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+					}
+					
 				}
 			}
 			delete vehicles;
@@ -5106,9 +5206,11 @@ namespace Saint {
 		}
 		void send_once() {
 			static int timer;
-			if ((GetTickCount() - timer) > 500) {
-				add_message(text.c_str(), get_name(), false);
-				timer = GetTickCount();
+			if (timer == 0 || (int)(GetTickCount64() - timer) > 500) {
+				if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+					add_message(text.c_str(), get_name(), false);
+				}
+				timer = GetTickCount64();
 			}
 		}
 	};
@@ -5137,7 +5239,104 @@ namespace Saint {
 		}
 	};
 	inline rainb3ow_ui rainbow_ui;
+	class ESP {
+	public:
+		bool skeleton = true;
+		void draw_bone(NativeVector3 first, NativeVector3 second) {
+			GRAPHICS::DRAW_LINE(first.x, first.y, first.z, second.x, second.y, second.z, 255, 255, 255, 255);
+		}
+		void init() {
+			if (skeleton) {
+				NativeVector3 RightFoot = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_R_Foot, 0, 0, 0);
+				NativeVector3 RightKnee = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), MH_R_Knee, 0, 0, 0);
+				NativeVector3 RightThigh = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_R_Thigh, 0, 0, 0);
+				NativeVector3 LeftFoot = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_L_Foot, 0, 0, 0);
+				NativeVector3 LeftKnee = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), MH_L_Knee, 0, 0, 0);
+				NativeVector3 LeftThigh = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_L_Thigh, 0, 0, 0);
+				NativeVector3 Center = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_ROOT, 0, 0, 0);
+				NativeVector3 Neck = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_Neck_1, 0, 0, 0);
+				NativeVector3 Head = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_Head, 0, 0, 0);
+				NativeVector3 ForearmR = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_R_UpperArm, 0, 0, 0);
+				NativeVector3 Forearm2 = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_R_Forearm, 0, 0, 0);
+				NativeVector3 HandR = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_R_Hand, 0, 0, 0);
+
+				NativeVector3 ForearmL = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_L_UpperArm, 0, 0, 0);
+				NativeVector3 Forearm2L = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_L_Forearm, 0, 0, 0);
+				NativeVector3 HandL = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_L_Hand, 0, 0, 0);
+
+				NativeVector3 RightToe = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_R_Toe0, 0, 0, 0);
+				NativeVector3 LeftToe = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_L_Toe0, 0, 0, 0);
+
+				
+				GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(8);
+				GRAPHICS::DRAW_LINE(RightFoot.x, RightFoot.y, RightFoot.z, RightKnee.x, RightKnee.y, RightKnee.z, 255, 255, 255, 255);
+				GRAPHICS::DRAW_LINE(RightKnee.x, RightKnee.y, RightKnee.z, RightThigh.x, RightThigh.y, RightThigh.z, 255, 255, 255, 255);
+
+				GRAPHICS::DRAW_LINE(RightThigh.x, RightThigh.y, RightThigh.z, Center.x, Center.y, Center.z, 255, 255, 255, 255);
+				GRAPHICS::DRAW_LINE(LeftFoot.x, LeftFoot.y, LeftFoot.z, LeftKnee.x, LeftKnee.y, LeftKnee.z, 255, 255, 255, 255);
+
+				GRAPHICS::DRAW_LINE(LeftKnee.x, LeftKnee.y, LeftKnee.z, LeftThigh.x, LeftThigh.y, LeftThigh.z, 255, 255, 255, 255);
+				GRAPHICS::DRAW_LINE(LeftThigh.x, LeftThigh.y, LeftThigh.z, Center.x, Center.y, Center.z, 255, 255, 255, 255);
+
+				GRAPHICS::DRAW_LINE(Center.x, Center.y, Center.z, Neck.x, Neck.y, Neck.z, 255, 255, 255, 255);
+				GRAPHICS::DRAW_LINE(Neck.x, Neck.y, Neck.z, Head.x, Head.y, Head.z, 255, 255, 255, 255);
+
+				GRAPHICS::DRAW_LINE(Neck.x, Neck.y, Neck.z, ForearmR.x, ForearmR.y, ForearmR.z, 255, 255, 255, 255);
+				GRAPHICS::DRAW_LINE(ForearmR.x, ForearmR.y, ForearmR.z, Forearm2.x, Forearm2.y, Forearm2.z, 255, 255, 255, 255);
+
+				GRAPHICS::DRAW_LINE(Forearm2.x, Forearm2.y, Forearm2.z, HandR.x, HandR.y, HandR.z, 255, 255, 255, 255);
+
+				GRAPHICS::DRAW_LINE(Neck.x, Neck.y, Neck.z, ForearmL.x, ForearmL.y, ForearmL.z, 255, 255, 255, 255);
+				GRAPHICS::DRAW_LINE(ForearmL.x, ForearmL.y, ForearmL.z, Forearm2L.x, Forearm2L.y, Forearm2L.z, 255, 255, 255, 255);
+
+				GRAPHICS::DRAW_LINE(Forearm2L.x, Forearm2L.y, Forearm2L.z, HandL.x, HandL.y, HandL.z, 255, 255, 255, 255);
+			}
+		}
+	};
+	inline ESP esp;
+	namespace am_criminal_damage
+	{
+		constexpr static auto broadcast_idx = 110;
+		constexpr static auto score_idx = 105;
+	}
+	inline GtaThread* find_script_thread(rage::joaat_t hash)
+	{
+		for (auto thread : *g_GameFunctions->m_script_threads)
+		{
+			if (thread && thread->m_context.m_thread_id && thread->m_handler && thread->m_script_hash == hash)
+			{
+				return thread;
+			}
+		}
+
+		return nullptr;
+	}
+	inline bool force_host(rage::joaat_t hash)
+	{
+		uint32_t self = PLAYER::PLAYER_ID();
+		if (auto launcher = find_script_thread(hash); launcher && launcher->m_net_component)
+		{
+			for (int i = 0; !((CGameScriptHandlerNetComponent*)launcher->m_net_component)->is_local_player_host(); i++)
+			{
+				if (i > 200)
+					return false;
+
+				((CGameScriptHandlerNetComponent*)launcher->m_net_component)
+					->send_host_migration_event(g_GameVariables->m_net_game_player(self));
+				fbr::cur()->wait(10ms);
+
+				if (!launcher->m_stack || !launcher->m_net_component)
+					return false;
+			}
+		}
+
+		return true;
+	}
+	
+
 	inline void FeatureInitalize() {
+		weather.init2();
+		esp.init();
 		rainbow_ui.init();
 		get_model_info.init();
 	

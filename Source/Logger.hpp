@@ -28,7 +28,7 @@ namespace Saint
 		void Theme(const char* format, ...);
 		void Debug(const char* format, ...);
 
-		void Push(LogFlag flag, const char* format, ...);
+		void Push(const char* title, LogFlag flag, const char* format, ...);
 
 
 		/**

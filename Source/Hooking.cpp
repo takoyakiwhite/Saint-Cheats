@@ -231,7 +231,7 @@ namespace Saint
 			}
 			case 0x762F9994: {
 				char name[64];
-				sprintf(name, "%s reported you for annoying", Source->PlayerInfo->m_net_player_data.m_name);
+				sprintf(name, "%s reported you for being annoying", Source->PlayerInfo->m_net_player_data.m_name);
 				protections.push_notification(name);
 				return true;
 				break;
@@ -397,6 +397,7 @@ namespace Saint
 				protections.push_notification(name);
 				if (all_players.notifications.log) {
 					g_Logger->Info(name);
+					g_Logger->Push("Leaving Player", LogFlag::Error, name);
 				}
 
 
@@ -421,7 +422,7 @@ namespace Saint
 			}
 			protections.push_notification(name);
 			if (all_players.notifications.log) {
-				g_Logger->Info(name);
+				g_Logger->Push("Joining Player", LogFlag::Success, name);
 			}
 
 
@@ -508,11 +509,19 @@ namespace Saint
 			
 			case eNetworkEvents::CExplosionEvent: {
 				if (protections.GameEvents.explosion) {
-					char name2324[64];
-					sprintf(name2324, "Explosion from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+					if (source->m_player_id < 32)
+					{
+						char name2324[64];
+						if (target->m_player_info->m_net_player_data.m_name == (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_net_player_data.m_name) {
+							sprintf(name2324, "Explosion from %s going to you blocked.", source->m_player_info->m_net_player_data.m_name);
+						}
+						else {
+							sprintf(name2324, "Explosion from %s going to %s blocked.", source->m_player_info->m_net_player_data.m_name, target->m_player_info->m_net_player_data.m_name);
+						}
 
-					g_NotificationManager->add(name2324, 2000, 1);
-					return;
+						g_NotificationManager->add(name2324, 2000, 1);
+						return;
+					}
 				}
 				break;
 			}

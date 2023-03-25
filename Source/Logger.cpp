@@ -59,10 +59,9 @@ namespace Saint
 		va_start(args, format);
 		Log("Error", format, args);
 		va_end(args);
-		g_Running = false;
 	}
 
-	void Logger::Push(LogFlag flag, const char* format, ...)
+	void Logger::Push(const char* title, LogFlag flag, const char* format, ...)
 	{
 		switch (flag) {
 		case LogFlag::Warning:
@@ -80,9 +79,8 @@ namespace Saint
 		}
 		std::va_list args{};
 		va_start(args, format);
-		Log("Log", format, args);
+		Log(title, format, args);
 		va_end(args);
-		g_Running = false;
 	}
 
 	void Logger::Log(const char* type, const char* format, std::va_list args)

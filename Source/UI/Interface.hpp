@@ -129,6 +129,8 @@ namespace Saint::UserInterface
 		float m_glare_direction;
 		void draw_glare();
 
+		int y_test = 70;
+
 		// Input
 		std::int32_t m_OpenDelay = 200;
 		std::int32_t m_BackDelay = 300;
@@ -290,6 +292,9 @@ namespace Saint::UserInterface
 
 		//break
 		bool break_italic = true;
+
+		//footer
+		bool freeze_icon = false;
 
 		//submenu
 		int sub_alpha = 190;

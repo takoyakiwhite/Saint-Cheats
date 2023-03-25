@@ -165,6 +165,18 @@ namespace Saint::UserInterface
 			PAD::DISABLE_ALL_CONTROL_ACTIONS(0);
 			ShowCursor(true);
 			SetCursor(LoadCursorA(NULL, IDC_ARROW));
+			
+
+		}
+		if (g_Settings.command_window)
+		{
+			PAD::DISABLE_ALL_CONTROL_ACTIONS(0);
+			if (!g_Render->m_Opened) {
+				ShowCursor(true);
+				SetCursor(LoadCursorA(NULL, IDC_ARROW));
+			}
+			
+
 
 		}
 
@@ -240,7 +252,7 @@ namespace Saint::UserInterface
 
 	void UIManager::HandleInput()
 	{
-		if (controlsEnabled) {
+		if (controlsEnabled && !g_Settings.command_window) {
 			static Timer openTimer(0ms);
 			openTimer.SetDelay(std::chrono::milliseconds(m_OpenDelay));
 			if (m_OpenKeyPressed && openTimer.Update())
@@ -316,6 +328,7 @@ namespace Saint::UserInterface
 			}
 			if (m_Opened && !m_SubmenuStack.empty())
 			{
+				
 				PAD::DISABLE_CONTROL_ACTION(2, 0, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 19, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 140, true);
@@ -329,7 +342,7 @@ namespace Saint::UserInterface
 				PAD::DISABLE_CONTROL_ACTION(2, 58, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 70, true);
 				auto sub = m_SubmenuStack.top();
-
+				
 				static Timer enterTimer(0ms);
 				enterTimer.SetDelay(std::chrono::milliseconds(m_EnterDelay));
 				if (m_EnterKeyPressed && sub->GetNumOptions() != 0 && enterTimer.Update())
@@ -587,13 +600,14 @@ namespace Saint::UserInterface
 		if (selected)
 		{
 			m_CurrentCoord = lerp(m_CurrentCoord, m_DrawBaseY + (m_OptionHeight / 2.f), smooth_scroll_speed); m_OptionSelectedTextColor;
-			GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(2);
-			DrawRect(
-				m_PosX,
-				m_CurrentCoord,
-				m_Width,
-				m_OptionHeight,
-				m_OptionSelectedBackgroundColor);
+				GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(2);
+				DrawRect(
+					m_PosX,
+					m_CurrentCoord,
+					m_Width,
+					m_OptionHeight,
+					m_OptionSelectedBackgroundColor);
+			
 		}
 
 		GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(3);
@@ -902,17 +916,19 @@ namespace Saint::UserInterface
 
 			if (!m_SubmenuStack.empty())
 			{
-				if (sub->GetSelectedOption() == 0)
-				{
-					rotation = 90.f;
-					texture = "arrowright";
-					size *= 0.8f;
-				}
-				else if (sub->GetSelectedOption() + 1 == sub->GetNumOptions())
-				{
-					rotation = 270.f;
-					texture = "arrowright";
-					size *= 0.8f;
+				if (!freeze_icon) {
+					if (sub->GetSelectedOption() == 0)
+					{
+						rotation = 90.f;
+						texture = "arrowright";
+						size *= 0.8f;
+					}
+					else if (sub->GetSelectedOption() + 1 == sub->GetNumOptions())
+					{
+						rotation = 270.f;
+						texture = "arrowright";
+						size *= 0.8f;
+					}
 				}
 			}
 
@@ -986,7 +1002,7 @@ namespace Saint::UserInterface
 
 				if (LeftFooterText) {
 					DrawLeftText(
-						"Saint Free",
+						"Saint Paid",
 						m_PosX - (m_Width / m_FooterTextPadding),
 						m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
 						m_FooterTextSize, m_FooterTextFont,

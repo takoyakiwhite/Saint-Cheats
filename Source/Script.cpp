@@ -31,6 +31,7 @@
 #include "Notifications.h"
 #include "Discord/DiscordHandler.hpp"
 #include "hex_memory.h"
+#include "ScriptLocal.h"
 namespace Saint
 {
 
@@ -673,32 +674,39 @@ namespace Saint
 						
 
 					});
-		
-		sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
-		namespace fs = std::filesystem;
-		fs::directory_iterator dirIt{ "C:\\Saint\\Outfits\\" };
-		for (auto&& dirEntry : dirIt)
-		{
-			if (dirEntry.is_regular_file())
-			{
-				auto path = dirEntry.path();
-				if (path.has_filename())
-				{
-					if (path.extension() == ".ini")
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				if (std::filesystem::exists("C:\\Saint\\Outfits\\") && std::filesystem::is_directory("C:\\Saint\\Outfits\\")) {
+
+					namespace fs = std::filesystem;
+					fs::directory_iterator dirIt{ "C:\\Saint\\Outfits\\" };
+					for (auto&& dirEntry : dirIt)
 					{
-						
-						char nigger[64];
-						sprintf(nigger, "%s", path.stem().u8string().c_str());
-						sub->draw_option<RegularOption>(nigger, nullptr, [=]
+						if (dirEntry.is_regular_file())
+						{
+							auto path = dirEntry.path();
+							if (path.has_filename())
 							{
-								g_Outfits.load(nigger);
-							});
+								if (path.extension() == ".ini")
+								{
 
+									char nigger[64];
+									sprintf(nigger, "%s", path.stem().u8string().c_str());
+									sub->draw_option<RegularOption>(nigger, nullptr, [=]
+										{
+											g_Outfits.load(nigger);
+										});
+
+								}
+
+							}
+						}
 					}
-
 				}
-			}
-		}
+				else {
+					std::filesystem::create_directory("C:\\Saint\\Outfits\\");
+				}
+		
+		
 			});
 
 		g_Render->draw_submenu<sub>(("Invisible"), SubmenuInvisible, [](sub* sub)
@@ -1021,31 +1029,42 @@ namespace Saint
 						m_VehicleLoad.save(VehNameBuffer);
 							});
 					});
-				sub->draw_option<UnclickOption>(("Lists"), nullptr, [] {});
-				namespace fs = std::filesystem;
-				fs::directory_iterator dirIt{ "C:\\Saint\\Vehicles\\" };
-				for (auto&& dirEntry : dirIt)
-				{
-					if (dirEntry.is_regular_file())
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				if (std::filesystem::exists("C:\\Saint\\Vehicles\\") && std::filesystem::is_directory("C:\\Saint\\Vehicles\\")) {
+					namespace fs = std::filesystem;
+					fs::directory_iterator dirIt{ "C:\\Saint\\Vehicles\\" };
+					for (auto&& dirEntry : dirIt)
 					{
-						auto path = dirEntry.path();
-						if (path.has_filename())
+						if (dirEntry.is_regular_file())
 						{
-							if (path.extension() == ".ini")
+							auto path = dirEntry.path();
+							if (path.has_filename())
 							{
-								OutfitList();
-								char nigger[64];
-								sprintf(nigger, "%s", path.stem().u8string().c_str());
-								sub->draw_option<RegularOption>(nigger, nullptr, [=]
-									{
-										m_VehicleLoad.load(nigger);
-									});
+								if (path.extension() == ".ini")
+								{
+									OutfitList();
+									char nigger[64];
+									sprintf(nigger, "%s", path.stem().u8string().c_str());
+									sub->draw_option<RegularOption>(nigger, nullptr, [=]
+										{
+											m_VehicleLoad.load(nigger);
+										});
+
+								}
 
 							}
-
 						}
 					}
 				}
+				else {
+					if (std::filesystem::create_directory("C:\\Saint\\Vehicles\\")) {
+
+					}
+					else {
+						std::filesystem::create_directory("C:\\Saint\\Vehicles\\");
+					}
+				}
+				
 
 			});
 		g_Render->draw_submenu<sub>(("All"), SubmenuVehicleAll, [](sub* sub)
@@ -2850,30 +2869,37 @@ namespace Saint
 						});
 					});
 				sub->draw_option<UnclickOption>(("Lists"), nullptr, [] {});
-				namespace fs = std::filesystem;
-				fs::directory_iterator dirIt{ "C:\\Saint\\Handling\\" };
-				for (auto&& dirEntry : dirIt)
-				{
-					if (dirEntry.is_regular_file())
+				if (std::filesystem::exists("C:\\Saint\\Handling\\") && std::filesystem::is_directory("C:\\Saint\\Handling\\")) {
+					namespace fs = std::filesystem;
+					fs::directory_iterator dirIt{ "C:\\Saint\\Handling\\" };
+					for (auto&& dirEntry : dirIt)
 					{
-						auto path = dirEntry.path();
-						if (path.has_filename())
+						if (dirEntry.is_regular_file())
 						{
-							if (path.extension() == ".ini")
+							auto path = dirEntry.path();
+							if (path.has_filename())
 							{
-								OutfitList();
-								char nigger[64];
-								sprintf(nigger, "%s", path.stem().u8string().c_str());
-								sub->draw_option<RegularOption>(nigger, nullptr, [=]
-									{
-										m_handling.load(nigger);
-									});
+								if (path.extension() == ".ini")
+								{
+									OutfitList();
+									char nigger[64];
+									sprintf(nigger, "%s", path.stem().u8string().c_str());
+									sub->draw_option<RegularOption>(nigger, nullptr, [=]
+										{
+											m_handling.load(nigger);
+										});
+
+								}
 
 							}
-
 						}
 					}
+
 				}
+				else {
+					std::filesystem::create_directory("C:\\Saint\\Handling\\");
+				}
+				
 
 
 
@@ -2920,7 +2946,7 @@ namespace Saint
 				m_shotgun.onDisable();
 			}
 			});
-		//sub->draw_option<toggle<bool>>(("Weapons In Interior"), nullptr, &weapons_in_int, BoolDisplay::OnOff);
+		sub->draw_option<toggle_number_option<std::int32_t, bool>>("Force", nullptr, &features.force_gun, &features.force_gun_mult, 0, 300, 10);
 			});
 		g_Render->draw_submenu<sub>(("Entity Shooter"), EntityShooter, [](sub* sub)
 			{
@@ -3018,7 +3044,7 @@ namespace Saint
 		sub->draw_option<toggle<bool>>(("Exclude Friends"), nullptr, &triggerbot.exclude_friends, BoolDisplay::OnOff);
 		sub->draw_option<ChooseOption<const char*, std::size_t>>("Filter", nullptr, &triggerbot.filter, &triggerbot.filter_i);
 		sub->draw_option<ChooseOption<const char*, std::size_t>>("Redirect To Bone", nullptr, &triggerbot.shoot_coords, &triggerbot.scoords_i);
-		sub->draw_option<number<std::int32_t>>("Delay", nullptr, &triggerbot.delay, 0, 5000);
+		sub->draw_option<number<std::int32_t>>("Delay", nullptr, &triggerbot.delay, 0, 5000, 50);
 
 
 			});
@@ -3143,7 +3169,7 @@ namespace Saint
 
 			});
 		sub->draw_option<number<float>>("Accuracy Spread", nullptr, &weapon->m_accuracy_spread, -1000.f, 1000.f, 0.1f, 1);
-		sub->draw_option<number<float>>("Accurate Mode Acuracy Modifier", nullptr, &weapon->m_accurate_mode_accuracy_modifier, -1000.f, 1000.f, 0.1f, 1);
+		sub->draw_option<number<float>>("Accurate Mode Accuracy Modifier", nullptr, &weapon->m_accurate_mode_accuracy_modifier, -1000.f, 1000.f, 0.1f, 1);
 		sub->draw_option<number<float>>("RNG Accuracy", nullptr, &weapon->m_run_and_gun_accuracy, -1000.f, 1000.f, 0.1f, 1);
 		sub->draw_option<number<float>>("RNG Min Accuracy", nullptr, &weapon->m_run_and_gun_min_accuracy, -1000.f, 1000.f, 0.1f, 1);
 		sub->draw_option<number<float>>("Recoil Accuracy Max", nullptr, &weapon->m_recoil_accuracy_max, -1000.f, 1000.f, 0.1f, 1);
@@ -3365,7 +3391,7 @@ namespace Saint
 				sub->draw_option<submenu>("Player List", nullptr, SubmenuPlayerList);
 		sub->draw_option<submenu>("Modder Detection", nullptr, SubmenuAntiCheat);
 		sub->draw_option<submenu>("Spoofing", nullptr, SubmenuSpoofing);
-		sub->draw_option<submenu>("Friends", nullptr, SubmenuFriends);
+		//sub->draw_option<submenu>("Friends", nullptr, SubmenuFriends);
 		sub->draw_option<submenu>("Recovery", nullptr, SubmenuRecovery);
 		sub->draw_option<submenu>("Requests", nullptr, SubmenuRequests);
 		sub->draw_option<submenu>("Session Starter", nullptr, SubmenuSesStart);
@@ -3374,7 +3400,17 @@ namespace Saint
 		sub->draw_option<submenu>("Chat", nullptr, SubmenuChat);
 		sub->draw_option<submenu>("Team", nullptr, SubmenuTeam);
 		sub->draw_option<submenu>("Off The Radar", nullptr, SubmenuOffRadar);
+		sub->draw_option<submenu>("Freemode Events", nullptr, rage::joaat("FreemodeEvent"));
 		sub->draw_option<submenu>("Heist Control", nullptr, HeistControl);
+			});
+		g_Render->draw_submenu<sub>("Freemode Events", rage::joaat("FreemodeEvent"), [](sub* sub)
+			{
+				sub->draw_option<RegularOption>(("Max Criminal Damage"), nullptr, [=]
+						{
+
+							if (auto criminal_damage = find_script_thread(rage::joaat("am_criminal_damage")))
+								*script_local(criminal_damage->m_stack, am_criminal_damage::score_idx).as<int*>() = 999'999'999;
+						});
 			});
 		g_Render->draw_submenu<sub>("Friends", SubmenuFriends, [](sub* sub)
 			{
@@ -3634,7 +3670,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Spoofing"), SubmenuSpoofing, [](sub* sub)
 			{
-				sub->draw_option<submenu>("Information", nullptr, SubmenuInformation);
+				//sub->draw_option<submenu>("Information", nullptr, SubmenuInformation);
 		sub->draw_option<submenu>("Game", nullptr, SubmenuGame);
 		sub->draw_option<submenu>("Crew", nullptr, SubmenuCrew);
 		sub->draw_option<toggle<bool>>(("QA Tester"), nullptr, &spoofing.qa_tester, BoolDisplay::OnOff);
@@ -3642,42 +3678,6 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Information"), SubmenuInformation, [](sub* sub)
 			{
 				sub->draw_option<submenu>("IP", nullptr, SubmenuIP);
-
-			});
-		g_Render->draw_submenu<sub>(("IP"), SubmenuIP, [](sub* sub)
-			{
-				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &spoofing.ip.enabled, BoolDisplay::OnOff);
-		sub->draw_option<KeyboardOption>(("Field 1"), nullptr, spoofing.ip.f1, []
-			{
-				
-
-
-			});
-		sub->draw_option<KeyboardOption>(("Field 2"), nullptr, spoofing.ip.f2.c_str(), []
-			{
-				showKeyboard("Enter Something", "", 3, &spoofing.ip.f2, [] {
-				spoofing.ip.field2 = atoi(spoofing.ip.f2.c_str());
-					});
-
-
-			});
-		sub->draw_option<KeyboardOption>(("Field 3"), nullptr, spoofing.ip.f3.c_str(), []
-			{
-				showKeyboard("Enter Something", "", 3, &spoofing.ip.f3, [] {
-				spoofing.ip.field3 = atoi(spoofing.ip.f3.c_str());
-					});
-
-
-			});
-		sub->draw_option<KeyboardOption>(("Field 4"), nullptr, spoofing.ip.f4.c_str(), []
-			{
-				showKeyboard("Enter Something", "", 3, &spoofing.ip.f4, [] {
-				spoofing.ip.field4 = atoi(spoofing.ip.f4.c_str());
-					});
-
-
-			});
-
 
 			});
 		g_Render->draw_submenu<sub>(("Crew"), SubmenuCrew, [](sub* sub)
@@ -4018,7 +4018,7 @@ namespace Saint
 				}
 		
 			});
-
+		
 		g_Render->draw_submenu<PlayerSubmenu>(&g_SelectedPlayer, SubmenuSelectedPlayer, [](PlayerSubmenu* sub)
 			{
 				sub->draw_option<submenu>("Trolling", nullptr, SubmenuTrolling);
@@ -4032,6 +4032,7 @@ namespace Saint
 		sub->draw_option<submenu>("Removals", nullptr, SubmenuRemoval);
 		sub->draw_option<submenu>("Chat", nullptr, SubmenuSelectedChat);
 		sub->draw_option<submenu>("Social Club", nullptr, SubmenuSocialClub);
+		sub->draw_option<submenu>("Block Actions", nullptr, rage::joaat("BlockActions"));
 		sub->draw_option<submenu>("Detections", nullptr, SubmenuSelectedDetections);
 		if (g_SelectedPlayer != PLAYER::PLAYER_ID()) {
 			sub->draw_option<toggle<bool>>(("Spectate"), nullptr, &features.spectate, BoolDisplay::OnOff, false, [] {
@@ -4089,6 +4090,10 @@ namespace Saint
 
 
 			});
+		g_Render->draw_submenu<sub>("Block Actions", rage::joaat("BlockActions"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Shooting"), nullptr, &g_players.get_selected.block_actions.shooting, BoolDisplay::OnOff);
+			});
 		g_Render->draw_submenu<sub>("Chat", SubmenuSelectedChat, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Presets", nullptr, SubmenuSelectedChatPresets);
@@ -4099,7 +4104,7 @@ namespace Saint
 
 
 					});
-				sub->draw_option<RegularOption>(("Send Once"), nullptr, []
+				sub->draw_option<RegularOption>(("Send Once"), "~y~Notice: ~w~Local only.", []
 					{
 						p_chat.send_once();
 					});
@@ -4135,26 +4140,30 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Detections", SubmenuSelectedDetections, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Exclude"), nullptr, &antiCheat.excludethatuck, BoolDisplay::OnOff, false, [] {
-				if (antiCheat.excludethatuck) {
-					antiCheat.exclude_player(all_players.get_id(g_SelectedPlayer));
-				}
-				if (!antiCheat.excludethatuck) {
-					antiCheat.remove_exclude(all_players.get_id(g_SelectedPlayer));
-				}
-					});
+					if (antiCheat.excludethatuck) {
+						antiCheat.exclude_player(all_players.get_id(g_SelectedPlayer));
+					}
+					if (!antiCheat.excludethatuck) {
+						antiCheat.remove_exclude(all_players.get_id(g_SelectedPlayer));
+					}
+				});
 				if (antiCheat.excludethatuck) {
 					sub->draw_option<UnclickOption>(("This player is excluded."), nullptr, [] {});
-						}
+				}
 				if (!antiCheat.excludethatuck) {
 					sub->draw_option<RegularOption>("Mark As Cheater", nullptr, [=]
 						{
-							antiCheat.flag_as_modder(all_players.get_id(g_SelectedPlayer), g_SelectedPlayer, true);
+							if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+								antiCheat.flag_as_modder(all_players.get_id(g_SelectedPlayer), g_SelectedPlayer, true);
+							}
 							
 
 						});
 					sub->draw_option<RegularOption>("Unmark As Cheater", nullptr, [=]
 						{
-							antiCheat.remove_as_modder(all_players.get_id(g_SelectedPlayer));
+							if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+								antiCheat.remove_as_modder(all_players.get_id(g_SelectedPlayer));
+							}
 
 						});
 				}
@@ -4405,36 +4414,46 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Saved"), SubmenuSavedPlayers, [](sub* sub)
 			{
 
-				sub->draw_option<RegularOption>(("Delete All"), nullptr, []
+				sub->draw_option<RegularOption>(("Clear"), nullptr, []
 					{
-
+						std::string path = "C:\\Saint\\Players\\";
+						for (const auto& entry : std::filesystem::directory_iterator(path)) {
+							std::filesystem::remove(entry.path());
+						}
+						//thank you chat gpt!
 						
 					});
-		sub->draw_option<UnclickOption>(("Lists"), nullptr, [] {});
-		namespace fs = std::filesystem;
-		fs::directory_iterator dirIt{ "C:\\Saint\\Players\\" };
-		for (auto&& dirEntry : dirIt)
-		{
-			if (dirEntry.is_regular_file())
-			{
-				auto path = dirEntry.path();
-				if (path.has_filename())
-				{
-					if (path.extension() == ".ini")
+				sub->draw_option<UnclickOption>(("Lists"), nullptr, [] {});
+				if (std::filesystem::exists("C:\\Saint\\Players\\") && std::filesystem::is_directory("C:\\Saint\\Players\\")) {
+
+					namespace fs = std::filesystem;
+					fs::directory_iterator dirIt{ "C:\\Saint\\Players\\" };
+					for (auto&& dirEntry : dirIt)
 					{
-						OutfitList();
-						char nigger[64];
-						sprintf(nigger, "%s", path.stem().u8string().c_str());
-						sub->draw_option<RegularOption>(nigger, nullptr, [=]
+						if (dirEntry.is_regular_file())
+						{
+							auto path = dirEntry.path();
+							if (path.has_filename())
 							{
-								
-							});
+								if (path.extension() == ".ini")
+								{
+									OutfitList();
+									char nigger[64];
+									sprintf(nigger, "%s", path.stem().u8string().c_str());
+									sub->draw_option<RegularOption>(nigger, nullptr, [=]
+										{
 
+										});
+
+								}
+
+							}
+						}
 					}
-
 				}
-			}
-		}
+				else {
+					std::filesystem::create_directory("C:\\Saint\\Players\\");
+				}
 
 
 
@@ -4570,7 +4589,6 @@ namespace Saint
 		sub->draw_option<number<std::int32_t>>("Bounty", nullptr, &boost_power, 0, 10000, 1, 3, false, "", "", [] {
 			g_players.get_selected.bounty(boost_power);
 		});
-		//sub->draw_option<toggle<bool>>(("Freeze"), nullptr, &g_players.get_selected.freeze, BoolDisplay::OnOff);
 		sub->draw_option<RegularOption>(("Taze"), nullptr, [=]
 			{
 				g_players.get_selected.taze();
@@ -4747,13 +4765,16 @@ namespace Saint
 							PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), c.x, c.y, c.z);
 						}
 					});
-		sub->draw_option<RegularOption>(("Their Vehicle To You"), nullptr, [=]
+		sub->draw_option<RegularOption>(("Their Vehicle To Me"), nullptr, [=]
 			{
+				
 				if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false))) {
 					Entity ent = PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
 					NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
 					ENTITY::SET_ENTITY_COORDS(ent, coords.x, coords.y, coords.z, 0, 0, 0, 0);
+					
 				}
+				
 
 
 
@@ -4805,7 +4826,7 @@ namespace Saint
 		sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize RP Model", nullptr, &drops.random_rp_model, &drops.model_delay, 0, 5000, 50);
 		sub->draw_option<ChooseOption<const char*, std::size_t>>("Location", nullptr, &drops.location, &drops.data);
 		sub->draw_option<ChooseOption<const char*, std::size_t>>("RP Model", nullptr, &drops.rp_model, &drops.rp_model_data);
-		sub->draw_option<ChooseOption<const char*, std::size_t>>("Model Model", nullptr, &drops.money_model, &drops.money_model_data);
+		sub->draw_option<ChooseOption<const char*, std::size_t>>("Money Model", nullptr, &drops.money_model, &drops.money_model_data);
 		sub->draw_option<number<std::int32_t>>("Height", nullptr, &drops.height, 0, 100);
 		sub->draw_option<number<std::int32_t>>("Delay", nullptr, &drops.delay, 0, 5000, 50);
 			});
@@ -4875,7 +4896,6 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Notifications"), rage::joaat("ProtectionsNOTI"), [](sub* sub)
 			{
-				sub->draw_option<toggle<bool>>(("Regular"), nullptr, &protections.regular_noti, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Money Stolen"), nullptr, &protections.moneystolen, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Money Removed"), nullptr, &protections.moneyremoved, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Money Banked"), nullptr, &protections.moneybanked, BoolDisplay::OnOff);
@@ -4905,18 +4925,127 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Teleport"), SubmenuTeleport, [](sub* sub)
 			{
-				sub->draw_option<toggle<bool>>(("Automatic"), nullptr, &m_teleport.automatic, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Automaticly Teleport To Waypoint"), nullptr, &m_teleport.automatic, BoolDisplay::OnOff);
 				sub->draw_option<RegularOption>(("Waypoint"), nullptr, []
 					{
-
-
-
 						m_teleport.waypoint();
-
+					});
+				sub->draw_option<UnclickOption>(("Locations"), nullptr, [] {});
+				sub->draw_option<submenu>("Popular", nullptr, rage::joaat("populartps"));
+				sub->draw_option<submenu>("Clubhouse & Warehouses", nullptr, rage::joaat("warhouse"));
+				sub->draw_option<submenu>("Indoors", nullptr, rage::joaat("indoors"));
+				
+				
+			});
+		g_Render->draw_submenu<sub>(("Popular"), rage::joaat("populartps"), [](sub* sub)
+			{
+				sub->draw_option<RegularOption>("Maze Bank Roof", "", []
+					{
+						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), -75.015, 818.215, 326.176, false, false, false, false);
+					});
+				sub->draw_option<RegularOption>("Main LS Customs", "", []
+					{
+						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), -365.425, 131.809, 37.873, false, false, false, false);
 					});
 				
 			});
+		g_Render->draw_submenu<sub>(("Indoors"), rage::joaat("indoors"), [](sub* sub)
+			{
+				sub->draw_option<RegularOption>("Franklin's House", "", []
+					{
+						NativeVector3 Coords;
+						Coords.x = -6, 54853; Coords.y = 520, 445007; Coords.z = 174, 627792;
+						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+					});
+				sub->draw_option<RegularOption>("Franklin's First House", "", []
+					{
+						NativeVector3 Coords;
+						Coords.x = -14, 577254; Coords.y = -1427, 414917; Coords.z = 31, 101492;
 
+						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+					});
+				sub->draw_option<RegularOption>("Trevor's Truck", "", []
+					{
+						NativeVector3 Coords;
+						Coords.x = 1973, 865845; Coords.y = 3819, 97168; Coords.z = 33, 436317;
+						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+					});
+
+				sub->draw_option<RegularOption>("Michael's House", "", []
+					{
+						NativeVector3 Coords;
+						Coords.x = -812, 573303; Coords.y = 180, 043457; Coords.z = 72, 159172;
+						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+					});
+
+				sub->draw_option<RegularOption>("Lester's House", "", []
+					{
+						NativeVector3 Coords;
+						Coords.x = 1269, 541504; Coords.y = -1710, 447876; Coords.z = 54, 771492;
+						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+					});
+
+				
+
+				sub->draw_option<RegularOption>("Prison", "", []
+					{
+						NativeVector3 Coords;
+						Coords.x = 1739.5726; Coords.y = 2576.4565; Coords.z = 45.0334;
+						
+						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+					});
+				sub->draw_option<RegularOption>("Humane Labs", "", []
+					{
+						NativeVector3 Coords;
+						Coords.x = 3614, 394775; Coords.y = 3744, 803467; Coords.z = 28, 690090;
+						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+					});
+				sub->draw_option<RegularOption>("FIB Building", "", []
+					{
+						NativeVector3 Coords;
+						Coords.x = 128, 572662; Coords.y = -727, 923401; Coords.z = 254, 152115;
+						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+					});
+				
+				sub->draw_option<RegularOption>("Floyd's Appartement", "", []
+					{
+						NativeVector3 Coords;
+						Coords.x = -1155, 725952; Coords.y = -1518, 761719; Coords.z = 10, 632728;
+						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+					});
+				sub->draw_option<RegularOption>("Strip Club", "", []
+					{
+						NativeVector3 Coords;
+						Coords.x = 126.135;
+						Coords.y = -1278.583;
+						Coords.z = 29.270;
+						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+					});
+			});
+		g_Render->draw_submenu<sub>(("Clubhouse & Warehouses"), rage::joaat("warhouse"), [](sub* sub)
+			{
+				sub->draw_option<RegularOption>(("Clubhouse 1"), nullptr, []
+					{
+						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 1107.04, -3157.399, -37.51859, false, false, false, false);
+					});
+				sub->draw_option<RegularOption>(("Clubhouse 2"), nullptr, []
+					{
+						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 998.4809, -3164.711, -38.90733, false, false, false, false);
+					});
+				sub->draw_option<RegularOption>(("Methlab"), nullptr, []
+					{
+						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 1009.5, -3196.6, -38.99682, false, false, false, false);
+					});
+				sub->draw_option<RegularOption>(("Weed Farm"), nullptr, []
+					{
+						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 1051.491, -3196.536, -39.14842, false, false, false, false);
+					});
+				sub->draw_option<RegularOption>(("Cocaine Lockup"), nullptr, []
+					{
+						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 1093.6, -3196.6, -38.99841, false, false, false, false);
+					});
+			});
+		
 		g_Render->draw_submenu<sub>(("World"), SubmenuWorld, [](sub* sub)
 			{
 				//sub->draw_option<submenu>("Peds", nullptr, SubmenuPeds);
@@ -4998,6 +5127,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Traffic"), NearbyVehicles, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Horn"), nullptr, &m_nearby.m_traffic.horn, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Max Loop"), nullptr, &m_nearby.m_traffic.max_loop, BoolDisplay::OnOff);
 				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Rainbow", nullptr, &m_nearby.m_traffic.rainbow, &m_nearby.m_traffic.rainbow_type, &m_nearby.m_traffic.rainbow_int);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Acrobatics", nullptr, &acrobatic_type, &m_nearby.m_traffic.acrobatic, false, -1, [] {
 							if (m_nearby.m_traffic.acrobatic == 0) {
@@ -5057,10 +5187,45 @@ namespace Saint
 
 							}
 					});
+				
+				sub->draw_option<RegularOption>(("Teleport To Me"), nullptr, []
+					{
+						Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
+						vehicles[0] = 10;
+						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), vehicles); i++)
+						{
+							Vehicle playerVehicle = vehicles[(i * 2 + 2)];
+							NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+							ENTITY::SET_ENTITY_COORDS2(playerVehicle, self_coords, false, false, false, false);
+
+						}
+						delete vehicles;
+					});
+				sub->draw_option<RegularOption>(("Max"), nullptr, []
+					{
+						Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
+						vehicles[0] = 10;
+						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), vehicles); i++)
+						{
+							Vehicle playerVehicle = vehicles[(i * 2 + 2)];
+							VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
+							for (int i = 0; i < 50; i++)
+							{
+								VEHICLE::SET_VEHICLE_MOD(playerVehicle, i, MISC::GET_RANDOM_INT_IN_RANGE(0, VEHICLE::GET_NUM_VEHICLE_MODS(playerVehicle, i) - 1), false);
+
+							}
+							VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 2));
+							VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+							VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+
+						}
+						delete vehicles;
+					});
 
 			});
 		g_Render->draw_submenu<sub>(("Weather"), SubmeuWeather, [](sub* sub)
 			{
+				sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize", nullptr, &weather.randomize, &weather.randomize_delay, 0, 5000, 50);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &weather.data, &weather.init);
 		sub->draw_option<RegularOption>(("Apply"), nullptr, []
 			{
@@ -5218,7 +5383,7 @@ namespace Saint
 		
 		
 		
-		sub->draw_option<toggle<bool>>("Log Script Events", nullptr, &g_LogScriptEvents, BoolDisplay::OnOff);
+				
 		
 		sub->draw_option<RegularOption>("Unload", nullptr, []
 			{
@@ -5238,30 +5403,37 @@ namespace Saint
 					});
 
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
-				namespace fs = std::filesystem;
-				fs::directory_iterator dirIt{ "C:\\Saint\\Themes\\" };
-				for (auto&& dirEntry : dirIt)
-				{
-					if (dirEntry.is_regular_file())
-					{
-						auto path = dirEntry.path();
-						if (path.has_filename())
-						{
-							if (path.extension() == ".ini")
-							{
+				if (std::filesystem::exists("C:\\Saint\\Themes\\") && std::filesystem::is_directory("C:\\Saint\\Themes\\")) {
 
-								char nigger[64];
-								sprintf(nigger, "%s", path.stem().u8string().c_str());
-								sub->draw_option<RegularOption>(nigger, nullptr, [=]
-									{
-										g_ThemeLoading.load(nigger);
-									});
+					namespace fs = std::filesystem;
+					fs::directory_iterator dirIt{ "C:\\Saint\\Themes\\" };
+					for (auto&& dirEntry : dirIt)
+					{
+						if (dirEntry.is_regular_file())
+						{
+							auto path = dirEntry.path();
+							if (path.has_filename())
+							{
+								if (path.extension() == ".ini")
+								{
+
+									char nigger[64];
+									sprintf(nigger, "%s", path.stem().u8string().c_str());
+									sub->draw_option<RegularOption>(nigger, nullptr, [=]
+										{
+											g_ThemeLoading.load(nigger);
+										});
+
+								}
 
 							}
-
 						}
 					}
 				}
+				else {
+					std::filesystem::create_directory("C:\\Saint\\Themes\\");
+				}
+				
 
 
 			});
@@ -5275,9 +5447,16 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Base"), PositionsMenu, [](sub* sub)
 			{
-
+				sub->draw_option<toggle<bool>>("Move With Mouse", "Works best in fullscreen.", &features.move_with_mouse, BoolDisplay::OnOff, false, [] {
+					g_Settings.m_LockMouse = false;
+				});
 				sub->draw_option<number<float>>("X", nullptr, &g_Render->m_PosX, 0.f, 1.f, 0.01f, 2);
 				sub->draw_option<number<float>>("Y", nullptr, &g_Render->m_PosY, 0.f, 1.f, 0.01f, 2);
+				sub->draw_option<RegularOption>("Reset", nullptr, [=]
+					{
+						g_Render->m_PosX = 0.18f;
+						g_Render->m_PosY = 0.1f;
+					});
 
 
 			});
@@ -5848,7 +6027,8 @@ namespace Saint
 				sub->draw_option<toggle<bool>>("Enabled", nullptr, &g_Render->footer_enabled, BoolDisplay::OnOff);
 				sub->draw_option<number<float>>("Height", nullptr, &g_Render->m_FooterHeight, 0.01f, 0.1f, 0.001f, 3);
 		sub->draw_option<number<float>>("Sprite Size", nullptr, &g_Render->m_FooterSpriteSize, 0.01f, 1.f, 0.001f, 3);
-		sub->draw_option<toggle<bool>>("Dynamic Footer", nullptr, &g_Render->m_dynamic_footer, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>("Dynamic", nullptr, &g_Render->m_dynamic_footer, BoolDisplay::OnOff);
+		sub->draw_option<toggle<bool>>("Freeze Icon", nullptr, &g_Render->freeze_icon, BoolDisplay::OnOff);
 			});
 
 		g_Render->draw_submenu<sub>("Header", SubmenuSettingsHeader, [](sub* sub)

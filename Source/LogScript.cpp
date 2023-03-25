@@ -60,12 +60,49 @@ namespace Saint
 		float p7 = (p2 / p3) * p1.a;
 		return ImU32(ImColor(p4, p5, p6, p7));
 	}
+	static char buf1[64] = "Fortnite";
+	void remove_from_string(std::string str, std::string what) {
+		std::size_t spacePos = str.find(' ');
+		str = str.substr(spacePos + 1);
+	}
+	bool Command(std::string str, std::string check)
+	{
+		std::size_t found = str.find(' ');
+		if (found != std::string::npos)
+		{
+			if (str.substr(0, found) == check)
+			{
+				str = str.substr(found + 1, str.size());
+				return true;
+			}
+		}
+		else
+		{
+			if (str == check)
+				return true;
+		}
+		return false;
+	}
+	void copytoclipboard2(const std::string& tocopy)
+	{
+		OpenClipboard(NULL);
+		EmptyClipboard();
+		HGLOBAL HG = GlobalAlloc(GMEM_MOVEABLE, tocopy.size());
+		if (!HG)
+		{
+			CloseClipboard();
+		}
+		memcpy(GlobalLock(HG), tocopy.c_str(), tocopy.size());
+		GlobalUnlock(HG);
+		SetClipboardData(CF_TEXT, HG);
+		CloseClipboard();
+		GlobalFree(HG);
+	}
 	void LogScript::Tick()
 	{
 
 			if (g_Render->m_Opened && g_Render->m_HeaderText)
 			{
-				auto m_Hello = ImGui::CalcTextSize("Hello").y;
 				auto m_XPosition = ((g_Render->m_PosX - (g_Render->m_Width / g_Render->m_FooterTextPadding)) * ImGui::GetIO().DisplaySize.x);
 				auto m_YPosition = (g_Render->m_PosY + (g_Render->m_HeaderHeight / 100.f) + ((ImGui::CalcTextSize(g_Render->m_CurrentSubMenuName).y / 1920) / 4.f)) * ImGui::GetIO().DisplaySize.y;
 				if (ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground)) {
@@ -77,6 +114,31 @@ namespace Saint
 					ImGui::PopFont();
 				}
 			}  ImGui::End();
+			if (g_Settings.command_window)
+			{
+				ImGui::SetNextWindowSize(ImVec2(505, 74), ImGuiCond_Once);
+				ImGui::SetNextWindowPos(ImVec2(967, 244), ImGuiCond_Once);
+				if (ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize | )) {
+					ImGui::PushFont(g_D3DRenderer->m_DefaultFont);
+					
+					ImGui::InputText("Command", buf1, 128);
+					const char* input = std::format("{}", buf1).c_str();
+					
+
+					if (GetAsyncKeyState(0x0D) & 1) {
+						if (buf1 == "fortnite") { //dont work i dont know why
+							Noti::InsertNotification({ ImGuiToastType_None, 2000, "YOUR A FAGGOT"});
+						}
+						Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s copied to clipboard.", input});
+					}
+					
+					
+					
+
+					ImGui::PopFont();
+					ImGui::End();
+				}
+			} 
 		if (g_Render->m_Opened && g_Settings.m_LogWindow)
 		{
 			ImGui::SetNextWindowSize(ImVec2(500, 250), ImGuiCond_FirstUseEver);

@@ -100,7 +100,8 @@ namespace Saint
 		m_send_remove_gamer_cmd(Signature("8D 42 FF 83 F8 FD 77 3D").Scan().Add(65).Rip().As<send_remove_gamer_cmd>()),
 		m_handle_remove_gamer_cmd(Signature("41 FF C6 FF C7").Scan().Sub(0x6E).As<handle_remove_gamer_cmd>()),
 		//m_get_network_event_data(Signature("53 43 52 49 50 54 5F 4E 45 54 57 4F 52 4B").Scan().Sub(0x38).As<PVOID*>()),
-		should_sync_money_rewards(Signature("40 8A 2D ? ? ? ? 48 83 64 24 40 00").Scan().Add(3).Rip().As<decltype(should_sync_money_rewards)>())
+		should_sync_money_rewards(Signature("40 8A 2D ? ? ? ? 48 83 64 24 40 00").Scan().Add(3).Rip().As<decltype(should_sync_money_rewards)>()),
+		m_script_threads(Signature("45 33 F6 8B E9 85 C9 B8").Scan().Sub(4).Rip().Sub(8).As<decltype(m_script_threads)>())
 
 	{
 	}

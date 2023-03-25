@@ -89,12 +89,12 @@ namespace Saint {
 			float offset = 0.02;
 			float xfr = x + 0.205f + offset;
 			if (first) {
-				drawText(text, xfr - 0.110f, 0.105f, 0.25f, 0, false, col2, false);
-				drawText(text2, xfr + 0.066f -x_offset, 0.105f, 0.25f, 0, false, col2, true);
+				drawText(text, xfr - 0.110f, 0.105f, 0.23f, 0, false, col2, false);
+				drawText(text2, xfr + 0.066f -x_offset, 0.105f, 0.23f, 0, false, col2, true);
 			}
 			else {
-				drawText(text, xfr - 0.110f, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, false);
-				drawText(text2, xfr + 0.066f - x_offset, 0.105f + 0.015f * pos, 0.25f, 0, false, col2, true);
+				drawText(text, xfr - 0.110f, 0.105f + 0.015f * pos, 0.23f, 0, false, col2, false);
+				drawText(text2, xfr + 0.066f - x_offset, 0.105f + 0.015f * pos, 0.23f, 0, false, col2, true);
 			}
 		}
 		void drawSprite(const char* dict, const char* texture, float x, float y, float width, float height, Color color, float rotation)
@@ -361,14 +361,14 @@ namespace Saint {
 			
 
 			g_Render->DrawRect(PosX, PosY + 0.28, 0.25f, 0.125, m_InfoBG); // second bar
-			g_Render->DrawRect(PosX, PosY + 0.31 - 0.09375, 0.25f, 0.002f, g_Render->m_HeaderBackgroundColor);
+			g_Render->DrawRect(PosX, PosY + 0.312 - 0.09375, 0.25f, 0.002f, g_Render->m_HeaderBackgroundColor);
 
 			Ped ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player);
 
 			NativeVector3 get_coords = ENTITY::GET_ENTITY_COORDS(ped, 0);
 			std::string wantedlvl = GetWanted(player);
 			std::string ammo = std::format("{}", WEAPON::GET_AMMO_IN_PED_WEAPON(ped, WEAPON::GET_SELECTED_PED_WEAPON(ped)));
-			std::string coords = std::format("[{0},{1},{2}]", std::roundl(get_coords.x), std::roundl(get_coords.y), std::roundl(get_coords.z));
+			std::string coords = std::format("{0},{1},{2}", std::roundl(get_coords.x), std::roundl(get_coords.y), std::roundl(get_coords.z));
 
 			script_global globalplayer_bd(2657589);
 			script_global gpbd_fm_3(1894573);
@@ -492,7 +492,7 @@ namespace Saint {
 
 			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.148f, 0.001f, 0.015f, m_white);
 			Text("Ammo", { m_white }, { SeperatorX - 0.048f, TextY + 0.139f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.ammo ? "~t~~italic~Hidden" : ammo.c_str(), RTextX2, TextY + 0.148f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+			g_Render->DrawRightText(hide_information.ammo ? "~t~~italic~Hidden" : ammo.c_str(), RTextX2, TextY + 0.139f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
 			Text("Stand User", { m_white }, { LTextX, TextY + 0.16f }, { 0.23f, 0.23f }, false);
 			g_Render->DrawRightText(hide_information.standuser ? "~t~~italic~Hidden" : is_player_stand_user(player) ? "Yes" : "No", RTextX2, TextY + 0.16f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);

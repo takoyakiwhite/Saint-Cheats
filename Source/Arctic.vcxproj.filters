@@ -250,6 +250,9 @@
     <ClInclude Include="Hooks.h">
       <Filter>Hooking\Hooks</Filter>
     </ClInclude>
+    <ClInclude Include="ScriptLocal.h">
+      <Filter>Interface\Memory\Script\Local</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">
@@ -333,6 +336,9 @@
     </ClCompile>
     <ClCompile Include="ClassHelper.cpp">
       <Filter>Hooking\ClassHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptLocal.cpp">
+      <Filter>Interface\Memory\Script\Local</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -458,6 +464,9 @@
     </Filter>
     <Filter Include="Hooking\Hooks">
       <UniqueIdentifier>{5ef4e094-62f5-4c46-b005-c590f82c4987}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Memory\Script\Local">
+      <UniqueIdentifier>{b5e597f7-31ab-4c0a-a9cc-a85e67d369dd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

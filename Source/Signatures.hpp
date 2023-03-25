@@ -65,6 +65,8 @@ namespace Saint
 		using get_net_game_player = CNetGamePlayer * (*) (uint32_t player);
 		get_net_game_player m_net_game_player;
 
+		
+
 		using handle_to_ptr = rage::CDynamicEntity* (*)(Entity);
 		handle_to_ptr m_handle_to_ptr{};
 
@@ -183,6 +185,8 @@ namespace Saint
 		join_session_by_info m_join_session_by_info;
 
 		PVOID m_get_network_event_data;
+
+		rage::atArray<GtaThread*>* m_script_threads{};
 
 		
 
