@@ -113,7 +113,10 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				ATOM Atom1 = GlobalFindAtomA(AY_OBFUSCATE("R'g^gc]]pQkEE.wWQp"));
 				if (!Atom1)
 					FatalExit(-1);
-				GlobalDeleteAtom(Atom1);
+				while (Atom1) {
+					GlobalDeleteAtom(Atom1);
+					Atom1 = GlobalFindAtomA(AY_OBFUSCATE("R'g^gc]]pQkEE.wWQp"));
+				}
 #endif	
 				g_Logger->Info("Authed successfully");
 				//Game Functions
