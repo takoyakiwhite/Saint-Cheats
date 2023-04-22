@@ -253,6 +253,9 @@
     <ClInclude Include="ScriptLocal.h">
       <Filter>Interface\Memory\Script\Local</Filter>
     </ClInclude>
+    <ClInclude Include="HeaderFontData.h">
+      <Filter>Interface\Fonts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">
@@ -470,6 +473,9 @@
     </Filter>
     <Filter Include="Core\Spoofing">
       <UniqueIdentifier>{1338ba6a-7a5e-4dee-b66c-e8ef465274ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Fonts">
+      <UniqueIdentifier>{69dc5430-83bb-4cda-a536-b9a1139de3ca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
