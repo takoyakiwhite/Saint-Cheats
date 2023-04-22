@@ -340,6 +340,9 @@
     <ClCompile Include="ScriptLocal.cpp">
       <Filter>Interface\Memory\Script\Local</Filter>
     </ClCompile>
+    <ClCompile Include="md5.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ImGui">

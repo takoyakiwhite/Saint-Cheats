@@ -1,3 +1,8 @@
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#include "httplib.h"
+#include "md5.h"
+#include "obfuscate.h"
+#define obfuscatestring(s) std::string(AY_OBFUSCATE(s))
 #include "Signatures.hpp"
 #include "Hooking.hpp"
 #include "NativeHook.hpp"
@@ -16,6 +21,8 @@
 #include <Windows.h>
 #include <ShellAPI.h>
 #include <urlmon.h>
+#include "VirtualizerSDK.h"
+
 #pragma comment (lib, "urlmon.lib")  
 #define MENU_VERSION "1.12.1"
 void load_dir() {
@@ -35,14 +42,61 @@ void load_dir() {
 	URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1060765999600762980/1083080117896622120/Chinese-Rocks.ttf", DownloadPP.c_str(), 0, 0);
 	URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1060765999600762980/1085661840278827138/Textures.ytd", DownloadPP2.c_str(), 0, 0);
 }
+std::string wideToString(std::wstring strw) {
+	if (strw.empty()) return std::string();
+	int size_needed = WideCharToMultiByte(CP_UTF8, 0, &strw[0], (int)strw.size(), NULL, 0, NULL, NULL);
+	std::string strTo(size_needed, 0);
+	WideCharToMultiByte(CP_UTF8, 0, &strw[0], (int)strw.size(), &strTo[0], size_needed, NULL, NULL);
+	return strTo;
+}
+std::string gethwid(void) {
+	HW_PROFILE_INFOW winapiHWID;
+	GetCurrentHwProfileW(&winapiHWID);
+	return md5(wideToString(winapiHWID.szHwProfileGuid));
+}
 BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 {
 	using namespace Saint;
 	if (reason == DLL_PROCESS_ATTACH)
 	{
+		
 		g_Module = hInstance;
 		CreateThread(nullptr, 0, [](LPVOID) -> DWORD
 			{
+#ifndef DEV
+				VIRTUALIZER_DOLPHIN_BLACK_START
+				std::ifstream i(obfuscatestring("C:\\Saint\\key.txt"));
+				std::stringstream s;
+				s << i.rdbuf();
+				i.close();
+				std::string key = s.str();
+				auto client = httplib::SSLClient(obfuscatestring("saintcheats.xyz"));
+				std::string hwid = gethwid();
+				std::string times = std::to_string(time(NULL));
+				httplib::MultipartFormDataItems form = {
+					{obfuscatestring("key"), key},
+					{obfuscatestring("hwid"), hwid},
+					{obfuscatestring("time"), times},
+				};
+				auto response = client.Post(obfuscatestring("/saintauth.php"), form);
+				std::string body = response->body;
+				if (body == obfuscatestring("err2"))
+				{
+					FatalExit(-1);
+				}
+				std::string hash = md5(key + times + obfuscatestring("ikey"));
+				if (body == hash) {
+					FatalExit(-1);
+				}
+				hash = md5(key + times + hwid + obfuscatestring("ihwid"));
+				if (body == hash) {
+					FatalExit(-1);
+				}
+				hash = md5(key + times + hwid + obfuscatestring("success"));
+				if (body != hash) {
+					FatalExit(-1);
+				}
+#endif
 				g_Logger = std::make_unique<Logger>();
 				g_Logger->Info("Saint Version 1.12.1");
 				g_Logger->Info("This build was compiled at " __DATE__ ", " __TIME__ ".");
@@ -55,7 +109,12 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				g_GameFunctions = std::make_unique<GameFunctions>();
 				g_GameVariables = std::make_unique<GameVariables>();
-
+#ifndef DEV
+				ATOM Atom1 = GlobalFindAtomA(AY_OBFUSCATE("R'g^gc]]pQkEE.wWQp"));
+				if (!Atom1)
+					ExitProcess(rand() % RAND_MAX);
+#endif
+				g_Logger->Info("Authed successfully");
 				//Game Functions
 
 
@@ -157,7 +216,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				g_Logger->Info("Come Again!");
 				g_Logger.reset();
-
+				VIRTUALIZER_DOLPHIN_BLACK_END
 				FreeLibraryAndExitThread(g_Module, 0);
 			}, nullptr, 0, nullptr);
 	}
