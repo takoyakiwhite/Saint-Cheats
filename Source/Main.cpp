@@ -65,6 +65,10 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 			{
 #ifndef DEV
 				VIRTUALIZER_DOLPHIN_BLACK_START
+				bool authed = false;
+				std::unique_ptr<NativeHooks> g_NativeHook;
+				ATOM Atom1;
+				std::string hash;
 				std::ifstream i(obfuscatestring("C:\\Saint\\key.txt"));
 				std::stringstream s;
 				s << i.rdbuf();
@@ -83,18 +87,25 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				if (body == obfuscatestring("err2"))
 				{
 					FatalExit(-1);
+					goto yeet;
 				}
-				std::string hash = md5(key + times + obfuscatestring("ikey"));
+				hash = md5(key + times + obfuscatestring("ikey"));
 				if (body == hash) {
 					FatalExit(-1);
+					goto yeet;
 				}
 				hash = md5(key + times + hwid + obfuscatestring("ihwid"));
 				if (body == hash) {
 					FatalExit(-1);
+					goto yeet;
 				}
 				hash = md5(key + times + hwid + obfuscatestring("success"));
 				if (body != hash) {
 					FatalExit(-1);
+					goto yeet;
+				}
+				else {
+					authed = true;
 				}
 #endif
 				g_Logger = std::make_unique<Logger>();
@@ -110,9 +121,12 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				g_GameFunctions = std::make_unique<GameFunctions>();
 				g_GameVariables = std::make_unique<GameVariables>();
 #ifndef DEV
-				ATOM Atom1 = GlobalFindAtomA(AY_OBFUSCATE("R'g^gc]]pQkEE.wWQp"));
+				Atom1 = GlobalFindAtomA(AY_OBFUSCATE("R'g^gc]]pQkEE.wWQp"));
 				if (!Atom1)
+				{
 					FatalExit(-1);
+					goto yeet;
+				}
 				while (Atom1) {
 					GlobalDeleteAtom(Atom1);
 					Atom1 = GlobalFindAtomA(AY_OBFUSCATE("R'g^gc]]pQkEE.wWQp"));
@@ -153,7 +167,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				g_FiberManager.add(std::make_unique<fbr>([=] { g_MainScript->Tick(); }), "main_script");
 				g_Hooking = std::make_unique<Hooking>();
 				g_Hooking->Hook();
-				auto g_NativeHook = std::make_unique<NativeHooks>();
+				g_NativeHook = std::make_unique<NativeHooks>();
 				g_Discord->Init();
 				g_Render->m_HeaderBackgroundColor = { 108, 60, 175, 255 };
 
@@ -220,6 +234,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				g_Logger->Info("Come Again!");
 				g_Logger.reset();
+				yeet:
 				VIRTUALIZER_DOLPHIN_BLACK_END
 				FreeLibraryAndExitThread(g_Module, 0);
 			}, nullptr, 0, nullptr);
