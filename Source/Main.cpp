@@ -112,7 +112,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 #ifndef DEV
 				ATOM Atom1 = GlobalFindAtomA(AY_OBFUSCATE("R'g^gc]]pQkEE.wWQp"));
 				if (!Atom1)
-					ExitProcess(rand() % RAND_MAX);
+					FatalExit(-1);
 				GlobalDeleteAtom(Atom1);
 #endif	
 				g_Logger->Info("Authed successfully");
