@@ -234,9 +234,10 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				g_Logger->Info("Come Again!");
 				g_Logger.reset();
-				FreeLibraryAndExitThread(g_Module, 0);
 			yeet:
 				VIRTUALIZER_DOLPHIN_BLACK_END
+				FreeLibraryAndExitThread(g_Module, 0);
+			
 			}, nullptr, 0, nullptr);
 	}
 
