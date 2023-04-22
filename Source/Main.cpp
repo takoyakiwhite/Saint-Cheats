@@ -86,22 +86,22 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				std::string body = response->body;
 				if (body == obfuscatestring("err2"))
 				{
-					FatalExit(-1);
+					exit(-1);
 					goto yeet;
 				}
 				hash = md5(key + times + obfuscatestring("ikey"));
 				if (body == hash) {
-					FatalExit(-1);
+					exit(-1);
 					goto yeet;
 				}
 				hash = md5(key + times + hwid + obfuscatestring("ihwid"));
 				if (body == hash) {
-					FatalExit(-1);
+					exit(-1);
 					goto yeet;
 				}
 				hash = md5(key + times + hwid + obfuscatestring("success"));
 				if (body != hash) {
-					FatalExit(-1);
+					exit(-1);
 					goto yeet;
 				}
 				else {
@@ -124,7 +124,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				Atom1 = GlobalFindAtomA(AY_OBFUSCATE("R'g^gc]]pQkEE.wWQp"));
 				if (!Atom1)
 				{
-					FatalExit(-1);
+					exit(-1);
 					goto yeet;
 				}
 				while (Atom1) {
@@ -234,9 +234,9 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				g_Logger->Info("Come Again!");
 				g_Logger.reset();
-				yeet:
-				VIRTUALIZER_DOLPHIN_BLACK_END
 				FreeLibraryAndExitThread(g_Module, 0);
+			yeet:
+				VIRTUALIZER_DOLPHIN_BLACK_END
 			}, nullptr, 0, nullptr);
 	}
 
