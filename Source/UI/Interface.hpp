@@ -44,7 +44,7 @@ namespace Saint::UserInterface
 		Static = 0,
 		YTD = 1
 	};
-	
+
 	struct Rectangle
 	{
 		Vector2 m_Center;
@@ -165,14 +165,14 @@ namespace Saint::UserInterface
 		// Footer Text
 		bool LeftFooterText = false;
 		bool RightFooterText = true;
-		float m_FooterTextSize = 0.32f;
-		Font m_FooterTextFont = Font::ChaletComprimeCologne;
+		float m_FooterTextSize = 0.27f;
+		Font m_FooterTextFont = Font::ChaletLondon;
 		float m_FooterTextPadding = 2.1f;
 		Color m_FooterTextColor{ 255,255,255, 255 };
 
 		//enables
 		bool footer_enabled = true;
-		bool lines_enabled = false;
+		bool lines_enabled = true;
 
 		// Smooth Scrolling
 		float lerp(float a, float b, float t)
@@ -215,8 +215,8 @@ namespace Saint::UserInterface
 
 		// Options
 		float m_OptionHeight = 0.0315f;
-		float m_OptionTextSize = 0.36f;
-		Font m_OptionFont = Font::ChaletComprimeCologne;
+		float m_OptionTextSize = 0.27f;
+		Font m_OptionFont = Font::ChaletLondon;
 		Font m_SeperatorFont = Font::HouseScript;
 		float m_OptionPadding = 2.1f;
 		Color m_OptionSelectedTextColor{ 255,255,255, 255 };
@@ -303,8 +303,8 @@ namespace Saint::UserInterface
 		float m_DescriptionHeightPadding = 0.01f;
 		float m_DescriptionHeight = 0.060f;
 		float m_DescriptionHeight2 = 0.033f;
-		float m_DescriptionTextSize = 0.33f;
-		Font m_DescriptionFont = Font::ChaletComprimeCologne;
+		float m_DescriptionTextSize = 0.28f;
+		Font m_DescriptionFont = Font::ChaletLondon;
 		Color m_DescriptionBackgroundColor{ 0, 0, 0, 160 };
 		Color m_DescriptionTextColor{ 255,255,255, 255 };
 		float m_DescriptionSpriteSize = 0.025f;
@@ -337,7 +337,7 @@ namespace Saint::UserInterface
 		void HandleInput();
 		void ResetInput();
 
-		
+
 		void DrawHeader();
 		void drawstring(char* text, float X, float Y);
 		void setupdraw(bool outline);
@@ -347,7 +347,7 @@ namespace Saint::UserInterface
 		void DrawFooter();
 		void DrawDescription();
 		void DrawSprite1(const char* textureDict, const char* textureName, float screenX, float screenY, float width, float height, float heading, int red, int green, int blue, int alpha);
-		
+
 		void DrawSprite(const char* dict, const char* texture, float x, float y, float width, float height, Color color, float rotation);
 		void DrawLeftText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow, bool wrap = false);
 		void DrawCenteredText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow);
@@ -357,7 +357,7 @@ namespace Saint::UserInterface
 
 		bool IsMouseLocked();
 		Rectangle GetMenuRect();
-		
+
 
 		std::vector<std::unique_ptr<AbstractSubmenu>> m_AllSubmenus;
 

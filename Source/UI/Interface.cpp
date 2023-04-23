@@ -44,332 +44,13 @@ namespace Saint::UserInterface
 	}
 	void MenuOpeningAnimation()
 	{
-		g_FiberPool.queue([]
-			{
-				g_Render->m_MenuOpeningAnimation = true;
-				g_Render->m_Opened = true;
-				g_Render->g_MenuAlpha = 0;
-				g_Render->m_HeaderTextColor.a = 0;
-				fbr::cur()->wait(10ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha + 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha + 5;
-				g_Render->m_MenuOpeningAnimation = false;
-			});
+
+		g_Render->m_Opened = true;
 	}
 	void MenuClosingAnimation()
 	{
-		g_FiberPool.queue([]
-			{
-				g_Render->m_MenuOpeningAnimation = true;
-				g_Render->m_Opened = true;
-				//g_Render->g_MenuAlpha = 255;
-				g_Render->m_HeaderTextColor.a = 255;
-				fbr::cur()->wait(10ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				fbr::cur()->wait(1ms);
-				g_Render->m_HeaderTextColor.a = g_Render->g_MenuAlpha - 5;
-				g_Render->g_MenuAlpha = g_Render->g_MenuAlpha - 5;
-				g_Render->m_Opened = false;
-				g_Render->m_MenuOpeningAnimation = false;
-			});
+
+		g_Render->m_Opened = false;
 	}
 
 	bool g_HasSetToolTip = false;
@@ -387,48 +68,16 @@ namespace Saint::UserInterface
 	void UIManager::RenderToolTip()
 	{
 		static const char* names[] = {
-			"put me in coach",
-		"i've made a severe and continuous lapse in my judgment",
-		"nothing. you get nothing here today. fuck you.",
-		"I'll have you know I graduated top of my class in the Navy Seals",
-		"penis size should be a volumetric measurement, let me explain...",
-		"there's no such thing as a \"simp\"",
-		"unleash your inner vali",
-		"ligma",
-		"sugma",
-		"hi sisters",
-		"nigger",
-		"kill all niggers",
-		"one does not simply walk into mordor",
-		"if you spill cleaning product, did you make a mess?",
-		"welcome to the best menu you'll ever touch",
-		"bro where the fuck am i?",
-		"welcome to pogzark :tm:?",
-		"see, the wait paid off didn't it? no??? fuck you then",
-		"i aint ever gonna stop loving you, bitch",
-		"saint update when?",
-		"sudo rm -f / -no-preserve-root",
-		"bro that's cap",
-		"dude, where's my car?",
-		"rate the saint exit scam 1 thru 10",
-		"fuck you",
-		"sponsored by cheatengine",
-		"\"Such an obvious exit scam\" - DoneWithDegeneracy",
-		"wow we can edit the weather color, we're so cool",
-		"you humans put an insane amount of importance on age.",
-		"gotta love ozark, i mean north",
-		"we love ida in this household",
-		"why don't you stroke the open key UwU",
-		"chris don't sue me",
-		"guess what, chicken butt",
-		"saint exit scam when?",
-		"saints exiting on 9/11/23",
-		"can't wait for saint exit ;)"
+			"Get Good Get Saint",
+			"Sexy Saint Cheats",
+			"what am i doing wrong??? - patek",
+			"Kiddions VIP On Top",
+			"Become you're inner vali."
 		};
 
 		if (!g_HasSetToolTip)
 		{
-			g_ToolTip = MISC::GET_RANDOM_INT_IN_RANGE(0, 37);
+			g_ToolTip = MISC::GET_RANDOM_INT_IN_RANGE(0, 4);
 			g_HasSetToolTip = true;
 		}
 
@@ -516,7 +165,7 @@ namespace Saint::UserInterface
 			PAD::DISABLE_ALL_CONTROL_ACTIONS(0);
 			ShowCursor(true);
 			SetCursor(LoadCursorA(NULL, IDC_ARROW));
-			
+
 
 		}
 		if (g_Settings.command_window)
@@ -526,19 +175,30 @@ namespace Saint::UserInterface
 				ShowCursor(true);
 				SetCursor(LoadCursorA(NULL, IDC_ARROW));
 			}
+
+
+
 		}
+
 		if (g_Render->m_Opened && g_Settings.m_LockMouse)
 		{
 			PAD::DISABLE_ALL_CONTROL_ACTIONS(0);
 		}
+
 		//RenderToolTip
 		if (!g_Render->m_Opened)
 		{
 			RenderToolTip();
 		}
+
+
+
+
 		CheckForInput();
+
 		HandleInput();
 		LoadYTD();
+
 		if (m_Opened)
 		{
 			// Drawing order
@@ -554,10 +214,7 @@ namespace Saint::UserInterface
 				auto sub = m_SubmenuStack.top();
 				sub->Reset();
 				sub->Execute();
-				if (submenu_enabled == true)
-				{
-					DrawSubmenuBar(sub);
-				}
+				DrawSubmenuBar(sub);
 				g_Render->m_CurrentSubMenuName = submenu_enabled ? header_name.c_str() : sub->GetName();
 				if (sub->GetNumOptions() != 0)
 				{
@@ -598,7 +255,7 @@ namespace Saint::UserInterface
 		if (controlsEnabled && !g_Settings.command_window) {
 			static Timer openTimer(0ms);
 			openTimer.SetDelay(std::chrono::milliseconds(m_OpenDelay));
-			if (m_OpenKeyPressed or m_OpenKeyPressed2 && openTimer.Update())
+			if (m_OpenKeyPressed && openTimer.Update())
 			{
 				if (!m_Opened) {
 					MenuOpeningAnimation();
@@ -624,6 +281,18 @@ namespace Saint::UserInterface
 					if (m_Sounds)
 						AUDIO::PLAY_SOUND_FRONTEND(-1, m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
 				}
+			}
+			if (m_OpenKeyPressed2 && openTimer.Update())
+			{
+				if (!m_Opened) {
+					MenuOpeningAnimation();
+				}
+				else {
+					MenuClosingAnimation();
+				}
+
+				if (m_Sounds)
+					AUDIO::PLAY_SOUND_FRONTEND(-1, m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
 			}
 			static Timer backTimer(0ms);
 			backTimer.SetDelay(std::chrono::milliseconds(m_BackDelay));
@@ -659,7 +328,7 @@ namespace Saint::UserInterface
 			}
 			if (m_Opened && !m_SubmenuStack.empty())
 			{
-				
+
 				PAD::DISABLE_CONTROL_ACTION(2, 0, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 19, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 140, true);
@@ -673,7 +342,7 @@ namespace Saint::UserInterface
 				PAD::DISABLE_CONTROL_ACTION(2, 58, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 70, true);
 				auto sub = m_SubmenuStack.top();
-				
+
 				static Timer enterTimer(0ms);
 				enterTimer.SetDelay(std::chrono::milliseconds(m_EnterDelay));
 				if (m_EnterKeyPressed && sub->GetNumOptions() != 0 && enterTimer.Update())
@@ -822,7 +491,7 @@ namespace Saint::UserInterface
 		m_LeftKeyPressed = false;
 		m_RightKeyPressed = false;
 	}
-	
+
 	void UIManager::DrawHeader()
 	{
 		switch (m_HeaderType)
@@ -847,7 +516,7 @@ namespace Saint::UserInterface
 					m_HeaderHeight,
 					m_HeaderBackgroundColor,
 					0.f);
-				
+
 			}
 			break;
 
@@ -877,7 +546,7 @@ namespace Saint::UserInterface
 			char rightText[32] = {};
 			std::snprintf(rightText, sizeof(rightText) - 1, "%zu / %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
 
-			
+
 
 			DrawRect(
 				m_PosX,
@@ -935,24 +604,24 @@ namespace Saint::UserInterface
 			m_OptionHeight,
 			m_OptionUnselectedBackgroundColor);
 		if (selected) {
-			
+
 		}
 		if (selected)
 		{
 			m_CurrentCoord = lerp(m_CurrentCoord, m_DrawBaseY + (m_OptionHeight / 2.f), smooth_scroll_speed); m_OptionSelectedTextColor;
-				GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(2);
-				DrawRect(
-					m_PosX,
-					m_CurrentCoord,
-					m_Width,
-					m_OptionHeight,
-					m_OptionSelectedBackgroundColor);
-			
+			GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(2);
+			DrawRect(
+				m_PosX,
+				m_CurrentCoord,
+				m_Width,
+				m_OptionHeight,
+				m_OptionSelectedBackgroundColor);
+
 		}
 
 		GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(3);
 		if (opt->GetFlag(OptionFlag::PlayerSub)) {
-			
+
 			DrawLeftText(
 				opt->GetLeftText(),
 				m_PosX - (m_Width / m_OptionPadding) - 0.002f,
@@ -973,7 +642,7 @@ namespace Saint::UserInterface
 				selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
 				false, false);
 		}
-		
+
 		if (opt->GetFlag(OptionFlag::BoolWithNumber)) {
 			if (selected) {
 
@@ -1094,7 +763,7 @@ namespace Saint::UserInterface
 				false, false);
 			DrawSprite("Textures", "Pen", m_PosX + (m_Width / m_OptionPadding - 0.004f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 0.0);
 		}
-		
+
 		else {
 			DrawRightText(
 				opt->GetRightText(),
@@ -1113,7 +782,7 @@ namespace Saint::UserInterface
 			m_SeperatorFont,
 			selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
 			false, false);
-		
+
 		if (opt->GetFlag(OptionFlag::BoolWithNumber) || opt->GetFlag(OptionFlag::ChooseBool) || opt->GetFlag(OptionFlag::BoolOption))
 		{
 			auto res = GetSpriteScale(0.025f);
@@ -1293,25 +962,26 @@ namespace Saint::UserInterface
 					m_FooterSpriteColor,
 					rotation);
 
+				char rightText[32] = {};
+				std::snprintf(rightText, sizeof(rightText) - 1, "%zu ~s~&#8226; %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
+
 				if (LeftFooterText) {
 					DrawLeftText(
+						VERSION_TYPE,
+						m_PosX - (m_Width / m_FooterTextPadding),
+						m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
+						m_FooterTextSize, m_FooterTextFont,
+						m_FooterTextColor,
+						false, true);
+				}
+				if (RightFooterText) {
+					DrawRightText(
 						g_GameVariables->m_version,
 						m_PosX + (m_Width / m_FooterTextPadding),
 						m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
 						m_FooterTextSize, m_FooterTextFont,
 						m_FooterTextColor,
 						false, true);
-
-				}
-				std::string rightText{ std::format("{} ~s~{} {}", sub->GetSelectedOption() + 1, "&#8226;", sub->GetNumOptions()) };
-				if (RightFooterText) {
-					DrawRightText(
-						rightText.c_str(),
-						m_PosX + (m_Width / m_FooterTextPadding),
-						m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
-						m_FooterTextSize, m_FooterTextFont,
-						m_FooterTextColor,
-						false, false);
 				}
 
 				m_DrawBaseY += m_FooterHeight;
@@ -1336,11 +1006,12 @@ namespace Saint::UserInterface
 					m_FooterSpriteColor,
 					rotation);
 
-				std::string rightText{ std::format("{} ~s~{} {}", sub->GetSelectedOption() + 1, "&#8226;", sub->GetNumOptions()) };
+				char rightText[32] = {};
+				std::snprintf(rightText, sizeof(rightText) - 1, "%zu ~s~&#8226; %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
 
 				if (LeftFooterText) {
 					DrawLeftText(
-						g_GameVariables->m_version,
+						"Saint Paid",
 						m_PosX - (m_Width / m_FooterTextPadding),
 						m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
 						m_FooterTextSize, m_FooterTextFont,
@@ -1348,12 +1019,13 @@ namespace Saint::UserInterface
 						false, true);
 				}
 				if (RightFooterText) {
-					DrawRightText(rightText.c_str(),
+					DrawRightText(
+						g_GameVariables->m_version,
 						m_PosX + (m_Width / m_FooterTextPadding),
 						m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
 						m_FooterTextSize, m_FooterTextFont,
 						m_FooterTextColor,
-						false, false);
+						false, true);
 				}
 				if (lines_enabled) {
 					GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (0.001f / 2.0f), m_Width, 0.0018f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
