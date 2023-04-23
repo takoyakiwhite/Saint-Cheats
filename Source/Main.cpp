@@ -1,8 +1,11 @@
+#ifndef DEV
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "httplib.h"
 #include "md5.h"
 #include "obfuscate.h"
 #define obfuscatestring(s) std::string(AY_OBFUSCATE(s))
+#include "VirtualizerSDK.h"
+#endif
 #include "Signatures.hpp"
 #include "Hooking.hpp"
 #include "NativeHook.hpp"
@@ -21,7 +24,7 @@
 #include <Windows.h>
 #include <ShellAPI.h>
 #include <urlmon.h>
-#include "VirtualizerSDK.h"
+
 
 #pragma comment (lib, "urlmon.lib") 
 #define MENU_VERSION "1.12.1"
@@ -49,6 +52,7 @@ std::string wideToString(std::wstring strw) {
 	WideCharToMultiByte(CP_UTF8, 0, &strw[0], (int)strw.size(), &strTo[0], size_needed, NULL, NULL);
 	return strTo;
 }
+#ifndef DEV
 std::string gethwid(void) {
 	HW_PROFILE_INFOW winapiHWID;
 	GetCurrentHwProfileW(&winapiHWID);
@@ -62,6 +66,7 @@ std::string encryptDecrypt(std::string toEncrypt) {
 		output[i] = toEncrypt[i] ^ key[i % (sizeof(key) / sizeof(char))];
 	return output;
 }
+#endif
 BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 {
 	using namespace Saint;
@@ -71,10 +76,10 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 		g_Module = hInstance;
 		CreateThread(nullptr, 0, [](LPVOID) -> DWORD
 			{
+				std::unique_ptr<NativeHooks> g_NativeHook;
 #ifndef DEV
 				VIRTUALIZER_DOLPHIN_BLACK_START
 				bool authed = false;
-				std::unique_ptr<NativeHooks> g_NativeHook;
 				ATOM Atom1;
 				std::string hash;
 				std::ifstream i(obfuscatestring("C:\\Saint\\key.txt"));
@@ -236,7 +241,9 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				g_Logger->Info("Come Again!");
 				g_Logger.reset();
 			yeet:
+#ifndef DEV
 				VIRTUALIZER_DOLPHIN_BLACK_END
+#endif
 				FreeLibraryAndExitThread(g_Module, 0);
 			
 			}, nullptr, 0, nullptr);
