@@ -23,7 +23,7 @@
 #include <urlmon.h>
 #include "VirtualizerSDK.h"
 
-#pragma comment (lib, "urlmon.lib")  
+#pragma comment (lib, "urlmon.lib") 
 #define MENU_VERSION "1.12.1"
 void load_dir() {
 	using namespace Saint;
@@ -115,9 +115,6 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				g_FiberPool.registerFbrPool();
 				g_TranslationManager = std::make_unique<TranslationManager>();
 				g_TranslationManager->LoadTranslations("English");
-
-
-
 				g_GameFunctions = std::make_unique<GameFunctions>();
 				g_GameVariables = std::make_unique<GameVariables>();
 #ifndef DEV
@@ -134,9 +131,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 #endif	
 				g_Logger->Info("Authed successfully");
 				//Game Functions
-
-
-
+				// 
 				// Wait for the game to load
 				while (*g_GameVariables->m_GameState != 0)
 				{
@@ -197,7 +192,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				//registering
 				load_dir();
-				//Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome %s",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome %s",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
 				while (g_Running)
 				{
 					if (IsKeyPressed(VK_DELETE))

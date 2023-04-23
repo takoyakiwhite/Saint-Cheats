@@ -165,14 +165,14 @@ namespace Saint::UserInterface
 		// Footer Text
 		bool LeftFooterText = false;
 		bool RightFooterText = true;
-		float m_FooterTextSize = 0.27f;
-		Font m_FooterTextFont = Font::ChaletLondon;
+		float m_FooterTextSize = 0.32f;
+		Font m_FooterTextFont = Font::ChaletComprimeCologne;
 		float m_FooterTextPadding = 2.1f;
 		Color m_FooterTextColor{ 255,255,255, 255 };
 
 		//enables
 		bool footer_enabled = true;
-		bool lines_enabled = true;
+		bool lines_enabled = false;
 
 		// Smooth Scrolling
 		float lerp(float a, float b, float t)
@@ -215,8 +215,8 @@ namespace Saint::UserInterface
 
 		// Options
 		float m_OptionHeight = 0.0315f;
-		float m_OptionTextSize = 0.27f;
-		Font m_OptionFont = Font::ChaletLondon;
+		float m_OptionTextSize = 0.36f;
+		Font m_OptionFont = Font::ChaletComprimeCologne;
 		Font m_SeperatorFont = Font::HouseScript;
 		float m_OptionPadding = 2.1f;
 		Color m_OptionSelectedTextColor{ 255,255,255, 255 };
@@ -303,8 +303,8 @@ namespace Saint::UserInterface
 		float m_DescriptionHeightPadding = 0.01f;
 		float m_DescriptionHeight = 0.060f;
 		float m_DescriptionHeight2 = 0.033f;
-		float m_DescriptionTextSize = 0.28f;
-		Font m_DescriptionFont = Font::ChaletLondon;
+		float m_DescriptionTextSize = 0.33f;
+		Font m_DescriptionFont = Font::ChaletComprimeCologne;
 		Color m_DescriptionBackgroundColor{ 0, 0, 0, 160 };
 		Color m_DescriptionTextColor{ 255,255,255, 255 };
 		float m_DescriptionSpriteSize = 0.025f;

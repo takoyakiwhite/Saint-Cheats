@@ -3540,15 +3540,18 @@ namespace Saint
 							break;
 						}
 						*script_global(262145 + 1574918).as<int*>() = 1999000000;
-
-
 					});
-				
-
-
-				
-
-
+				sub->draw_option<RegularOption>("Nightclub 300k", "", []
+					{
+						*script_global(262145 + 24045).as<int*>() = 300000;
+						*script_global(262145 + 24041).as<int*>() = 300000;
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLUB_POPULARITY"), 10000, true);
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLUB_PAY_TIME_LEFT"), -1, true);
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLUB_POPULARITY"), 100000, true);
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLUB_POPULARITY"), 10000, true);
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLUB_PAY_TIME_LEFT"), -1, true);
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLUB_POPULARITY"), 100000, true);
+					});
 			});
 		g_Render->draw_submenu<sub>("Unlocks", SubmenuUnlocks, [](sub* sub)
 			{
