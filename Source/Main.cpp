@@ -54,6 +54,14 @@ std::string gethwid(void) {
 	GetCurrentHwProfileW(&winapiHWID);
 	return md5(wideToString(winapiHWID.szHwProfileGuid));
 }
+std::string encryptDecrypt(std::string toEncrypt) {
+	char key[3] = { 'V', 'B', 'C' };
+	std::string output = toEncrypt;
+
+	for (int i = 0; i < toEncrypt.size(); i++)
+		output[i] = toEncrypt[i] ^ key[i % (sizeof(key) / sizeof(char))];
+	return output;
+}
 BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 {
 	using namespace Saint;
@@ -75,12 +83,15 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				i.close();
 				std::string key = s.str();
 				auto client = httplib::SSLClient(obfuscatestring("saintcheats.xyz"));
+				auto response2 = client.Get(obfuscatestring("/saintauth.php?init=true"));
 				std::string hwid = gethwid();
 				std::string times = std::to_string(time(NULL));
+				std::string times2 = encryptDecrypt(response2->body);
 				httplib::MultipartFormDataItems form = {
 					{obfuscatestring("key"), key},
 					{obfuscatestring("hwid"), hwid},
-					{obfuscatestring("time"), times},
+					{obfuscatestring("key1"), times},
+					{obfuscatestring("key2"), times2},
 				};
 				auto response = client.Post(obfuscatestring("/saintauth.php"), form);
 				std::string body = response->body;
@@ -133,21 +144,16 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				//Game Functions
 				// 
 				// Wait for the game to load
+				if (*g_GameVariables->m_GameState != 0) 
+					g_Logger->Info("Waiting For Game To Load.");
+				
 				while (*g_GameVariables->m_GameState != 0)
 				{
 					std::this_thread::sleep_for(3s);
 					std::this_thread::yield();
 				}
-
-				//If game not started when injected say "Waitng for game to load" when loaded say "Game loaded" 
-				if (*g_GameVariables->m_GameState = 0)
-				{
-					g_Logger->Info("Waiting For Game To Load.");
-					if (*g_GameVariables->m_GameState = 1)
-					{
-						g_Logger->Info("Game Loaded.");
-					}
-				}
+				g_Logger->Info("Game Loaded.");
+				
 
 				g_GameVariables->PostInit();
 				g_CustomText = std::make_unique<CustomText>();
