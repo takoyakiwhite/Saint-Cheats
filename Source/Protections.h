@@ -4,8 +4,20 @@ namespace Saint {
 	
 	class Crash {
 	public:
-		bool vehicle = true;
 		bool loading_screen = true;
+		bool rope = true;
+		bool groupoverride = true;
+		bool invalidworldstate = true;
+		bool task = true;
+		bool weapon = true;
+		bool fragment = true;
+		bool train = true;
+		bool entity = true;
+		bool object = true;
+		bool player = true;
+		bool ped = true;
+		bool vehicle = true;
+		bool invalid_script_entity = true;
 	};
 	class GameEvents {
 	public:
@@ -166,5 +178,6 @@ namespace Saint {
 			{ 276906331, "Money Banked", &protections.moneybanked},
 			{ 82080686, "Money Stolen", &protections.moneystolen},
 			{ 853249803, "Money Removed", &protections.moneyremoved},
+			{ 1459520933, "Bounty", &protections.ScriptEvents.bounty},
 	};
 }

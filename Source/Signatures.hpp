@@ -19,9 +19,10 @@
 #include <GTAV-Classes/rage/rlTaskStatus.hpp>
 #include <GTAV-Classes/network/Network.hpp>
 #include <GTAV-Classes/socialclub/FriendRegistry.hpp>
+
 namespace Saint
 {
-
+	class datBitBuffer2;
 	class netConnectionManager;
 	class netConnectionPeer
 	{
@@ -85,6 +86,8 @@ namespace Saint
 
 		FriendRegistry* m_friendRegistry;
 		const char* m_version = "1.12.1";
+
+		
 
 	};
 
@@ -229,7 +232,83 @@ namespace Saint
 		PVOID m_player_appearance_data_node{};
 		PVOID m_invalid_player_crash_patch;
 
+		char* m_east_azimuth_patch;//0F 29 62 20
+		char* m_west_azimuth_patch;//0F 29 62 50
+		char* m_azimuth_transition_patch;//0F 29 A2 80 00 00 00
+		char* m_zenith_patch;//0F 29 A2 B0 00 00 00 8B 81 58 03 00 00
+		char* m_zenith_transition_patch;//0F 29 A2 E0 00 00 00
+		char* m_cloud_mid_patch;//0F 29 8B 60 03 00 00
+		char* m_cloud_base_patch;//0F 29 A2 80 03 00 00
+
+
+		using ReadBitbufDword = bool(datBitBuffer2* buffer, PVOID read, int bits);
+		ReadBitbufDword* m_ReadBitbufDword;
+
 		
+
+		
+
+
+	};
+	inline GameFunctions get_functions_from_here;
+	class datBitBuffer2 {
+	public:
+		bool ReadDword(std::uint32_t* integer, int bits)
+		{
+			return get_functions_from_here.m_ReadBitbufDword(this, integer, bits);
+		}
+
+		bool Seek(std::uint32_t bits)
+		{
+			if (bits >= 0) {
+				std::uint32_t length = (m_flagBits & 1) ? m_maxBit : m_curBit;
+				if (bits <= length)
+					m_bitsRead = bits;
+			}
+			return false;
+		}
+
+		bool ReadInt32(int32_t* integer, int bits)
+		{
+			int32_t v8;
+			int32_t v9;
+			if (ReadDword((uint32_t*)&v8, 1u) && ReadDword((uint32_t*)&v9, bits - 1))
+			{
+				*integer = v8 + (v9 ^ -v8);
+				return true;
+			}
+			return false;
+		}
+
+		template<typename T>
+		inline T ReadSigned(int length)
+		{
+			static_assert(sizeof(T) <= 4, "maximum of 32 bit read");
+
+			int val = 0;
+			ReadInt32(&val, length);
+
+			return T(val);
+		}
+
+		template<typename T>
+		inline T Read(int length)
+		{
+			static_assert(sizeof(T) <= 4, "maximum of 32 bit read");
+
+			std::uint32_t val = 0;
+			ReadDword(&val, length);
+
+			return T(val);
+		}
+	public:
+		void* m_data; //0x0000
+		std::uint32_t m_bitOffset; //0x0008
+		std::uint32_t m_maxBit; //0x000C
+		std::uint32_t m_bitsRead; //0x0010
+		std::uint32_t m_curBit; //0x0014
+		std::uint32_t m_highestBitsRead; //0x0018
+		std::uint8_t m_flagBits; //0x001C
 	};
 
 	inline std::unique_ptr<GameVariables> g_GameVariables;

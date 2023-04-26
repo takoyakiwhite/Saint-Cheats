@@ -1,11 +1,9 @@
-#ifndef DEV
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "httplib.h"
 #include "md5.h"
 #include "obfuscate.h"
 #define obfuscatestring(s) std::string(AY_OBFUSCATE(s))
 #include "VirtualizerSDK.h"
-#endif
 #include "Signatures.hpp"
 #include "Hooking.hpp"
 #include "NativeHook.hpp"
@@ -42,8 +40,8 @@ void load_dir() {
 	std::string DownloadPP2 = std::string("C:\\Saint\\Textures.ytd");
 
 
-	URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1060765999600762980/1083080117896622120/Chinese-Rocks.ttf", DownloadPP.c_str(), 0, 0);
-	URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1060765999600762980/1085661840278827138/Textures.ytd", DownloadPP2.c_str(), 0, 0);
+	URLDownloadToFileA(0, "https://saintcheats.xyz/Chinese-Rocks.ttf", DownloadPP.c_str(), 0, 0);
+	URLDownloadToFileA(0, "https://saintcheats.xyz/Textures.ytd", DownloadPP2.c_str(), 0, 0);
 }
 std::string wideToString(std::wstring strw) {
 	if (strw.empty()) return std::string();
@@ -129,8 +127,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				g_Logger->Info("This build was compiled at " __DATE__ ", " __TIME__ ".");
 
 				g_FiberPool.registerFbrPool();
-				g_TranslationManager = std::make_unique<TranslationManager>();
-				g_TranslationManager->LoadTranslations("English");
+				
 				g_GameFunctions = std::make_unique<GameFunctions>();
 				g_GameVariables = std::make_unique<GameVariables>();
 #ifndef DEV
@@ -191,7 +188,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				//Background
 				g_Render->m_OptionSelectedTextColor = { 0, 0, 0, 255 };
 				g_Render->m_Width = 0.21;
-				g_Render->glare_x_offset = 0.008;
+				g_Render->glare_x_offset = 0.007;
 				g_Render->header_name = "Saint";
 
 				g_Render->m_HeaderText = false;
@@ -203,7 +200,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				//registering
 				load_dir();
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome %s",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome, if your looking to disable phone its in misc",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
 				while (g_Running)
 				{
 					if (IsKeyPressed(VK_DELETE))
@@ -233,7 +230,6 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				g_Hooking.reset();
 
-				g_TranslationManager.reset();
 
 				g_GameVariables.reset();
 				g_GameFunctions.reset();

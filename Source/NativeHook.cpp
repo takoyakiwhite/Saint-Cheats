@@ -9,6 +9,9 @@ namespace Saint
 	NativeHooks::NativeHooks()
 	{
 		AddNativeDetour("SGI", Joaat("main_persistent"), 0x767FBC2AC802EF3D, Hooks::GetStatInt);
+		AddNativeDetour("HFWW", 0xEB354E5376BC81A7, Hooks::HUD_FORCE_WEAPON_WHEEL);
+		AddNativeDetour("DCA", 0xFE99B66D079CF6BC, Hooks::DISABLE_CONTROL_ACTION);
+		AddNativeDetour("SCPW", 0xADF692B254977C0C, Hooks::SET_CURRENT_PED_WEAPON);
 		AddNativeDetour("GNI", Joaat("maintransition"), 0x6F3D4ED9BEE4E61D, Hooks::NETWORK_SESSION_HOST);
 
 		for (auto& entry : *g_GameVariables->m_ScriptProgramTable)

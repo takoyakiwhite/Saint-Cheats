@@ -25,6 +25,7 @@ namespace Saint
 		get_scene_preset(Signature("0F B7 81 10 08 00 00").Scan().As<decltype(get_scene_preset)>()),
 		m_is_session_started(Signature("40 38 35 ? ? ? ? 75 0E 4C 8B C3 49 8B D7 49 8B CE").Scan().Add(3).Rip().As<bool*>()),
 		m_friendRegistry(Signature("3B 0D ? ? ? ? 73 17").Scan().Add(2).Rip().As<FriendRegistry*>()),
+		
 		m_ModelSpawnBypass(Signature("48 8B C8 FF 52 30 84 C0 74 05 48").Scan().Add(8).As<decltype(m_ModelSpawnBypass)>())
 	{
 		char* c_location = nullptr;
@@ -73,7 +74,7 @@ namespace Saint
 		//YTD
 		m_RegisterFile(Signature("84 C0 74 0D 4C 8B 07").Scan().Sub(0x6C).As<decltype(m_RegisterFile)>()),
 		//Protections
-		m_send_event_ack(Signature("E8 ? ? ? ? 66 83 7B 08 5B").Scan().Add(1).As<decltype(m_send_event_ack)>()),
+		m_send_event_ack(Signature("E8 ? ? ? ? 66 83 7B 08 5B").Scan().Add(1).Rip().As<decltype(m_send_event_ack)>()),
 		m_pickup_creation(Signature("48 8B EC 48 83 EC 20 80 B9 C0 00 00 00 00").Scan().As<PVOID>()),
 		//RID Joiner
 		m_start_get_session_by_gamer_handle(Signature("E8 ? ? ? ? 84 C0 0F 84 ? ? ? ? 8B 05 ? ? ? ? 48 8D 4C 24").Scan().Add(1).Rip().As<start_get_session_by_gamer_handle>()),
@@ -101,6 +102,13 @@ namespace Saint
 		m_handle_remove_gamer_cmd(Signature("41 FF C6 FF C7").Scan().Sub(0x6E).As<handle_remove_gamer_cmd>()),
 		//m_get_network_event_data(Signature("53 43 52 49 50 54 5F 4E 45 54 57 4F 52 4B").Scan().Sub(0x38).As<PVOID*>()),
 		should_sync_money_rewards(Signature("40 8A 2D ? ? ? ? 48 83 64 24 40 00").Scan().Add(3).Rip().As<decltype(should_sync_money_rewards)>()),
+		m_east_azimuth_patch(Signature("0F 29 62 20").Scan().As<decltype(m_east_azimuth_patch)>()),
+		m_west_azimuth_patch(Signature("0F 29 62 50 8B 81 9C 03 00 00").Scan().As<decltype(m_west_azimuth_patch)>()),
+		m_azimuth_transition_patch(Signature("0F 29 A2 80 00 00 00").Scan().As<decltype(m_azimuth_transition_patch)>()),
+		m_zenith_patch(Signature("0F 29 A2 B0 00 00 00 8B 81 58 03 00 00").Scan().As<decltype(m_zenith_patch)>()),
+		m_zenith_transition_patch(Signature("0F 29 A2 E0 00 00 00").Scan().As<decltype(m_zenith_transition_patch)>()),
+		m_cloud_mid_patch(Signature("0F 29 8B 60 03 00 00").Scan().As<decltype(m_cloud_mid_patch)>()),
+		m_ReadBitbufDword(Signature("48 89 74 24 ? 57 48 83 EC 20 48 8B D9 33 C9 41 8B F0 8A").Scan().Sub(5).As<decltype(m_ReadBitbufDword)>()),
 		m_script_threads(Signature("45 33 F6 8B E9 85 C9 B8").Scan().Sub(4).Rip().Sub(8).As<decltype(m_script_threads)>())
 
 	{

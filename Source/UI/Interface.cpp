@@ -8,11 +8,11 @@
 #include "../ImGui/imgui.h"
 #include "../D3DRenderer.hpp"
 #include "../ImGui/imgui_internal.h"
-
+#include "../Translation.hpp"
 #define VERSION 4
-#define DEV_MODE
+//#define DEV_MODE
 //#define TESTER_MODE
-//#define RELEASE_MODE
+#define RELEASE_MODE
 
 
 #ifdef DEV_MODE
@@ -20,7 +20,7 @@
 #undef TESTER_MODE
 #define VERSION_TYPE "DEV"
 #endif
-
+#define VERSION_TYPE "RELEASE"
 namespace Saint::UserInterface
 {
 	bool FileExists(const std::string& fileName)
@@ -269,7 +269,7 @@ namespace Saint::UserInterface
 					AUDIO::PLAY_SOUND_FRONTEND(-1, m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
 			}
 			if (!PAD::IS_USING_KEYBOARD_AND_MOUSE(2)) {
-				if (PAD::IS_CONTROL_PRESSED(2, 227) && PAD::IS_CONTROL_PRESSED(2, INPUT_CELLPHONE_RIGHT) && openTimer.Update())
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 227) && PAD::IS_DISABLED_CONTROL_PRESSED(2, INPUT_CELLPHONE_RIGHT) && openTimer.Update())
 				{
 					if (!m_Opened) {
 						MenuOpeningAnimation();
@@ -311,7 +311,7 @@ namespace Saint::UserInterface
 					m_SubmenuStack.pop();
 				}
 			}
-			if (m_Opened && PAD::IS_CONTROL_PRESSED(2, 194) && backTimer.Update())
+			if (m_Opened && PAD::IS_DISABLED_CONTROL_PRESSED(2, 194) && backTimer.Update())
 			{
 				if (m_Sounds)
 					AUDIO::PLAY_SOUND_FRONTEND(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
@@ -361,7 +361,7 @@ namespace Saint::UserInterface
 						opt->HandleAction(OptionAction::HotkeyPress);
 					}
 				}
-				if (PAD::IS_CONTROL_PRESSED(2, 191) && sub->GetNumOptions() != 0 && enterTimer.Update())
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 191) && sub->GetNumOptions() != 0 && enterTimer.Update())
 				{
 					if (m_Sounds)
 						AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
@@ -387,7 +387,7 @@ namespace Saint::UserInterface
 						}
 					}
 				}
-				if (PAD::IS_CONTROL_PRESSED(2, 172) && sub->GetNumOptions() != 0 && upTimer.Update())
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 172) && sub->GetNumOptions() != 0 && upTimer.Update())
 				{
 					if (m_Sounds)
 						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
@@ -418,7 +418,7 @@ namespace Saint::UserInterface
 					}
 
 				}
-				if (PAD::IS_CONTROL_PRESSED(2, 173) && sub->GetNumOptions() != 0 && downTimer.Update())
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 173) && sub->GetNumOptions() != 0 && downTimer.Update())
 				{
 					if (m_Sounds)
 						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
@@ -445,7 +445,7 @@ namespace Saint::UserInterface
 						opt->HandleAction(OptionAction::LeftPress);
 					}
 				}
-				if (PAD::IS_CONTROL_PRESSED(2, 174) && sub->GetNumOptions() != 0 && leftTimer.Update())
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 174) && sub->GetNumOptions() != 0 && leftTimer.Update())
 				{
 					if (m_Sounds)
 						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
@@ -467,7 +467,7 @@ namespace Saint::UserInterface
 						opt->HandleAction(OptionAction::RightPress);
 					}
 				}
-				if (PAD::IS_CONTROL_PRESSED(2, 175) && !PAD::IS_CONTROL_PRESSED(2, 227) && sub->GetNumOptions() != 0 && rightTimer.Update())
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 175) && !PAD::IS_CONTROL_PRESSED(2, 227) && sub->GetNumOptions() != 0 && rightTimer.Update())
 				{
 					if (m_Sounds)
 						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
@@ -594,8 +594,13 @@ namespace Saint::UserInterface
 			GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(dict, false);
 		}
 	}
+
 	void UIManager::DrawOption(AbstractOption* opt, bool selected)
 	{
+		std::string s1 = Translations::GetTranslation(opt->GetLeftText());
+		std::string s2 = Translations::GetTranslation(opt->GetRightText());
+		const char* lefttext = s1.c_str();
+		const char* righttext = s2.c_str();
 		GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(1);
 		DrawRect(
 			m_PosX,
@@ -623,7 +628,7 @@ namespace Saint::UserInterface
 		if (opt->GetFlag(OptionFlag::PlayerSub)) {
 
 			DrawLeftText(
-				opt->GetLeftText(),
+				lefttext,
 				m_PosX - (m_Width / m_OptionPadding) - 0.002f,
 				m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
 				m_OptionTextSize,
@@ -634,7 +639,7 @@ namespace Saint::UserInterface
 		}
 		else {
 			DrawLeftText(
-				opt->GetLeftText(),
+				lefttext,
 				m_PosX - (m_Width / m_OptionPadding) - 0.002f,
 				m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
 				m_OptionTextSize,
@@ -651,7 +656,7 @@ namespace Saint::UserInterface
 				DrawSprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.016f, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
 
 				DrawRightText(
-					opt->GetRightText(),
+					righttext,
 					m_PosX + (m_Width / m_OptionPadding) - 0.022,
 					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
 					m_OptionTextSize,
@@ -661,7 +666,7 @@ namespace Saint::UserInterface
 			}
 			else {
 				DrawRightText(
-					opt->GetRightText(),
+					righttext,
 					m_PosX + (m_Width / m_OptionPadding) - 0.01,
 					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
 					m_OptionTextSize,
@@ -678,7 +683,7 @@ namespace Saint::UserInterface
 				DrawSprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.005f, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
 
 				DrawRightText(
-					opt->GetRightText(),
+					righttext,
 					m_PosX + (m_Width / m_OptionPadding) - 0.012,
 					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
 					m_OptionTextSize,
@@ -688,7 +693,7 @@ namespace Saint::UserInterface
 			}
 			else {
 				DrawRightText(
-					opt->GetRightText(),
+					righttext,
 					m_PosX + (m_Width / m_OptionPadding),
 					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
 					m_OptionTextSize,
@@ -705,7 +710,7 @@ namespace Saint::UserInterface
 				DrawSprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.015, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
 
 				DrawRightText(
-					opt->GetRightText(),
+					righttext,
 					m_PosX + (m_Width / m_OptionPadding) - 0.020,
 					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
 					m_OptionTextSize,
@@ -715,7 +720,7 @@ namespace Saint::UserInterface
 			}
 			else {
 				DrawRightText(
-					opt->GetRightText(),
+					righttext,
 					m_PosX + (m_Width / m_OptionPadding) - 0.01,
 					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
 					m_OptionTextSize,
@@ -731,7 +736,7 @@ namespace Saint::UserInterface
 				DrawSprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding - 0.005f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
 
 				DrawRightText(
-					opt->GetRightText(),
+					righttext,
 					m_PosX + (m_Width / m_OptionPadding) - 0.012,
 					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
 					m_OptionTextSize,
@@ -741,7 +746,7 @@ namespace Saint::UserInterface
 			}
 			else {
 				DrawRightText(
-					opt->GetRightText(),
+					righttext,
 					m_PosX + (m_Width / m_OptionPadding),
 					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
 					m_OptionTextSize,
@@ -754,7 +759,7 @@ namespace Saint::UserInterface
 			auto res = GetSpriteScale(0.0185);
 			auto res2 = GetSpriteScale(0.0185);
 			DrawRightText(
-				opt->GetRightText(),
+				righttext,
 				m_PosX + (m_Width / m_OptionPadding - 0.01f),
 				m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
 				m_OptionTextSize,
@@ -766,7 +771,7 @@ namespace Saint::UserInterface
 
 		else {
 			DrawRightText(
-				opt->GetRightText(),
+				righttext,
 				m_PosX + (m_Width / m_OptionPadding),
 				m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
 				m_OptionTextSize,

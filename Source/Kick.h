@@ -8,15 +8,15 @@ namespace Saint {
 	class Kicks {
 	public:
 
-		const char* Menu[3]
+		const char* Menu[1]
 		{
-			"Kiddions", "Rebound", "All"
+			"Kiddions"
 		};
 
 		std::size_t Menu_Data = 0;
 		const char* CrashMenu[1]
 		{
-			"Cherax"
+			"Basic"
 		};
 
 		std::size_t Menu_DataCrash = 0;
@@ -62,32 +62,16 @@ namespace Saint {
 				});
 		}
 		void crash() {
-			auto Ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
-			NativeVector3 pos = ENTITY::GET_ENTITY_COORDS(Ped, 1);
-			auto Crash1 = MISC::GET_HASH_KEY("mp_m_freemode_01");
-			auto Crash2 = MISC::GET_HASH_KEY("mp_f_freemode_01");
-			g_CallbackScript->AddCallback<ModelCallback>(Crash1, [=] {
-				
+			std::int64_t Args1[] = { (std::int64_t)-992162568, (std::int64_t)PLAYER::PLAYER_ID() };
+			g_GameFunctions->m_trigger_script_event(1, Args1, sizeof(Args1) / sizeof(Args1[0]), 1 << g_SelectedPlayer);
 
-				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x9090;
-				auto Male = PED::CREATE_PED(2, Crash1, pos.x, pos.y, pos.z, 0.f, TRUE, TRUE);
-				PED::SET_PED_COMPONENT_VARIATION(Male, 0, 393, 0, 0);
-				PED::SET_PED_COMPONENT_VARIATION(Male, 4, 144, 0, 0);
-				PED::SET_PED_COMPONENT_VARIATION(Male, 6, 102, 0, 0);
+			std::int64_t Args2[] = { (std::int64_t)1131623211, (std::int64_t)PLAYER::PLAYER_ID(), rand() % INT64_MAX };
+			g_GameFunctions->m_trigger_script_event(1, Args2, sizeof(Args2) / sizeof(Args2[0]), 1 << g_SelectedPlayer);
 
-				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-			});
-			g_CallbackScript->AddCallback<ModelCallback>(Crash2, [=] {
+			std::int64_t Args3[] = { (std::int64_t)1556360603, (std::int64_t)PLAYER::PLAYER_ID(), rand() % INT64_MAX, rand() % INT64_MAX };
+			g_GameFunctions->m_trigger_script_event(1, Args3, sizeof(Args3) / sizeof(Args3[0]), 1 << g_SelectedPlayer);
 
-
-				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x9090;
-
-				auto Female = PED::CREATE_PED(1, Crash2, pos.x, pos.y, pos.z, 0.f, TRUE, TRUE);
-				PED::SET_PED_COMPONENT_VARIATION(Female, 0, 415, 0, 0);
-				PED::SET_PED_COMPONENT_VARIATION(Female, 4, 151, 0, 0);
-				PED::SET_PED_COMPONENT_VARIATION(Female, 6, 106, 0, 0);
-				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-				});
+			
 			
 
 		}

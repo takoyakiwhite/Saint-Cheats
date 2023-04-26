@@ -16,7 +16,7 @@
 #include "Render.h"
 #include "hex_memory.h"
 #include "ScriptLocal.h"
-
+#include "Timer.hpp"
 namespace Saint {
 	inline std::string handlingBuffer = "";
 	inline std::string VehNameBuffer = "";
@@ -74,6 +74,8 @@ namespace Saint {
 		bool SetRotation = false;
 		bool DisableCollision = true;
 		float speed = 2.5f;
+		bool transparent = false;
+		bool spin = false;
 		const char* FlyType[2]
 		{
 			"None", "T-Pose"
@@ -93,10 +95,29 @@ namespace Saint {
 				if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
 				{
 					static bool turnoff = true;
-					if (turnoff)
+					if (!transparent)
 					{
 						ENTITY::SET_ENTITY_ALPHA(PLAYER::PLAYER_PED_ID(), 255, false);
 						turnoff = false;
+					}
+					if (transparent) {
+						ENTITY::SET_ENTITY_ALPHA(PLAYER::PLAYER_PED_ID(), 180, false);
+					}
+					if (spin) {
+						static int Heading;
+						Heading++;
+						Heading++;
+						Heading++;
+						Heading++;
+						Heading++;
+						Heading++;
+						Heading++;
+						Heading++;
+						Heading++;
+						Heading++;
+						Heading++;
+						Heading++;
+						ENTITY::SET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID(), Heading);
 					}
 
 					NativeVector3 coords4 = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
@@ -392,6 +413,8 @@ namespace Saint {
 	inline std::size_t  animation_int = 0;
 	inline const char* acrobatic_type[4] = { "Backflip", "Frontflip", "Kickflip", "Bunny Hop" };
 	inline std::size_t acrobatic_int = 0;
+	inline const char* jump_type[2] = { "Normal", "Beast" };
+	inline std::size_t jump_int = 0;
 	class Weather {
 	public:
 		const char* data[14] = { "Extra Sunny", "Clouds", "Smog", "Foggy", "Overcast", "Rain", "Clearing", "Neutral", "Snow", "Blizzard", "Snow (Light)", "Christmas", "Halloween", "Clear" };
@@ -529,6 +552,24 @@ namespace Saint {
 		int amount = 9999;
 	};
 	inline Give_ammo give_ammo;
+	inline bool has_string_attached(std::string str, std::string check)
+	{
+		std::size_t found = str.find(' ');
+		if (found != std::string::npos)
+		{
+			if (str.substr(0, found) == check)
+			{
+				str = str.substr(found + 1, str.size());
+				return true;
+			}
+		}
+		else
+		{
+			if (str == check)
+				return true;
+		}
+		return false;
+	}
 	class Features {
 	public:
 		bool vehicle_godmode = false;
@@ -577,7 +618,44 @@ namespace Saint {
 		bool force_gun = false;
 		int force_gun_mult = 150;
 		bool move_with_mouse = false;
+		bool disable_wanted_stars = false;
+		int fake_wanted_levels = 0;
+		bool hide_hsw_mods = false;
+		bool disable_camber = false;
+		bool no_idle_kick = false;
+		bool show_skidmarks = false;
+		bool wet = false;
+		bool reveal_all_players = false;
+		bool hide_map = false;
+		bool use_stunt_jump_camera = false;
 		void init() {
+			if (use_stunt_jump_camera) {
+				CAM::USE_VEHICLE_CAM_STUNT_SETTINGS_THIS_UPDATE();
+			}
+			if (hide_map) {
+				HUD::DISPLAY_RADAR(false);
+			}
+			if (reveal_all_players) {
+				*script_global(2657589).at(PLAYER::PLAYER_ID(), 466).at(213).as<std::int32_t*>() = 1;
+				*script_global(2672505).at(58).as<std::int32_t*>() = NETWORK::GET_NETWORK_TIME() + 60;
+			}
+			if (wet) {
+				PED::SET_PED_WETNESS_ENABLED_THIS_FRAME(PLAYER::PLAYER_PED_ID());
+				PED::SET_PED_WETNESS_HEIGHT(PLAYER::PLAYER_PED_ID(), 10.0);
+			}
+			if (show_skidmarks) {
+				GRAPHICS::USE_SNOW_WHEEL_VFX_WHEN_UNSHELTERED(true);
+			}
+			if (no_idle_kick) {
+				*script_global(1653913).at(1172).as<int*>() = -1; 
+				*script_global(1653913).at(1156).as<int*>() = -1;
+			}
+			if (disable_camber) {
+				VEHICLE::SET_CAN_USE_HYDRAULICS(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false);
+			}
+			if (disable_wanted_stars) {
+				HUD::HIDE_HUD_COMPONENT_THIS_FRAME(1);
+			}
 			if (move_with_mouse) {
 				g_Settings.m_LockMouse = true;
 				Vector2 pos = g_Render->GetMousePos();
@@ -961,7 +1039,7 @@ namespace Saint {
 		int blamed_person = 0;
 		bool blame = false;
 		const char* explode_type[81] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare",
-			"Unkown", "Extinguisher", "Unkown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
+			"Unknown", "Extinguisher", "Unknown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
 			"Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
 			"Bomb (Wide)", "Explosive Ammo (Shotgun)", "Oppressor MK II", "Kinetic Mortar", "Kinetic Vehicle Mine", "EMP Vehicle Mine", "Spike Vehicle Mine", "Slick Vehicle Mine", "Tar Vehicle Mine", "Script Drone", "Up-n-Atomizer", "Burried Mine", "Script Missle", "RC Tank Rocket",
 			"Bomb (Water)", "Bomb (Water 2)", "Flash Grenade", "Stun Grenade", "Script Missle (Large)", "Submarine (Big)", "EMP Launcher" };
@@ -1064,6 +1142,8 @@ namespace Saint {
 	public:
 		bool money = false;
 		bool rp = false;
+		bool health = false;
+		bool armor = false;
 		int height = 0;
 		int delay = 1100;
 		bool random_rp_model = false;
@@ -1113,6 +1193,7 @@ namespace Saint {
 			static int delayfr3 = 0;
 			if (delayfr3 == 0 || (int)(GetTickCount64() - delayfr3) > delay)
 			{
+				
 				if (rp) {
 					float dz = rp_c.z;
 					rp_c.z = dz + height;
@@ -1564,15 +1645,22 @@ namespace Saint {
 	class Speedo {
 	public:
 		bool enabled = false;
-		const char* type[3] = { "MPH", "KPH", "Game" };
+		const char* type[4] = { "MPH", "KPH", "Game", "Custom"};
 		std::size_t type_i = 0;
 		float x_offset = 0.00f;
 		float y_offset = 0.00f;
 		float scale = 0.25f;
+		std::size_t font2 = 0;
+		int r = 255;
+		int g = 255;
+		int b = 255;
+		int a = 255;
+		float custom_times = 5.0;
+		std::string custom_name;
 		void drawText(const char* text, float x, float y, float size, int font, bool center, bool right) {
 			HUD::SET_TEXT_SCALE(size, size);
-			HUD::SET_TEXT_FONT(font);
-			HUD::SET_TEXT_COLOUR(255, 255, 255, 255);
+			HUD::SET_TEXT_FONT(font2);
+			HUD::SET_TEXT_COLOUR(r, g, b, a);
 			HUD::SET_TEXT_CENTRE(center);
 			if (right) {
 				HUD::SET_TEXT_WRAP(0.0f, x);
@@ -1601,6 +1689,12 @@ namespace Saint {
 					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 					float vehicleSpeed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
 					snprintf(buffer, sizeof(buffer), "%i GMPH", (int)vehicleSpeed);
+					drawText(buffer, 0.01f + x_offset, 0.01f + y_offset, scale, 0, false, false);
+				}
+				if (type_i == 3) {
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					float vehicleSpeed = ENTITY::GET_ENTITY_SPEED(playerVehicle) * custom_times;
+					snprintf(buffer, sizeof(buffer), "%i %s", (int)vehicleSpeed, custom_name.c_str());
 					drawText(buffer, 0.01f + x_offset, 0.01f + y_offset, scale, 0, false, false);
 				}
 			}
@@ -1728,6 +1822,7 @@ namespace Saint {
 	};
 	inline Text_spam text_spam;
 	inline int i_hate_niggers = 0;
+	inline float move_rate = 1.0f;
 	class Max_loop {
 	public:
 		bool enabled = false;
@@ -1819,7 +1914,7 @@ namespace Saint {
 		float cameraShake = 0.0f;
 		float damage_scale = 100.0f;
 		const char* data[81] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare",
-			"Unkown", "Extinguisher", "Unkown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
+			"Unknown", "Extinguisher", "Unknown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
 			"Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
 			"Bomb (Wide)", "Explosive Ammo (Shotgun)", "Oppressor MK II", "Kinetic Mortar", "Kinetic Vehicle Mine", "EMP Vehicle Mine", "Spike Vehicle Mine", "Slick Vehicle Mine", "Tar Vehicle Mine", "Script Drone", "Up-n-Atomizer", "Burried Mine", "Script Missle", "RC Tank Rocket",
 			"Bomb (Water)", "Bomb (Water 2)", "Flash Grenade", "Stun Grenade", "Script Missle (Large)", "Submarine (Big)", "EMP Launcher" };
@@ -1975,8 +2070,27 @@ namespace Saint {
 	}
 	inline int m_selected_vehicle_class;
 	inline int m_selected_player_vehicle_class;
+	class spawnedVeh {
+	public:
+		spawnedVeh(std::string name, Vehicle id) {
+			m_name = name;
+			m_id = id;
 
+		}
+	public:
+		std::string m_name;
+		Vehicle m_id = 0;
+	};
+	class SpawnedVehicles {
+	public:
+		std::vector<spawnedVeh> spawned = {
 
+		};
+		int selectedveh = 0;
+		int selectedclass = 0;
+		const char* seletedname = "";
+	};
+	inline SpawnedVehicles spawned_veh;
 	class Veh_spawner {
 	public:
 		bool spawn_in_air = true;
@@ -1997,6 +2111,7 @@ namespace Saint {
 		int spawnb2 = 0;
 		const char* fade_speed[2] = {"Fast", "Slow"};
 		std::size_t fade_speed_i = 0;
+		bool max = false;
 		void spawn(Hash hash, Vehicle* buffer) {
 			*script_global(4540726).as<bool*>() = true;
 			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
@@ -2012,6 +2127,7 @@ namespace Saint {
 			NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::PLAYER_PED_ID(), { 0.f, dellast ? 0.f : 8.0f, (VEHICLE::IS_THIS_MODEL_A_PLANE(hash) && spawninair || VEHICLE::IS_THIS_MODEL_A_HELI(hash) && spawninair) ? 1.0f + heightmulti : 1.0f });
 			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 			Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
+			spawned_veh.spawned.push_back({ HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicle))), vehicle });
 			*buffer = vehicle;
 			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 			DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
@@ -2021,6 +2137,16 @@ namespace Saint {
 			VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
 			PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
 			VEHICLE::SET_VEHICLE_FORWARD_SPEED(vehicle, veh_speed);
+			if (max) {
+				VEHICLE::SET_VEHICLE_MOD_KIT(vehicle, 0);
+				for (int i = 0; i < 50; i++)
+				{
+					VEHICLE::SET_VEHICLE_MOD(vehicle, i, MISC::GET_RANDOM_INT_IN_RANGE(0, VEHICLE::GET_NUM_VEHICLE_MODS(vehicle, i) - 1), false);
+
+				}
+				VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(vehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 2));
+				
+			}
 			if (setengineon) {
 				VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
 			}
@@ -2219,7 +2345,7 @@ namespace Saint {
 		Ped aimbot_ped;
 		Cam aimcam;
 		int SKEL_Head = 0x796e;
-
+		bool fov_circle = false;
 		std::uint32_t BoneHashes[2]
 		{ 0x796e, 0xdd1c };
 		std::size_t WeaponInt = 0;
@@ -2286,7 +2412,7 @@ namespace Saint {
 							}
 						}
 						if (excludes.peds) {
-							if (PED::IS_PED_A_PLAYER(closest)) {
+							if (!ENTITY::IS_ENTITY_A_PED(closest)) {
 								if (veh != NULL) {
 									for (int i = 0; i < count; i++)
 									{
@@ -2441,7 +2567,7 @@ namespace Saint {
 					}
 				}
 				if (excludes.peds) {
-					if (PED::IS_PED_A_PLAYER(closest)) {
+					if (!ENTITY::IS_ENTITY_A_PED(closest)) {
 						if (veh != NULL) {
 							for (int i = 0; i < count; i++)
 							{
@@ -2499,7 +2625,7 @@ namespace Saint {
 					}
 				}
 				if (excludes.players) {
-					if (!PED::IS_PED_A_PLAYER(closest)) {
+					if (PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(closest)) {
 						if (veh != NULL) {
 							for (int i = 0; i < count; i++)
 							{
@@ -2781,9 +2907,65 @@ namespace Saint {
 	class teleport {
 	public:
 		bool automatic = false;
+		Cam m_TeleportCam = NULL;
+		bool GetBlipLocation(NativeVector3& location, int sprite, int color = -1)
+		{
+			Blip Blip;
+			for (
+				Blip = HUD::GET_FIRST_BLIP_INFO_ID(sprite);
+				HUD::DOES_BLIP_EXIST(Blip) && color != -1 && HUD::GET_BLIP_COLOUR(Blip) != color;
+				Blip = HUD::GET_NEXT_BLIP_INFO_ID(sprite)
+				);
+
+			if (!HUD::DOES_BLIP_EXIST(Blip) || (color != -1 && HUD::GET_BLIP_COLOUR(Blip) != color))
+				return false;
+
+			location = HUD::GET_BLIP_COORDS(Blip);
+
+			return true;
+		}
+		bool GetObjectiveLocation(NativeVector3& location)
+		{
+			if (GetBlipLocation(location, (int)BlipIcons::Circle, (int)BlipColors::YellowMission))
+				return true;
+			if (GetBlipLocation(location, (int)BlipIcons::Circle, (int)BlipColors::YellowMission2))
+				return true;
+			if (GetBlipLocation(location, (int)BlipIcons::Circle, (int)BlipColors::Mission))
+				return true;
+			if (GetBlipLocation(location, (int)BlipIcons::RaceFinish, (int)BlipColors::None))
+				return true;
+			if (GetBlipLocation(location, (int)BlipIcons::Circle, (int)BlipColors::Green))
+				return true;
+			if (GetBlipLocation(location, (int)BlipIcons::Circle, (int)BlipColors::Blue))
+				return true;
+			if (GetBlipLocation(location, (int)BlipIcons::CrateDrop))
+				return true;
+
+			static const int Blips[] = { 1, 57, 128, 129, 130, 143, 144, 145, 146, 271, 286, 287, 288 };
+			for (const auto& Blip : Blips)
+			{
+				if (GetBlipLocation(location, Blip, 5))
+					return true;
+			}
+
+			return false;
+		}
+		void objective() {
+			NativeVector3 Location;
+
+			if (!GetObjectiveLocation(Location))
+			{
+				return;
+			}
+
+			PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), Location.x, Location.y, Location.z);
+		}
 		void waypoint() {
+
 			NativeVector3 coords = GetBlipIcon();
 			Ped ped = PLAYER::PLAYER_PED_ID();
+
+			
 
 			if (coords.x == 0 && coords.y == 0) { return; }
 
@@ -3089,7 +3271,7 @@ namespace Saint {
 				m_queue.add(10ms, "Adding Cage", [=] {
 					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
 
-				Object cage = OBJECT::CREATE_OBJECT(MISC::GET_HASH_KEY("prop_gold_cont_01"), c.x, c.y, c.z - 1.f, true, false, false);
+				Object cage = OBJECT::CREATE_OBJECT(MISC::GET_HASH_KEY("prop_gold_cont_01"), c.x, c.y, c.z, true, false, false);
 				if (is_invisible) {
 					ENTITY::SET_ENTITY_VISIBLE(cage, false, 0);
 				}
@@ -4245,12 +4427,20 @@ namespace Saint {
 	inline std::size_t Opreracogh2 = 0;
 	inline const char* Aproach2[5] = { "Chester McCoy (Best)", "Eddie Toh", "Taliana Martinez", "Zach Nelson", "Karim Denz" };
 	inline std::size_t Opreracogh22 = 0;
+	inline const char* Aproach3[5] = { "Tequila", "Ruby Necklace", "Bearer Bonds", "Pink Diamond", "Panther Statue" };
+	inline std::size_t Opreracogh223 = 0;
+	inline const char* AproachVeh[6] = { "Kosatka", "Alkonost", "Velum", "Stealth Annihilator", "Patrol Boat", "Longfin" };
+	inline std::size_t Opreracogh2232 = 0;
 	class Disables2 {
 	public:
 		bool recording = false;
 		bool cin = false;
 		bool stuntjumps = false;
+		bool idle_cam = false;
 		void init() {
+			if (idle_cam) {
+				CAM::INVALIDATE_IDLE_CAM();
+			}
 			if (cin) {
 				CAM::SET_CINEMATIC_BUTTON_ACTIVE(false);
 			}
@@ -4344,9 +4534,70 @@ namespace Saint {
 			
 		}
 	};
+	class PedN {
+	public:
+		bool IsPedShooting(Ped ped)
+		{
+			NativeVector3 Coords = ENTITY::GET_ENTITY_COORDS(ped, true);
+			return PED::IS_PED_SHOOTING_IN_AREA(ped, Coords.x, Coords.y, Coords.z, Coords.x, Coords.y, Coords.z, true, true);
+		}
+		bool activated = false;
+		bool enabled = false;
+		float speed = 3.0f;
+		NativeVector3 coords;
+		bool riot = false;
+		void init() {
+			if (enabled) {
+				if (IsPedShooting(PLAYER::PLAYER_PED_ID()))
+				{
+					NativeVector3 hitCoords;
+					if (raycast(hitCoords)) {
+						auto BulletCoord = hitCoords;
+						coords = { BulletCoord.x, BulletCoord.y, BulletCoord.z };
+						activated = true;
+
+					}
+				}
+
+				if (activated)
+				{
+					Ped* peds = new Ped[(10 * 2 + 2)];
+					peds[0] = 10;
+					for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), peds, 0); i++)
+					{
+						Ped ped = peds[(i * 2 + 2)];
+						auto Coords = ENTITY::GET_ENTITY_COORDS(ped, true);
+						auto Distance = SYSTEM::VDIST(coords.x, coords.y, coords.z, Coords.x, Coords.y, Coords.z);
+						if (Distance < 3.0f)
+						{
+							TASK::CLEAR_PED_TASKS_IMMEDIATELY(ped);
+							TASK::CLEAR_PED_SECONDARY_TASK(ped);
+							activated = false;
+						}
+						else
+						{
+							NativeVector3 Velocity;
+							Velocity.x = (coords.x - Coords.x) * 3.0f;
+							Velocity.y = (coords.y - Coords.y) * 3.0f;
+							Velocity.z = (coords.z - Coords.z) * 3.0f;
+							TASK::TASK_SKY_DIVE(ped, 0);
+							ENTITY::SET_ENTITY_VELOCITY(ped, Velocity.x, Velocity.y, Velocity.z);
+						}
+
+					}
+					delete peds;
+					
+				}
+			}
+			if (riot) {
+				MISC::SET_RIOT_MODE_ENABLED(true);
+			}
+		}
+	};
 	class Nearby {
 	public:
 		Traffic m_traffic;
+		PedN m_peds;
 	};
 	inline Nearby m_nearby;
 	class PlayerImpacts {
@@ -4538,7 +4789,7 @@ namespace Saint {
 	class HandTrail {
 	public:
 		const char* type[2] = { "Normal", "Sphere" };
-		std::size_t size = 0;
+		std::size_t size = 1;
 		bool enabled = false;
 		bool rainbow = false;
 		int r = 255;
@@ -4561,17 +4812,17 @@ namespace Saint {
 					}
 				}
 				if (size == 0) {
-					STREAMING::REQUEST_NAMED_PTFX_ASSET("scr_minigametennis");
-					g_CallbackScript->AddCallback<PTFXCallback>("scr_minigametennis", [=] {
+					STREAMING::REQUEST_NAMED_PTFX_ASSET("scr_powerplay");
+					g_CallbackScript->AddCallback<PTFXCallback>("scr_powerplay", [=] {
 
-						GRAPHICS::USE_PARTICLE_FX_ASSET("scr_minigametennis");
-					int handle = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("scr_tennis_ball_trail", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 28422, 0.5f, 0, 0, 0);
+						GRAPHICS::USE_PARTICLE_FX_ASSET("scr_powerplay");
+					int handle = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("sp_powerplay_beast_appear_trails", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 28422, 0.5f, 0, 0, 0);
 					
 
 
 
-					GRAPHICS::USE_PARTICLE_FX_ASSET("scr_minigametennis");
-					int handle1 = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("scr_tennis_ball_trail", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 60309, 0.5f, 0, 0, 0);
+					GRAPHICS::USE_PARTICLE_FX_ASSET("scr_powerplay");
+					int handle1 = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("sp_powerplay_beast_appear_trails", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 60309, 0.5f, 0, 0, 0);
 					
 						});
 				}
@@ -4967,6 +5218,7 @@ namespace Saint {
 		ScenarioFemale,
 		Emergency,
 		Players,
+		Story,
 	};
 	class modelHandler {
 	public:
@@ -5065,9 +5317,13 @@ namespace Saint {
 		}
 	};
 	inline Creator m_creator;
+	
+	
 	class ModelChanger {
 	public:
 		std::vector<modelHandler> m_GetModels = {
+			{ "a_f_m_beach_01", "Beach", ModelClass::AmbientFemale },
+			{ "a_f_m_bodybuild_01", "Bodybuilder", ModelClass::AmbientFemale },
 			{ "a_m_m_acult_01", "Cult", ModelClass::AmbientMale },
 			{ "a_m_m_afriamer_01", "Friamer", ModelClass::AmbientMale },
 
@@ -5078,70 +5334,96 @@ namespace Saint {
 			{ "mp_s_m_armoured_01", "Guard", ModelClass::Emergency },
 			{ "mp_m_exarmy_01", "Ex-Army", ModelClass::Emergency },
 			{ "s_f_y_sheriff_01", "Sheriff (Female)", ModelClass::Emergency },
+			{ "s_m_m_ciasec_01", "CIA", ModelClass::Emergency },
+			{ "s_m_m_security_01", "Security", ModelClass::Emergency },
+			{ "s_m_y_ranger_01", "Ranger", ModelClass::Emergency },
+			{ "s_m_y_swat_01", "Swat", ModelClass::Emergency },
 
+			//animals
+
+			{ "a_c_boar", "Boar", ModelClass::Animal },
+			{ "a_c_cat_01", "Cat", ModelClass::Animal },
+			{ "a_c_chickenhawk", "Chickenhawk", ModelClass::Animal },
+			{ "a_c_chimp", "Chimp", ModelClass::Animal },
+			{ "a_c_chop", "Chop", ModelClass::Animal },
+			{ "a_c_cormorant", "Cormorant", ModelClass::Animal },
+			{ "a_c_cow", "Cow", ModelClass::Animal },
+			{ "a_c_coyote", "Coyote", ModelClass::Animal },
+			{ "a_c_crow", "Crow", ModelClass::Animal },
+			{ "a_c_deer", "Deer", ModelClass::Animal },
+			{ "a_c_dolphin", "Dolphin", ModelClass::Animal },
+			{ "a_c_fish", "Fish", ModelClass::Animal },
+			{ "a_c_hen", "Hen", ModelClass::Animal },
+			{ "a_c_humpback", "Humpback", ModelClass::Animal },
+			{ "a_c_husky", "Husky", ModelClass::Animal },
+			{ "a_c_mtlion", "Mountain Lion", ModelClass::Animal },
+			{ "a_c_killerwhale", "Killerwhale", ModelClass::Animal },
+			{ "a_c_panther", "Panther", ModelClass::Animal },
+			{ "a_c_pig", "Pig", ModelClass::Animal },
+			{ "a_c_pigeon", "Pigeon", ModelClass::Animal },
+			{ "a_c_poodle", "Poodle", ModelClass::Animal },
+			{ "a_c_pug", "Pug", ModelClass::Animal },
+			{ "a_c_rabbit_01", "Rabbit", ModelClass::Animal },
+			{ "a_c_rabbit_02", "Rabbit (Large)", ModelClass::Animal },
+			{ "a_c_rat", "Rat", ModelClass::Animal },
+			{ "a_c_retriever", "Retriever", ModelClass::Animal },
+			{ "a_c_rhesus", "Rhesus", ModelClass::Animal },
+			{ "a_c_rottweiler", "Rottweiler", ModelClass::Animal },
+			{ "a_c_seagull", "Seagull", ModelClass::Animal },
+			{ "a_c_sharkhammer", "Hammerhead Shark", ModelClass::Animal },
+			{ "a_c_sharktiger", "Tiger Shark", ModelClass::Animal },
+			{ "a_c_shepherd", "Shepherd", ModelClass::Animal },
+			{ "a_c_stingray", "Stringray", ModelClass::Animal },
+			{ "a_c_westy", "Westy", ModelClass::Animal },
+
+			{ "ig_brad", "Brad", ModelClass::Story },
+			{ "ig_floyd", "Floyd", ModelClass::Story },
+			{ "ig_amandatownley", "Amanda Townley", ModelClass::Story },
+			{ "ig_jimmydisanto", "Jimmy", ModelClass::Story },
+			{ "ig_chrisformage", "Chris Formage", ModelClass::Story },
+
+			{ "mp_m_freemode_01", "MP (Male)", ModelClass::Players },
+			{ "mp_f_freemode_01", "MP (Female)", ModelClass::Players },
 			{ "player_one", "Franklin", ModelClass::Players },
 			{ "player_zero", "Michael", ModelClass::Players },
 			{ "player_two", "Trevor", ModelClass::Players },
 		};
 		GetClasses get_classes;
 		int selected_class = 0;
-		int size = 10;
-		const char* get_class_name[10] = {"Ambient Female", "Ambient Male", "Animal", "Cutscene", "Gang Female", "Gang Male", "Multiplayer", "Scenario Female", "Emergency", "Player"};
+		int size = 11;
+		const char* get_class_name[11] = {"Ambient Female", "Ambient Male", "Animal", "Cutscene", "Gang Female", "Gang Male", "Multiplayer", "Scenario Female", "Emergency", "Player", "Story"};
 		
-		void change(const char* To_Change)
+		
+		bool change(const Hash hash)
 		{
-			Hash Model_To_Change = rage::joaat(To_Change);
-			{
-
-				NativeVector3 Coordinates = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
-				if (STREAMING::IS_MODEL_IN_CDIMAGE(Model_To_Change))
+			g_FiberPool.queue([=] {
+				for (uint8_t i = 0; !STREAMING::HAS_MODEL_LOADED(hash) && i < 100; i++)
 				{
-					g_CallbackScript->AddCallback<ModelCallback>(Model_To_Change, [=] {
-						
-						
-
-						if (STREAMING::IS_MODEL_VALID(Model_To_Change))
-						{
-							Ped PED_Spawn = PED::CREATE_PED(26, Model_To_Change, Coordinates.x, Coordinates.y, Coordinates.z, 0, true, true);
-
-							
-
-
-							STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(Model_To_Change);
-							if (*g_GameVariables->m_is_session_started) {
-								NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(PED_Spawn);
-								auto NET_ID = NETWORK::PED_TO_NET(PED_Spawn);
-								DECORATOR::DECOR_SET_INT(PED_Spawn, (char*)"MPBitset", 0);
-								NETWORK::NETWORK_REGISTER_ENTITY_AS_NETWORKED(PED_Spawn);
-								if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(PED_Spawn))
-									NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(NET_ID, true);
-								ENTITY::SET_ENTITY_AS_MISSION_ENTITY(PED_Spawn, true, true);
-								NETWORK::SET_NETWORK_ID_CAN_MIGRATE(NETWORK::PED_TO_NET(PED_Spawn), TRUE);
-
-								if (!DECORATOR::DECOR_EXIST_ON(PED_Spawn, "MissionType"))
-								{
-									DECORATOR::DECOR_REGISTER("MissionType", 3);
-									DECORATOR::DECOR_SET_INT(PED_Spawn, "MissionType", 0);
-
-								}
-							}
-
-							Ped PED_TO_DELETE = PLAYER::PLAYER_PED_ID();
-							PLAYER::CHANGE_PLAYER_PED(PLAYER::PLAYER_ID(), PED_Spawn, true, true);
-							ENTITY::SET_ENTITY_ALPHA(PED_Spawn, 255, 0);
-							ENTITY::SET_ENTITY_VISIBLE(PED_Spawn, true, 1);
-							ENTITY::DELETE_ENTITY(&PED_TO_DELETE);
-						}
-					});
+					STREAMING::REQUEST_MODEL(hash);
+					fbr::cur()->wait();
 				}
-			}
+				if (!STREAMING::HAS_MODEL_LOADED(hash))
+				{
+					return false;
+				}
+				PLAYER::SET_PLAYER_MODEL(PLAYER::PLAYER_ID(), hash);
+				Ped ped = PLAYER::PLAYER_PED_ID();
+				fbr::cur()->wait();
+				STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
+				for (int i = 0; i < 12; i++)
+				{
+					PED::SET_PED_COMPONENT_VARIATION(ped, i, PED::GET_PED_DRAWABLE_VARIATION(ped, i), PED::GET_PED_TEXTURE_VARIATION(ped, i), PED::GET_PED_PALETTE_VARIATION(ped, i));
+				}
+			});
+			return true;
 		}
+
 		
 	};
 	inline ModelChanger m_ModelChanger;
 	class Recovery {
 	public:
-		const char* get_char_name[2] = { "Loading", "Loading"};
+		const char* get_char_name[2] = { "First", "Second"};
 		std::size_t selected = 0;
 	};
 	inline Recovery g_RecoveryManager;
@@ -5246,7 +5528,7 @@ namespace Saint {
 	inline rainb3ow_ui rainbow_ui;
 	class ESP {
 	public:
-		bool skeleton = true;
+		bool skeleton = false;
 		void draw_bone(NativeVector3 first, NativeVector3 second) {
 			GRAPHICS::DRAW_LINE(first.x, first.y, first.z, second.x, second.y, second.z, 255, 255, 255, 255);
 		}
@@ -5295,6 +5577,8 @@ namespace Saint {
 				GRAPHICS::DRAW_LINE(ForearmL.x, ForearmL.y, ForearmL.z, Forearm2L.x, Forearm2L.y, Forearm2L.z, 255, 255, 255, 255);
 
 				GRAPHICS::DRAW_LINE(Forearm2L.x, Forearm2L.y, Forearm2L.z, HandL.x, HandL.y, HandL.z, 255, 255, 255, 255);
+
+
 			}
 		}
 	};
@@ -5383,8 +5667,277 @@ namespace Saint {
 		}
 	};
 	inline SpectateOptions spectateo;
-	inline void FeatureInitalize() {
+	class TimeEditor {
+	public:
+		const char* type[3] = { "Seconds", "Minutes", "Hours"};
+		std::size_t pos;
+		int second = 0;
+		int min = 0;
+		int hour = 0;
+		bool sync = false;
+		void add(int min, int second, int hour) {
+			CLOCK::ADD_TO_CLOCK_TIME(hour, min, second);
+		}
+		void init() {
+			if (sync) {
+				static Timer syncTimer(0ms);
+				syncTimer.SetDelay(std::chrono::seconds(1));
+				if (syncTimer.Update())
+				{
+					CLOCK::PAUSE_CLOCK(sync);
+					std::int32_t Time[6];
+					CLOCK::GET_LOCAL_TIME(&Time[0], &Time[1], &Time[2], &Time[3], &Time[4], &Time[5]);
+					NETWORK::NETWORK_OVERRIDE_CLOCK_TIME(Time[3], Time[4], Time[5]);
+					CLOCK::SET_CLOCK_TIME(Time[3], Time[4], Time[5]);
+				}
+			}
+		}
+	};
+	inline uintptr_t g_base_address = (uintptr_t)GetModuleHandle(NULL);
+	inline uintptr_t scan_address(uintptr_t ptr, std::vector<unsigned int> offsets)
+	{
+		uintptr_t addr = ptr;
+		for (unsigned int i = 0; i < offsets.size(); ++i)
+		{
+			addr = *(uintptr_t*)addr;
+			addr += offsets[i];
+		}
+		return addr;
+	}
+	inline TimeEditor time_gta;
+	class East {
+	public:
+		bool changed = false;
+		int r = 0;
+		int g = 0;
+		int b = 0;
+		float brightness = 1.0;
+	};
+	class West {
+	public:
+		bool changed = false;
+		int r = 0;
+		int g = 0;
+		int b = 0;
+		float brightness = 1.0;
+	};
+	class SouthNorth {
+	public:
+		bool changed = false;
+		int r = 0;
+		int g = 0;
+		int b = 0;
+		float brightness = 1.0;
+	};
+	class Cloud {
+	public:
+		bool changed = false;
+		int r = 0;
+		int g = 0;
+		int b = 0;
+		float brightness = 1.0;
+	};
+	class SkyData {
+	public:
+		East east;
+		West west;
+		SouthNorth southnorth;
+		Cloud cloud;
+		void change_effect() {
+			if (east.changed) {
+				uintptr_t east_red = scan_address(g_base_address + 0x26CFAB0, {});
+				uintptr_t east_green = scan_address(g_base_address + 0x26CFAB4, {});
+				uintptr_t east_blue = scan_address(g_base_address + 0x26CFAB8, {});
+
+				*(float*)east_red = (east.r / 255.f) * east.brightness;
+				*(float*)east_green = (east.g / 255.f) * east.brightness;
+				*(float*)east_blue = (east.b / 255.f) * east.brightness;
+			}
+			if (west.changed) {
+				uintptr_t west_red = scan_address(g_base_address + 0x26CFAE0, {});
+				uintptr_t west_green = scan_address(g_base_address + 0x26CFAE4, {});
+				uintptr_t west_blue = scan_address(g_base_address + 0x26CFAE8, {});
+
+				*(float*)west_red = (west.r / 255.f) * west.brightness;
+				*(float*)west_green = (west.g / 255.f) * west.brightness;
+				*(float*)west_blue = (west.b / 255.f) * west.brightness;
+			}
+			if (southnorth.changed) {
+				uintptr_t west_red = scan_address(g_base_address + 0x26CFB10, {});
+				uintptr_t west_green = scan_address(g_base_address + 0x26CFB14, {});
+				uintptr_t west_blue = scan_address(g_base_address + 0x26CFB18, {});
+
+				*(float*)west_red = (southnorth.r / 255.f) * southnorth.brightness;
+				*(float*)west_green = (southnorth.g / 255.f) * southnorth.brightness;
+				*(float*)west_blue = (southnorth.b / 255.f) * southnorth.brightness;
+			}
+			if (cloud.changed) {
+				uintptr_t west_red = scan_address(g_base_address + 0x26CFE10, {});
+				uintptr_t west_green = scan_address(g_base_address + 0x26CFE14, {});
+				uintptr_t west_blue = scan_address(g_base_address + 0x26CFE18, {});
+
+				*(float*)west_red = (cloud.r / 255.f) * cloud.brightness;
+				*(float*)west_green = (cloud.g / 255.f) * cloud.brightness;
+				*(float*)west_blue = (cloud.b / 255.f) * cloud.brightness;
+
+				
+
+				
+			}
+		}
+	};
+	inline SkyData sky_data;
+	class Autostart {
+	public:
+		bool enabled = false;
+		int max;
+		void init() {
+			if (enabled) {
+				if (NETWORK::NETWORK_GET_NUM_CONNECTED_PLAYERS() < max) {
+					if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+						session.join(eSessionType::JOIN_PUBLIC);
+					}
+				}
+			}
+		}
+	};
+	inline Autostart autostart;
+	inline int max_players = 0;
+	inline int max_spectators = 0;
+	class ParachuteSelf {
+	public:
+		const char* types[15] = {"None", "Rainbow", "Red", "Seaside Stripes", "Widow Maker", "Patriot", "Blue", "Black", "Hornet", "Air Focce", "Desert", "Shadow", "High Altitude", "Airbone", "Sunrise"};
+		std::size_t pos;
+		bool give_when_in_plane = false;
+		bool use_reservered = false;
+		int r;
+		int g;
+		int b;
+		void init() {
+			if (use_reservered) {
+				PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 363, true);
+			}
+			if (give_when_in_plane) {
+				PLAYER::SET_AUTO_GIVE_PARACHUTE_WHEN_ENTER_PLANE(PLAYER::PLAYER_PED_ID(), true);
+			}
+		}
+		void set_color(int r, int g, int b) {
+			PLAYER::SET_PLAYER_PARACHUTE_SMOKE_TRAIL_COLOR(PLAYER::PLAYER_PED_ID(), r, g, b);
+		}
+		void set_tint(int id) {
+			PLAYER::SET_PLAYER_PARACHUTE_TINT_INDEX(PLAYER::PLAYER_PED_ID(), id);
+		}
+	};
+	inline ParachuteSelf parachutes;
+	class GrappleHook {
+	public:
+		bool IsPedShooting(Ped ped)
+		{
+			NativeVector3 Coords = ENTITY::GET_ENTITY_COORDS(ped, true);
+			return PED::IS_PED_SHOOTING_IN_AREA(ped, Coords.x, Coords.y, Coords.z, Coords.x, Coords.y, Coords.z, true, true);
+		}
+		bool activated = false;
+		bool enabled = false;
+		float speed = 3.0f;
+		NativeVector3 coords;
+		void init() {
+			if (enabled) {
+				if (IsPedShooting(PLAYER::PLAYER_PED_ID()))
+				{
+					NativeVector3 hitCoords;
+					if (raycast(hitCoords)) {
+						auto BulletCoord = hitCoords;
+						coords = { BulletCoord.x, BulletCoord.y, BulletCoord.z };
+						activated = true;
+						
+					}
+				}
+
+				if (activated)
+				{
+					auto Coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+					auto Distance = SYSTEM::VDIST(coords.x, coords.y, coords.z, Coords.x, Coords.y, Coords.z);
+					if (Distance < 3.0f)
+					{
+						TASK::CLEAR_PED_TASKS_IMMEDIATELY(PLAYER::PLAYER_PED_ID());
+						TASK::CLEAR_PED_SECONDARY_TASK(PLAYER::PLAYER_PED_ID());
+						activated = false;
+					}
+					else
+					{
+						NativeVector3 Velocity;
+						Velocity.x = (coords.x - Coords.x) * speed;
+						Velocity.y = (coords.y - Coords.y) * speed;
+						Velocity.z = (coords.z - Coords.z) * speed;
+						TASK::TASK_SKY_DIVE(PLAYER::PLAYER_PED_ID(), 0);
+						ENTITY::SET_ENTITY_VELOCITY(PLAYER::PLAYER_PED_ID(), Velocity.x, Velocity.y, Velocity.z);
+					}
+				}
+			}
+		}
+	};
+	inline GrappleHook ghook;
+	class MiniMap {
+	public:
+		bool hide_fow = false;
+		bool force_exterior = false;
+		int zoom = 1;
+		void init() {
+			if (force_exterior) {
+				HUD::SET_RADAR_AS_EXTERIOR_THIS_FRAME();
+			}
+			if (hide_fow) {
+				HUD::SET_MINIMAP_HIDE_FOW(true);
+			}
+		}
+	};
+	inline MiniMap minimap;
+	class Ocean {
+	public:
+		const char* type[3] = { "Normal", "Smooth", "Bubbly" };
+		std::size_t pos;
+		float intensity;
+	};
+	inline Ocean ocean;
+	class BypassWeaponRestrictions {
+	public:
 		
+	};
+	inline BypassWeaponRestrictions bypass_weapon;
+	inline bool freeze_time = false;
+	class Phone {
+	public:
+		const char* type[4] = { "Michael", "Trevor", "Franklin", "Prologue" };
+		std::size_t pos;
+		bool disable = false;
+		float scale = 500.0f;
+		bool scaler = false;
+		int x;
+		int y;
+		int z;
+		int rotx;
+		int roty;
+		int rotz;
+		void init() {
+			if (scaler) {
+				MOBILE::SET_MOBILE_PHONE_SCALE(scale);
+			}
+			if (disable) {
+				MOBILE::DESTROY_MOBILE_PHONE();
+			}
+		}
+	};
+	inline Phone phone;
+	
+	inline void FeatureInitalize() {
+		phone.init();
+		time_gta.init();
+		CLOCK::PAUSE_CLOCK(freeze_time);
+		minimap.init();
+		ghook.init();
+		parachutes.init();
+		autostart.init();
+		sky_data.change_effect();
 		weather.init2();
 		esp.init();
 		rainbow_ui.init();
@@ -5400,8 +5953,19 @@ namespace Saint {
 
 				Ped playerPed = PLAYER::PLAYER_PED_ID();
 				NativeVector3 pos = ENTITY::GET_ENTITY_COORDS(playerPed, 0);
-				const char* cages[47] = { "bkr_prop_cashtrolley_01a", "p_cablecar_s_door_r", "p_cablecar_s_door_l", "p_cablecar_s_door_l" ,"p_cablecar_s", "prop_rub_cage01a", "prop_gold_cont_01", "prop_gold_cont_01b", "prop_dog_cage_01", "prop_dog_cage_02", "stt_prop_stunt_tube_l", "stt_prop_stunt_tube_crn2", "stt_prop_stunt_tube_crn", "stt_prop_stunt_tube_crn2", "stt_prop_stunt_tube_crn_15d", "stt_prop_stunt_tube_crn_30d", "stt_prop_stunt_tube_crn_5d", "stt_prop_stunt_tube_cross", "stt_prop_stunt_tube_end", "stt_prop_stunt_tube_xs", "stt_prop_stunt_tube_xxs", "stt_prop_stunt_tube_speeda", "stt_prop_stunt_tube_qg", "stt_prop_stunt_tube_s", "stt_prop_stunt_tube_m", "stt_prop_stunt_tube_l", "stt_prop_stunt_tube_jmp2", "stt_prop_stunt_tube_jmp", "stt_prop_stunt_tube_hg", "stt_prop_stunt_tube_gap_03", "stt_prop_stunt_tube_gap_02", "stt_prop_stunt_tube_gap_01", "stt_prop_stunt_tube_fork", "stt_prop_stunt_tube_fn_05", "stt_prop_stunt_tube_fn_04", "stt_prop_stunt_tube_fn_03", "stt_prop_stunt_tube_fn_02", "stt_prop_stunt_tube_fn_01", "stt_prop_stunt_tube_ent", "bkr_prop_biker_tube_gap_02", "bkr_prop_biker_tube_gap_01", "bkr_prop_biker_tube_xs", "bkr_prop_biker_tube_s", "bkr_prop_biker_tube_m", "bkr_prop_biker_tube_l", "bkr_prop_biker_tube_gap_03", "prop_fnclink_05crnr1" };
-				const char* cage_name[47] = { "Trolly", "Cablecar Door", "Cablecar Door 2", "Cablecar Door 3" ,"Cablecar", "Stunt Tube", "Normal", "Normal 2", "Dog Cage", "Dog Cage 2", "Stunt Tube (L)", "Stunt Tube (Crn)", "Stunt Tube (Crn 2)", "Stunt Tube (Crn 3)", "Stunt Tube (15D)", "Stunt Tube (30D)", "Stunt Tube (5D)", "Stunt Tube (Cross)", "Stunt Tube (End)", "Stunt Tube (XS)", "Stunt Tube (XXS)", "Stunt Tube (Speed)", "Stunt Tube (qg)", "Stunt Tube (S)", "Stunt Tube (M)", "Stunt Tube (L)", "Stunt Tube (Jump)", "Stunt Tube (Jump 2)", "Stunt Tube (HG)", "Stunt Tube (Gap)", "Stunt Tube (Gap 2)", "Stunt Tube (Gap 3)", "Stunt Tube (Fork)", "Stunt Tube (FN5)", "Stunt Tube (FN4)", "Stunt Tube (FN3)", "Stunt Tube (FN2)", "Stunt Tube (FN1)", "Stunt Tube (Ent)", "Stunt Tube (Gap 4)", "Stunt Tube (Gap 5)", "Stunt Tube (Biker XS)", "Stunt Tube (Biker S)", "Stunt Tube (Biker M)", "Stunt Tube (Biker L)", "Stunt Tube (Gap 6)", "Stunt Tube (Clink)" };
+				const char* cages[52] = { "bkr_prop_cashtrolley_01a", "p_cablecar_s_door_r", "p_cablecar_s_door_l", "p_cablecar_s_door_l" ,"p_cablecar_s", "prop_rub_cage01a", "prop_gold_cont_01", "prop_gold_cont_01b",
+					"prop_dog_cage_01", "prop_dog_cage_02", "stt_prop_stunt_tube_l", "stt_prop_stunt_tube_crn2", "stt_prop_stunt_tube_crn", "stt_prop_stunt_tube_crn2", "stt_prop_stunt_tube_crn_15d",
+					"stt_prop_stunt_tube_crn_30d", "stt_prop_stunt_tube_crn_5d", "stt_prop_stunt_tube_cross", "stt_prop_stunt_tube_end", "stt_prop_stunt_tube_xs", "stt_prop_stunt_tube_xxs", "stt_prop_stunt_tube_speeda",
+					"stt_prop_stunt_tube_qg", "stt_prop_stunt_tube_s", "stt_prop_stunt_tube_m", "stt_prop_stunt_tube_l", "stt_prop_stunt_tube_jmp2", "stt_prop_stunt_tube_jmp", "stt_prop_stunt_tube_hg",
+					"stt_prop_stunt_tube_gap_03", "stt_prop_stunt_tube_gap_02", "stt_prop_stunt_tube_gap_01", "stt_prop_stunt_tube_fork", "stt_prop_stunt_tube_fn_05", "stt_prop_stunt_tube_fn_04",
+					"stt_prop_stunt_tube_fn_03", "stt_prop_stunt_tube_fn_02", "stt_prop_stunt_tube_fn_01", "stt_prop_stunt_tube_ent", "bkr_prop_biker_tube_gap_02", "bkr_prop_biker_tube_gap_01",
+					"bkr_prop_biker_tube_xs", "bkr_prop_biker_tube_s", "bkr_prop_biker_tube_m", "bkr_prop_biker_tube_l", "bkr_prop_biker_tube_gap_03", "prop_fnclink_05crnr1", "prop_rub_cage01a", "prop_fnclink_05crnr1", "prop_fnclink_02n", "prop_fnclink_04g", "prop_fnclink_09b" };
+
+				const char* cage_name[52] = { "Trolly", "Cablecar Door", "Cablecar Door 2", "Cablecar Door 3" ,"Cablecar", "Stunt Tube", "Normal", "Normal 2", "Dog Cage", "Dog Cage 2", "Stunt Tube (L)",
+									"Stunt Tube (Crn)", "Stunt Tube (Crn 2)", "Stunt Tube (Crn 3)", "Stunt Tube (15D)", "Stunt Tube (30D)", "Stunt Tube (5D)", "Stunt Tube (Cross)", "Stunt Tube (End)", "Stunt Tube (XS)",
+									"Stunt Tube (XXS)", "Stunt Tube (Speed)", "Stunt Tube (qg)", "Stunt Tube (S)", "Stunt Tube (M)", "Stunt Tube (L)", "Stunt Tube (Jump)", "Stunt Tube (Jump 2)", "Stunt Tube (HG)", "Stunt Tube (Gap)",
+									"Stunt Tube (Gap 2)", "Stunt Tube (Gap 3)", "Stunt Tube (Fork)", "Stunt Tube (FN5)", "Stunt Tube (FN4)", "Stunt Tube (FN3)", "Stunt Tube (FN2)", "Stunt Tube (FN1)", "Stunt Tube (Ent)",
+									"Stunt Tube (Gap 4)", "Stunt Tube (Gap 5)", "Stunt Tube (Biker XS)", "Stunt Tube (Biker S)", "Stunt Tube (Biker M)", "Stunt Tube (Biker L)", "Stunt Tube (Gap 6)", "Stunt Tube (Clink)", "Rub", "Fence 1", "Fence Part 2", "Fence Part 3", "Fence Part 4" };
 
 				for (int i = 0; i < 47; i++)
 				{
@@ -5433,6 +5997,7 @@ namespace Saint {
 		m_fx.init();
 		m_impacts.init();
 		m_nearby.m_traffic.init();
+		m_nearby.m_peds.init();
 		m_disables.init();
 		m_entity_shooter.init();
 		m_frame_flags.init();

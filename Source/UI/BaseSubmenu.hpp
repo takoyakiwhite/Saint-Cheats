@@ -52,10 +52,30 @@ namespace Saint::UserInterface
 		{
 			m_SelectedOption = n;
 		}
-
+#ifdef logoptions
+		std::vector<std::string> s;
+#endif
 		template <typename OptionType, typename ...TArgs>
 		void draw_option(TArgs&&... args)
 		{
+#ifdef logoptions
+			std::string soos = std::string(std::get<0>(std::tie(args...)));
+			bool found = false;
+			for (int i = 0; i < s.size(); i++) {
+				if (s[i] == soos) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				s.push_back(soos);
+				soos = soos + "\n";
+				std::ofstream o("C:\\Users\\Tim\\sainttranslation.txt", std::ios_base::app);
+				o.write(soos.c_str(), soos.size());
+				o.close();
+			}
+			
+#endif
 			m_Options.push_back(std::make_unique<OptionType>(std::forward<TArgs>(args)...));
 		}
 

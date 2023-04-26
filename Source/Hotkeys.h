@@ -14,7 +14,7 @@ namespace Saint {
 		bool* toggle;
 	};
 	inline std::vector<hotkeyHandler> m_Hotkeys = {
-		{"No-Clip", 0x45, &no_clip.enabled}
+		
 	};
 	inline void hotkey_tick() {
 		for (auto& hotkey : m_Hotkeys) {

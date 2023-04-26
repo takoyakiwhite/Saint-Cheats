@@ -163,6 +163,95 @@ namespace Saint {
 			GRAPHICS::DRAW_RECT(x - 0.510, y + -0.000, 0.183, -0.002, g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255, false);
 			GRAPHICS::DRAW_RECT(xfr, y + -0.000, 0.183f, -0.002, g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255, false);
 		}
+		std::string separateByCommas(int num) {
+			std::string numStr = std::to_string(num);
+			std::string result;
+			int count = 0;
+
+			// Iterate through the string from the right and add commas
+			for (int i = numStr.size() - 1; i >= 0; i--) {
+				result = numStr[i] + result;
+				count++;
+				if (count == 3 && i != 0) {
+					result = "," + result;
+					count = 0;
+				}
+			}
+
+			return result;
+		}
+		void draw_info3() {
+
+			float x = g_Render->m_PosX;
+			float y = g_Render->m_PosY;
+			Color col;
+
+			float offset = 0.023f;
+			float xfr = x + 0.205f + offset - 0.025f;
+			GRAPHICS::DRAW_RECT(xfr, y + -0.090 + 0.178, 0.183f, 0.178, g_Render->m_OptionUnselectedBackgroundColor.r, g_Render->m_OptionUnselectedBackgroundColor.g, g_Render->m_OptionUnselectedBackgroundColor.b, 160, false);
+			Color col2 = { 255, 255, 255, 190 };
+
+			char timesince[128];
+			char max_speed[128];
+			char seats[64];
+			char price[128];
+			char make[128];
+			char make2[128];
+			script_global globalplayer_bd(2657589);
+			script_global gpbd_fm_3(1894573);
+			script_global gpbd_fm_1(1853910);
+			auto& stats = gpbd_fm_1.as<GPBD_FM*>()->Entries[PLAYER::PLAYER_ID()].PlayerStats;
+			auto& stats1 = gpbd_fm_1.as<GPBD_FM*>()->Entries[PLAYER::PLAYER_ID()];
+			auto& stats2 = gpbd_fm_3.as<GPBD_FM_3*>()->Entries[PLAYER::PLAYER_ID()];
+			auto& stats3 = globalplayer_bd.as<GlobalPlayerBD*>()->Entries[PLAYER::PLAYER_ID()];
+			sprintf(timesince, "%s", separateByCommas(stats1.PropertyData.NightclubData.SafeCashValue));
+			sprintf(max_speed, "%i%", (int)stats1.PropertyData.NightclubData.Popularity);
+			sprintf(seats, "$%i", (int)stats1.PropertyData.NightclubData.EntryCost);
+			sprintf(price, "%i", (int)stats1.PropertyData.BusinessHubData.Upgrades);
+			sprintf(make, "%i", (int)stats1.PropertyData.BusinessHubData.TotalSoldProduct.Data);
+			sprintf(make2, "%i", (int)stats1.PropertyData.NightclubData.CroudVariation);
+			//drawSprite(preview.dict, preview.texture, x + 0.3545595, y + -0.139, 0.1493f, 0.10f, { 255, 255, 255, 255 }, 0.0f);
+			draw_info_text("Safe Cash", timesince, 1, 0, true);
+			draw_info_text("Popularity", max_speed, 1, 0);
+			draw_info_text("Entry Cost", seats, 2, 0);
+			draw_info_text("Upgrades", price, 3, 0);
+			draw_info_text("Total Sold Product", make, 4, 0);
+			draw_info_text("Croud Variation", make, 5, 0);
+
+
+
+			switch (g_Render->ThemeIterator) {
+			case 0:
+				col = { 138, 43, 226, 255 };
+				break;
+			case 1:
+				col = { 255, 108, 116, 255 };
+				break;
+			case 2:
+				col = { 15, 82, 186, 255 };
+				break;
+			case 3:
+				col = { 24, 26, 24, 255 };
+				break;
+			case 4:
+				col = { 0, 155, 119, 255 };
+				break;
+			case 5:
+				col = { 70, 38, 180, 255 };
+			case 6:
+				col = { 255, 145, 164, 255 };
+				break;
+			case 7:
+				col = { 17, 17, 17, 255 };
+				break;
+			case 8:
+				col = { 234, 90, 81, 255 };
+				break;
+
+			}
+			GRAPHICS::DRAW_RECT(x - 0.510, y + -0.000, 0.183, -0.002, g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255, false);
+			GRAPHICS::DRAW_RECT(xfr, y + -0.000, 0.183f, -0.002, g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255, false);
+		}
 		void draw_info2(Hash hash) {
 			
 			float x = g_Render->m_PosX;
@@ -311,23 +400,7 @@ namespace Saint {
 
 			return { 0 };
 		}
-		std::string separateByCommas(int num) {
-			std::string numStr = std::to_string(num);
-			std::string result;
-			int count = 0;
-
-			// Iterate through the string from the right and add commas
-			for (int i = numStr.size() - 1; i >= 0; i--) {
-				result = numStr[i] + result;
-				count++;
-				if (count == 3 && i != 0) {
-					result = "," + result;
-					count = 0;
-				}
-			}
-
-			return result;
-		}
+		
 		
 		void draw_info(std::uint32_t player) {
 			Color m_InfoBG{ 0, 0, 0, 190 };

@@ -65,6 +65,7 @@ namespace Saint
 		std::size_t spacePos = str.find(' ');
 		str = str.substr(spacePos + 1);
 	}
+	
 	bool Command(std::string str, std::string check)
 	{
 		std::size_t found = str.find(' ');
@@ -98,6 +99,13 @@ namespace Saint
 		CloseClipboard();
 		GlobalFree(HG);
 	}
+	ImU32 RGBtoU32(int r, int g, int b)
+	{
+		float fr = (float)r / 255.0;
+		float fg = (float)g / 255.0;
+		float fb = (float)b / 255.0;
+		return ImGui::GetColorU32(ImVec4(fr, fg, fb, 1));
+	}
 	void LogScript::Tick()
 	{
 
@@ -109,7 +117,12 @@ namespace Saint
 					ImGui::SetWindowSize(ImGui::GetIO().DisplaySize);
 					ImGui::PushFont(g_D3DRenderer->m_HeaderFont);
 					auto DrawList = ImGui::GetWindowDrawList();
-					
+					D3D11_VIEWPORT viewport{};
+					float ScreenCenterX = viewport.Width / 2.0f;
+					float ScreenCenterY = viewport.Height / 2.0f;
+					if (g_Render->fov_circle) {
+						DrawList->AddCircle(ImVec2(ScreenCenterX, ScreenCenterY), float(80.f), RGBtoU32(255, 255, 255), 100.0f, 0.5f);
+					}
 					DrawList->AddText(ImVec2(m_XPosition, m_YPosition), ImColor(g_Render->m_HeaderTextColor.r, g_Render->m_HeaderTextColor.g, g_Render->m_HeaderTextColor.b, g_Render->m_HeaderTextColor.a), g_Render->m_CurrentSubMenuName);
 					ImGui::PopFont();
 				}

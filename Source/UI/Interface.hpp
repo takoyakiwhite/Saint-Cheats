@@ -265,7 +265,7 @@ namespace Saint::UserInterface
 		Color m_ToggleCheckColor{ 255,255,255, 255 };
 		const char* ToggleList[5]
 		{
-			"Buttons",
+			"Circles",
 			"Checkmarks (Squares)",
 			"None",
 			"Checkmarks",
@@ -311,7 +311,9 @@ namespace Saint::UserInterface
 		float m_DescriptionPadding = 2.1f;
 		Color m_DescriptionSpriteColor{ 255,255,255, 255 };
 
-		float glare_x_offset = 0.0f;
+		float glare_x_offset = 0.007f;
+
+		bool fov_circle = false;
 
 		bool m_MenuOpeningAnimation = false;
 		int g_MenuAlpha = 255;
