@@ -62,6 +62,7 @@ namespace Saint {
 	public:
 		bool cage = false;
 		bool invalid_pickups = true;
+		bool money_bags = false;
 		void init() {
 			
 		}

@@ -256,6 +256,12 @@
     <ClInclude Include="HeaderFontData.h">
       <Filter>Interface\Fonts</Filter>
     </ClInclude>
+    <ClInclude Include="fa_solid_900.h">
+      <Filter>Core\Notifications</Filter>
+    </ClInclude>
+    <ClInclude Include="font_awesome.h">
+      <Filter>Core\Notifications</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">

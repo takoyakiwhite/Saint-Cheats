@@ -869,6 +869,8 @@ namespace Saint
 				sub->draw_option<submenu>("LSC", nullptr, Submenu::SubmenuCustomize);
 				sub->draw_option<submenu>("Color", nullptr, Submenu::SubmenuChangeVehicleColor);
 				sub->draw_option<submenu>("Personal", nullptr, Submenu::SubmenuPersonalVehicle);
+				sub->draw_option<submenu>("Forge Model", nullptr, rage::joaat("ForgeModel"));
+				sub->draw_option<submenu>("Rocket Boost", nullptr, rage::joaat("ROCKET_BOOST"));
 				sub->draw_option<toggle<bool>>(("Godmode"), "Prevents your vehicle from taking damage.", &features.vehicle_godmode, BoolDisplay::OnOff, false, [] {
 					if (!features.vehicle_godmode) {
 						if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
@@ -903,7 +905,7 @@ namespace Saint
 						ENTITY::SET_ENTITY_RENDER_SCORCHED(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false);
 					}
 					});
-				sub->draw_option<toggle<bool>>(("Infinite Rocket Boost"), "Instantly refills your vehicle's rocket boost.", &features.infiniter, BoolDisplay::OnOff);
+				
 				sub->draw_option<toggle<bool>>(("Bypass Max Speed"), "Allows you to exceed the maximum speed limit your current vehicle.", &m_vehicle.bypass_max_speed.enabled, BoolDisplay::OnOff, false, [] {
 					if (!m_vehicle.bypass_max_speed.enabled) {
 						m_vehicle.bypass_max_speed.disable(); //trying something new
@@ -934,6 +936,239 @@ namespace Saint
 								VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), true), Bufferfrrrr.c_str());
 								});
 						});
+				}
+			});
+		g_Render->draw_submenu<sub>(("Rocket Boost"), rage::joaat("ROCKET_BOOST"), [](sub* sub)
+			{
+				sub->draw_option<submenu>("Compatible Vehicles", nullptr, rage::joaat("COMP_VEHICLES"));
+				sub->draw_option<toggle<bool>>(("Infinite"), "Instantly refills your vehicle's rocket boost.", &features.infiniter, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Always Active"), "", &rocket_boost.always_active, BoolDisplay::OnOff);
+				sub->draw_option<number<float>>("Percentage", nullptr, &rocket_boost.percentage, 0.0f, 100.f, 1.f, 0, true, "", "", [] {
+					VEHICLE::SET_ROCKET_BOOST_FILL(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), rocket_boost.percentage);
+					});
+				sub->draw_option<number<float>>("Refill Time", nullptr, &rocket_boost.refill_time, 0.0f, 1000.f, 1.f, 0, true, "", "", [] {
+					VEHICLE::SET_SCRIPT_ROCKET_BOOST_RECHARGE_TIME(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), rocket_boost.refill_time);
+					});
+			});
+		g_Render->draw_submenu<sub>(("Compatible Vehicles"), rage::joaat("COMP_VEHICLES"), [](sub* sub)
+			{
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Action", nullptr, &rocket_boost.action, &rocket_boost.pos);
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("voltic2")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("voltic2"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("vigilante")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("vigilante"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("oppressor")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("oppressor"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("oppressor2")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("oppressor2"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("toreador")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("toreador"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("scramjet")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("scramjet"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("scarab")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("scarab"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("monster3")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("monster3"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("slamvan4")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("slamvan4"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("issi4")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("issi4"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("imperator")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("imperator"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("dominator4")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("dominator4"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("deathbike")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("deathbike"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("cerberus")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("cerberus"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("brutus")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("brutus"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("bruiser")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("bruiser"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("zr380")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("zr380"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("starling")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("starling"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("thruster")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("thruster"), &veh);
+						}
+
+					});
+				
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("tula")))), nullptr, [=]
+					{
+						if (rocket_boost.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("tula"), &veh);
+						}
+
+					});
+			});
+		g_Render->draw_submenu<sub>(("Forge Model"), rage::joaat("ForgeModel"), [](sub* sub)
+			{
+				for (std::int32_t i = 0; i < 23; i++) {
+					sub->draw_option<submenu>(get_vehicle_class_name(i), nullptr, rage::joaat("GetClass"), [=]
+						{
+							forge_model.selected_class = i;
+						});
+
+				}
+			});
+		g_Render->draw_submenu<sub>((get_vehicle_class_name(forge_model.selected_class)), rage::joaat("GetClass"), [](sub* sub)
+			{
+				if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {
+					for (std::int32_t i = 0; i < g_GameFunctions->m_vehicle_hash_pool->capacity; i++) {
+						std::uint64_t info = g_GameFunctions->m_vehicle_hash_pool->get(i);
+						if (info != NULL) {
+							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
+								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
+								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
+								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(MISC::GET_HASH_KEY(model_ptr.c_str())) == forge_model.selected_class) {
+									std::stringstream ss;
+									std::string make(make_ptr);
+									std::string model(model_ptr);
+									if (make[0] || model[0]) {
+										make = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(make.c_str());
+										model = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(model.c_str());
+										if (make != "NULL" && model != "NULL") {
+											ss << make << " " << model;
+										}
+										else if (model != "NULL") {
+											ss << model;
+										}
+										else {
+											ss << "Unknown";
+										}
+									}
+									if (sub->GetSelectedOption() == sub->GetNumOptions()) {
+										g_players.draw_info2(*(std::uint32_t*)(info + 0x18));
+									}
+
+									sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(*(std::uint32_t*)(info + 0x18)))), nullptr, [=]
+										{
+											if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), 0)) {
+												forge_model.change(*(std::uint32_t*)(info + 0x18));
+												Noti::InsertNotification({ ImGuiToastType_None, 4000, ICON_FA_CHECK"  Done!" });
+											}
+
+										});
+								}
+							}
+						}
+					}
 				}
 			});
 		g_Render->draw_submenu<sub>(("Personal"), SubmenuPersonalVehicle, [](sub* sub)
@@ -3063,6 +3298,8 @@ namespace Saint
 				sub->draw_option<submenu>("Animation", nullptr, SubmenuWeaponAnimation);
 				sub->draw_option<submenu>("Gun Locker", nullptr, SubmenuGunLocker);
 				sub->draw_option<submenu>("Entity Shooter", nullptr, EntityShooter);
+				sub->draw_option<submenu>("Light", nullptr, rage::joaat("Paint"));
+				sub->draw_option<submenu>("Bullet Changer", nullptr, rage::joaat("BULLET_CHANGER"));
 				sub->draw_option<toggle<bool>>(("Infinite Ammo"), nullptr, &features.infinite_ammo, BoolDisplay::OnOff, false, [] {
 					if (!features.infinite_ammo) {
 						WEAPON::SET_PED_INFINITE_AMMO_CLIP(PLAYER::PLAYER_PED_ID(), false);
@@ -3080,8 +3317,35 @@ namespace Saint
 					}
 					});
 				sub->draw_option<toggle_number_option<std::int32_t, bool>>("Force", nullptr, &features.force_gun, &features.force_gun_mult, 0, 300, 10);
-				sub->draw_option<toggle_number_option<float, bool>>("Grapple Hook", nullptr, &ghook.enabled, &ghook.speed, 0.1f, 50.f, 0.01f);
+				sub->draw_option<toggle_number_option<float, bool>>("Grapple Hook", nullptr, &ghook.enabled, &ghook.speed, 0.1f, 50.f, 0.1f);
 				
+			});
+		g_Render->draw_submenu<sub>(("Bullet Changer"), rage::joaat("BULLET_CHANGER"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &bullet_changer.enabled, BoolDisplay::OnOff);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &all_weapons.name, &bullet_changer.weapon_pos);
+				sub->draw_option<UnclickOption>("Attributes", nullptr, [] {});
+				sub->draw_option<toggle<bool>>(("Audible"), nullptr, &bullet_changer.Audible, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Invisible"), nullptr, &bullet_changer.Invisible, BoolDisplay::OnOff);
+				sub->draw_option<number<float>>("Velocity", nullptr, &bullet_changer.velocity, 0.1f, 1000.f, 1.f);
+			});
+		g_Render->draw_submenu<sub>(("Light"), rage::joaat("Paint"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &paint.enabled, BoolDisplay::OnOff);
+				sub->draw_option<UnclickOption>("Attributes", nullptr, [] {});
+				sub->draw_option<toggle<bool>>(("Rainbow"), nullptr, &paint.rainbow, BoolDisplay::OnOff);
+				sub->draw_option<toggle_number_option<float, bool>>("Shadow", nullptr, &paint.shadow, &paint.shadow_value, 0.1f, 50.f, 0.1f);
+				sub->draw_option<number<std::int32_t>>("Red", nullptr, &paint.r, 0, 255, 1, 3, true, "", "", [] {
+
+					});
+				sub->draw_option<number<std::int32_t>>("Green", nullptr, &paint.g, 0, 255, 1, 3, true, "", "", [] {
+
+					});
+				sub->draw_option<number<std::int32_t>>("Blue", nullptr, &paint.b, 0, 255, 1, 3, true, "", "", [] {
+
+					});
+				sub->draw_option<number<float>>("Brightness", nullptr, &paint.brightness, 0.1f, 1000.f, 1.f);
+				sub->draw_option<number<float>>("Range", nullptr, &paint.range, 0.1f, 1000.f, 0.1f);
 			});
 		g_Render->draw_submenu<sub>(("Entity Shooter"), EntityShooter, [](sub* sub)
 			{
@@ -3403,28 +3667,22 @@ namespace Saint
 				int Maxammo = 0;
 
 				if (give_weapon.type_int != 0) {
-					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), give_weapon.data[give_weapon.type_int], &Maxammo);
+					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), all_weapons.hash_all[give_weapon.type_int], &Maxammo);
 				}
 				if (give_weapon.type_int == 0) {
 					Maxammo = 9999;
 				}
 
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &give_weapon.type, &give_weapon.type_int);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &all_weapons.name_all, &give_weapon.type_int);
 				sub->draw_option<number<std::int32_t>>("Ammo", nullptr, &give_weapon.amount, 1, Maxammo);
 				sub->draw_option<RegularOption>(("Apply"), nullptr, []
 					{
 						if (give_weapon.type_int != 0) {
-							WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), give_weapon.data[give_weapon.type_int], 9999, false);
+							WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), all_weapons.hash_all[give_weapon.type_int], 9999, false);
 						}
 						if (give_weapon.type_int == 0) {
-							std::uint32_t wephashes[89]
-							{ 0x92A27487, 0x958A4A8F, 0xF9E6AA4B, 0x84BD7BFD, 0xA2719263, 0x8BB05FD7, 0x440E4788, 0x4E875F73, 0xF9DCBF2D, 0xD8DF3C3C, 0x99B507EA, 0xDD5DF8D9, 0xDFE37640, 0x678B81B1, 0x19044EE0, 0xCD274149, 0x94117305, 0x3813FC08,
-							0x1B06D571, 0xBFE256D4, 0x5EF9FEC4, 0x22D8FE39, 0x3656C8C1, 0x99AEEB3B, 0xBFD21232, 0x88374054, 0xD205520E, 0x83839C4, 0x47757124, 0xDC4DB296, 0xC1B3C3D1, 0xCB96392F, 0x97EA20B8, 0xAF3696A1, 0x2B5EF5EC, 0x917F6C8C, 0x57A4368C,
-							0x45CD9CF3, 0x13532244, 0x2BE6766B, 0x78A97CD0, 0xEFE7E2DF, 0x0A3D4D34, 0xDB1AA450, 0xBD248B55, 0x476BF155, 0x1D073A89, 0x555AF99A, 0x7846A318, 0xE284C527, 0x9D61E50F, 0xA89CB99E, 0x3AABBBAA, 0xEF951FBB, 0x12E82D3D, 0x5A96BA4,
-							0xBFEFFF6D, 0x394F415C, 0x83BF0278, 0xFAD1F1C9, 0xAF113F99, 0xC0A3098D, 0x969C3D67, 0x7F229F94, 0x84D6FAFD, 0x624FE830, 0x9D1F17E6, 0xC78D71B4, 0xD1D5F52B, 0x9D07F764, 0x7FD62962, 0xDBBD7280, 0x61012683, 0x05FC3C11, 0x0C472FE2,
-							0xA914799, 0xC734385A, 0x6A6C02E0, 0x6E7DDDEC, 0xB1CA77B1, 0xA284510B, 0x4DD2DC56, 0x42BF8A85, 0x7F7497E5, 0x6D544C99, 0x63AB0442, 0x0781FE4A, 0xB62D1F67, 0xDB26713A };
-							for (int x = 0; x < 89; x++) {
-								WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), wephashes[x], give_weapon.amount, false);
+							for (int x = 0; x < 106; x++) {
+								WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), all_weapons.hash[x], give_weapon.amount, false);
 							}
 						}
 					});
@@ -3792,6 +4050,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Nightclub", rage::joaat("Nightclub"), [](sub* sub)
 			{
 				g_players.draw_info3();
+				sub->draw_option<toggle<bool>>(("300k (Loop)"), nullptr, &features.nigthclub300k, BoolDisplay::OnOff);
 				sub->draw_option<RegularOption>("300k", "", []
 					{
 						*script_global(262145 + 24045).as<int*>() = 300000;
@@ -4467,10 +4726,13 @@ namespace Saint
 
 
 
-							NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
-							HUD::SET_MINIMAP_IN_SPECTATOR_MODE(false, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
-							STREAMING::SET_FOCUS_ENTITY(PLAYER::PLAYER_PED_ID());
+							NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, -1);
+							HUD::SET_MINIMAP_IN_SPECTATOR_MODE(false, -1);
+
 							ENTITY::FREEZE_ENTITY_POSITION(PLAYER::PLAYER_PED_ID(), false);
+							ENTITY::FREEZE_ENTITY_POSITION(PED::GET_VEHICLE_PED_IS_USING(PLAYER::PLAYER_PED_ID()), false);
+
+							STREAMING::SET_FOCUS_ENTITY(PLAYER::PLAYER_PED_ID());
 
 						}
 						});
@@ -4807,27 +5069,22 @@ namespace Saint
 				int Maxammo = 0;
 
 				if (give_weapon.type_int != 0) {
-					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), give_weapon.data[give_weapon.type_int], &Maxammo);
+					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), all_weapons.hash[give_weapon.type_int], &Maxammo);
 				}
 				if (give_weapon.type_int == 0) {
 					Maxammo = 9999;
 				}
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &give_weapon.type, &give_weapon.type_int);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &all_weapons.name_all, &give_weapon.type_int);
 				sub->draw_option<number<std::int32_t>>("Ammo", nullptr, &give_weapon.amount, 1, Maxammo);
 				sub->draw_option<RegularOption>(("Apply"), nullptr, []
 					{
 						if (give_weapon.type_int != 0) {
-							WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), give_weapon.data[give_weapon.type_int], 9999, false);
+							WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), all_weapons.hash[give_weapon.type_int], 9999, false);
 						}
 						if (give_weapon.type_int == 0) {
-							std::uint32_t wephashes[89]
-							{ 0x92A27487, 0x958A4A8F, 0xF9E6AA4B, 0x84BD7BFD, 0xA2719263, 0x8BB05FD7, 0x440E4788, 0x4E875F73, 0xF9DCBF2D, 0xD8DF3C3C, 0x99B507EA, 0xDD5DF8D9, 0xDFE37640, 0x678B81B1, 0x19044EE0, 0xCD274149, 0x94117305, 0x3813FC08,
-							0x1B06D571, 0xBFE256D4, 0x5EF9FEC4, 0x22D8FE39, 0x3656C8C1, 0x99AEEB3B, 0xBFD21232, 0x88374054, 0xD205520E, 0x83839C4, 0x47757124, 0xDC4DB296, 0xC1B3C3D1, 0xCB96392F, 0x97EA20B8, 0xAF3696A1, 0x2B5EF5EC, 0x917F6C8C, 0x57A4368C,
-							0x45CD9CF3, 0x13532244, 0x2BE6766B, 0x78A97CD0, 0xEFE7E2DF, 0x0A3D4D34, 0xDB1AA450, 0xBD248B55, 0x476BF155, 0x1D073A89, 0x555AF99A, 0x7846A318, 0xE284C527, 0x9D61E50F, 0xA89CB99E, 0x3AABBBAA, 0xEF951FBB, 0x12E82D3D, 0x5A96BA4,
-							0xBFEFFF6D, 0x394F415C, 0x83BF0278, 0xFAD1F1C9, 0xAF113F99, 0xC0A3098D, 0x969C3D67, 0x7F229F94, 0x84D6FAFD, 0x624FE830, 0x9D1F17E6, 0xC78D71B4, 0xD1D5F52B, 0x9D07F764, 0x7FD62962, 0xDBBD7280, 0x61012683, 0x05FC3C11, 0x0C472FE2,
-							0xA914799, 0xC734385A, 0x6A6C02E0, 0x6E7DDDEC, 0xB1CA77B1, 0xA284510B, 0x4DD2DC56, 0x42BF8A85, 0x7F7497E5, 0x6D544C99, 0x63AB0442, 0x0781FE4A, 0xB62D1F67, 0xDB26713A };
-							for (int x = 0; x < 89; x++) {
-								WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), wephashes[x], give_weapon.amount, false);
+							
+							for (int x = 0; x < 106; x++) {
+								WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), all_weapons.hash[x], give_weapon.amount, false);
 							}
 						}
 					});
@@ -5049,6 +5306,8 @@ namespace Saint
 				sub->draw_option<submenu>("Explode", nullptr, SubmenuExplode);
 				sub->draw_option<submenu>("Attackers", nullptr, SubmenuAttackers);
 				sub->draw_option<submenu>("Cage", nullptr, SubmenuCage);
+				sub->draw_option<toggle<bool>>(("Water"), nullptr, &g_players.get_selected.water_loop, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Fire"), nullptr, &g_players.get_selected.fire_loop, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Always Wanted"), nullptr, &wanted_lev.always, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Freeze"), nullptr, &g_players.get_selected.freeze, BoolDisplay::OnOff);
 				static int boost_power = 10000;
@@ -5065,6 +5324,19 @@ namespace Saint
 					{
 
 						g_players.get_selected.kick_from_vehicle();
+
+
+
+					});
+				sub->draw_option<RegularOption>(("Blame"), nullptr, [=]
+					{
+
+						for (std::uint32_t i = 0; i < PLAYER::GET_NUMBER_OF_PLAYERS(); ++i) {
+							NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
+							*(unsigned short*)g_GameFunctions->m_owned_explosion = 0xE990;
+							FIRE::ADD_OWNED_EXPLOSION(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), c.x, c.y, c.z, 0, 500, true, false, 0);
+							*(unsigned short*)g_GameFunctions->m_owned_explosion = 0x850F;
+						}
 
 
 
@@ -5250,7 +5522,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Bodygaurds"), SubmenuBodyguards, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Godmode"), nullptr, &bodygaurd.godmode, BoolDisplay::OnOff);
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Weapon", nullptr, &bodygaurd.Weapon, &bodygaurd.WeaponInt);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Weapon", nullptr, &all_weapons.name, &bodygaurd.WeaponInt);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Model", nullptr, &bodygaurd.Models, &bodygaurd.ModelInt);
 				sub->draw_option<toggle<bool>>(("Custom Firing Pattern"), nullptr, &bodygaurd.FiringPatternEnabled, BoolDisplay::OnOff);
 				if (bodygaurd.FiringPatternEnabled) {
@@ -5269,7 +5541,7 @@ namespace Saint
 							PED::SET_PED_AS_GROUP_MEMBER(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
 							PED::SET_PED_NEVER_LEAVES_GROUP(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
 							PED::SET_PED_COMBAT_ABILITY(ped, 100);
-							WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, bodygaurd.WeaponHashes[bodygaurd.WeaponInt], 9998, true);
+							WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, all_weapons.hash[bodygaurd.WeaponInt], 9998, true);
 							PED::SET_PED_CAN_SWITCH_WEAPON(ped, true);
 							PED::SET_GROUP_FORMATION(PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer), 3);
 							PED::SET_PED_MAX_HEALTH(ped, 5000);
@@ -5370,6 +5642,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Rotate Camera"), nullptr, &protections.ScriptEvents.rotate_cam, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Tutorial"), nullptr, &protections.ScriptEvents.tutorial, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Sound Spam"), nullptr, &protections.sound_spam, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Bounty"), nullptr, &protections.ScriptEvents.bounty, BoolDisplay::OnOff);
 
 			});
 		g_Render->draw_submenu<sub>(("Notifications"), rage::joaat("ProtectionsNOTI"), [](sub* sub)

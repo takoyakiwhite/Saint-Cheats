@@ -889,7 +889,7 @@ namespace Saint
 				if (evnt.hash == args[0]) {
 					
 					char g_RemoveWeapons[64];
-					sprintf(g_RemoveWeapons, "%s tried to send the event '%s'", sender_name, evnt.name.c_str());
+					sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender_name, evnt.name.c_str());
 					g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
 					switch (protections.reaction.type_2) {
 					case 0:
@@ -915,7 +915,7 @@ namespace Saint
 		if (protections.Crashes.fragment) {
 			if (auto ptr = *reinterpret_cast<uintptr_t*>(a5 + 0x70); ptr)
 				if (auto ptr2 = *reinterpret_cast<uintptr_t*>(ptr + 8 * a2); !ptr2) {
-					protections.push_notification2("Prevented Crash | Fragment");
+					protections.push_notification2(ICON_FA_SHIELD_ALT"  Prevented Crash | Fragment");
 					return false;
 				}
 		}
@@ -925,7 +925,7 @@ namespace Saint
 	{
 		if (protections.Crashes.train) {
 			if (!*reinterpret_cast<void**>(a1 + 0x38)) {
-				protections.push_notification2("Prevented Crash | Train");
+				protections.push_notification2(ICON_FA_SHIELD_ALT"  Prevented Crash | Train");
 				return 0;
 			}
 		}
@@ -936,7 +936,7 @@ namespace Saint
 		if (object_type < eNetObjType::NET_OBJ_TYPE_AUTOMOBILE || object_type > eNetObjType::NET_OBJ_TYPE_TRAIN)
 		{
 			if (protections.Crashes.entity) {
-				protections.push_notification2("Prevented crash | Entity");
+				protections.push_notification2(ICON_FA_SHIELD_ALT"  Prevented crash | Entity");
 				return true;
 			}
 		}
@@ -949,7 +949,7 @@ namespace Saint
 		if (object_type < eNetObjType::NET_OBJ_TYPE_AUTOMOBILE || object_type > eNetObjType::NET_OBJ_TYPE_TRAIN)
 		{
 			if (protections.Crashes.object) {
-				protections.push_notification2("Prevented crash | Object");
+				protections.push_notification2(ICON_FA_SHIELD_ALT"  Prevented crash | Object");
 				return eAckCode::ACKCODE_FAIL;
 			}
 		}
@@ -957,7 +957,7 @@ namespace Saint
 		if (auto net_obj = g_GameFunctions->m_get_net_object(mgr, object_id, true); net_obj && net_obj->m_object_type != (int16_t)object_type)
 		{
 			if (protections.Crashes.object) {
-				protections.push_notification2("Prevented crash | Object");
+				protections.push_notification2(ICON_FA_SHIELD_ALT"  Prevented crash | Object");
 				return eAckCode::ACKCODE_FAIL;
 			}
 		}
@@ -969,7 +969,7 @@ namespace Saint
 	{
 		if (protections.Crashes.fragment) {
 			if (!a1 || !a2) {
-				protections.push_notification2("Prevented Crash | Fragment");
+				protections.push_notification2(ICON_FA_SHIELD_ALT"  Prevented Crash | Fragment");
 				return false;
 			}
 		}
@@ -983,7 +983,7 @@ namespace Saint
 		if (protections.Crashes.object) {
 
 			if (Lists::crash_model_check(node->m_model)) {
-				protections.push_notification2("Prevented crash | Object");
+				protections.push_notification2(ICON_FA_SHIELD_ALT"  Prevented crash | Object");
 				return true;
 			}
 
@@ -1002,7 +1002,7 @@ namespace Saint
 			v8 = *(uint64_t**)(a1 + 0x50);
 
 			if (!is_valid_ptr(v8)) {
-				protections.push_notification("Prevented Crash | Player");
+				protections.push_notification(ICON_FA_SHIELD_ALT"  Prevented Crash | Player");
 				return;
 			}
 
@@ -1019,11 +1019,11 @@ namespace Saint
 		auto result = static_cast<decltype(&hk_ped_creation_data_node)>(g_Hooking->ped_creation)(node);
 		if (protections.Crashes.ped) {
 			if (Lists::crash_model_check(node->m_model)) {
-				protections.push_notification("Prevented crash | Ped");
+				protections.push_notification(ICON_FA_SHIELD_ALT"  Prevented crash | Ped");
 				return true;
 			}
 			else if (Lists::crash_model_check(node->m_prop_model)) {
-				protections.push_notification("Prevented crash | Ped");
+				protections.push_notification(ICON_FA_SHIELD_ALT"  Prevented crash | Ped");
 				return true;
 			}
 		}

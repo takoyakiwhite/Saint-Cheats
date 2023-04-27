@@ -104,6 +104,7 @@ namespace Saint
 		ImGui::GetIO().Fonts->AddFontDefault();
 		ImFontConfig font_cfg;
 		m_DefaultFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Arial.ttf", 19.f, &font_cfg);
+		Noti::MergeIconsWithLatestFont(17.f, false);
 	}
 
 	D3DRenderer::~D3DRenderer() noexcept

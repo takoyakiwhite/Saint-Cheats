@@ -7,13 +7,17 @@
 
 #include "ImGui/imgui.h"
 #include "UI/Interface.hpp"
+#include "font_awesome.h"
+#include "fa_solid_900.h"
+#include "FiberHelper.hpp"
+#include <set>
 #define NOTIFY_MAX_MSG_LENGTH			4096		// Max message content length
 #define NOTIFY_PADDING_X				5.f		// Bottom-left X padding
 #define NOTIFY_PADDING_Y				1330.f		// Bottom-left Y padding
 #define NOTIFY_PADDING_MESSAGE_Y		4.f		// Padding Y between each message
 #define NOTIFY_FADE_IN_OUT_TIME			1050			// Fade in and out duration
-#define NOTIFY_DEFAULT_DISMISS			3000		// Auto dismiss after X ms (default, applied only of no data provided in constructors)
-#define NOTIFY_OPACITY					0.5f		// 0-1 Toast opacity
+#define NOTIFY_DEFAULT_DISMISS			5000		// Auto dismiss after X ms (default, applied only of no data provided in constructors)
+#define NOTIFY_OPACITY					0.8f		// 0-1 Toast opacity
 #define NOTIFY_TOAST_FLAGS				ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing
 // Comment out if you don't want any separator between title and content
 #define NOTIFY_USE_SEPARATOR
@@ -64,7 +68,7 @@ private:
 	char			title[NOTIFY_MAX_MSG_LENGTH];
 	char			content[NOTIFY_MAX_MSG_LENGTH];
 	char			content2[NOTIFY_MAX_MSG_LENGTH];
-	int				dismiss_time = NOTIFY_DEFAULT_DISMISS;
+	int				dismiss_time = 2000;
 	uint64_t		creation_time = 0;
 
 private:
@@ -150,7 +154,9 @@ public:
 	NOTIFY_INLINE auto get_content() -> char* { return this->content; };
 
 	NOTIFY_INLINE auto get_elapsed_time() { return GetTickCount64() - this->creation_time; }
-
+	NOTIFY_INLINE auto get_dismiss_time() -> const int {
+		return this->dismiss_time;
+	}
 	NOTIFY_INLINE auto get_phase() -> const ImGuiToastPhase&
 	{
 		const auto elapsed = get_elapsed_time();
@@ -198,7 +204,7 @@ public:
 		IM_ASSERT(type < ImGuiToastType_COUNT);
 
 		this->type = type;
-		this->dismiss_time = dismiss_time;
+		this->dismiss_time = 2000;
 		this->creation_time = GetTickCount64();
 
 		memset(this->title, 0, sizeof(this->title));
@@ -224,7 +230,8 @@ namespace Saint {
 		{
 
 
-			if (notifications.size() < 15) {
+
+			if (notifications.size() < 10) {
 				notifications.push_back(toast);
 			}
 		}
@@ -269,9 +276,9 @@ namespace Saint {
 				const auto content = current_toast->get_content();
 				const auto default_title = current_toast->get_default_title();
 				const auto opacity = current_toast->get_fade_percent(); // Get opacity based of the current phase
-
 				const auto time = current_toast->get_elapsed_time();
-
+				std::string content_s = current_toast->get_content();
+				int length = content_s.length();
 				// Window rendering
 				auto text_color = current_toast->get_color();
 				text_color.w = opacity;
@@ -281,12 +288,9 @@ namespace Saint {
 				char window_name[50];
 				sprintf_s(window_name, "##TOAST%d", i);
 
-
-
-
 				//ImGui::PushStyleColor(ImGuiCol_Text, text_color);
 
-				ImGui::SetNextWindowBgAlpha(opacity);
+
 				ImGui::SetNextWindowPos(ImVec2(vp_size.x - NOTIFY_PADDING_X, vp_size.y - NOTIFY_PADDING_Y - height), ImGuiCond_Always, ImVec2(1.0f, 1.0f));
 				ImGui::SetNextWindowSize(ImVec2(NULL, 50), 0);
 				ImGui::Begin(window_name, NULL, NOTIFY_TOAST_FLAGS);
@@ -295,14 +299,18 @@ namespace Saint {
 				{
 
 
+
+
 					ImDrawList* draw_list = ImGui::GetWindowDrawList();
 					ImVec2 panelPos = ImGui::GetWindowPos();
 					auto height = ImGui::GetWindowHeight();
 					ImGui::PushTextWrapPos(vp_size.x / 3.f); // We want to support multi-line text, this will wrap the text after 1/3 of the screen width
 					for (int i = 0; i < height; i++)
 					{
-
-						draw_list->AddRectFilled(ImVec2(panelPos.x, panelPos.y + i), ImVec2(panelPos.x + 5, panelPos.y + 4), ImU32(ImColor(g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255)));
+						int timefr = time / 11.7f;
+						draw_list->AddRectFilled(ImVec2(panelPos.x, panelPos.y + i), ImVec2(panelPos.x + 5, panelPos.y + 90), ImU32(ImColor(g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255)));
+						//line
+						draw_list->AddRectFilled(ImVec2(panelPos.x + 5.5, panelPos.y + i + 48), ImVec2(panelPos.x + 350 - timefr, panelPos.y + 99), ImU32(ImColor(255, 255, 255, 255)));
 
 					}
 
@@ -310,7 +318,7 @@ namespace Saint {
 
 
 
-					ImGui::InvisibleButton("##123", ImVec2(1, panelPos.y), 0); ImGui::SameLine(); 
+					ImGui::InvisibleButton("##123", ImVec2(1, panelPos.y), 0); ImGui::SameLine();
 					ImGui::Text(content); ImGui::SameLine(); ImGui::InvisibleButton("##1234", ImVec2(1, panelPos.y), 0);
 
 
@@ -331,6 +339,18 @@ namespace Saint {
 		/// Adds font-awesome font, must be called ONCE on initialization
 		/// <param name="FontDataOwnedByAtlas">Fonts are loaded from read-only memory, should be set to false!</param>
 		/// </summary>
+		/// 
+		NOTIFY_INLINE VOID MergeIconsWithLatestFont(float font_size, bool FontDataOwnedByAtlas = false)
+		{
+			static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+
+			ImFontConfig icons_config;
+			icons_config.MergeMode = true;
+			icons_config.PixelSnapH = true;
+			icons_config.FontDataOwnedByAtlas = FontDataOwnedByAtlas;
+
+			ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)fa_solid_900, sizeof(fa_solid_900), font_size, &icons_config, icons_ranges);
+		}
 
 	}
 

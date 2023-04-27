@@ -30,9 +30,11 @@
     <ClInclude Include="Discord\Discord_RPC.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Explode.h" />
+    <ClInclude Include="fa_solid_900.h" />
     <ClInclude Include="Features.h" />
     <ClInclude Include="FiberHelper.hpp" />
     <ClInclude Include="Flash Blip.h" />
+    <ClInclude Include="font_awesome.h" />
     <ClInclude Include="HeaderFontData.h" />
     <ClInclude Include="hex_memory.h" />
     <ClInclude Include="Hooks.h" />

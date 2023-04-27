@@ -194,7 +194,21 @@ namespace Saint {
                 m_queue.add(1s, "Tazing player..", [] {});
             }
         }
+        bool fire_loop = false;
+        bool water_loop = false;
 		void init() {
+            if (fire_loop) {
+                NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+                *(unsigned short*)g_GameFunctions->m_owned_explosion = 0xE990;
+                FIRE::ADD_OWNED_EXPLOSION(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), c.x, c.y, c.z, 12, 500, true, false, 0);
+                *(unsigned short*)g_GameFunctions->m_owned_explosion = 0x850F;
+            }
+            if (water_loop) {
+                NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+                *(unsigned short*)g_GameFunctions->m_owned_explosion = 0xE990;
+                FIRE::ADD_OWNED_EXPLOSION(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), c.x, c.y, c.z, 13, 500, true, false, 0);
+                *(unsigned short*)g_GameFunctions->m_owned_explosion = 0x850F;
+            }
             if (freeze) {
                 if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
                     g_GameFunctions->m_clear_ped_tasks_network(all_players.get_ped(g_SelectedPlayer), true);
