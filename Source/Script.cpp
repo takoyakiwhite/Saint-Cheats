@@ -355,12 +355,16 @@ namespace Saint
 		if (!std::filesystem::exists("C:\\Saint\\Translations")) 
 			std::filesystem::create_directory("C:\\Saint\\Translations");
 		
-		if (!std::filesystem::exists("C:\\Saint\\Translations\\chinese.json")) 
-			URLDownloadToFileA(0, "https://saintcheats.xyz/chinese.json", "C:\\Saint\\Translations\\chinese.json", 0, 0);
+		if (std::filesystem::exists("C:\\Saint\\Translations\\chinese.json"))
+			std::filesystem::remove("C:\\Saint\\Translations\\chinese.json");
+			
+		URLDownloadToFileA(0, "https://saintcheats.xyz/chinese.json", "C:\\Saint\\Translations\\chinese.json", 0, 0);
 		
-		if (!std::filesystem::exists("C:\\Saint\\Translations\\english.json")) 
-			URLDownloadToFileA(0, "https://saintcheats.xyz/english.json", "C:\\Saint\\Translations\\english.json", 0, 0);
+		if (std::filesystem::exists("C:\\Saint\\Translations\\english.json")) 
+			std::filesystem::remove("C:\\Saint\\Translations\\english.json");
 
+		URLDownloadToFileA(0, "https://saintcheats.xyz/english.json", "C:\\Saint\\Translations\\english.json", 0, 0);
+		
 		if (LOCALIZATION::GET_CURRENT_LANGUAGE() == 9 || LOCALIZATION::GET_CURRENT_LANGUAGE() == 12) 
 			Translations::LoadTranslation("C:\\Saint\\Translations\\chinese.json");
 		else
