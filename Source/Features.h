@@ -27,6 +27,9 @@ namespace Saint {
 	inline std::string replaceTextBuffer2 = "";
 	inline bool replaced = false;
 	inline bool replaced2 = false;
+	inline CVehicle* get_ped_vehicle() {
+		return (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle;
+	}
 	inline bool raycast_with_cam(Cam cam, NativeVector3& raycastHitCoords) {
 		bool raycastHit;
 		NativeVector3 surfaceNormal;
@@ -598,6 +601,23 @@ namespace Saint {
 		}
 		return false;
 	}
+	inline std::string separateByCommas2(int num) {
+		std::string numStr = std::to_string(num);
+		std::string result;
+		int count = 0;
+
+		// Iterate through the string from the right and add commas
+		for (int i = numStr.size() - 1; i >= 0; i--) {
+			result = numStr[i] + result;
+			count++;
+			if (count == 3 && i != 0) {
+				result = "," + result;
+				count = 0;
+			}
+		}
+
+		return result;
+	}
 	class Features {
 	public:
 		bool vehicle_godmode = false;
@@ -607,6 +627,8 @@ namespace Saint {
 		bool teleport_gun = false;
 		const char* teleport_gun_type[2] = { "Smooth", "Rough" };
 		std::size_t teleport_gun_int = 0;
+		const char* veh_density[2] = { "None", "Normal" };
+		std::size_t vden_pos = 0;
 		bool delete_gun = false;
 		bool infinite_ammo = false;
 		bool spectate = false;
@@ -657,7 +679,32 @@ namespace Saint {
 		bool hide_map = false;
 		bool use_stunt_jump_camera = false;
 		bool nigthclub300k = false;
+		bool stop_cut = false;
+		bool no_grav_veh = false;
+		bool clean_veh = false;
+		float forklight_height = 0.0f;
+		bool can_be_used_by_peds = false;
+		bool ragdoll_on_q = false;
+		std::size_t bullet_int = 0;
 		void init() {
+			if (ragdoll_on_q) {
+				if (GetAsyncKeyState(0x51) & 1) {
+					NativeVector3 v = ENTITY::GET_ENTITY_FORWARD_VECTOR(PLAYER::PLAYER_PED_ID());
+					PED::SET_PED_TO_RAGDOLL_WITH_FALL(PLAYER::PLAYER_PED_ID(), 1500, 2000, 1, -v.x, -v.y, -v.z, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
+				}
+			}
+			if (can_be_used_by_peds) {
+				VEHICLE::SET_VEHICLE_CAN_BE_USED_BY_FLEEING_PEDS(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true);
+			}
+			if (clean_veh) {
+				VEHICLE::SET_VEHICLE_DIRT_LEVEL(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 0.0);
+			}
+			if (no_grav_veh) {
+				VEHICLE::SET_VEHICLE_GRAVITY(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false);
+			}
+			if (stop_cut) {
+				CUTSCENE::STOP_CUTSCENE_IMMEDIATELY();
+			}
 			if (nigthclub300k) {
 				*script_global(262145 + 24045).as<int*>() = 300000;
 				*script_global(262145 + 24041).as<int*>() = 300000;
@@ -1394,7 +1441,7 @@ namespace Saint {
 		void remove_exclude(int slot) {
 			excluded[slot] = false;
 		}
-		void flag_as_modder(int slot, int slot2, bool manual = false) {
+		void flag_as_modder(int slot, int slot2, bool manual = false, const char* reason = "") {
 			if (excluded[slot]) {
 
 			}
@@ -1411,7 +1458,7 @@ namespace Saint {
 					}
 					else {
 						char input2[64];
-						sprintf(input2, "%s marked as cheater", g_GameVariables->m_net_game_player(slot2)->m_player_info->m_net_player_data.m_name);
+						sprintf(input2, "%s marked as cheater | %s", g_GameVariables->m_net_game_player(slot2)->m_player_info->m_net_player_data.m_name, reason);
 						Noti::InsertNotification({ ImGuiToastType_None, 2000, input2 });
 						cheater[slot] = true;
 					}
@@ -1457,7 +1504,7 @@ namespace Saint {
 						if (tiny_ped) {
 							if (PED::GET_PED_CONFIG_FLAG(ped, 223, true)) {
 
-								flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+								flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Tiny Ped");
 							}
 						}
 						bool godmodec = false;
@@ -1470,14 +1517,14 @@ namespace Saint {
 						if (fly) {
 							if (ENTITY::GET_ENTITY_SPEED(ped) > 77.0f) {
 								if (!PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
-									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Fly");
 								}
 							}
 						}
 						if (scenarios) {
 							if (PED::GET_PED_CONFIG_FLAG(ped, 194, true)) {
 
-								flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+								flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Scenario");
 							}
 						}
 						Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(ped, false);
@@ -1532,7 +1579,7 @@ namespace Saint {
 										if (!PED::IS_PED_IN_ANY_PLANE(ped) && !PED::IS_PED_IN_ANY_HELI(ped)) {
 											if (!VEHICLE::IS_ROCKET_BOOST_ACTIVE(PED::GET_VEHICLE_PED_IS_IN(ped, false))) {
 												if (PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
-													flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+													flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Vehicle Speed");
 
 
 												}
@@ -1552,7 +1599,7 @@ namespace Saint {
 											if (!PED::IS_PED_IN_ANY_PLANE(ped) && !PED::IS_PED_IN_ANY_HELI(ped)) {
 												if (!VEHICLE::IS_ROCKET_BOOST_ACTIVE(PED::GET_VEHICLE_PED_IS_IN(ped, false))) {
 													if (PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
-														flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+														flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Vehicle Speed");
 
 
 													}
@@ -1573,7 +1620,7 @@ namespace Saint {
 											if (!PED::IS_PED_IN_ANY_PLANE(ped) && !PED::IS_PED_IN_ANY_HELI(ped)) {
 												if (!VEHICLE::IS_ROCKET_BOOST_ACTIVE(PED::GET_VEHICLE_PED_IS_IN(ped, false))) {
 													if (PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
-														flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+														flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Vehicle Speed");
 
 
 													}
@@ -1594,7 +1641,7 @@ namespace Saint {
 									if (!PED::IS_PED_IN_ANY_PLANE(ped) && !PED::IS_PED_IN_ANY_HELI(ped)) {
 										if (!VEHICLE::IS_ROCKET_BOOST_ACTIVE(PED::GET_VEHICLE_PED_IS_IN(ped, false))) {
 											if (PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
-												flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+												flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Vehicle Speed");
 											}
 										}
 
@@ -1608,7 +1655,7 @@ namespace Saint {
 							if (ENTITY::GET_ENTITY_SPEED(PED::GET_VEHICLE_PED_IS_IN(ped, false)) > 161 && speed) {
 								if (!PED::IS_PED_IN_ANY_PLANE(ped) && !PED::IS_PED_IN_ANY_HELI(ped)) {
 									if (PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
-										flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+										flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Vehicle Speed");
 									}
 
 								}
@@ -1619,7 +1666,7 @@ namespace Saint {
 
 						if (PLAYER::GET_PLAYER_FAKE_WANTED_LEVEL(ped) == 6 && wantedlevel) {
 
-							flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+							flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Fly");
 						}
 						if (godmodec && godmode) {
 
@@ -4825,8 +4872,18 @@ namespace Saint {
 	inline ShotGunMode m_shotgun;
 	class HandTrail {
 	public:
+		void ParticleOnBone(const char* dict, const char* particle, PedBones bone, float scale, bool color = false, float r = 1.f, float g = 1.f, float b = 1.f)
+		{
+			STREAMING::REQUEST_NAMED_PTFX_ASSET(dict);
+			GRAPHICS::USE_PARTICLE_FX_ASSET(dict);
+			GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE(particle, PLAYER::PLAYER_PED_ID(), 0.00f, 0.00f, 0.00f, 0.00f, 0.00f, 0.0f, bone, scale, TRUE, TRUE, TRUE);
+			if (color)
+				GRAPHICS::SET_PARTICLE_FX_NON_LOOPED_COLOUR(r, g, b);
+			STREAMING::REMOVE_PTFX_ASSET();
+		}
+
 		const char* type[2] = { "Normal", "Sphere" };
-		std::size_t size = 1;
+		std::size_t size = 0;
 		bool enabled = false;
 		bool rainbow = false;
 		int r = 255;
@@ -4834,50 +4891,47 @@ namespace Saint {
 		int b = 255;
 		void init() {
 			if (enabled) {
-				if (rainbow) {
-					if (r > 0 && b == 0) {
-						r--;
-						g++;
-					}
-					if (g > 0 && r == 0) {
-						g--;
-						b++;
-					}
-					if (b > 0 && g == 0) {
-						r++;
-						b--;
-					}
-				}
 				if (size == 0) {
-					STREAMING::REQUEST_NAMED_PTFX_ASSET("scr_powerplay");
-					g_CallbackScript->AddCallback<PTFXCallback>("scr_powerplay", [=] {
-
-						GRAPHICS::USE_PARTICLE_FX_ASSET("scr_powerplay");
-					int handle = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("sp_powerplay_beast_appear_trails", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 28422, 0.5f, 0, 0, 0);
-					
-
-
-
-					GRAPHICS::USE_PARTICLE_FX_ASSET("scr_powerplay");
-					int handle1 = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("sp_powerplay_beast_appear_trails", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 60309, 0.5f, 0, 0, 0);
-					
-						});
+					if (rainbow) {
+						if (r > 0 && b == 0) {
+							r--;
+							g++;
+						}
+						if (g > 0 && r == 0) {
+							g--;
+							b++;
+						}
+						if (b > 0 && g == 0) {
+							r++;
+							b--;
+						}
+					}
+					float r2 = r / 255.f;
+					float g2 = g / 255.f;
+					float b2 = b / 255.f;
+					ParticleOnBone("scr_powerplay", "sp_powerplay_beast_appear_trails", SKEL_L_Hand, 0.2f, true, r2, g2, b2);
+					ParticleOnBone("scr_powerplay", "sp_powerplay_beast_appear_trails", SKEL_R_Hand, 0.2f, true, r2, g2, b2);
 				}
 				if (size == 1) {
-					STREAMING::REQUEST_NAMED_PTFX_ASSET("scr_indep_fireworks");
-					g_CallbackScript->AddCallback<PTFXCallback>("scr_indep_fireworks", [=] {
-
-						GRAPHICS::USE_PARTICLE_FX_ASSET("scr_indep_fireworks");
-						
-					int handle = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("scr_indep_firework_sparkle_spawn", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 28422, 0.5f, 0, 0, 0);
-					
-
-
-
-					GRAPHICS::USE_PARTICLE_FX_ASSET("scr_indep_fireworks");
-					int handle1 = GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("scr_indep_firework_sparkle_spawn", PLAYER::PLAYER_PED_ID(), 0, 0, 0, 0, 0, 0, 60309, 0.5f, 0, 0, 0);
-					
-						});
+					if (rainbow) {
+						if (r > 0 && b == 0) {
+							r--;
+							g++;
+						}
+						if (g > 0 && r == 0) {
+							g--;
+							b++;
+						}
+						if (b > 0 && g == 0) {
+							r++;
+							b--;
+						}
+					}
+					float r2 = r / 255.f;
+					float g2 = g / 255.f;
+					float b2 = b / 255.f;
+					ParticleOnBone("scr_indep_fireworks", "scr_indep_firework_sparkle_spawn", SKEL_L_Hand, 0.5f, true, r2, g2, b2);
+					ParticleOnBone("scr_indep_fireworks", "scr_indep_firework_sparkle_spawn", SKEL_R_Hand, 0.5f, true, r2, g2, b2);
 				}
 			}
 		}
@@ -5245,17 +5299,26 @@ namespace Saint {
 		};
 	};
 	enum ModelClass {
-		AmbientFemale,
-		AmbientMale,
+		Beach,
+		Fat,
+		Pedestrain,
+		Bodybuilder,
+		Rich,
+		Special,
+		Business,
+		Gang,
 		Animal,
-		Cutscene,
-		GangFemale,
-		GangMale,
-		Multiplayer,
-		ScenarioFemale,
-		Emergency,
-		Players,
+		Known,
+		Prison,
+		Construction,
 		Story,
+		Medical,
+		Military,
+		Police,
+		CIA,
+		Althedic,
+		Main,
+		Casino,
 	};
 	class modelHandler {
 	public:
@@ -5359,22 +5422,134 @@ namespace Saint {
 	class ModelChanger {
 	public:
 		std::vector<modelHandler> m_GetModels = {
-			{ "a_f_m_beach_01", "Beach", ModelClass::AmbientFemale },
-			{ "a_f_m_bodybuild_01", "Bodybuilder", ModelClass::AmbientFemale },
-			{ "a_m_m_acult_01", "Cult", ModelClass::AmbientMale },
-			{ "a_m_m_afriamer_01", "Friamer", ModelClass::AmbientMale },
 
-			//Emergency
-			{ "s_m_y_cop_01", "Cop (Male)", ModelClass::Emergency },
-			{ "s_f_y_cop_01", "Cop (Female)", ModelClass::Emergency },
-			{ "mp_m_fibsec_01", "FIB", ModelClass::Emergency },
-			{ "mp_s_m_armoured_01", "Guard", ModelClass::Emergency },
-			{ "mp_m_exarmy_01", "Ex-Army", ModelClass::Emergency },
-			{ "s_f_y_sheriff_01", "Sheriff (Female)", ModelClass::Emergency },
-			{ "s_m_m_ciasec_01", "CIA", ModelClass::Emergency },
-			{ "s_m_m_security_01", "Security", ModelClass::Emergency },
-			{ "s_m_y_ranger_01", "Ranger", ModelClass::Emergency },
-			{ "s_m_y_swat_01", "Swat", ModelClass::Emergency },
+			{ "a_f_m_beach_01", "Bikini (Female)", ModelClass::Beach },
+			{ "a_f_y_beach_01", "Bikini (With Extra Stuff)", ModelClass::Beach },
+			{ "a_f_m_bevhills_01", "Beverly Hills", ModelClass::Rich },
+			{ "a_f_m_bevhills_02", "Beverly Hills 2", ModelClass::Rich },
+			{ "a_f_y_bevhills_01", "Beverly Hills 3", ModelClass::Rich },
+			{ "a_f_y_bevhills_02", "Beverly Hills 4", ModelClass::Rich },
+			{ "a_f_y_bevhills_03", "Beverly Hills 5", ModelClass::Rich },
+			{ "a_f_y_bevhills_04", "Beverly Hills 6", ModelClass::Rich },
+
+			{ "a_f_m_bodybuild_01", "Bikini (Semi-Fat)", ModelClass::Bodybuilder },
+
+			{ "a_f_m_business_02", "Regular Female", ModelClass::Business },
+
+			{ "a_f_m_downtown_01", "Downtown", ModelClass::Pedestrain },
+			{ "a_f_m_eastsa_01", "East SA", ModelClass::Pedestrain },
+			{ "a_f_m_eastsa_02", "East SA", ModelClass::Pedestrain },
+			{ "a_f_m_ktown_01", "KTown", ModelClass::Pedestrain },
+			{ "a_f_m_ktown_02", "KTown 2", ModelClass::Pedestrain },
+			{ "a_f_m_salton_01", "Salton", ModelClass::Pedestrain },
+
+			{ "a_f_m_fatbla_01", "Typical", ModelClass::Fat },
+			{ "a_f_m_fatcult_01", "Cult", ModelClass::Fat },
+			{ "a_f_m_fatwhite_01", "White", ModelClass::Fat },
+			{ "a_f_m_prolhost_01", "Prolouge Hostage", ModelClass::Known },
+			{ "a_f_m_skidrow_01", "Skid Row", ModelClass::Pedestrain },
+			{ "a_f_m_soucent_01", "Soucent", ModelClass::Pedestrain },
+			{ "a_f_m_soucent_02", "Soucent 2", ModelClass::Pedestrain },
+			{ "a_f_o_soucent_01", "Soucent 3", ModelClass::Pedestrain },
+			{ "a_f_o_soucent_02", "Soucent 4", ModelClass::Pedestrain },
+			{ "a_f_m_soucentmc_01", "Soucent (MC)", ModelClass::Pedestrain },
+			{ "a_f_m_tourist_01", "Tourist", ModelClass::Pedestrain },
+			{ "a_f_m_tramp_01", "Tramp", ModelClass::Fat },
+			{ "a_f_m_trampbeac_01", "Tramp Beach", ModelClass::Beach },
+			{ "a_f_o_genstreet_01", "Gen Street", ModelClass::Pedestrain },
+			{ "a_f_o_indian_01", "Indian", ModelClass::Special },
+			{ "a_f_o_ktown_01", "KTown 3", ModelClass::Pedestrain },
+			{ "a_f_o_salton_01", "Salton 2", ModelClass::Pedestrain },
+			{ "a_f_y_business_01", "Typical (With Cool Outfit)", ModelClass::Business },
+			{ "a_f_y_business_02", "Typical (Interesting Hair)", ModelClass::Business },
+			{ "a_f_y_business_03", "Full Black", ModelClass::Business },
+			{ "a_f_y_business_04", "White", ModelClass::Business },
+
+			//construction
+			{ "s_m_y_construct_01", "Greenish Vest", ModelClass::Construction },
+			{ "s_m_y_construct_02", "Orange Vest", ModelClass::Construction },
+
+			//military
+			{ "s_m_y_armymech_01", "Mech", ModelClass::Military },
+			{ "s_m_y_blackops_01", "Black Ops", ModelClass::Military },
+			{ "s_m_y_blackops_02", "Black Ops 2", ModelClass::Military },
+			{ "s_m_y_blackops_03", "Black Ops 3", ModelClass::Military },
+			{ "s_m_y_marine_01", "Marine", ModelClass::Military },
+			{ "s_m_y_marine_02", "Marine (Shirt Off)", ModelClass::Military },
+			{ "s_m_y_marine_03", "Marine 2", ModelClass::Military },
+			{ "mp_m_exarmy_01", "Ex-Army", ModelClass::Military },
+
+			//police
+			{ "s_m_y_cop_01", "Normal (Male)", ModelClass::Police },
+			{ "s_f_y_cop_01", "Normal (Female)", ModelClass::Police },
+			{ "s_m_y_ranger_01", "Ranger (Male)", ModelClass::Police },
+			{ "s_f_y_ranger_01", "Ranger (Female)", ModelClass::Police },
+			{ "s_m_y_sheriff_01", "Sheriff (Male)", ModelClass::Police },
+			{ "s_f_y_sheriff_01", "Sheriff (Female)", ModelClass::Police },
+			{ "s_m_m_snowcop_01", "Snow", ModelClass::Police },
+			{ "s_m_y_hwaycop_01", "Highway", ModelClass::Police },
+			{ "s_m_y_swat_01", "Swat", ModelClass::Police },
+			{ "ig_casey", "Casey", ModelClass::Police },
+
+			//medical
+			{ "s_f_y_scrubs_01", "Scrubs (Female)", ModelClass::Medical },
+			{ "s_m_y_autopsy_01", "Autopsy", ModelClass::Medical },
+			{ "s_m_m_paramedic_01", "Paramedic", ModelClass::Medical },
+			{ "s_m_m_doctor_01", "Doctor", ModelClass::Medical },
+			{ "u_m_y_corpse_01", "Corpse", ModelClass::Medical },
+			{ "u_f_y_corpse_01", "Corpse 2", ModelClass::Medical },
+			{ "u_f_y_corpse_02", "Corpse 3", ModelClass::Medical },
+			{ "u_f_m_corpse_01", "Corpse 4", ModelClass::Medical },
+
+			//cia
+			{ "ig_karen_daniels", "Karen Daniels", ModelClass::CIA },
+			{ "ig_josh", "Josh", ModelClass::CIA },
+			{ "ig_michelle", "Michelle", ModelClass::CIA },
+			{ "s_m_m_fibsec_01", "Secruity", ModelClass::CIA },
+			{ "s_m_m_ciasec_01", "Secruity 2", ModelClass::CIA },
+			{ "cs_davenorton", "Dave Nortan", ModelClass::CIA },
+
+			//special
+			{ "u_m_y_zombie_01", "Zombie", ModelClass::Special },
+			{ "u_m_y_rsranger_01", "Space Ranger", ModelClass::Special },
+			{ "u_m_y_juggernaut_01", "Doomsday Juggernaut", ModelClass::Special },
+			{ "u_m_y_mani", "Mani", ModelClass::Special },
+			{ "u_m_y_pogo_01", "Pogo", ModelClass::Special },
+			{ "u_m_y_imporage", "Impotent Rage", ModelClass::Special },
+			{ "u_m_m_streetart_01", "Street Tart", ModelClass::Special },
+			{ "ig_orleans", "Bigfoot", ModelClass::Special },
+			{ "ig_johnnyklebitz", "Johhny Klebitz", ModelClass::Special },
+			{ "s_m_y_mime", "Mime", ModelClass::Special },
+			{ "s_m_y_clown_01", "Clown (Kyro)", ModelClass::Special },
+			{ "s_m_m_movspace_01", "Astronaut", ModelClass::Special },
+			{ "s_m_m_movalien_01", "Alien", ModelClass::Special },
+			{ "mp_m_niko_01", "Niko", ModelClass::Special },
+			{ "mp_m_marston_01", "Marston", ModelClass::Special },
+			{ "cs_bradcadaver", "Brad Cadaver", ModelClass::Special },
+			{ "u_m_m_jesus_01", "Jesus", ModelClass::Special },
+
+			//prison
+			{ "csb_rashcosvki", "Rashcovski", ModelClass::Prison },
+			{ "u_m_y_prisoner_01", "Inmate", ModelClass::Prison },
+			{ "s_m_y_prismuscl_01", "Inmate (No Shirt)", ModelClass::Prison },
+			{ "s_m_y_prismuscl_01", "Inmate 2", ModelClass::Prison },
+
+			//main
+			{ "mp_m_freemode_01", "Freemode (Male)", ModelClass::Main },
+			{ "mp_f_freemode_01", "Freemode (Female)", ModelClass::Main },
+			{ "player_zero", "Micheal", ModelClass::Main },
+			{ "player_two", "Trevor", ModelClass::Main },
+			{ "player_two", "Franklin", ModelClass::Main },
+
+			//casino
+			{ "csb_agatha", "Agatha Baker", ModelClass::Casino },
+			{ "csb_tomcasino", "Tom", ModelClass::Casino },
+			{ "csb_vincent", "Vincent", ModelClass::Casino },
+			{ "csb_tonyprince", "Tony Prince", ModelClass::Casino },
+			{ "u_f_m_casinocash_01", "Cash (Female)", ModelClass::Casino },
+			{ "u_f_m_casinoshop_01", "Shop", ModelClass::Casino },
+			{ "s_f_y_casino_01", "Assistant (Female)", ModelClass::Casino },
+			{ "s_m_y_casino_01", "Assistant (Male)", ModelClass::Casino },
 
 			//animals
 
@@ -5412,23 +5587,13 @@ namespace Saint {
 			{ "a_c_shepherd", "Shepherd", ModelClass::Animal },
 			{ "a_c_stingray", "Stringray", ModelClass::Animal },
 			{ "a_c_westy", "Westy", ModelClass::Animal },
-
-			{ "ig_brad", "Brad", ModelClass::Story },
-			{ "ig_floyd", "Floyd", ModelClass::Story },
-			{ "ig_amandatownley", "Amanda Townley", ModelClass::Story },
-			{ "ig_jimmydisanto", "Jimmy", ModelClass::Story },
-			{ "ig_chrisformage", "Chris Formage", ModelClass::Story },
-
-			{ "mp_m_freemode_01", "MP (Male)", ModelClass::Players },
-			{ "mp_f_freemode_01", "MP (Female)", ModelClass::Players },
-			{ "player_one", "Franklin", ModelClass::Players },
-			{ "player_zero", "Michael", ModelClass::Players },
-			{ "player_two", "Trevor", ModelClass::Players },
 		};
 		GetClasses get_classes;
 		int selected_class = 0;
-		int size = 11;
-		const char* get_class_name[11] = {"Ambient Female", "Ambient Male", "Animal", "Cutscene", "Gang Female", "Gang Male", "Multiplayer", "Scenario Female", "Emergency", "Player", "Story"};
+		int size = 19;
+		const char* get_class_name[20] = {"Beach", "Fat", "Pedestrain", "Bodybuilder", "Rich", "Special", "Business", "Gang", "Animal", "Known", "Prison", "Construction", "Story", "Medical", "Military/Army", "Police", "CIA/FIB/IAA", "Althedic", 
+		"Main Characters", "Casino"
+		};
 		
 		
 		bool change(const Hash hash)
@@ -5666,12 +5831,12 @@ namespace Saint {
 		int roll = 0;
 		void stop() {
 			features.spectate = false;
-			NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
-			HUD::SET_MINIMAP_IN_SPECTATOR_MODE(false, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
+			
 			NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(roll));
 			HUD::SET_MINIMAP_IN_SPECTATOR_MODE(false, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(roll));
 			STREAMING::SET_FOCUS_ENTITY(PLAYER::PLAYER_PED_ID());
-			ENTITY::FREEZE_ENTITY_POSITION(PLAYER::PLAYER_PED_ID(), false);
+			TASK::CLEAR_PED_TASKS_IMMEDIATELY(PLAYER::PLAYER_PED_ID());
+			
 		}
 		void random() {
 			features.spectate = false;
@@ -6086,6 +6251,8 @@ namespace Saint {
 			}
 		}
 	};
+	inline int bike_lean = 0;
+	inline int bike_lean2 = 0;
 	inline BulletChanger bullet_changer;
 	class RocketBoost {
 	public:
@@ -6102,7 +6269,41 @@ namespace Saint {
 		}
 	};
 	inline RocketBoost rocket_boost;
+	class Doors {
+	public:
+		const char* action[3] = { "Open", "Close", "Delete"};
+		std::size_t pos;
+	};
+	inline Doors doors;
+	class Cargobob {
+	public:
+		bool magnet = false;
+		float strength;
+		float eraidus;
+		float falloff;
+		void init() {
+			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+			if (magnet) {
+				VEHICLE::SET_CARGOBOB_PICKUP_MAGNET_ACTIVE(veh, true);
+			}
+		}
+	};
+	inline Cargobob cargobob;
+	class jforce {
+	public:
+		bool increase = false;
+		const char* action[2] = { "View", "Spawn" };
+		std::size_t pos;
+		void init() {
+			if (increase) {
+				VEHICLE::SET_USE_HIGHER_CAR_JUMP(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true);
+			}
+		}
+	};
+	inline jforce jump_force;
 	inline void FeatureInitalize() {
+		jump_force.init();
+		cargobob.init();
 		rocket_boost.init();
 		bullet_changer.init();
 		paint.init();

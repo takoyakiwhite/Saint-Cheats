@@ -497,6 +497,7 @@ namespace Saint
 					});
 				sub->draw_option<toggle<bool>>(("Walk Underwater"), "Disables the swimming animation.", &features.walk_underwater, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Push Water Away"), "Pushes water away from you.", &features.push_water_away, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Ragdoll On Q"), "", &features.ragdoll_on_q, BoolDisplay::OnOff);
 				sub->draw_option<number<std::int32_t>>("Wanted Level", nullptr, &i_hate_niggers, 0, 5, 1, 3, true, "", "", [] {
 					(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_wanted_level = i_hate_niggers;
 					});
@@ -595,6 +596,17 @@ namespace Saint
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &g_HandTrails.enabled, BoolDisplay::OnOff);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &g_HandTrails.type, &g_HandTrails.size);
+				sub->draw_option<UnclickOption>(("Color"), nullptr, [] {});
+				sub->draw_option<toggle<bool>>(("Rainbow"), nullptr, &g_HandTrails.rainbow, BoolDisplay::OnOff);
+				sub->draw_option<number<std::int32_t>>("Red", nullptr, &g_HandTrails.r, 0, 255, 1, 3, true, "", "", [] {
+
+					});
+				sub->draw_option<number<std::int32_t>>("Green", nullptr, &g_HandTrails.g, 0, 255, 1, 3, true, "", "", [] {
+
+					});
+				sub->draw_option<number<std::int32_t>>("Blue", nullptr, &g_HandTrails.b, 0, 255, 1, 3, true, "", "", [] {
+
+					});
 			});
 		g_Render->draw_submenu<sub>(("Outfit Editor"), SubmenuOutfitEditor, [](sub* sub)
 			{
@@ -871,6 +883,10 @@ namespace Saint
 				sub->draw_option<submenu>("Personal", nullptr, Submenu::SubmenuPersonalVehicle);
 				sub->draw_option<submenu>("Forge Model", nullptr, rage::joaat("ForgeModel"));
 				sub->draw_option<submenu>("Rocket Boost", nullptr, rage::joaat("ROCKET_BOOST"));
+				sub->draw_option<submenu>("Jump Force", nullptr, rage::joaat("JUNPFORCE"));
+				sub->draw_option<submenu>("Bike Lean", nullptr, rage::joaat("BIKE_LEAN"));
+				sub->draw_option<submenu>("Doors", nullptr, rage::joaat("DOORS"));
+				//sub->draw_option<submenu>("Cargobob", nullptr, rage::joaat("CARGO_BOB"));
 				sub->draw_option<toggle<bool>>(("Godmode"), "Prevents your vehicle from taking damage.", &features.vehicle_godmode, BoolDisplay::OnOff, false, [] {
 					if (!features.vehicle_godmode) {
 						if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
@@ -898,6 +914,11 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Keep Engine On"), "Prevents your vehicle's engine from being turned off when exiting.", &features.keep_engine_on, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("No Plane Turbulence"), "Removes your plane's turbulance. When turning off, it can make turbulance levels a little messed up.", &NoPlaneTurbulance, BoolDisplay::OnOff);
 				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>(auto_repair.name, "Automaticly repairs you're vehicle.", &features.auto_repair, &features.auto_repair_type, &features.get_repair_type);
+				sub->draw_option<toggle<bool>>(("Can Be Used By Fleeing Peds"), nullptr, &features.can_be_used_by_peds, BoolDisplay::OnOff, false, [] {
+					if (!features.can_be_used_by_peds) {
+						VEHICLE::SET_VEHICLE_CAN_BE_USED_BY_FLEEING_PEDS(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false);
+					}
+					});
 				sub->draw_option<toggle<bool>>(("Remove Deformation"), "Removes deformation from you're vehicle.", &features.remove_def, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Stick To Ground"), "Creates a weird wheel effect, and makes it so you're vehicle stays on the ground.", &features.stick_to_ground, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Burned"), "Displays you're vehicle as destroyed like you blew it up.", &features.burned, BoolDisplay::OnOff, false, [] {
@@ -928,15 +949,266 @@ namespace Saint
 						GRAPHICS::USE_SNOW_WHEEL_VFX_WHEN_UNSHELTERED(false);
 					}
 					});
+				sub->draw_option<toggle<bool>>(("No Gravity"), nullptr, &features.no_grav_veh, BoolDisplay::OnOff, false, [] {
+					if (!features.no_grav_veh) {
+						VEHICLE::SET_VEHICLE_GRAVITY(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true);
+					}
+					});
+				sub->draw_option<toggle<bool>>(("Auto Clean"), "", &features.clean_veh, BoolDisplay::OnOff);
 				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false)) {
 					sub->draw_option<KeyboardOption>(("Liscene Plate"), nullptr, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), true)), []
 						{
 
 							showKeyboard("Enter Something", "", 8, &Bufferfrrrr, [=] {
-								VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), true), Bufferfrrrr.c_str());
+								VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), Bufferfrrrr.c_str());
 								});
 						});
 				}
+				sub->draw_option<number<float>>("Forklift Height", nullptr, &features.forklight_height, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
+					VEHICLE::SET_FORKLIFT_FORK_HEIGHT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), features.forklight_height);
+					});
+				
+			});
+		g_Render->draw_submenu<sub>(("Jump Force"), rage::joaat("JUNPFORCE"), [](sub* sub)
+			{
+				sub->draw_option<submenu>("Compatible Vehicles", nullptr, rage::joaat("COMPVEHICLES2"));
+				sub->draw_option<toggle<bool>>(("Increase"), "", &jump_force.increase, BoolDisplay::OnOff, false, [] {
+					if (!jump_force.increase) {
+						VEHICLE::SET_USE_HIGHER_CAR_JUMP(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false);
+					}
+				});
+			});
+		g_Render->draw_submenu<sub>(("Compatible Vehicles"), rage::joaat("COMPVEHICLES2"), [](sub* sub)
+			{
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Action", nullptr, &jump_force.action, &jump_force.pos);
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("ruiner2")))), nullptr, [=]
+					{
+						if (jump_force.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("ruiner2"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("scramjet")))), nullptr, [=]
+					{
+						if (jump_force.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("scramjet"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("scarab")))), nullptr, [=]
+					{
+						if (jump_force.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("scarab"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("monster3")))), nullptr, [=]
+					{
+						if (jump_force.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("monster3"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("slamvan4")))), nullptr, [=]
+					{
+						if (jump_force.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("slamvan4"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("issi4")))), nullptr, [=]
+					{
+						if (jump_force.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("issi4"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("imperator")))), nullptr, [=]
+					{
+						if (jump_force.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("imperator"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("dominator4")))), nullptr, [=]
+					{
+						if (jump_force.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("dominator4"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("deathbike")))), nullptr, [=]
+					{
+						if (jump_force.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("deathbike"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("cerberus")))), nullptr, [=]
+					{
+						if (jump_force.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("cerberus"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("brutus")))), nullptr, [=]
+					{
+						if (jump_force.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("brutus"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("bruiser")))), nullptr, [=]
+					{
+						if (jump_force.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("bruiser"), &veh);
+						}
+
+					});
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("zr380")))), nullptr, [=]
+					{
+						if (jump_force.pos == 1) {
+							Vehicle veh;
+							veh_spawner.spawn(MISC::GET_HASH_KEY("zr380"), &veh);
+						}
+
+					});
+			});
+		g_Render->draw_submenu<sub>(("Cargobob"), rage::joaat("CARGO_BOB"), [](sub* sub)
+			{
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				sub->draw_option<toggle<bool>>(("Magnet"), nullptr, &cargobob.magnet, BoolDisplay::OnOff, false, [=] {
+					if (!cargobob.magnet) {
+						VEHICLE::SET_CARGOBOB_PICKUP_MAGNET_ACTIVE(veh, false);
+						
+					}
+					});
+				sub->draw_option<number<float>>("Strength", nullptr, &cargobob.strength, 0.0f, 1000.f, 1.f, 0, true, "", "", [=] {
+					VEHICLE::SET_CARGOBOB_PICKUP_MAGNET_STRENGTH(veh, cargobob.strength);
+					});
+				sub->draw_option<number<float>>("Effect Radius", nullptr, &cargobob.eraidus, 0.0f, 1000.f, 1.f, 0, true, "", "", [=] {
+					VEHICLE::SET_CARGOBOB_PICKUP_MAGNET_FALLOFF(veh, cargobob.eraidus);
+					});
+				sub->draw_option<number<float>>("Falloff", nullptr, &cargobob.falloff, 0.0f, 1000.f, 1.f, 0, true, "", "", [=] {
+					VEHICLE::SET_CARGOBOB_PICKUP_MAGNET_PULL_ROPE_LENGTH(veh, cargobob.falloff);
+					});
+				sub->draw_option<RegularOption>("Detach Current Vehicle From Magnet", nullptr, [=]
+					{
+						Vehicle get = VEHICLE::GET_VEHICLE_ATTACHED_TO_CARGOBOB(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false));
+						VEHICLE::DETACH_VEHICLE_FROM_CARGOBOB(get, PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false));
+
+					});
+			});
+		g_Render->draw_submenu<sub>(("Bike Lean"), rage::joaat("BIKE_LEAN"), [](sub* sub)
+			{
+				sub->draw_option<number<std::int32_t>>("X", nullptr, &bike_lean, -1, 1, 1, 3, true, "", "", [] {
+					VEHICLE::SET_BIKE_ON_STAND(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), bike_lean, bike_lean2);
+					});
+				sub->draw_option<number<std::int32_t>>("Y", nullptr, &bike_lean2, -1, 1, 1, 3, true, "", "", [] {
+					VEHICLE::SET_BIKE_ON_STAND(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), bike_lean, bike_lean2);
+					});
+			});
+		g_Render->draw_submenu<sub>(("Doors"), rage::joaat("DOORS"), [](sub* sub)
+			{
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Action", nullptr, &doors.action, &doors.pos);
+				sub->draw_option<RegularOption>("Driver Side (Front)", nullptr, [=]
+					{
+						if (doors.pos == 0) {
+							VEHICLE::SET_VEHICLE_DOOR_OPEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 0, true, false);
+						}
+						if (doors.pos == 1) {
+							VEHICLE::SET_VEHICLE_DOOR_SHUT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 0, false);
+						}
+						if (doors.pos == 2) {
+							VEHICLE::SET_VEHICLE_DOOR_BROKEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 0, true);
+						}
+
+					});
+				if (VEHICLE::GET_IS_DOOR_VALID(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 1)) {
+					sub->draw_option<RegularOption>("Driver Side (Rear)", nullptr, [=]
+						{
+							if (doors.pos == 0) {
+								VEHICLE::SET_VEHICLE_DOOR_OPEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 1, false, false);
+							}
+							if (doors.pos == 1) {
+								VEHICLE::SET_VEHICLE_DOOR_SHUT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 1, false);
+							}
+							if (doors.pos == 2) {
+								VEHICLE::SET_VEHICLE_DOOR_BROKEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 1, true);
+							}
+
+						});
+				}
+				if (VEHICLE::GET_IS_DOOR_VALID(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 2)) {
+					sub->draw_option<RegularOption>("Passenger Side (Front)", nullptr, [=]
+						{
+							if (doors.pos == 0) {
+								VEHICLE::SET_VEHICLE_DOOR_OPEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 2, false, false);
+							}
+							if (doors.pos == 1) {
+								VEHICLE::SET_VEHICLE_DOOR_SHUT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 2, false);
+							}
+							if (doors.pos == 2) {
+								VEHICLE::SET_VEHICLE_DOOR_BROKEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 2, true);
+							}
+
+						});
+				}
+				if (VEHICLE::GET_IS_DOOR_VALID(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 3)) {
+					sub->draw_option<RegularOption>("Passenger Side (Rear)", nullptr, [=]
+						{
+							if (doors.pos == 0) {
+								VEHICLE::SET_VEHICLE_DOOR_OPEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 3, false, false);
+							}
+							if (doors.pos == 1) {
+								VEHICLE::SET_VEHICLE_DOOR_SHUT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 3, false);
+							}
+							if (doors.pos == 2) {
+								VEHICLE::SET_VEHICLE_DOOR_BROKEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 3, true);
+							}
+
+						});
+				}
+				if (VEHICLE::GET_IS_DOOR_VALID(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 4)) {
+					sub->draw_option<RegularOption>("Hood", nullptr, [=]
+						{
+							if (doors.pos == 0) {
+								VEHICLE::SET_VEHICLE_DOOR_OPEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 4, false, false);
+							}
+							if (doors.pos == 1) {
+								VEHICLE::SET_VEHICLE_DOOR_SHUT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 4, false);
+							}
+							if (doors.pos == 2) {
+								VEHICLE::SET_VEHICLE_DOOR_BROKEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 4, true);
+							}
+
+						});
+				}
+				sub->draw_option<UnclickOption>(("Bomb Bay"), nullptr, [] {});
+				sub->draw_option<RegularOption>("Open", nullptr, [=]
+					{
+						VEHICLE::OPEN_BOMB_BAY_DOORS(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false));
+
+					});
+				sub->draw_option<RegularOption>("Close", nullptr, [=]
+					{
+						VEHICLE::CLOSE_BOMB_BAY_DOORS(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false));
+
+					});
 			});
 		g_Render->draw_submenu<sub>(("Rocket Boost"), rage::joaat("ROCKET_BOOST"), [](sub* sub)
 			{
@@ -3415,7 +3687,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Aimbot"), SubmenuAimbot, [](sub* sub)
 			{
-				sub->draw_option<submenu>("Excludes", nullptr, SubmenuAimbotExcludes);
+				//sub->draw_option<submenu>("Excludes", nullptr, SubmenuAimbotExcludes);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Bone", nullptr, &aimbot.bone, &aimbot.data);
 				//sub->draw_option<toggle<bool>>(("FOV Circle"), nullptr, &g_Render->fov_circle, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &aimbot.enabled, BoolDisplay::OnOff, false, [] {
@@ -4280,14 +4552,14 @@ namespace Saint
 				if (m_recovery.m_level.m_level < 1) {
 					m_recovery.m_level.m_level = 1;
 				}
-				sub->draw_option<KeyboardOption>(("Level"), nullptr, std::to_string(m_recovery.m_level.m_level), []
+				sub->draw_option<KeyboardOption>(("Value"), nullptr, std::to_string(m_recovery.m_level.m_level), []
 					{
 						showKeyboard("Enter Something", "", 4, &m_recovery.m_level.m_level_buffer, [] {
 
 
 							m_recovery.m_level.m_level = atoi(m_recovery.m_level.m_level_buffer.c_str());
 
-							});
+						});
 
 
 					});
@@ -4717,7 +4989,7 @@ namespace Saint
 				sub->draw_option<submenu>("Removals", nullptr, SubmenuRemoval);
 				sub->draw_option<submenu>("Chat", nullptr, SubmenuSelectedChat);
 				sub->draw_option<submenu>("Social Club", nullptr, SubmenuSocialClub);
-				sub->draw_option<submenu>("Block Actions", nullptr, rage::joaat("BlockActions"));
+				//sub->draw_option<submenu>("Block Actions", nullptr, rage::joaat("BlockActions"));
 				sub->draw_option<submenu>("More Information", nullptr, rage::joaat("MoreInformation"));
 				sub->draw_option<submenu>("Detections", nullptr, SubmenuSelectedDetections);
 				if (g_SelectedPlayer != PLAYER::PLAYER_ID()) {
@@ -4799,6 +5071,11 @@ namespace Saint
 					sub->draw_option<KeyboardOption>(("Invisible"), nullptr, stats3.IsInvisible ? "Yes" : "No", [] {});
 					sub->draw_option<KeyboardOption>(("Off Radar"), nullptr, stats3.OffRadarActive ? "Yes" : "No", [] {});
 					sub->draw_option<KeyboardOption>(("Yacht Name"), nullptr, stats3.YachtData.Appearance.Name.Data, [] {});
+					sub->draw_option<KeyboardOption>(("Nightclub Safe Cash"), nullptr, separateByCommas2(stats1.PropertyData.NightclubData.SafeCashValue), [] {});
+					sub->draw_option<KeyboardOption>(("Nightclub Entry Cost"), nullptr, std::to_string(stats1.PropertyData.NightclubData.EntryCost), [] {});
+					sub->draw_option<KeyboardOption>(("Nightclub Popularity"), nullptr, std::to_string((int)stats1.PropertyData.NightclubData.Popularity), [] {});
+					sub->draw_option<KeyboardOption>(("Bunker Research"), nullptr, std::to_string(stats1.PropertyData.TotalBunkerResearch), [] {});
+					sub->draw_option<KeyboardOption>(("Current Research Progress"), nullptr, std::to_string(stats1.PropertyData.CurrentBunkerResearchProgress), [] {});
 				}
 			});
 		g_Render->draw_submenu<sub>("Block Actions", rage::joaat("BlockActions"), [](sub* sub)
@@ -4914,6 +5191,108 @@ namespace Saint
 
 								Vehicle vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
 								VEHICLE::REMOVE_VEHICLE_MOD(vehicle, i);
+							}
+						}
+
+					});
+				sub->draw_option<RegularOption>("Clone", nullptr, [=]
+					{
+						Vehicle pedVeh = NULL;
+						Ped playerPed = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
+						if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, FALSE))
+						{
+							pedVeh = PED::GET_VEHICLE_PED_IS_IN(playerPed, FALSE);
+							if (ENTITY::DOES_ENTITY_EXIST(pedVeh))
+							{
+								
+								Hash vehicleModelHash = ENTITY::GET_ENTITY_MODEL(pedVeh);
+								*script_global(4540726).as<bool*>() = true;
+								g_CallbackScript->AddCallback<ModelCallback>(vehicleModelHash, [=]
+									{
+										
+										
+
+										Vehicle playerVeh;
+										NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::PLAYER_PED_ID(), { 0.f, 0.f, (VEHICLE::IS_THIS_MODEL_A_PLANE(vehicleModelHash) || VEHICLE::IS_THIS_MODEL_A_HELI(vehicleModelHash)) ? 1.0f + 50.f : 1.0f });
+										*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+										Vehicle vehicle = VEHICLE::CREATE_VEHICLE(vehicleModelHash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
+										spawned_veh.spawned.push_back({ HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicle))), vehicle });
+										playerVeh = vehicle;
+										*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+										DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+										auto networkId = NETWORK::VEH_TO_NET(vehicle);
+										if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
+											NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+										VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+										PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
+
+										int primaryColor, secondaryColor;
+										VEHICLE::GET_VEHICLE_COLOURS(pedVeh, &primaryColor, &secondaryColor);
+										VEHICLE::SET_VEHICLE_COLOURS(playerVeh, primaryColor, secondaryColor);
+										if (VEHICLE::GET_IS_VEHICLE_PRIMARY_COLOUR_CUSTOM(pedVeh))
+										{
+											int r, g, b;
+											VEHICLE::GET_VEHICLE_CUSTOM_PRIMARY_COLOUR(pedVeh, &r, &g, &b);
+											VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVeh, r, g, b);
+										}
+										if (VEHICLE::GET_IS_VEHICLE_SECONDARY_COLOUR_CUSTOM(pedVeh))
+										{
+											int r, g, b;
+											VEHICLE::GET_VEHICLE_CUSTOM_SECONDARY_COLOUR(pedVeh, &r, &g, &b);
+											VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(playerVeh, r, g, b);
+										}
+										if (VEHICLE::IS_THIS_MODEL_A_CAR(vehicleModelHash) || VEHICLE::IS_THIS_MODEL_A_BIKE(vehicleModelHash))
+										{
+											VEHICLE::SET_VEHICLE_MOD_KIT(playerVeh, 0);
+											VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, VEHICLE::GET_VEHICLE_WHEEL_TYPE(pedVeh));
+											for (int i = 0; i <= 24; i++)
+											{
+												if (i > 16 && i < 23)
+													VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, i, VEHICLE::IS_TOGGLE_MOD_ON(pedVeh, i));
+												else
+													VEHICLE::SET_VEHICLE_MOD(playerVeh, i, VEHICLE::GET_VEHICLE_MOD(pedVeh, i), VEHICLE::GET_VEHICLE_MOD_VARIATION(pedVeh, i));
+											}
+											int tireSmokeColor[3], pearlescentColor, wheelColor;
+											VEHICLE::GET_VEHICLE_TYRE_SMOKE_COLOR(pedVeh, &tireSmokeColor[0], &tireSmokeColor[1], &tireSmokeColor[2]);
+											VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, tireSmokeColor[0], tireSmokeColor[1], tireSmokeColor[2]);
+											VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(pedVeh));
+											VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(playerVeh, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(pedVeh));
+											VEHICLE::GET_VEHICLE_EXTRA_COLOURS(pedVeh, &pearlescentColor, &wheelColor);
+											VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, pearlescentColor, wheelColor);
+											if (VEHICLE::IS_VEHICLE_A_CONVERTIBLE(pedVeh, 0))
+											{
+												int convertableState = VEHICLE::GET_CONVERTIBLE_ROOF_STATE(pedVeh);
+												if (convertableState == 0 || convertableState == 3 || convertableState == 5)
+													VEHICLE::RAISE_CONVERTIBLE_ROOF(playerVeh, 1);
+												else
+													VEHICLE::LOWER_CONVERTIBLE_ROOF(playerVeh, 1);
+											}
+											for (int i = 0; i <= 3; i++)
+											{
+												VEHICLE::SET_VEHICLE_NEON_ENABLED(playerVeh, i, VEHICLE::GET_VEHICLE_NEON_ENABLED(pedVeh, i));
+											}
+											for (int i = 0; i <= 11; i++)
+											{
+												if (VEHICLE::DOES_EXTRA_EXIST(pedVeh, i))
+													VEHICLE::SET_VEHICLE_EXTRA(playerVeh, i, !VEHICLE::IS_VEHICLE_EXTRA_TURNED_ON(pedVeh, i));
+											}
+											if ((VEHICLE::GET_VEHICLE_LIVERY_COUNT(pedVeh) > 1) && VEHICLE::GET_VEHICLE_LIVERY(pedVeh) >= 0)
+											{
+												VEHICLE::SET_VEHICLE_LIVERY(playerVeh, VEHICLE::GET_VEHICLE_LIVERY(pedVeh));
+											}
+											int neonColor[3];
+											VEHICLE::GET_VEHICLE_NEON_COLOUR(pedVeh, &neonColor[0], &neonColor[1], &neonColor[2]);
+											VEHICLE::SET_VEHICLE_NEON_COLOUR(playerVeh, neonColor[0], neonColor[1], neonColor[2]);
+											VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, VEHICLE::GET_VEHICLE_WINDOW_TINT(pedVeh));
+											VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVeh, VEHICLE::GET_VEHICLE_DIRT_LEVEL(pedVeh));
+										}
+										
+									});
+								
+								
+								
+
+								
 							}
 						}
 
@@ -5306,6 +5685,7 @@ namespace Saint
 				sub->draw_option<submenu>("Explode", nullptr, SubmenuExplode);
 				sub->draw_option<submenu>("Attackers", nullptr, SubmenuAttackers);
 				sub->draw_option<submenu>("Cage", nullptr, SubmenuCage);
+				sub->draw_option<submenu>("Shoot Single Bullet", nullptr, rage::joaat("SHOOT_BULLET"));
 				sub->draw_option<toggle<bool>>(("Water"), nullptr, &g_players.get_selected.water_loop, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Fire"), nullptr, &g_players.get_selected.fire_loop, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Always Wanted"), nullptr, &wanted_lev.always, BoolDisplay::OnOff);
@@ -5361,6 +5741,22 @@ namespace Saint
 				//sub->draw_option<number<std::int32_t>>("Delay", nullptr, &Fake_drops.delay, 0, 5000, 50);
 
 
+			});
+		g_Render->draw_submenu<sub>(("Shoot Single Bullet"), rage::joaat("SHOOT_BULLET"), [](sub* sub) 
+			{
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Weapon", nullptr, &all_weapons.name, &features.bullet_int);
+				sub->draw_option<RegularOption>(("Shoot"), nullptr, [=]
+					{
+						std::int32_t hash = all_weapons.hash[features.bullet_int];
+						WEAPON::REQUEST_WEAPON_ASSET(hash, 31, 0);
+						g_FiberPool.queue([=] {
+							while (!WEAPON::HAS_WEAPON_ASSET_LOADED(hash))
+								fbr::cur()->wait();
+							});
+						NativeVector3 destination = PED::GET_PED_BONE_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), SKEL_ROOT, 0.0f, 0.0f, 0.0f);
+						NativeVector3 origin = PED::GET_PED_BONE_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), SKEL_R_Hand, 0.0f, 0.0f, 0.2f);
+						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(origin.x, origin.y, origin.z, destination.x, destination.y, destination.z, 1, 0, hash, PLAYER::PLAYER_PED_ID(), false, false, 100.f);
+					});
 			});
 		g_Render->draw_submenu<sub>(("Send To Interior"), SubmenuSendToInt, [](sub* sub) {
 			sub->draw_option<RegularOption>(("Casino"), nullptr, [=]
@@ -5811,6 +6207,16 @@ namespace Saint
 				sub->draw_option<submenu>("Sky", nullptr, rage::joaat("Sky"));
 				sub->draw_option<submenu>("Clouds", nullptr, rage::joaat("Clouds"));
 				sub->draw_option<submenu>("Ocean", nullptr, rage::joaat("Ocean"));
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Vehicle Density", nullptr, &features.veh_density, &features.vden_pos, true, -1, [] {
+					switch (features.vden_pos) {
+					case 0:
+						VEHICLE::SET_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME(0.0f);
+						break;
+					case 1:
+						VEHICLE::SET_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME(1.0f);
+						break;
+					}
+				});
 
 
 			});
@@ -5979,31 +6385,23 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Sync"), "", &time_gta.sync, BoolDisplay::OnOff, false, [] {});
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Unit", nullptr, &time_gta.type, &time_gta.pos);
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				
 				if (time_gta.pos == 0) {
-					sub->draw_option<RegularOption>("Add", nullptr, [=]
-						{
-
-							time_gta.add(0, 1, 0);
-
-
+					sub->draw_option<number<std::int32_t>>("Value", nullptr, &time_gta.second, 0, 60, 1, 3, true, "", "", [] {
+						NETWORK::NETWORK_OVERRIDE_CLOCK_TIME(time_gta.hour, time_gta.min, time_gta.second);
+						CLOCK::SET_CLOCK_TIME(time_gta.hour, time_gta.min, time_gta.second);
 						});
 				}
 				if (time_gta.pos == 1) {
-					sub->draw_option<RegularOption>("Add", nullptr, [=]
-						{
-
-							time_gta.add(1, 0, 0);
-
-
+					sub->draw_option<number<std::int32_t>>("Value", nullptr, &time_gta.min, 0, 60, 1, 3, true, "", "", [] {
+						NETWORK::NETWORK_OVERRIDE_CLOCK_TIME(time_gta.hour, time_gta.min, time_gta.second);
+						CLOCK::SET_CLOCK_TIME(time_gta.hour, time_gta.min, time_gta.second);
 						});
 				}
 				if (time_gta.pos == 2) {
-					sub->draw_option<RegularOption>("Add", nullptr, [=]
-						{
-
-							time_gta.add(0, 0, 1);
-
-
+					sub->draw_option<number<std::int32_t>>("Hour", nullptr, &time_gta.second, 0, 24, 1, 3, true, "", "", [] {
+						NETWORK::NETWORK_OVERRIDE_CLOCK_TIME(time_gta.hour, time_gta.min, time_gta.second);
+						CLOCK::SET_CLOCK_TIME(time_gta.hour, time_gta.min, time_gta.second);
 						});
 				}
 			});
@@ -6311,8 +6709,23 @@ namespace Saint
 				sub->draw_option<submenu>("Disables", nullptr, Disables);
 				sub->draw_option<submenu>("HUD", nullptr, rage::joaat("HUDFORT"));
 				sub->draw_option<submenu>("Phone", nullptr, rage::joaat("Phone"));
+				sub->draw_option<submenu>("Cutscene", nullptr, rage::joaat("Cutscene"));
 				//sub->draw_option<toggle<bool>>(("Use Stunt Jump Camera"), nullptr, &features.use_stunt_jump_camera, BoolDisplay::OnOff); dont work sadly
 
+			});
+		g_Render->draw_submenu<sub>("Cutscene", rage::joaat("Cutscene"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Stop (Loop)"), nullptr, &features.stop_cut, BoolDisplay::OnOff);
+				sub->draw_option<RegularOption>(("Stop"), nullptr, []
+					{
+						CUTSCENE::STOP_CUTSCENE_IMMEDIATELY();
+
+					});
+				sub->draw_option<RegularOption>(("Set Skipable"), nullptr, []
+					{
+						CUTSCENE::SET_CUTSCENE_CAN_BE_SKIPPED(0);
+
+					});
 			});
 		g_Render->draw_submenu<sub>("Phone", rage::joaat("Phone"), [](sub* sub)
 			{

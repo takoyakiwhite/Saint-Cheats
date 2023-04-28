@@ -129,28 +129,7 @@ namespace Saint
 			}  ImGui::End();
 			if (g_Settings.command_window)
 			{
-				ImGui::SetNextWindowSize(ImVec2(505, 74), ImGuiCond_Once);
-				ImGui::SetNextWindowPos(ImVec2(967, 244), ImGuiCond_Once);
-				if (ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize)) {
-					ImGui::PushFont(g_D3DRenderer->m_DefaultFont);
-					
-					ImGui::InputText("Command", buf1, 128);
-					const char* input = std::format("{}", buf1).c_str();
-					
-
-					if (GetAsyncKeyState(0x0D) & 1) {
-						if (buf1 == "fortnite") { //dont work i dont know why
-							Noti::InsertNotification({ ImGuiToastType_None, 2000, "YOUR A FAGGOT"});
-						}
-						Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s copied to clipboard.", input});
-					}
-					
-					
-					
-
-					ImGui::PopFont();
-					ImGui::End();
-				}
+				
 			} 
 		if (g_Render->m_Opened && g_Settings.m_LogWindow)
 		{
