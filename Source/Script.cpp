@@ -6725,7 +6725,7 @@ namespace Saint
 						CUTSCENE::STOP_CUTSCENE_IMMEDIATELY();
 
 					});
-				sub->draw_option<RegularOption>(("Set Skipable"), nullptr, []
+				sub->draw_option<RegularOption>(("Set Skippable"), nullptr, []
 					{
 						CUTSCENE::SET_CUTSCENE_CAN_BE_SKIPPED(0);
 
