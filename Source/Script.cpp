@@ -6403,10 +6403,10 @@ namespace Saint
 						});
 				}
 				if (time_gta.pos == 2) {
-					sub->draw_option<number<std::int32_t>>("Hour", nullptr, &time_gta.second, 0, 24, 1, 3, true, "", "", [] {
+					sub->draw_option<number<std::int32_t>>("Value", nullptr, &time_gta.hour, 0, 24, 1, 3, true, "", "", [] {
 						NETWORK::NETWORK_OVERRIDE_CLOCK_TIME(time_gta.hour, time_gta.min, time_gta.second);
 						CLOCK::SET_CLOCK_TIME(time_gta.hour, time_gta.min, time_gta.second);
-						});
+					});
 				}
 			});
 		g_Render->draw_submenu<sub>(("Creator"), rage::joaat("Creator"), [](sub* sub)

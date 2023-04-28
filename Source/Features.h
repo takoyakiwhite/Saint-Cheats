@@ -5423,22 +5423,28 @@ namespace Saint {
 	public:
 		std::vector<modelHandler> m_GetModels = {
 
-			{ "a_f_m_beach_01", "Bikini (Female)", ModelClass::Beach },
+			{ "a_f_m_beach_01", "Bikini", ModelClass::Beach },
 			{ "a_f_y_beach_01", "Bikini (With Extra Stuff)", ModelClass::Beach },
+			{ "a_m_m_beach_01", "Normal", ModelClass::Beach },
+			{ "a_m_m_beach_02", "Normal 2", ModelClass::Beach },
+
 			{ "a_f_m_bevhills_01", "Beverly Hills", ModelClass::Rich },
 			{ "a_f_m_bevhills_02", "Beverly Hills 2", ModelClass::Rich },
 			{ "a_f_y_bevhills_01", "Beverly Hills 3", ModelClass::Rich },
 			{ "a_f_y_bevhills_02", "Beverly Hills 4", ModelClass::Rich },
 			{ "a_f_y_bevhills_03", "Beverly Hills 5", ModelClass::Rich },
 			{ "a_f_y_bevhills_04", "Beverly Hills 6", ModelClass::Rich },
+			{ "a_m_m_bevhills_01", "Beverly Hills (Male)", ModelClass::Rich },
+			{ "a_m_m_bevhills_02", "Beverly Hills 2 (Male)", ModelClass::Rich },
 
+			{ "a_m_y_musclbeac_01", "Muscle", ModelClass::Bodybuilder },
 			{ "a_f_m_bodybuild_01", "Bikini (Semi-Fat)", ModelClass::Bodybuilder },
 
 			{ "a_f_m_business_02", "Regular Female", ModelClass::Business },
 
 			{ "a_f_m_downtown_01", "Downtown", ModelClass::Pedestrain },
 			{ "a_f_m_eastsa_01", "East SA", ModelClass::Pedestrain },
-			{ "a_f_m_eastsa_02", "East SA", ModelClass::Pedestrain },
+			{ "a_f_m_eastsa_02", "East SA 2", ModelClass::Pedestrain },
 			{ "a_f_m_ktown_01", "KTown", ModelClass::Pedestrain },
 			{ "a_f_m_ktown_02", "KTown 2", ModelClass::Pedestrain },
 			{ "a_f_m_salton_01", "Salton", ModelClass::Pedestrain },
@@ -5446,25 +5452,80 @@ namespace Saint {
 			{ "a_f_m_fatbla_01", "Typical", ModelClass::Fat },
 			{ "a_f_m_fatcult_01", "Cult", ModelClass::Fat },
 			{ "a_f_m_fatwhite_01", "White", ModelClass::Fat },
+			{ "a_m_m_farmer_01", "Farmer", ModelClass::Fat },
+			{ "a_m_m_fatlatin_01", "Latin", ModelClass::Fat },
+			{ "a_m_m_genfat_01", "Gen", ModelClass::Fat },
+			{ "a_m_m_genfat_02", "Gen 2", ModelClass::Fat },
+
 			{ "a_f_m_prolhost_01", "Prolouge Hostage", ModelClass::Known },
 			{ "a_f_m_skidrow_01", "Skid Row", ModelClass::Pedestrain },
 			{ "a_f_m_soucent_01", "Soucent", ModelClass::Pedestrain },
 			{ "a_f_m_soucent_02", "Soucent 2", ModelClass::Pedestrain },
 			{ "a_f_o_soucent_01", "Soucent 3", ModelClass::Pedestrain },
 			{ "a_f_o_soucent_02", "Soucent 4", ModelClass::Pedestrain },
+			{ "a_f_y_soucent_01", "Soucent 5", ModelClass::Pedestrain },
+			{ "a_f_y_soucent_02", "Soucent 6", ModelClass::Pedestrain },
+			{ "a_f_y_soucent_03", "Soucent 7", ModelClass::Pedestrain },
 			{ "a_f_m_soucentmc_01", "Soucent (MC)", ModelClass::Pedestrain },
 			{ "a_f_m_tourist_01", "Tourist", ModelClass::Pedestrain },
+			{ "a_f_y_tourist_01", "Tourist 2", ModelClass::Pedestrain },
+			{ "a_f_y_tourist_02", "Tourist 3", ModelClass::Pedestrain },
 			{ "a_f_m_tramp_01", "Tramp", ModelClass::Fat },
-			{ "a_f_m_trampbeac_01", "Tramp Beach", ModelClass::Beach },
+			{ "a_f_m_trampbeac_01", "Tramp", ModelClass::Beach },
 			{ "a_f_o_genstreet_01", "Gen Street", ModelClass::Pedestrain },
 			{ "a_f_o_indian_01", "Indian", ModelClass::Special },
+			{ "a_f_y_indian_01", "Indian 2", ModelClass::Special },
 			{ "a_f_o_ktown_01", "KTown 3", ModelClass::Pedestrain },
 			{ "a_f_o_salton_01", "Salton 2", ModelClass::Pedestrain },
+
 			{ "a_f_y_business_01", "Typical (With Cool Outfit)", ModelClass::Business },
 			{ "a_f_y_business_02", "Typical (Interesting Hair)", ModelClass::Business },
+			{ "a_m_m_business_01", "Typical (Male)", ModelClass::Business },
+			{ "a_m_y_business_01", "Typical 2 (Male)", ModelClass::Business },
+			{ "a_m_y_business_02", "Typical 3 (Male)", ModelClass::Business },
+			{ "a_m_y_business_03", "Typical 4 (Male)", ModelClass::Business },
 			{ "a_f_y_business_03", "Full Black", ModelClass::Business },
 			{ "a_f_y_business_04", "White", ModelClass::Business },
 
+			{ "a_f_y_clubcust_01", "Club Cust", ModelClass::Pedestrain },
+			{ "a_f_y_clubcust_02", "Club Cust 2", ModelClass::Pedestrain },
+			{ "a_f_y_clubcust_03", "Club Cust 3", ModelClass::Pedestrain },
+			{ "a_f_y_eastsa_01", "East SA 3", ModelClass::Pedestrain },
+			{ "a_f_y_eastsa_02", "East SA 4", ModelClass::Pedestrain },
+			{ "a_f_y_eastsa_03", "East SA 5", ModelClass::Pedestrain },
+			{ "a_f_y_epsilon_01", "Epsilon", ModelClass::Pedestrain },
+			{ "a_m_y_epsilon_01", "Epsilon (Male)", ModelClass::Pedestrain },
+			{ "a_m_y_epsilon_02", "Epsilon 2 (Male)", ModelClass::Pedestrain },
+			{ "a_f_y_genhot_01", "Gen Hot", ModelClass::Pedestrain },
+			{ "a_f_y_golfer_01", "Golfer", ModelClass::Pedestrain },
+			{ "a_m_m_golfer_01", "Golfer (Male)", ModelClass::Pedestrain },
+			{ "a_f_y_hiker_01", "Hiker", ModelClass::Pedestrain },
+			{ "a_f_y_hippie_01", "Hippie", ModelClass::Pedestrain },
+			{ "a_f_y_hipster_01", "Hipster", ModelClass::Pedestrain },
+			{ "a_f_y_hipster_02", "Hipster 2", ModelClass::Pedestrain },
+			{ "a_f_y_hipster_03", "Hipster 3", ModelClass::Pedestrain },
+			{ "a_f_y_hipster_04", "Hipster 4", ModelClass::Pedestrain },
+			{ "a_f_y_juggalo_01", "Juggalo", ModelClass::Special },
+			{ "a_f_y_rurmeth_01", "Meth", ModelClass::Pedestrain },
+			{ "a_f_y_scdressy_01", "Dressy", ModelClass::Pedestrain },
+			{ "a_f_y_skater_01", "Skater", ModelClass::Pedestrain },
+			{ "a_m_y_skater_01", "Skater (Male)", ModelClass::Pedestrain },
+			{ "a_m_y_skater_02", "Skater 2 (Male)", ModelClass::Pedestrain },
+			{ "a_m_m_skater_01", "Skater 3 (Male)", ModelClass::Pedestrain },
+			{ "a_f_y_yoga_01", "Yoga", ModelClass::Pedestrain },
+			{ "a_m_y_yoga_01", "Yoga (Male)", ModelClass::Pedestrain },
+
+			
+			
+
+			//althedic
+			{ "a_f_y_fitness_01", "Fitness", ModelClass::Althedic },
+			{ "a_f_y_fitness_02", "Fitness 2", ModelClass::Althedic },
+			{ "a_f_y_runner_01", "Runner", ModelClass::Althedic },
+			{ "a_f_y_tennis_01", "Tennis", ModelClass::Althedic },
+			{ "a_m_y_musclbeac_02", "Runner (Male)", ModelClass::Althedic },
+			{ "a_m_y_runner_01", "Runner 2 (Male)", ModelClass::Althedic },
+			{ "a_m_y_runner_02", "Runner 3 (Male)", ModelClass::Althedic },
 			//construction
 			{ "s_m_y_construct_01", "Greenish Vest", ModelClass::Construction },
 			{ "s_m_y_construct_02", "Orange Vest", ModelClass::Construction },
@@ -5508,6 +5569,7 @@ namespace Saint {
 			{ "s_m_m_fibsec_01", "Secruity", ModelClass::CIA },
 			{ "s_m_m_ciasec_01", "Secruity 2", ModelClass::CIA },
 			{ "cs_davenorton", "Dave Nortan", ModelClass::CIA },
+			{ "a_f_y_femaleagent", "Agent", ModelClass::CIA },
 
 			//special
 			{ "u_m_y_zombie_01", "Zombie", ModelClass::Special },
@@ -5527,6 +5589,8 @@ namespace Saint {
 			{ "mp_m_marston_01", "Marston", ModelClass::Special },
 			{ "cs_bradcadaver", "Brad Cadaver", ModelClass::Special },
 			{ "u_m_m_jesus_01", "Jesus", ModelClass::Special },
+			{ "a_m_y_motox_01", "Motox", ModelClass::Special },
+			{ "a_m_m_tranvest_01", "Trans Vest", ModelClass::Special },
 
 			//prison
 			{ "csb_rashcosvki", "Rashcovski", ModelClass::Prison },
@@ -5541,6 +5605,16 @@ namespace Saint {
 			{ "player_two", "Trevor", ModelClass::Main },
 			{ "player_two", "Franklin", ModelClass::Main },
 
+			//Known
+			{ "ig_avon", "Avon", ModelClass::Known },
+			{ "ig_bankman", "Bankman", ModelClass::Known },
+			
+			//Story
+			{ "ig_brad", "Brad", ModelClass::Story },
+			{ "ig_denise", "Denise", ModelClass::Story },
+			{ "ig_devin", "Devin", ModelClass::Story },
+			{ "ig_floyd", "Floyd", ModelClass::Story },
+
 			//casino
 			{ "csb_agatha", "Agatha Baker", ModelClass::Casino },
 			{ "csb_tomcasino", "Tom", ModelClass::Casino },
@@ -5550,6 +5624,47 @@ namespace Saint {
 			{ "u_f_m_casinoshop_01", "Shop", ModelClass::Casino },
 			{ "s_f_y_casino_01", "Assistant (Female)", ModelClass::Casino },
 			{ "s_m_y_casino_01", "Assistant (Male)", ModelClass::Casino },
+
+			{ "g_f_importexport_01", "Import Export (Female)", ModelClass::Gang },
+			{ "g_f_y_ballas_01", "Ballas (Female)", ModelClass::Gang },
+			{ "g_f_y_families_01", "Families (Female)", ModelClass::Gang },
+			{ "g_f_y_lost_01", "Lost (Female)", ModelClass::Gang },
+			{ "g_f_y_vagos_01", "Vagos (Female)", ModelClass::Gang },
+
+			{ "g_m_importexport_01", "Import Export (Male)", ModelClass::Gang },
+			{ "g_m_m_armboss_01", "Armed Boss", ModelClass::Gang },
+			{ "g_m_m_armgoon_01", "Armed Goon", ModelClass::Gang },
+			{ "g_m_y_armgoon_02", "Armed Goon 2", ModelClass::Gang },
+			{ "g_m_m_armlieut_01", "Armed Lieut", ModelClass::Gang },
+			{ "g_m_m_chemwork_01", "Chemical Work", ModelClass::Gang },
+			{ "g_m_m_chicold_01", "Snow", ModelClass::Gang },
+			{ "g_m_m_chigoon_01", "Chinese Goon", ModelClass::Gang },
+			{ "g_m_m_mexboss_01", "Mexican Boss", ModelClass::Gang },
+			{ "g_m_m_mexboss_02", "Mexican Boss 2", ModelClass::Gang },
+			{ "g_m_y_mexgang_01", "Mexican Gang", ModelClass::Gang },
+			{ "g_m_y_mexgoon_01", "Mexican Goon", ModelClass::Gang },
+			{ "g_m_y_mexgoon_02", "Mexican Goon 2", ModelClass::Gang },
+			{ "g_m_y_mexgoon_03", "Mexican Goon 3", ModelClass::Gang },
+			{ "g_m_y_azteca_01", "Azteca", ModelClass::Gang },
+			{ "g_m_y_ballaeast_01", "Ballas (East)", ModelClass::Gang },
+			{ "g_m_y_ballasout_01", "Ballas (South)", ModelClass::Gang },
+			{ "g_m_y_ballaorig_01", "Ballas (Original)", ModelClass::Gang },
+			{ "g_m_y_famca_01", "Families (Male)", ModelClass::Gang },
+			{ "g_m_y_famdnf_01", "Families 2 (Male)", ModelClass::Gang },
+			{ "g_m_y_famfor_01", "Families 3 (Male)", ModelClass::Gang },
+			{ "g_m_m_korboss_01", "Korean Boss", ModelClass::Gang },
+			{ "g_m_y_korean_01", "Korean", ModelClass::Gang },
+			{ "g_m_y_korean_02", "Korean 2", ModelClass::Gang },
+			{ "g_m_y_korean_02", "Korean Lieut", ModelClass::Gang },
+			{ "g_m_y_korlieut_01", "Korean Lieut 2", ModelClass::Gang },
+			{ "g_m_y_lost_01", "Lost MC", ModelClass::Gang },
+			{ "g_m_y_lost_02", "Lost MC 2", ModelClass::Gang },
+			{ "g_m_y_lost_03", "Lost MC 3", ModelClass::Gang },
+			{ "g_m_y_pologoon_01", "Polo Goon", ModelClass::Gang },
+			{ "g_m_y_salvagoon_01", "Salvage Goon", ModelClass::Gang },
+			{ "g_m_y_salvagoon_02", "Salvage Goon 2", ModelClass::Gang },
+			{ "g_m_m_casrn_01", "Casrn", ModelClass::Gang },
+
 
 			//animals
 
@@ -5592,7 +5707,7 @@ namespace Saint {
 		int selected_class = 0;
 		int size = 19;
 		const char* get_class_name[20] = {"Beach", "Fat", "Pedestrain", "Bodybuilder", "Rich", "Special", "Business", "Gang", "Animal", "Known", "Prison", "Construction", "Story", "Medical", "Military/Army", "Police", "CIA/FIB/IAA", "Althedic", 
-		"Main Characters", "Casino"
+			"Main Characters", "Casino"
 		};
 		
 		
@@ -6245,7 +6360,7 @@ namespace Saint {
 								fbr::cur()->wait();
 							});
 
-						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(hitCoords.x, hitCoords.y, hitCoords.z, aim.x, aim.y, aim.z, 250, FALSE, hash, PLAYER::PLAYER_PED_ID(), Invisible, velocity, 100.0f);
+						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(hitCoords.x, hitCoords.y, hitCoords.z, aim.x, aim.y, aim.z, 250, FALSE, hash, PLAYER::PLAYER_PED_ID(), Audible, Invisible, velocity);
 					}
 				}
 			}

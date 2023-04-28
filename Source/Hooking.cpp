@@ -1049,6 +1049,7 @@ namespace Saint
 
 		return result;
 	}
+	
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
