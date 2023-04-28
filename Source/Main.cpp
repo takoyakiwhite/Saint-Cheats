@@ -1,5 +1,4 @@
 #define CPPHTTPLIB_OPENSSL_SUPPORT
-#define DEV
 #include "httplib.h"
 #include "md5.h"
 #include "obfuscate.h"
