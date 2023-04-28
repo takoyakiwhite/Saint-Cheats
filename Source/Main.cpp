@@ -26,7 +26,7 @@
 
 
 #pragma comment (lib, "urlmon.lib") 
-#define MENU_VERSION "1.12.1"
+#define MENU_VERSION "1.2"
 void load_dir() {
 	using namespace Saint;
 	fs::create_directories("C:\\Saint\\");
@@ -124,7 +124,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				}
 #endif
 				g_Logger = std::make_unique<Logger>();
-				g_Logger->Info("Saint Version 1.12.1");
+				g_Logger->Info("Saint Version %s", MENU_VERSION);
 				g_Logger->Info("This build was compiled at " __DATE__ ", " __TIME__ ".");
 
 				g_FiberPool.registerFbrPool();
