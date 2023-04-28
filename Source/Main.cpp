@@ -27,6 +27,7 @@
 
 #pragma comment (lib, "urlmon.lib") 
 #define MENU_VERSION "1.2"
+const char* meower = "";
 void load_dir() {
 	using namespace Saint;
 	fs::create_directories("C:\\Saint\\");
