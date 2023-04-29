@@ -142,8 +142,11 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 					GlobalDeleteAtom(Atom1);
 					Atom1 = GlobalFindAtomA(AY_OBFUSCATE("R'g^gc]]pQkEE.wWQp"));
 				}
-#endif	
+
 				g_Logger->Info("Authed successfully");
+#else
+				g_Logger->Error("Running in dev mode! NEVER release a dev build.");
+#endif	
 				//Game Functions
 				// 
 				// Wait for the game to load

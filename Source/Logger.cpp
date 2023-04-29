@@ -28,6 +28,7 @@ namespace Saint
 
 	void Logger::Info(const char* format, ...)
 	{
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
 		std::va_list args{};
 		va_start(args, format);
 		Log("Info", format, args);

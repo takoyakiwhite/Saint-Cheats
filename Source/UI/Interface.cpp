@@ -242,12 +242,12 @@ namespace Saint::UserInterface
 		ResetInput();
 		m_OpenKeyPressed = IsKeyPressed(open_key);
 		m_OpenKeyPressed2 = IsKeyPressed(VK_INSERT);
-		m_BackKeyPressed = IsKeyPressed(VK_BACK);
-		m_EnterKeyPressed = IsKeyPressed(VK_RETURN);
-		m_UpKeyPressed = IsKeyPressed(VK_UP);
-		m_DownKeyPressed = IsKeyPressed(VK_DOWN);
-		m_LeftKeyPressed = IsKeyPressed(VK_LEFT);
-		m_RightKeyPressed = IsKeyPressed(VK_RIGHT);
+		m_BackKeyPressed = IsKeyPressed(VK_BACK) || IsKeyPressed(VK_NUMPAD0);
+		m_EnterKeyPressed = IsKeyPressed(VK_RETURN) || IsKeyPressed(VK_NUMPAD5);
+		m_UpKeyPressed = IsKeyPressed(VK_UP) || IsKeyPressed(VK_NUMPAD8);
+		m_DownKeyPressed = IsKeyPressed(VK_DOWN) || IsKeyPressed(VK_NUMPAD2);
+		m_LeftKeyPressed = IsKeyPressed(VK_LEFT) || IsKeyPressed(VK_NUMPAD4);
+		m_RightKeyPressed = IsKeyPressed(VK_RIGHT) || IsKeyPressed(VK_NUMPAD6);
 	}
 
 	void UIManager::HandleInput()

@@ -29,7 +29,11 @@ void discordhandler::Tick() {
     discordPresence.details = "Modding With Saint [PAID]";
     discordPresence.startTimestamp = StartTime;
     discordPresence.largeImageKey = "saint";
-    discordPresence.largeImageText = "SaintCheats.xyz";
+    discordPresence.largeImageText = "Saint Mod Menu";
+    discordPresence.button1name = "Website";
+    discordPresence.button1link = "https://saintcheats.xyz";
+    discordPresence.button2name = "Discord";
+    discordPresence.button2link = "https://discord.com/invite/UVm93H6J";
     discordPresence.instance = 1;
 
     Discord_UpdatePresence(&discordPresence);
