@@ -927,7 +927,7 @@ namespace Saint
 				sub->draw_option<submenu>("Particles", nullptr, Submenu::SubmenuVehParticles);
 				sub->draw_option<submenu>("Invisible", nullptr, Submenu::SubmenuVehicleInvis);
 				sub->draw_option<submenu>("Ramps", nullptr, Submenu::SubmenuVehicleRamps);
-				sub->draw_option<submenu>("Upgrades", nullptr, Submenu::SubmenuUpgrades);
+				sub->draw_option<submenu>("Randomization", nullptr, Submenu::SubmenuUpgrades);
 				sub->draw_option<submenu>("LSC", nullptr, Submenu::SubmenuCustomize);
 				sub->draw_option<submenu>("Color", nullptr, Submenu::SubmenuChangeVehicleColor);
 				sub->draw_option<submenu>("Personal", nullptr, Submenu::SubmenuPersonalVehicle);
@@ -962,6 +962,7 @@ namespace Saint
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Keep Engine On"), "Prevents your vehicle's engine from being turned off when exiting.", &features.keep_engine_on, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Infinite Countermeasures"), "", &features.inf_c, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("No Plane Turbulence"), "Removes your plane's turbulance. When turning off, it can make turbulance levels a little messed up.", &NoPlaneTurbulance, BoolDisplay::OnOff);
 				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>(auto_repair.name, "Automaticly repairs you're vehicle.", &features.auto_repair, &features.auto_repair_type, &features.get_repair_type);
 				sub->draw_option<toggle<bool>>(("Can Be Used By Fleeing Peds"), nullptr, &features.can_be_used_by_peds, BoolDisplay::OnOff, false, [] {
@@ -1014,6 +1015,10 @@ namespace Saint
 								});
 						});
 				}
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Upgrades", nullptr, &m_upgrades.types, &m_upgrades.data, false, SubmenuMaxThatFucker, [] {
+
+					m_upgrades.apply(m_upgrades.data);
+					});
 				sub->draw_option<number<float>>("Forklift Height", nullptr, &features.forklight_height, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
 					VEHICLE::SET_FORKLIFT_FORK_HEIGHT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), features.forklight_height);
 					});
@@ -1926,16 +1931,25 @@ namespace Saint
 
 
 			});
-		g_Render->draw_submenu<sub>(("Upgrades"), SubmenuUpgrades, [](sub* sub)
+		g_Render->draw_submenu<sub>(("Randomization"), SubmenuUpgrades, [](sub* sub)
 			{
-				sub->draw_option<submenu>("Max (Loop)", nullptr, Submenu::SubmenuUpgradeLoop);
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Max (Once)", nullptr, &m_upgrades.types, &m_upgrades.data, false, SubmenuMaxThatFucker, [] {
-
-					m_upgrades.apply(m_upgrades.data);
-					});
+				sub->draw_option<submenu>("Upgrades", nullptr, Submenu::SubmenuUpgradeLoop);
+				sub->draw_option<submenu>("Acrobatics", nullptr, rage::joaat("acrobaticsr"));
+				
 
 			});
-		g_Render->draw_submenu<sub>(("Max (Loop)"), SubmenuUpgradeLoop, [](sub* sub)
+		g_Render->draw_submenu<sub>(("Acrobatics"), rage::joaat("acrobaticsr"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &randomization.acrobatics, BoolDisplay::OnOff);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &randomization.delay, 0, 5000, 50);
+			});
+		g_Render->draw_submenu<sub>(("Upgrades"), SubmenuUpgradeLoop, [](sub* sub)
+			{
+				sub->draw_option<submenu>("Color", nullptr, Submenu::SubmenuSelectedVehicleColor);
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &max_loop.enabled, BoolDisplay::OnOff);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &max_loop.delay, 0, 5000, 50);
+			});
+		g_Render->draw_submenu<sub>(("Upgrades"), SubmenuUpgradeLoop, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Color", nullptr, Submenu::SubmenuSelectedVehicleColor);
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &max_loop.enabled, BoolDisplay::OnOff);
@@ -8122,6 +8136,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("East"), rage::joaat("East"), [](sub* sub)
 			{
+				sub->draw_option<toggle<bool>>(("Rainbow"), nullptr, &sky_data.east.rainbow, BoolDisplay::OnOff);
 				sub->draw_option<number<std::int32_t>>("Red", nullptr, &sky_data.east.r, 0, 255, 1, 3, true, "", "", [] {
 
 					});
@@ -8148,6 +8163,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("West"), rage::joaat("West"), [](sub* sub)
 			{
+				sub->draw_option<toggle<bool>>(("Rainbow"), nullptr, &sky_data.west.rainbow, BoolDisplay::OnOff);
 				sub->draw_option<number<std::int32_t>>("Red", nullptr, &sky_data.west.r, 0, 255, 1, 3, true, "", "", [] {
 
 					});
@@ -8174,6 +8190,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("South & North"), rage::joaat("SouthNorth"), [](sub* sub)
 			{
+				sub->draw_option<toggle<bool>>(("Rainbow"), nullptr, &sky_data.southnorth.rainbow, BoolDisplay::OnOff);
 				sub->draw_option<number<std::int32_t>>("Red", nullptr, &sky_data.southnorth.r, 0, 255, 1, 3, true, "", "", [] {
 
 					});

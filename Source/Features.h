@@ -734,8 +734,12 @@ namespace Saint {
 		float forklight_height = 0.0f;
 		bool can_be_used_by_peds = false;
 		bool ragdoll_on_q = false;
+		bool inf_c = false;
 		std::size_t bullet_int = 0;
 		void init() {
+			if (inf_c) {
+				VEHICLE::SET_VEHICLE_COUNTERMEASURE_AMMO(get_veh(), 10);
+			}
 			if (ragdoll_on_q) {
 				if (GetAsyncKeyState(0x51) & 1) {
 					NativeVector3 v = ENTITY::GET_ENTITY_FORWARD_VECTOR(PLAYER::PLAYER_PED_ID());
@@ -6301,6 +6305,7 @@ namespace Saint {
 	inline TimeEditor time_gta;
 	class East {
 	public:
+		bool rainbow = false;
 		bool changed = false;
 		int r = 0;
 		int g = 0;
@@ -6309,6 +6314,7 @@ namespace Saint {
 	};
 	class West {
 	public:
+		bool rainbow = false;
 		bool changed = false;
 		int r = 0;
 		int g = 0;
@@ -6317,6 +6323,7 @@ namespace Saint {
 	};
 	class SouthNorth {
 	public:
+		bool rainbow = false;
 		bool changed = false;
 		int r = 0;
 		int g = 0;
@@ -6325,6 +6332,7 @@ namespace Saint {
 	};
 	class Cloud {
 	public:
+		bool rainbow = false;
 		bool changed = false;
 		int r = 0;
 		int g = 0;
@@ -6339,13 +6347,30 @@ namespace Saint {
 		Cloud cloud;
 		void change_effect() {
 			if (east.changed) {
+				
 				uintptr_t east_red = scan_address(g_base_address + 0x26CFAB0, {});
 				uintptr_t east_green = scan_address(g_base_address + 0x26CFAB4, {});
 				uintptr_t east_blue = scan_address(g_base_address + 0x26CFAB8, {});
 
+
 				*(float*)east_red = (east.r / 255.f) * east.brightness;
 				*(float*)east_green = (east.g / 255.f) * east.brightness;
 				*(float*)east_blue = (east.b / 255.f) * east.brightness;
+
+				if (east.rainbow) {
+					if (east.r > 0 && east.b == 0) {
+						east.r--;
+						east.g++;
+					}
+					if (east.g > 0 && east.r == 0) {
+						east.g--;
+						east.b++;
+					}
+					if (east.b > 0 && east.g == 0) {
+						east.r++;
+						east.b--;
+					}
+				}
 			}
 			if (west.changed) {
 				uintptr_t west_red = scan_address(g_base_address + 0x26CFAE0, {});
@@ -6355,6 +6380,21 @@ namespace Saint {
 				*(float*)west_red = (west.r / 255.f) * west.brightness;
 				*(float*)west_green = (west.g / 255.f) * west.brightness;
 				*(float*)west_blue = (west.b / 255.f) * west.brightness;
+
+				if (west.rainbow) {
+					if (west.r > 0 && west.b == 0) {
+						west.r--;
+						west.g++;
+					}
+					if (west.g > 0 && west.r == 0) {
+						west.g--;
+						west.b++;
+					}
+					if (west.b > 0 && west.g == 0) {
+						west.r++;
+						west.b--;
+					}
+				}
 			}
 			if (southnorth.changed) {
 				uintptr_t west_red = scan_address(g_base_address + 0x26CFB10, {});
@@ -6364,6 +6404,21 @@ namespace Saint {
 				*(float*)west_red = (southnorth.r / 255.f) * southnorth.brightness;
 				*(float*)west_green = (southnorth.g / 255.f) * southnorth.brightness;
 				*(float*)west_blue = (southnorth.b / 255.f) * southnorth.brightness;
+
+				if (southnorth.rainbow) {
+					if (southnorth.r > 0 && southnorth.b == 0) {
+						southnorth.r--;
+						southnorth.g++;
+					}
+					if (southnorth.g > 0 && southnorth.r == 0) {
+						southnorth.g--;
+						southnorth.b++;
+					}
+					if (southnorth.b > 0 && southnorth.g == 0) {
+						southnorth.r++;
+						southnorth.b--;
+					}
+				}
 			}
 			if (cloud.changed) {
 				uintptr_t west_red = scan_address(g_base_address + 0x26CFE10, {});
@@ -6972,7 +7027,73 @@ namespace Saint {
 		}
 	};
 	inline LSC lsc;
+	class Randomization {
+	public:
+		bool acrobatics = false;
+		int delay = 550;
+		int random(int min, int max)
+		{
+			static bool first = true;
+			if (first)
+			{
+				srand(time(NULL));
+				first = false;
+			}
+			return min + rand() % ((max + 1) - min);
+		}
+		void startc(int acrobatic_int) {
+			if (acrobatic_int == 0) {
+
+				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
+				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
+				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
+
+			}
+			if (acrobatic_int == 1) {
+
+				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
+				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
+				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
+
+			}
+			if (acrobatic_int == 2) {
+
+				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 10.0f, 20.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1);
+
+			}
+			if (acrobatic_int == 3) {
+
+				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 7.0f, 0, 0, 0, true, true, true, true, false, true);
+
+
+
+			}
+		}
+		void init() {
+			if (acrobatics) {
+				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				{
+					int upgradedelay = 0;
+					if (upgradedelay == 0 || (int)(GetTickCount64() - upgradedelay) > delay)
+					{
+						Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						if (!ENTITY::IS_ENTITY_IN_AIR(veh)) {
+							startc(random(0, 3));
+						}
+						upgradedelay = GetTickCount64();
+					}
+
+				}
+			}
+		}
+	};
+	inline Randomization randomization;
 	inline void FeatureInitalize() {
+		randomization.init();
 		lsc.init();
 		rope_gun.init();
 		wdrop.init();
