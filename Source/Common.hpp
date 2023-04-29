@@ -1,5 +1,5 @@
 #pragma once
-
+#define MENU_VERSION "1.3"
 #define _CRT_SECURE_NO_WARNINGS
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN

@@ -85,7 +85,7 @@ namespace Saint
 		uint64_t m_WorldPtr;
 
 		FriendRegistry* m_friendRegistry;
-		const char* m_version = "1.12.1";
+		const char* m_version = MENU_VERSION;
 
 		
 
