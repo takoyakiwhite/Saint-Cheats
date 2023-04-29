@@ -958,6 +958,8 @@ namespace Saint
 							VEHICLE::SET_VEHICLE_PETROL_TANK_HEALTH(playerVehicle, 1000.0f);
 							VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVehicle, !false);
 							VEHICLE::SET_VEHICLE_WHEELS_CAN_BREAK(playerVehicle, !false);
+
+							//cool
 						}
 					}
 					});
