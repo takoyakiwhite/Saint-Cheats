@@ -205,7 +205,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				//registering
 				load_dir();
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome, if your looking to disable phone its in misc",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
-				while (g_Running)
+				while (g_Running && authed)
 				{
 					if (IsKeyPressed(VK_DELETE))
 						g_Running = false;
@@ -244,6 +244,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 #ifndef DEV
 				VIRTUALIZER_DOLPHIN_BLACK_END
 #endif
+				OPENSSL_thread_stop();
 				FreeLibraryAndExitThread(g_Module, 0);
 			
 			}, nullptr, 0, nullptr);
