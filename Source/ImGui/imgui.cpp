@@ -4826,7 +4826,7 @@ void ImGui::Shutdown()
     if (g.IO.Fonts && g.FontAtlasOwnedByContext)
     {
         g.IO.Fonts->Locked = false;
-        IM_DELETE(g.IO.Fonts);
+       // IM_DELETE(g.IO.Fonts);
     }
     g.IO.Fonts = NULL;
     g.DrawListSharedData.TempBuffer.clear();
