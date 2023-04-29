@@ -32,8 +32,8 @@ void discordhandler::Tick() {
     discordPresence.largeImageText = "Saint Mod Menu";
     discordPresence.button1name = "Website";
     discordPresence.button1link = "https://saintcheats.xyz";
-    discordPresence.button2name = "Discord";
-    discordPresence.button2link = "https://discord.com/invite/UVm93H6J";
+    discordPresence.button2name = "Buy";
+    discordPresence.button2link = "https://saintcheats.sell.app/product/saintgta-lifetime-key";
     discordPresence.instance = 1;
 
     Discord_UpdatePresence(&discordPresence);
