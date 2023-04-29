@@ -1640,7 +1640,9 @@ namespace Saint
 					changeVehicleColor.r = 255;
 
 					});
-				sub->draw_option<toggle<bool>>(("Include Secondary"), nullptr, &changeVehicleColor.rainbow.change_secondary, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Secondary"), nullptr, &changeVehicleColor.rainbow.change_secondary, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Underglow"), nullptr, &changeVehicleColor.rainbow.underglow, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Tyre Smoke"), nullptr, &changeVehicleColor.rainbow.tyre_smoke, BoolDisplay::OnOff);
 				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &changeVehicleColor.rainbow.delay, rainbow_delay.min, rainbow_delay.max, rainbow_delay.step);
 
 
@@ -2318,10 +2320,8 @@ namespace Saint
 					{
 						sub->draw_option<submenu>("Brakes", "", LosSantosBrakes);
 					}
-					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_XENONLIGHTS) > 0)
-					{
-						sub->draw_option<submenu>("Lights", "", LosSantosLights);
-					}
+					sub->draw_option<submenu>("Lights", "", LosSantosLights);
+					
 					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_FRONTBUMPER) > 0)
 					{
 						sub->draw_option<submenu>("Front Bumper", "", LosSantosFront);
@@ -2488,13 +2488,7 @@ namespace Saint
 						sub->draw_option<submenu>("Windows", "", LosSantosWindows);
 					}
 					sub->draw_option<submenu>("Wheels", "", rage::joaat("Wheels"));
-					sub->draw_option<toggle<bool>>(("Xenon"), nullptr, &lsc.xenon, BoolDisplay::OnOff, false, [] {
-						if (!lsc.xenon)
-						{
-							VEHICLE::TOGGLE_VEHICLE_MOD(get_veh(), 22, false);
-
-						}
-						});
+					
 					sub->draw_option<toggle<bool>>(("Turbo"), nullptr, &lsc.turbo, BoolDisplay::OnOff, false, [] {
 						if (!lsc.turbo)
 						{
@@ -2509,6 +2503,48 @@ namespace Saint
 
 
 			});
+			g_Render->draw_submenu<sub>("Lights", LosSantosLights, [](sub* sub)
+				{
+					sub->draw_option<submenu>("Neon", "", rage::joaat("NeonLights"));
+					sub->draw_option<toggle<bool>>(("Xenon"), nullptr, &lsc.xenon, BoolDisplay::OnOff, false, [] {
+						if (!lsc.xenon)
+						{
+							VEHICLE::TOGGLE_VEHICLE_MOD(get_veh(), 22, false);
+
+						}
+						});
+				});
+			g_Render->draw_submenu<sub>("Wheels", rage::joaat("NeonLights"), [](sub* sub)
+				{
+					sub->draw_option<toggle<bool>>(("Front"), nullptr, &lsc.neon.front, BoolDisplay::OnOff, false, [] {
+						if (!lsc.neon.front)
+						{
+							VEHICLE::TOGGLE_VEHICLE_MOD(get_veh(), 2, false);
+
+						}
+						});
+					sub->draw_option<toggle<bool>>(("Back"), nullptr, &lsc.neon.back, BoolDisplay::OnOff, false, [] {
+						if (!lsc.neon.back)
+						{
+							VEHICLE::SET_VEHICLE_NEON_ENABLED(get_veh(), 3, false);
+
+						}
+						});
+					sub->draw_option<toggle<bool>>(("Left"), nullptr, &lsc.neon.left, BoolDisplay::OnOff, false, [] {
+						if (!lsc.neon.left)
+						{
+							VEHICLE::SET_VEHICLE_NEON_ENABLED(get_veh(), 0, false);
+
+						}
+						});
+					sub->draw_option<toggle<bool>>(("Right"), nullptr, &lsc.neon.right, BoolDisplay::OnOff, false, [] {
+						if (!lsc.neon.right)
+						{
+							VEHICLE::SET_VEHICLE_NEON_ENABLED(get_veh(), 1, false);
+
+						}
+						});
+				});
 		g_Render->draw_submenu<sub>("Wheels", rage::joaat("Wheels"), [](sub* sub)
 			{
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &lsc.TypeName, &lsc.pos, true, -1, [] {
@@ -5834,7 +5870,7 @@ namespace Saint
 					});
 
 
-				sub->draw_option<RegularOption>("More Specical T-Shirts", "", [] {
+				sub->draw_option<RegularOption>("More Special T-Shirts", "", [] {
 					//Brands Shirts :
 					*script_global(262145 + 14971).as<int64_t*>() = 1; // "Accountant Shirt"
 					*script_global(262145 + 14972).as<int64_t*>() = 1; // "Bahamamamas Shirt"

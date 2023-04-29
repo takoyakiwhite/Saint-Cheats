@@ -1727,29 +1727,29 @@ namespace Saint {
 						if (UnobtainableVehicle) {
 							if (PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
 								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter) {
-									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Unobtainable Vehicle");
 								}
 								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter2) {
-									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Unobtainable Vehicle");
 								}
 								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter3) {
-									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Unobtainable Vehicle");
 								}
 								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter4) {
-									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Unobtainable Vehicle");
 								}
 								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter5) {
-									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Unobtainable Vehicle");
 								}
 								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter6) {
-									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Unobtainable Vehicle");
 								}
 								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter7) {
-									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Unobtainable Vehicle");
 
 								}
 								if (ENTITY::GET_ENTITY_MODEL(veh) == cutter8) {
-									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i);
+									flag_as_modder(g_GameVariables->m_net_game_player(i)->m_player_id, i, false, "Unobtainable Vehicle");
 
 								}
 							}
@@ -3346,6 +3346,8 @@ namespace Saint {
 	public:
 		bool enabled = false;
 		bool change_secondary = false;
+		bool underglow = false;
+		bool tyre_smoke = false;
 		int delay = 0;
 
 
@@ -3376,12 +3378,20 @@ namespace Saint {
 						r++;
 						b--;
 					}
-					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 
-					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVehicle, r, g, b);
+					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(veh, r, g, b);
 					if (rainbow.change_secondary) {
-						VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(playerVehicle, r, g, b);
+						VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(veh, r, g, b);
 					}
+					if (rainbow.underglow) {
+						VEHICLE::SET_VEHICLE_NEON_COLOUR(veh, r, g, b);
+					}
+					if (rainbow.tyre_smoke) {
+						VEHICLE::TOGGLE_VEHICLE_MOD(veh, 20, true);
+						VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(veh, r, g, b);
+					}
+					
 					timer = GetTickCount64();
 				}
 			}
@@ -6919,8 +6929,16 @@ namespace Saint {
 
 	};
 	inline PedSpawner ped_spawner;
+	class NeonLights {
+	public:
+		bool left;
+		bool right;
+		bool front;
+		bool back;
+	};
 	class LSC {
 	public:
+		NeonLights neon;
 		bool xenon = false;
 		bool turbo = false;
 		const char* TypeName[13] = { "Sport", "Muscle", "Lowrider", "SUV", "Off-Road", "Tuner", "Bike", "Hiend", "Benny's Original", "Benny's Bespoke", "Open Wheel", "Street", "Track" };
@@ -6933,6 +6951,18 @@ namespace Saint {
 			VEHICLE::SET_VEHICLE_MOD(get_veh(), 23, type, true);
 		}
 		void init() {
+			if (neon.front) {
+				VEHICLE::SET_VEHICLE_NEON_ENABLED(get_veh(), 2, true);
+			}
+			if (neon.back) {
+				VEHICLE::SET_VEHICLE_NEON_ENABLED(get_veh(), 3, true);
+			}
+			if (neon.left) {
+				VEHICLE::SET_VEHICLE_NEON_ENABLED(get_veh(), 0, true);
+			}
+			if (neon.right) {
+				VEHICLE::SET_VEHICLE_NEON_ENABLED(get_veh(), 1, true);
+			}
 			if (xenon) {
 				VEHICLE::TOGGLE_VEHICLE_MOD(get_veh(), 22, true);
 			}
