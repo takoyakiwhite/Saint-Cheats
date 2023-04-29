@@ -2517,6 +2517,7 @@ namespace Saint
 				sub->draw_option<number<std::int32_t>>("Index", nullptr, &lsc.wheel_type, 0, VEHICLE::GET_NUM_VEHICLE_MODS(get_veh(), 23), 1, 3, true, "", "", [] {
 					lsc.set_wheel(lsc.wheel_type);
 					});
+				//crash the gate doing 98 (american song v98 and tim wouldent understand)
 			});
 		g_Render->draw_submenu<sub>("Windows", LosSantosWindows, [](sub* sub)
 			{
