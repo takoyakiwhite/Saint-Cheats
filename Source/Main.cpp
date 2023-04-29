@@ -205,7 +205,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				//registering
 				load_dir();
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome, if your looking to disable phone its in misc",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
-				while (g_Running && authed)
+				while (g_Running)
 				{
 					if (IsKeyPressed(VK_DELETE))
 						g_Running = false;
