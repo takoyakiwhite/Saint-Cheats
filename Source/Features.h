@@ -27,6 +27,9 @@ namespace Saint {
 	inline std::string replaceTextBuffer2 = "";
 	inline bool replaced = false;
 	inline bool replaced2 = false;
+	inline Vehicle get_veh() {
+		return PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+	}
 	inline CVehicle* get_ped_vehicle() {
 		return (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle;
 	}
@@ -81,7 +84,7 @@ namespace Saint {
 			"MG", "Combat MG", "Combat MG Mk II", "Gusenberg Sweeper",
 			"Sniper Rifle", "Heavy Sniper", "Heavy Sniper Mk II", "Marksman Rifle", "Marksman Rifle Mk II", "Precision Rifle",
 			"RPG", "Grenade Launcher", "Grenade Launcher Smoke", "Minigun", "Firework Launcher", "Railgun", "Homing Launcher", "Compact Grenade Launcher","Widowmaker","Compact EMP Launcher", "Grenade", "BZ Gas", "Molotov Cocktail", "Molotov Cocktail", "Proximity Mines",
-			"Snowballs", "Pipe Bombs", "Baseball", "Tear Gas", "Flare", "Jerry Can", "Parachute", "Fire Extinguisher", "Hazardous Jerry Can", "Fertilizer Can", "Candy Cane", "Acid Package"};
+			"Snowballs", "Pipe Bombs", "Baseball", "Tear Gas", "Flare", "Jerry Can", "Parachute", "Fire Extinguisher", "Hazardous Jerry Can", "Fertilizer Can", "Candy Cane", "Acid Package" };
 		std::uint32_t hash[106]
 		{ 0x92A27487, 0x958A4A8F, 0xF9E6AA4B, 0x84BD7BFD, 0xA2719263, 0x8BB05FD7, 0x440E4788, 0x4E875F73, 0xF9DCBF2D, 0xD8DF3C3C, 0x99B507EA, 0xDD5DF8D9, 0xDFE37640, 0x678B81B1, 0x19044EE0, 0xCD274149, 0x94117305, 0x3813FC08,
 			0x1B06D571, 0xBFE256D4, 0x5EF9FEC4, 0x22D8FE39, 0x3656C8C1, 0x99AEEB3B, 0xBFD21232, 0x88374054, 0xD205520E, 0x83839C4, 0x47757124, 0xDC4DB296, 0xC1B3C3D1, 0xCB96392F, 0x97EA20B8, 0xAF3696A1, 0x2B5EF5EC, 0x917F6C8C, 0x57A4368C,
@@ -92,7 +95,7 @@ namespace Saint {
 		};
 
 		const char* name_all[107]
-		{	"All", "Antique Cavalry Dagger", "Baseball Bat", "Broken Bottle", "Crowbar", "Unarmed", "Flashlight", "Golf Club", "Hammer", "Hatchet", "Brass Knucles", "Knife", "Machete", "Switchblade", "Nightstick", "Pipe Wrench",
+		{ "All", "Antique Cavalry Dagger", "Baseball Bat", "Broken Bottle", "Crowbar", "Unarmed", "Flashlight", "Golf Club", "Hammer", "Hatchet", "Brass Knucles", "Knife", "Machete", "Switchblade", "Nightstick", "Pipe Wrench",
 			"Battle Axe", "Pool Cue", "Stone Hatchet", "Pistol", "Pistol Mk II", "Combat Pistol", "AP Pistol", "Stun Gun", "Pistol .50", "SNS Pistol", "SNS Pistol Mk II", "Heavy Pistol", "Vintage Pistol", "Flare Gun", "Marksman Pistol",
 			"Heavy Revolver", "Heavy Revolver Mk II", "Double Action Revolver", "Up-n-Atomizer", "Ceramic Pistol", "Navy Revolver", "Perico Pistol", "Stun Gun",
 			"Micro SMG", "SMG", "SMG Mk II", "Assault SMG", "Combat PDW", "Machine Pistol", "Mini SMG", "Unholy Hellbringer",
@@ -103,7 +106,7 @@ namespace Saint {
 			"RPG", "Grenade Launcher", "Grenade Launcher Smoke", "Minigun", "Firework Launcher", "Railgun", "Homing Launcher", "Compact Grenade Launcher","Widowmaker","Compact EMP Launcher", "Grenade", "BZ Gas", "Molotov Cocktail", "Molotov Cocktail", "Proximity Mines",
 			"Snowballs", "Pipe Bombs", "Baseball", "Tear Gas", "Flare", "Jerry Can", "Parachute", "Fire Extinguisher", "Hazardous Jerry Can", "Fertilizer Can", "Candy Cane", "Acid Package" };
 		std::uint32_t hash_all[107]
-		{	0x11111, 0x92A27487, 0x958A4A8F, 0xF9E6AA4B, 0x84BD7BFD, 0xA2719263, 0x8BB05FD7, 0x440E4788, 0x4E875F73, 0xF9DCBF2D, 0xD8DF3C3C, 0x99B507EA, 0xDD5DF8D9, 0xDFE37640, 0x678B81B1, 0x19044EE0, 0xCD274149, 0x94117305, 0x3813FC08,
+		{ 0x11111, 0x92A27487, 0x958A4A8F, 0xF9E6AA4B, 0x84BD7BFD, 0xA2719263, 0x8BB05FD7, 0x440E4788, 0x4E875F73, 0xF9DCBF2D, 0xD8DF3C3C, 0x99B507EA, 0xDD5DF8D9, 0xDFE37640, 0x678B81B1, 0x19044EE0, 0xCD274149, 0x94117305, 0x3813FC08,
 			0x1B06D571, 0xBFE256D4, 0x5EF9FEC4, 0x22D8FE39, 0x3656C8C1, 0x99AEEB3B, 0xBFD21232, 0x88374054, 0xD205520E, 0x83839C4, 0x47757124, 0xDC4DB296, 0xC1B3C3D1, 0xCB96392F, 0x97EA20B8, 0xAF3696A1, 0x2B5EF5EC, 0x917F6C8C, 0x57A4368C,
 			0x45CD9CF3, 0x13532244, 0x2BE6766B, 0x78A97CD0, 0xEFE7E2DF, 0x0A3D4D34, 0xDB1AA450, 0xBD248B55, 0x476BF155, 0x1D073A89, 0x555AF99A, 0x7846A318, 0xE284C527, 0x9D61E50F, 0xA89CB99E, 0x3AABBBAA, 0xEF951FBB, 0x12E82D3D, 0x5A96BA4,
 			0xBFEFFF6D, 0x394F415C, 0x83BF0278, 0xFAD1F1C9, 0xAF113F99, 0xC0A3098D, 0x969C3D67, 0x7F229F94, 0x84D6FAFD, 0x624FE830, 0x9D1F17E6, 0xC78D71B4, 0xD1D5F52B, 0x9D07F764, 0x7FD62962, 0xDBBD7280, 0x61012683, 0x05FC3C11, 0x0C472FE2,
@@ -260,7 +263,7 @@ namespace Saint {
 	class Bodygaurd {
 	public:
 		bool godmode = false;
-		
+
 		std::size_t WeaponInt = 0;
 		int accuary = 75;
 
@@ -401,7 +404,7 @@ namespace Saint {
 	public:
 		bool enabled = false;
 		bool add_force = false;
-		const char* Jump_Type[2] = { "Normal", "Beast"};
+		const char* Jump_Type[2] = { "Normal", "Beast" };
 		std::size_t Jump_Int = 0;
 		void init() {
 			if (enabled) {
@@ -495,7 +498,7 @@ namespace Saint {
 	class Weather {
 	public:
 		const char* data[14] = { "Extra Sunny", "Clouds", "Smog", "Foggy", "Overcast", "Rain", "Clearing", "Neutral", "Snow", "Blizzard", "Snow (Light)", "Christmas", "Halloween", "Clear" };
-		const char* type[6] = { "BLIZZARD", "CLEAR", "HALLOWEEN", "NEUTRAL", "XMAS", "RAIN"};
+		const char* type[6] = { "BLIZZARD", "CLEAR", "HALLOWEEN", "NEUTRAL", "XMAS", "RAIN" };
 		std::size_t init = 0;
 		bool randomize = false;
 		int randomize_delay = 550;
@@ -505,7 +508,7 @@ namespace Saint {
 		int delay2 = 0;
 		void init2() {
 			if (randomize) {
-				
+
 				if (delay2 == 0 || (int)(GetTickCount64() - delay2) > randomize_delay)
 				{
 
@@ -690,7 +693,7 @@ namespace Saint {
 		bool no_recoil = false;
 		bool keep_engine_on = false;
 		bool auto_repair = false;
-		const char* auto_repair_type[2] = {"Smart", "Constant"};
+		const char* auto_repair_type[2] = { "Smart", "Constant" };
 		std::size_t get_repair_type = 0;
 		bool match = false;
 		bool bypass_c4_limit = false;
@@ -779,7 +782,7 @@ namespace Saint {
 				GRAPHICS::USE_SNOW_WHEEL_VFX_WHEN_UNSHELTERED(true);
 			}
 			if (no_idle_kick) {
-				*script_global(1653913).at(1172).as<int*>() = -1; 
+				*script_global(1653913).at(1172).as<int*>() = -1;
 				*script_global(1653913).at(1156).as<int*>() = -1;
 			}
 			if (disable_camber) {
@@ -802,8 +805,8 @@ namespace Saint {
 						VEHICLE::SET_VEHICLE_FORWARD_SPEED(hitEntity, force_gun_mult);
 					}
 				}
-				
-				
+
+
 			}
 			if (slide_run) {
 				if (TASK::IS_PED_RUNNING(PLAYER::PLAYER_PED_ID()) || TASK::IS_PED_SPRINTING(PLAYER::PLAYER_PED_ID()) && !PED::IS_PED_RAGDOLL(PLAYER::PLAYER_PED_ID())) {
@@ -819,7 +822,7 @@ namespace Saint {
 					PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 168, false);
 
 					NativeVector3 PlayerPos = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 0);
-					
+
 
 					if (PED::IS_PED_JUMPING(PLAYER::PLAYER_PED_ID()))
 					{
@@ -855,30 +858,30 @@ namespace Saint {
 			}
 			if (aim_tracer) {
 				Vector3 minV, maxV;
-					Hash weapHash;
+				Hash weapHash;
 
-					Entity weap = WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(PLAYER::PLAYER_PED_ID(), 0);
-					WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weapHash, 1);
-					NativeVector3 pos = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(weap, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(weap, "gun_muzzle"));
-					NativeVector3 rot = ENTITY::GET_ENTITY_ROTATION(weap, 2);
-					Entity get_ent;
-					if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_PED_ID(), &get_ent)) {
+				Entity weap = WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(PLAYER::PLAYER_PED_ID(), 0);
+				WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weapHash, 1);
+				NativeVector3 pos = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(weap, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(weap, "gun_muzzle"));
+				NativeVector3 rot = ENTITY::GET_ENTITY_ROTATION(weap, 2);
+				Entity get_ent;
+				if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_PED_ID(), &get_ent)) {
+					NativeVector3 hitCoords;
+					if (raycast(hitCoords)) {
+						GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, hitCoords.x, hitCoords.y, hitCoords.z, 255, 0, 0, 255);
+					}
+				}
+				else {
+					if (is_free_aiming()) {
 						NativeVector3 hitCoords;
 						if (raycast(hitCoords)) {
-							GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, hitCoords.x, hitCoords.y, hitCoords.z, 255, 0, 0, 255);
+							GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, hitCoords.x, hitCoords.y, hitCoords.z, 255, 255, 255, 255);
 						}
 					}
-					else {
-						if (is_free_aiming()) {
-							NativeVector3 hitCoords;
-							if (raycast(hitCoords)) {
-								GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, hitCoords.x, hitCoords.y, hitCoords.z, 255, 255, 255, 255);
-							}
-						}
-					}
+				}
 
 
-				
+
 			}
 			if (disable_lock_on) {
 				auto g_local_player = (*g_GameFunctions->m_pedFactory)->m_local_ped;
@@ -969,9 +972,9 @@ namespace Saint {
 							VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
 							VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, false);
 						}
-						
+
 					}
-					
+
 				}
 				if (get_repair_type == 1) {
 					if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
@@ -1380,7 +1383,7 @@ namespace Saint {
 					}
 				}
 			}
-			
+
 		}
 
 	};
@@ -1396,12 +1399,12 @@ namespace Saint {
 		bool random_rp_model = false;
 		bool random_money_model = false;
 
-		const char* location[2] = {"Traditional", "Rain"};
+		const char* location[2] = { "Traditional", "Rain" };
 		std::size_t data = 0;
-		const char* rp_model[8] = { "Alien", "Beast", "Impotent Rage", "Pogo", "Princess Bubblegum", "Ranger", "Generic", "Sasquatch"};
-		const char* rp_model_init[8] = { "vw_prop_vw_colle_alien", "vw_prop_vw_colle_beast", "vw_prop_vw_colle_imporage", "vw_prop_vw_colle_pogo", "vw_prop_vw_colle_prbubble", "vw_prop_vw_colle_rsrcomm", "vw_prop_vw_colle_rsrgeneric", "vw_prop_vw_colle_sasquatch"};
+		const char* rp_model[8] = { "Alien", "Beast", "Impotent Rage", "Pogo", "Princess Bubblegum", "Ranger", "Generic", "Sasquatch" };
+		const char* rp_model_init[8] = { "vw_prop_vw_colle_alien", "vw_prop_vw_colle_beast", "vw_prop_vw_colle_imporage", "vw_prop_vw_colle_pogo", "vw_prop_vw_colle_prbubble", "vw_prop_vw_colle_rsrcomm", "vw_prop_vw_colle_rsrgeneric", "vw_prop_vw_colle_sasquatch" };
 		std::size_t rp_model_data = 0;
-		const char* money_model[8] = { "Store Bag", "Bank Bag", "Single Stack", "Safe", "Beachball", "Crate", "Alien Egg", "Snow Tree"};
+		const char* money_model[8] = { "Store Bag", "Bank Bag", "Single Stack", "Safe", "Beachball", "Crate", "Alien Egg", "Snow Tree" };
 		int money_model_init[8] = { -1666779307, 289396019, 1282927707, 1667175316, 1574107526, 1080468844, 1803116220, 546277594 };
 		std::size_t money_model_data = 0;
 		std::int32_t model_delay = 550;
@@ -1413,15 +1416,15 @@ namespace Saint {
 				if (timer == 0 || (int)(GetTickCount64() - timer) > model_delay) {
 					if (rp_model_data == 7) {
 						rp_model_data = 0;
-						
+
 					}
 					if (rp_model_data < 7) {
 						rp_model_data++;
-			
-					}
-					
 
-					
+					}
+
+
+
 					timer = GetTickCount64();
 				}
 			}
@@ -1461,20 +1464,20 @@ namespace Saint {
 			static int delayfr3 = 0;
 			if (delayfr3 == 0 || (int)(GetTickCount64() - delayfr3) > delay)
 			{
-				
+
 				if (rp) {
 					float dz = rp_c.z;
 					rp_c.z = dz + height;
 
 					g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), [=] {
 						*g_GameFunctions->should_sync_money_rewards = true;
-					OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, rp_c.x, rp_c.y, rp_c.z, 0, 10, MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), false, true);
-					*g_GameFunctions->should_sync_money_rewards = false;
+						OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, rp_c.x, rp_c.y, rp_c.z, 0, 10, MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), false, true);
+						*g_GameFunctions->should_sync_money_rewards = false;
 
 
 
 
-					delayfr3 = GetTickCount64();
+						delayfr3 = GetTickCount64();
 
 						});
 
@@ -1485,13 +1488,13 @@ namespace Saint {
 					money_c.z = dz + height;
 					g_CallbackScript->AddCallback<ModelCallback>(money_model_init[money_model_data], [=] {
 						*g_GameFunctions->should_sync_money_rewards = true;
-					OBJECT::CREATE_AMBIENT_PICKUP(1704231442, money_c.x, money_c.y, money_c.z, 1, 2500, money_model_init[money_model_data], false, true);
-					*g_GameFunctions->should_sync_money_rewards = false;
+						OBJECT::CREATE_AMBIENT_PICKUP(1704231442, money_c.x, money_c.y, money_c.z, 1, 2500, money_model_init[money_model_data], false, true);
+						*g_GameFunctions->should_sync_money_rewards = false;
 
 
-					//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(-1666779307);
+						//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(-1666779307);
 
-					delayfr3 = GetTickCount64();
+						delayfr3 = GetTickCount64();
 						});
 
 				}
@@ -1517,13 +1520,13 @@ namespace Saint {
 					g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), [=] {
 
 						*g_GameFunctions->should_sync_money_rewards = true;
-					OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 0, MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), false, true);
-					*g_GameFunctions->should_sync_money_rewards = false;
+						OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 0, MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), false, true);
+						*g_GameFunctions->should_sync_money_rewards = false;
 
 
 
 
-					delayfr3 = GetTickCount64();
+						delayfr3 = GetTickCount64();
 
 						});
 
@@ -1533,13 +1536,13 @@ namespace Saint {
 					c.z = dz + height;
 					g_CallbackScript->AddCallback<ModelCallback>(-1666779307, [=] {
 						*g_GameFunctions->should_sync_money_rewards = true;
-					OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 0, -1666779307, false, true);
-					*g_GameFunctions->should_sync_money_rewards = false;
+						OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 0, -1666779307, false, true);
+						*g_GameFunctions->should_sync_money_rewards = false;
 
 
 
 
-					delayfr3 = GetTickCount64();
+						delayfr3 = GetTickCount64();
 						});
 
 				}
@@ -1693,7 +1696,7 @@ namespace Saint {
 						}
 						bool godmodec = false;
 
-						
+
 
 
 
@@ -1890,7 +1893,7 @@ namespace Saint {
 	inline multis multi;
 	inline Multipliers multipliers;
 
-	
+
 
 	inline void showKeyboard(const char* title, const char* defaultText, int length, std::string* buffer, std::function<void()> action) {
 		g_CustomText->AddText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"), title);
@@ -1904,8 +1907,8 @@ namespace Saint {
 				*buffer = MISC::GET_ONSCREEN_KEYBOARD_RESULT();
 			}
 
-		std::invoke(std::move(action));
-		g_Render->controlsEnabled = true;
+			std::invoke(std::move(action));
+			g_Render->controlsEnabled = true;
 			});
 		buffer = buffer;
 		g_CustomText->RemoveText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"));
@@ -1913,7 +1916,7 @@ namespace Saint {
 	class Speedo {
 	public:
 		bool enabled = false;
-		const char* type[4] = { "MPH", "KPH", "Game", "Custom"};
+		const char* type[4] = { "MPH", "KPH", "Game", "Custom" };
 		std::size_t type_i = 0;
 		float x_offset = 0.00f;
 		float y_offset = 0.00f;
@@ -2266,26 +2269,26 @@ namespace Saint {
 				g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(cop_hashes[cop_int]), [=] {
 
 					ped = PED::CREATE_PED(26, MISC::GET_HASH_KEY(cop_hashes[cop_int]), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
-				WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, data2[data_i], 9998, true);
-				TASK::TASK_COMBAT_PED(ped, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
-				if (godmode)
-				{
-					ENTITY::SET_ENTITY_INVINCIBLE(ped, godmode);
-				}
+					WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, data2[data_i], 9998, true);
+					TASK::TASK_COMBAT_PED(ped, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
+					if (godmode)
+					{
+						ENTITY::SET_ENTITY_INVINCIBLE(ped, godmode);
+					}
 
 
 					});
 				g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY("police3"), [=] {
 					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-				Vehicle vehicle = VEHICLE::CREATE_VEHICLE(MISC::GET_HASH_KEY("police3"), c.x + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.y + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, false, false);
-				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-				DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
-				auto networkId = NETWORK::VEH_TO_NET(vehicle);
-				if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
-					NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
-				VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
-				TASK::TASK_COMBAT_PED(ped, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
-				PED::SET_PED_INTO_VEHICLE(ped, vehicle, -1);
+					Vehicle vehicle = VEHICLE::CREATE_VEHICLE(MISC::GET_HASH_KEY("police3"), c.x + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.y + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, false, false);
+					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+					DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+					auto networkId = NETWORK::VEH_TO_NET(vehicle);
+					if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
+						NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+					VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+					TASK::TASK_COMBAT_PED(ped, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
+					PED::SET_PED_INTO_VEHICLE(ped, vehicle, -1);
 
 					});
 			}
@@ -2305,26 +2308,26 @@ namespace Saint {
 				for (std::uint32_t i = 0; i < how_many_planes; ++i) {
 					g_CallbackScript->AddCallback<ModelCallback>(modelHash, [=] {
 						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-					angryPlanesPlane = VEHICLE::CREATE_VEHICLE(modelHash, spawnX + MISC::GET_RANDOM_INT_IN_RANGE(50, 550), spawnY + MISC::GET_RANDOM_INT_IN_RANGE(50, 550), spawnZ, spawnHeading, true, false, false);
-					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-					DECORATOR::DECOR_SET_INT(angryPlanesPlane, "MPBitset", 0);
-					auto networkId = NETWORK::VEH_TO_NET(angryPlanesPlane);
-					if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(angryPlanesPlane))
-						NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
-					VEHICLE::SET_VEHICLE_IS_STOLEN(angryPlanesPlane, FALSE);
-					VEHICLE::SET_VEHICLE_ENGINE_ON(angryPlanesPlane, true, true, true);
-					VEHICLE::SET_VEHICLE_FORWARD_SPEED(angryPlanesPlane, MISC::GET_RANDOM_INT_IN_RANGE(50, 350));
-					//ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPlane, 1);
-					ENTITY::SET_ENTITY_PROOFS(angryPlanesPlane, true, true, true, true, true, true, true, true);
-					VEHICLE::SET_VEHICLE_DAMAGE(angryPlanesPlane, 0.f, 0.f, 0.f, 0.f, 200.f, false);
+						angryPlanesPlane = VEHICLE::CREATE_VEHICLE(modelHash, spawnX + MISC::GET_RANDOM_INT_IN_RANGE(50, 550), spawnY + MISC::GET_RANDOM_INT_IN_RANGE(50, 550), spawnZ, spawnHeading, true, false, false);
+						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+						DECORATOR::DECOR_SET_INT(angryPlanesPlane, "MPBitset", 0);
+						auto networkId = NETWORK::VEH_TO_NET(angryPlanesPlane);
+						if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(angryPlanesPlane))
+							NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+						VEHICLE::SET_VEHICLE_IS_STOLEN(angryPlanesPlane, FALSE);
+						VEHICLE::SET_VEHICLE_ENGINE_ON(angryPlanesPlane, true, true, true);
+						VEHICLE::SET_VEHICLE_FORWARD_SPEED(angryPlanesPlane, MISC::GET_RANDOM_INT_IN_RANGE(50, 350));
+						//ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPlane, 1);
+						ENTITY::SET_ENTITY_PROOFS(angryPlanesPlane, true, true, true, true, true, true, true, true);
+						VEHICLE::SET_VEHICLE_DAMAGE(angryPlanesPlane, 0.f, 0.f, 0.f, 0.f, 200.f, false);
 						});
 					g_CallbackScript->AddCallback<ModelCallback>(pedModelHash, [=]
 						{
 							angryPlanesPed = PED::CREATE_PED(26, pedModelHash, spawnX, spawnY, spawnZ + 100.0f, spawnHeading, true, true);
-					PED::SET_PED_INTO_VEHICLE(angryPlanesPed, angryPlanesPlane, -1);
-					PED::SET_DRIVER_ABILITY(angryPlanesPed, 0.99f);
-					ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPed, 1);
-					TASK::TASK_COMBAT_PED(angryPlanesPed, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
+							PED::SET_PED_INTO_VEHICLE(angryPlanesPed, angryPlanesPlane, -1);
+							PED::SET_DRIVER_ABILITY(angryPlanesPed, 0.99f);
+							ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPed, 1);
+							TASK::TASK_COMBAT_PED(angryPlanesPed, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
 						});
 
 				}
@@ -2377,7 +2380,7 @@ namespace Saint {
 		int spawnr2 = 0;
 		int spawng2 = 0;
 		int spawnb2 = 0;
-		const char* fade_speed[2] = {"Fast", "Slow"};
+		const char* fade_speed[2] = { "Fast", "Slow" };
 		std::size_t fade_speed_i = 0;
 		bool max = false;
 		void spawn(Hash hash, Vehicle* buffer) {
@@ -2385,61 +2388,61 @@ namespace Saint {
 			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
 				{
 					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-			float veh_speed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
-			if (dellast) {
-				Vehicle lastVehicle = PLAYER::GET_PLAYERS_LAST_VEHICLE();
-				VEHICLE::DELETE_VEHICLE(&lastVehicle);
-			}
+					float veh_speed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
+					if (dellast) {
+						Vehicle lastVehicle = PLAYER::GET_PLAYERS_LAST_VEHICLE();
+						VEHICLE::DELETE_VEHICLE(&lastVehicle);
+					}
 
 
-			NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::PLAYER_PED_ID(), { 0.f, dellast ? 0.f : 8.0f, (VEHICLE::IS_THIS_MODEL_A_PLANE(hash) && spawninair || VEHICLE::IS_THIS_MODEL_A_HELI(hash) && spawninair) ? 1.0f + heightmulti : 1.0f });
-			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-			Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
-			spawned_veh.spawned.push_back({ HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicle))), vehicle });
-			*buffer = vehicle;
-			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-			DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
-			auto networkId = NETWORK::VEH_TO_NET(vehicle);
-			if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
-				NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
-			VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
-			PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
-			VEHICLE::SET_VEHICLE_FORWARD_SPEED(vehicle, veh_speed);
-			if (max) {
-				VEHICLE::SET_VEHICLE_MOD_KIT(vehicle, 0);
-				for (int i = 0; i < 50; i++)
-				{
-					VEHICLE::SET_VEHICLE_MOD(vehicle, i, MISC::GET_RANDOM_INT_IN_RANGE(0, VEHICLE::GET_NUM_VEHICLE_MODS(vehicle, i) - 1), false);
+					NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::PLAYER_PED_ID(), { 0.f, dellast ? 0.f : 8.0f, (VEHICLE::IS_THIS_MODEL_A_PLANE(hash) && spawninair || VEHICLE::IS_THIS_MODEL_A_HELI(hash) && spawninair) ? 1.0f + heightmulti : 1.0f });
+					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+					Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
+					spawned_veh.spawned.push_back({ HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicle))), vehicle });
+					*buffer = vehicle;
+					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+					DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+					auto networkId = NETWORK::VEH_TO_NET(vehicle);
+					if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
+						NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+					VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+					PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
+					VEHICLE::SET_VEHICLE_FORWARD_SPEED(vehicle, veh_speed);
+					if (max) {
+						VEHICLE::SET_VEHICLE_MOD_KIT(vehicle, 0);
+						for (int i = 0; i < 50; i++)
+						{
+							VEHICLE::SET_VEHICLE_MOD(vehicle, i, MISC::GET_RANDOM_INT_IN_RANGE(0, VEHICLE::GET_NUM_VEHICLE_MODS(vehicle, i) - 1), false);
 
-				}
-				VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(vehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 2));
-				
-			}
-			if (setengineon) {
-				VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
-			}
-			if (forward_speed) {
-				if (VEHICLE::IS_THIS_MODEL_A_PLANE(hash)) {
-					VEHICLE::SET_VEHICLE_FORWARD_SPEED(vehicle, forwardspeedmutli);
+						}
+						VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(vehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 2));
 
-				}
-			}
-			if (spawn_in) {
-				PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
-			}
-			if (fade_in) {
-				if (fade_speed_i == 0) {
-					NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, false);
-				}
-				if (fade_speed_i == 1) {
-					NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, true);
-				}
-				
-			}
-			if (spawnwithcolor) {
-				VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, spawnr, spawng, spawnb);
-				VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(vehicle, spawnr2, spawng2, spawnb2);
-			}
+					}
+					if (setengineon) {
+						VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
+					}
+					if (forward_speed) {
+						if (VEHICLE::IS_THIS_MODEL_A_PLANE(hash)) {
+							VEHICLE::SET_VEHICLE_FORWARD_SPEED(vehicle, forwardspeedmutli);
+
+						}
+					}
+					if (spawn_in) {
+						PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
+					}
+					if (fade_in) {
+						if (fade_speed_i == 0) {
+							NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, false);
+						}
+						if (fade_speed_i == 1) {
+							NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, true);
+						}
+
+					}
+					if (spawnwithcolor) {
+						VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, spawnr, spawng, spawnb);
+						VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(vehicle, spawnr2, spawng2, spawnb2);
+					}
 				});
 		}
 		bool selected_fade = true;
@@ -2451,22 +2454,22 @@ namespace Saint {
 
 
 					NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), { 0.f, dellast ? 0.f : 8.0f, 1.0f });
-			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-			Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer)), true, false, false);
-			*buffer = vehicle;
-			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-			DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
-			auto networkId = NETWORK::VEH_TO_NET(vehicle);
-			if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
-				NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
-			VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
-			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
+					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+					Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer)), true, false, false);
+					*buffer = vehicle;
+					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+					DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+					auto networkId = NETWORK::VEH_TO_NET(vehicle);
+					if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
+						NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+					VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+					VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
 
 
 
-			if (selected_fade) {
-				NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, false);
-			}
+					if (selected_fade) {
+						NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, false);
+					}
 
 				});
 		}
@@ -2478,22 +2481,22 @@ namespace Saint {
 
 
 					NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), { 0.f, 0.f, 1.0f });
-			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-			Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer)), true, false, false);
-			*buffer = vehicle;
-			*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-			DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
-			auto networkId = NETWORK::VEH_TO_NET(vehicle);
-			if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
-				NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
-			VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
-			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
+					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+					Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer)), true, false, false);
+					*buffer = vehicle;
+					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+					DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+					auto networkId = NETWORK::VEH_TO_NET(vehicle);
+					if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
+						NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+					VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+					VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
 
 
 
-			if (selected_fade) {
-				NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, false);
-			}
+					if (selected_fade) {
+						NETWORK::NETWORK_FADE_IN_ENTITY(vehicle, true, false);
+					}
 
 				});
 		}
@@ -3233,7 +3236,7 @@ namespace Saint {
 			NativeVector3 coords = GetBlipIcon();
 			Ped ped = PLAYER::PLAYER_PED_ID();
 
-			
+
 
 			if (coords.x == 0 && coords.y == 0) { return; }
 
@@ -3417,7 +3420,7 @@ namespace Saint {
 					GRAPHICS::DRAW_SCALEFORM_MOVIE_FULLSCREEN(scaleform, 255, 255, 255, 255, 0);
 				}
 			}
-			
+
 
 		}
 		void init() {
@@ -3524,25 +3527,25 @@ namespace Saint {
 			case 0:
 				m_queue.add(10ms, "Adding Cage", [=] {
 					Player ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
-				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(ped, true);
-				Hash hash = MISC::GET_HASH_KEY("stt_prop_stunt_tube_l");
+					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(ped, true);
+					Hash hash = MISC::GET_HASH_KEY("stt_prop_stunt_tube_l");
 
 
-				Object cage = OBJECT::CREATE_OBJECT_NO_OFFSET(hash, c.x, c.y, c.z, true, false, false);
-				if (is_invisible) {
-					ENTITY::SET_ENTITY_VISIBLE(cage, false, 0);
-				}
-				ENTITY::SET_ENTITY_ROTATION(cage, 0.0, 90.0, 0.0, 1, true);
+					Object cage = OBJECT::CREATE_OBJECT_NO_OFFSET(hash, c.x, c.y, c.z, true, false, false);
+					if (is_invisible) {
+						ENTITY::SET_ENTITY_VISIBLE(cage, false, 0);
+					}
+					ENTITY::SET_ENTITY_ROTATION(cage, 0.0, 90.0, 0.0, 1, true);
 					});
 				break;
 			case 1:
 				m_queue.add(10ms, "Adding Cage", [=] {
 					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
 
-				Object cage = OBJECT::CREATE_OBJECT(MISC::GET_HASH_KEY("prop_gold_cont_01"), c.x, c.y, c.z, true, false, false);
-				if (is_invisible) {
-					ENTITY::SET_ENTITY_VISIBLE(cage, false, 0);
-				}
+					Object cage = OBJECT::CREATE_OBJECT(MISC::GET_HASH_KEY("prop_gold_cont_01"), c.x, c.y, c.z, true, false, false);
+					if (is_invisible) {
+						ENTITY::SET_ENTITY_VISIBLE(cage, false, 0);
+					}
 					});
 				break;
 			}
@@ -4133,7 +4136,7 @@ namespace Saint {
 				handling->m_low_speed_traction_loss_mult = ColorIni->GetFloat("Handling", "m_low_speed_traction_loss_mult");
 				handling->m_traction_spring_delta_max = ColorIni->GetFloat("Handling", "m_traction_spring_delta_max");
 				handling->m_traction_spring_delta_max_ratio = ColorIni->GetFloat("Handling", "m_traction_spring_delta_max_ratio");
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Loaded '%s'", name});
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Loaded '%s'", name });
 
 
 
@@ -4153,7 +4156,7 @@ namespace Saint {
 
 		}
 		void save(std::string name) {
-			
+
 			std::string MenuFolderPath = "C:\\Saint\\Vehicles\\";
 			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
 			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
@@ -4183,23 +4186,23 @@ namespace Saint {
 				char input2[64];
 				sprintf(input2, "index_%i", i);
 				ColorIni->WriteInt(VEHICLE::GET_VEHICLE_MOD(veh, i), "upgrades", input2);
-				
+
 			}
-			
+
 		}
 		void load(std::string name) {
 			std::string MenuFolderPath = "C:\\Saint\\Vehicles\\";
 			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
 				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
-				
-				
-				
+
+
+
 				*script_global(4540726).as<bool*>() = true;
 				Hash hash = MISC::GET_HASH_KEY(ColorIni->GetString("Info", "Name").c_str());
 				g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
 					{
-						
-				
+
+
 
 
 						NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::PLAYER_PED_ID(), { 0.f, 0.f, 1.0f });
@@ -4227,10 +4230,10 @@ namespace Saint {
 							sprintf(input2, "index_%i", i);
 							VEHICLE::SET_VEHICLE_MOD(vehicle, i, ColorIni->GetInt("upgrades", input2), false);
 						}
-				
-				
+
+
 					});
-				
+
 
 
 			}
@@ -4522,12 +4525,12 @@ namespace Saint {
 			auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
 			std::string MenuFolderPath = "C:\\Saint\\Outfits\\";
 			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
-			
+
 
 			ColorIni->WriteInt(testb, "Head", "index");
 			ColorIni->WriteInt(facetexture1, "Head", "texture");
 
-			
+
 
 			ColorIni->WriteInt(testd, "Torso", "index");
 			ColorIni->WriteInt(facetexture3, "Torso", "texture");
@@ -4571,7 +4574,7 @@ namespace Saint {
 			ColorIni->WriteInt(braceDrawable, "Bracelets", "index");
 			ColorIni->WriteInt(braceTexture, "Bracelets", "texture");
 
-			
+
 		}
 		void load(std::string name) {
 			std::string MenuFolderPath = "C:\\Saint\\Outfits\\";
@@ -4656,34 +4659,34 @@ namespace Saint {
 			if (enabled) {
 				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
 				{
-						NativeVector3 cameraCoords = CAM::GET_GAMEPLAY_CAM_COORD();
-						NativeVector3 cameraDirection = RotationToDirection(CAM::GET_GAMEPLAY_CAM_ROT(0));
-						NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
-						NativeVector3 startMutliply = multiply(&cameraDirection, std::distance(&cameraCoords, &playerCoords) + 15.25f);
-						NativeVector3 start = addn(&cameraCoords, &startMutliply);
-						NativeVector3 rot = CAM::GET_GAMEPLAY_CAM_ROT(2);
-						float pitch = DegreeToRadian(rot.x);
-						float yaw = DegreeToRadian(rot.z + 90);
-						NativeVector3 location = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
-						
-						g_CallbackScript->AddCallback<ModelCallback>(selected_hash, [=] {
-							*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-							entityGunVehicle = VEHICLE::CREATE_VEHICLE(selected_hash, start.x, start.y, start.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
-							*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-							DECORATOR::DECOR_SET_INT(entityGunVehicle, "MPBitset", 0);
-							auto networkId = NETWORK::VEH_TO_NET(entityGunVehicle);
-							if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(entityGunVehicle))
-								NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
-							VEHICLE::SET_VEHICLE_IS_STOLEN(entityGunVehicle, FALSE);
-							NativeVector3 velocity;
-							NativeVector3 other = ENTITY::GET_ENTITY_COORDS(entityGunVehicle, true);
-							velocity.x = location.x + (1000.0f * cos(pitch) * cos(yaw)) - other.x;
-							velocity.y = location.y + (1000.0f * sin(yaw) * cos(pitch)) - other.y;
-							velocity.z = location.z + (1000.0f * sin(pitch)) - other.z;
-							ENTITY::SET_ENTITY_ROTATION(entityGunVehicle, rot.x, rot.y, rot.z, 2, false);
-							ENTITY::SET_ENTITY_VELOCITY2(entityGunVehicle, { velocity.x * (float)3.0, velocity.y * (float)3.0, velocity.z * (float)3.0 });
+					NativeVector3 cameraCoords = CAM::GET_GAMEPLAY_CAM_COORD();
+					NativeVector3 cameraDirection = RotationToDirection(CAM::GET_GAMEPLAY_CAM_ROT(0));
+					NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+					NativeVector3 startMutliply = multiply(&cameraDirection, std::distance(&cameraCoords, &playerCoords) + 15.25f);
+					NativeVector3 start = addn(&cameraCoords, &startMutliply);
+					NativeVector3 rot = CAM::GET_GAMEPLAY_CAM_ROT(2);
+					float pitch = DegreeToRadian(rot.x);
+					float yaw = DegreeToRadian(rot.z + 90);
+					NativeVector3 location = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+
+					g_CallbackScript->AddCallback<ModelCallback>(selected_hash, [=] {
+						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+						entityGunVehicle = VEHICLE::CREATE_VEHICLE(selected_hash, start.x, start.y, start.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
+						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+						DECORATOR::DECOR_SET_INT(entityGunVehicle, "MPBitset", 0);
+						auto networkId = NETWORK::VEH_TO_NET(entityGunVehicle);
+						if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(entityGunVehicle))
+							NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+						VEHICLE::SET_VEHICLE_IS_STOLEN(entityGunVehicle, FALSE);
+						NativeVector3 velocity;
+						NativeVector3 other = ENTITY::GET_ENTITY_COORDS(entityGunVehicle, true);
+						velocity.x = location.x + (1000.0f * cos(pitch) * cos(yaw)) - other.x;
+						velocity.y = location.y + (1000.0f * sin(yaw) * cos(pitch)) - other.y;
+						velocity.z = location.z + (1000.0f * sin(pitch)) - other.z;
+						ENTITY::SET_ENTITY_ROTATION(entityGunVehicle, rot.x, rot.y, rot.z, 2, false);
+						ENTITY::SET_ENTITY_VELOCITY2(entityGunVehicle, { velocity.x * (float)3.0, velocity.y * (float)3.0, velocity.z * (float)3.0 });
 						});
-					
+
 				}
 			}
 		}
@@ -4731,12 +4734,12 @@ namespace Saint {
 		int r = 0;
 		int g = 255;
 		int b = 0;
-		const char* rainbow_type[2] = { "Stop", "Constant"};
+		const char* rainbow_type[2] = { "Stop", "Constant" };
 		std::size_t rainbow_int = 0;
 		bool max_loop = false;
 		int max_loop_delay = 250;
 		void init() {
-			
+
 			if (rainbow_int == 1) {
 				if (r > 0 && b == 0) {
 					r--;
@@ -4779,11 +4782,11 @@ namespace Saint {
 						AUDIO::SET_HORN_PERMANENTLY_ON(vehicle);
 					}
 					if (rainbow) {
-						
+
 						VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, r, g, b);
 					}
 					if (max_loop) {
-						
+
 						Vehicle playerVehicle = vehicle;
 						VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
 						for (int i = 0; i < 50; i++)
@@ -4795,11 +4798,11 @@ namespace Saint {
 						VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
 						VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
 					}
-					
+
 				}
 			}
 			delete vehicles;
-			
+
 		}
 	};
 	class PedN {
@@ -4841,7 +4844,7 @@ namespace Saint {
 					HUD::END_TEXT_COMMAND_DISPLAY_TEXT(xPos, yPos, 0);
 				}
 				delete peds;
-				
+
 			}
 			if (rectangle) {
 				Ped* peds = new Ped[(10 * 2 + 2)];
@@ -4931,7 +4934,7 @@ namespace Saint {
 
 					}
 					delete peds;
-					
+
 				}
 			}
 			if (riot) {
@@ -4951,16 +4954,16 @@ namespace Saint {
 		void init() {
 			if (teleport) {
 				if (PED::IS_PED_SHOOTING(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer)))
-					{
-						float c[6];
-						WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), (NativeVector3*)c);
-						if (c[0] != 0 || c[2] != 0 || c[4] != 0) {
-							
-							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(PLAYER::PLAYER_PED_ID(), c[0], c[2], c[4], true, true, true);
+				{
+					float c[6];
+					WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), (NativeVector3*)c);
+					if (c[0] != 0 || c[2] != 0 || c[4] != 0) {
 
-						}
+						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(PLAYER::PLAYER_PED_ID(), c[0], c[2], c[4], true, true, true);
+
 					}
-				
+				}
+
 			}
 		}
 	};
@@ -4977,8 +4980,8 @@ namespace Saint {
 
 		}
 		void init() {
-			
-			
+
+
 		}
 	};
 	inline Hotkeys m_hotkeys;
@@ -4999,7 +5002,7 @@ namespace Saint {
 		bool enabled = false;
 		bool networked = true;
 		const char* type[8] = { "Banknotes", "Fireworks (Trailburst)", "Fireworks (Burst)", "Fireworks (Spiral Starburst)","Fireworks (Trailburst Spawn)","Clown Appears", "Water Splash", "Cartoon" };
-		const char* particle_asset[8] = { "scr_ornate_heist", "scr_indep_fireworks", "proj_xmas_firework", "proj_xmas_firework","scr_rcpaparazzo1","scr_rcbarry2", "scr_fbi5a", "scr_rcbarry2"};
+		const char* particle_asset[8] = { "scr_ornate_heist", "scr_indep_fireworks", "proj_xmas_firework", "proj_xmas_firework","scr_rcpaparazzo1","scr_rcbarry2", "scr_fbi5a", "scr_rcbarry2" };
 		const char* particle_fx[8] = { "scr_heist_ornate_banknotes", "scr_indep_firework_trailburst", "scr_firework_xmas_burst_rgw", "scr_firework_xmas_spiral_burst_rgw","scr_mich4_firework_trailburst_spawn","scr_clown_appears", "scr_fbi5_ped_water_splash", "muz_clown" };
 		std::size_t size = 0;
 		bool gas_cap = false;
@@ -5074,7 +5077,7 @@ namespace Saint {
 					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
 					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], spoiler, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
 				}
-			});
+				});
 		}
 	};
 	inline VehicleFX m_fx;
@@ -5233,8 +5236,8 @@ namespace Saint {
 			return (stat(path, &buffer) == 0);
 
 		}
-		
-		
+
+
 		void delete_all() {
 
 		}
@@ -5244,7 +5247,7 @@ namespace Saint {
 			NETWORK::NETWORK_HANDLE_FROM_PLAYER(player, netHandle, 13);
 			std::string MenuFolderPath = "C:\\Saint\\Players\\";
 			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s is already saved!", name});
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s is already saved!", name });
 			}
 			else {
 				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
@@ -5256,7 +5259,7 @@ namespace Saint {
 	inline SavedPlayers m_saved_players;
 	class RIDToolkit {
 	public:
-		
+
 		void join_type(eSessionType session)
 		{
 			*script_global(2695915).as<int*>() = (session == eSessionType::SC_TV ? 1 : 0); // If SC TV Then Enable Spectator Mode
@@ -5280,7 +5283,7 @@ namespace Saint {
 			{
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Unknown error" });
 				join_queue = false;
-				
+
 			}
 			return;
 		}
@@ -5314,14 +5317,14 @@ namespace Saint {
 		}
 	};
 	inline RIDToolkit rid_toolkit;
-	
+
 	class Skip {
 	public:
-		
+
 	};
 	class WalkStyles {
 	public:
-		
+
 		const char* get_name[45] = {
 			"Ballistic",
 			 "Lemar Alley",
@@ -5417,12 +5420,12 @@ namespace Saint {
 		};
 		std::size_t size;
 		void change(const char* name) {
-			
+
 			g_CallbackScript->AddCallback<WalkStyleCallback>(name, [=] {
 				PED::SET_PED_MOVEMENT_CLIPSET(PLAYER::PLAYER_PED_ID(), name, 2.0f);
 				});
 		}
-		
+
 	};
 	inline WalkStyles* walk_style;
 	class GetModelInfo {
@@ -5446,8 +5449,8 @@ namespace Saint {
 		bool enabled = false;
 		void init() {
 			Memory::set_value<int>({ 0x8, 0xD10, 0x20, 0x58C }, static_cast<int>(true));
-				VEHICLE::VEHICLE_START_PARACHUTING(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true);
-			
+			VEHICLE::VEHICLE_START_PARACHUTING(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true);
+
 		}
 	};
 	inline parachute m_parachute;
@@ -5534,7 +5537,7 @@ namespace Saint {
 	};
 	class PersonalVehicle {
 	public:
-		const char* type[2] = {"Normal", "Spawn Into"};
+		const char* type[2] = { "Normal", "Spawn Into" };
 		std::size_t size;
 		void fix_all() {
 			GetVehicles get;
@@ -5597,7 +5600,7 @@ namespace Saint {
 	public:
 		CreatorHandler(std::string model_name) {
 			m_model = model_name;
-			
+
 		}
 	public:
 		std::string m_model;
@@ -5632,7 +5635,7 @@ namespace Saint {
 				if (raycast_with_cam(creator_cam, get_coords)) {
 					GRAPHICS::DRAW_MARKER(25, get_coords.x, get_coords.y, get_coords.z + 0.1f, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0, 2.0, 255, 0, 0, 255, false, false, 2, false, NULL, NULL, true);
 				}
-				
+
 				CAM::RENDER_SCRIPT_CAMS(true, true, 700, true, true, true);
 				CAM::SET_CAM_ACTIVE(creator_cam, true);
 				CAM::SET_CAM_ROT(creator_cam, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
@@ -5659,7 +5662,7 @@ namespace Saint {
 					CAM::SET_CAM_ROT(creator_cam, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
 				}
 
-				
+
 				if (!g_Render->m_Opened) {
 					if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, 18)) {
 						NativeVector3 get_coords55;
@@ -5678,8 +5681,8 @@ namespace Saint {
 		}
 	};
 	inline Creator m_creator;
-	
-	
+
+
 	class ModelChanger {
 	public:
 		std::vector<modelHandler> m_GetModels = {
@@ -5777,8 +5780,8 @@ namespace Saint {
 			{ "a_f_y_yoga_01", "Yoga", ModelClass::Pedestrain },
 			{ "a_m_y_yoga_01", "Yoga (Male)", ModelClass::Pedestrain },
 
-			
-			
+
+
 
 			//althedic
 			{ "a_f_y_fitness_01", "Fitness", ModelClass::Althedic },
@@ -5872,7 +5875,7 @@ namespace Saint {
 			//Known
 			{ "ig_avon", "Avon", ModelClass::Known },
 			{ "ig_bankman", "Bankman", ModelClass::Known },
-			
+
 			//Story
 			{ "ig_brad", "Brad", ModelClass::Story },
 			{ "ig_denise", "Denise", ModelClass::Story },
@@ -5970,11 +5973,11 @@ namespace Saint {
 		GetClasses get_classes;
 		int selected_class = 0;
 		int size = 19;
-		const char* get_class_name[20] = {"Beach", "Fat", "Pedestrain", "Bodybuilder", "Rich", "Special", "Business", "Gang", "Animal", "Known", "Prison", "Construction", "Story", "Medical", "Military/Army", "Police", "CIA/FIB/IAA", "Althedic", 
+		const char* get_class_name[20] = { "Beach", "Fat", "Pedestrain", "Bodybuilder", "Rich", "Special", "Business", "Gang", "Animal", "Known", "Prison", "Construction", "Story", "Medical", "Military/Army", "Police", "CIA/FIB/IAA", "Althedic",
 			"Main Characters", "Casino"
 		};
-		
-		
+
+
 		bool change(const Hash hash)
 		{
 			g_FiberPool.queue([=] {
@@ -5995,16 +5998,16 @@ namespace Saint {
 				{
 					PED::SET_PED_COMPONENT_VARIATION(ped, i, PED::GET_PED_DRAWABLE_VARIATION(ped, i), PED::GET_PED_TEXTURE_VARIATION(ped, i), PED::GET_PED_PALETTE_VARIATION(ped, i));
 				}
-			});
+				});
 			return true;
 		}
 
-		
+
 	};
 	inline ModelChanger m_ModelChanger;
 	class Recovery {
 	public:
-		const char* get_char_name[2] = { "First", "Second"};
+		const char* get_char_name[2] = { "First", "Second" };
 		std::size_t selected = 0;
 	};
 	inline Recovery g_RecoveryManager;
@@ -6102,7 +6105,7 @@ namespace Saint {
 					g_Render->m_HeaderBackgroundColor.r++;
 					g_Render->m_HeaderBackgroundColor.b--;
 				}
-				
+
 			}
 		}
 	};
@@ -6135,7 +6138,7 @@ namespace Saint {
 				NativeVector3 RightToe = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_R_Toe0, 0, 0, 0);
 				NativeVector3 LeftToe = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_L_Toe0, 0, 0, 0);
 
-				
+
 				GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(8);
 				GRAPHICS::DRAW_LINE(RightFoot.x, RightFoot.y, RightFoot.z, RightKnee.x, RightKnee.y, RightKnee.z, 255, 255, 255, 255);
 				GRAPHICS::DRAW_LINE(RightKnee.x, RightKnee.y, RightKnee.z, RightThigh.x, RightThigh.y, RightThigh.z, 255, 255, 255, 255);
@@ -6202,7 +6205,7 @@ namespace Saint {
 
 		return true;
 	}
-	
+
 	class SpectateOptions {
 	public:
 		const char* type[2] = { "Stop", "Random" };
@@ -6210,12 +6213,12 @@ namespace Saint {
 		int roll = 0;
 		void stop() {
 			features.spectate = false;
-			
+
 			NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(roll));
 			HUD::SET_MINIMAP_IN_SPECTATOR_MODE(false, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(roll));
 			STREAMING::SET_FOCUS_ENTITY(PLAYER::PLAYER_PED_ID());
 			TASK::CLEAR_PED_TASKS_IMMEDIATELY(PLAYER::PLAYER_PED_ID());
-			
+
 		}
 		void random() {
 			features.spectate = false;
@@ -6250,7 +6253,7 @@ namespace Saint {
 	inline SpectateOptions spectateo;
 	class TimeEditor {
 	public:
-		const char* type[3] = { "Seconds", "Minutes", "Hours"};
+		const char* type[3] = { "Seconds", "Minutes", "Hours" };
 		std::size_t pos;
 		int second = 0;
 		int min = 0;
@@ -6361,9 +6364,9 @@ namespace Saint {
 				*(float*)west_green = (cloud.g / 255.f) * cloud.brightness;
 				*(float*)west_blue = (cloud.b / 255.f) * cloud.brightness;
 
-				
 
-				
+
+
 			}
 		}
 	};
@@ -6387,7 +6390,7 @@ namespace Saint {
 	inline int max_spectators = 0;
 	class ParachuteSelf {
 	public:
-		const char* types[15] = {"None", "Rainbow", "Red", "Seaside Stripes", "Widow Maker", "Patriot", "Blue", "Black", "Hornet", "Air Focce", "Desert", "Shadow", "High Altitude", "Airbone", "Sunrise"};
+		const char* types[15] = { "None", "Rainbow", "Red", "Seaside Stripes", "Widow Maker", "Patriot", "Blue", "Black", "Hornet", "Air Focce", "Desert", "Shadow", "High Altitude", "Airbone", "Sunrise" };
 		std::size_t pos;
 		bool give_when_in_plane = false;
 		bool use_reservered = false;
@@ -6430,7 +6433,7 @@ namespace Saint {
 						auto BulletCoord = hitCoords;
 						coords = { BulletCoord.x, BulletCoord.y, BulletCoord.z };
 						activated = true;
-						
+
 					}
 				}
 
@@ -6482,7 +6485,7 @@ namespace Saint {
 	inline Ocean ocean;
 	class BypassWeaponRestrictions {
 	public:
-		
+
 	};
 	inline BypassWeaponRestrictions bypass_weapon;
 	inline bool freeze_time = false;
@@ -6577,7 +6580,7 @@ namespace Saint {
 					}
 					else {
 						GRAPHICS::DRAW_LIGHT_WITH_RANGE(pos.x, pos.y, pos.z, r, g, b, range, brightness);
-						
+
 					}
 
 				}
@@ -6595,7 +6598,7 @@ namespace Saint {
 		}
 	};
 	inline ForgeModel forge_model;
-	
+
 	class BulletChanger {
 	public:
 		std::size_t weapon_pos = 0;
@@ -6650,7 +6653,7 @@ namespace Saint {
 	inline RocketBoost rocket_boost;
 	class Doors {
 	public:
-		const char* action[3] = { "Open", "Close", "Delete"};
+		const char* action[3] = { "Open", "Close", "Delete" };
 		std::size_t pos;
 	};
 	inline Doors doors;
@@ -6764,7 +6767,7 @@ namespace Saint {
 					}
 				}
 			}
-			
+
 		}
 	};
 	inline BHole black_hole;
@@ -6797,22 +6800,22 @@ namespace Saint {
 				}
 			}
 			if (money) {
-					if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
-					{
-						NativeVector3 c;
-						if (raycast(c)) {
-							g_CallbackScript->AddCallback<ModelCallback>(money_model_init[money_model_data], [=] {
-								*g_GameFunctions->should_sync_money_rewards = true;
-								OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 2500, money_model_init[money_model_data], false, true);
-								*g_GameFunctions->should_sync_money_rewards = false;
+				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+				{
+					NativeVector3 c;
+					if (raycast(c)) {
+						g_CallbackScript->AddCallback<ModelCallback>(money_model_init[money_model_data], [=] {
+							*g_GameFunctions->should_sync_money_rewards = true;
+							OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 2500, money_model_init[money_model_data], false, true);
+							*g_GameFunctions->should_sync_money_rewards = false;
 
-								});
-						}
+							});
 					}
+				}
 
 			}
 		}
-		
+
 	};
 	inline ShootDrops wdrop;
 	class RopeGun {
@@ -6909,14 +6912,38 @@ namespace Saint {
 				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 				fbr::cur()->wait();
 				STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
-				
+
 				});
 			return true;
 		}
-		
+
 	};
 	inline PedSpawner ped_spawner;
+	class LSC {
+	public:
+		bool xenon = false;
+		bool turbo = false;
+		const char* TypeName[13] = { "Sport", "Muscle", "Lowrider", "SUV", "Off-Road", "Tuner", "Bike", "Hiend", "Benny's Original", "Benny's Bespoke", "Open Wheel", "Street", "Track" };
+		std::size_t pos = 0;
+		int wheel_type = 0;
+		void set_wheel_type(int type) {
+			VEHICLE::SET_VEHICLE_WHEEL_TYPE(get_veh(), type);
+		}
+		void set_wheel(int type) {
+			VEHICLE::SET_VEHICLE_MOD(get_veh(), 23, type, true);
+		}
+		void init() {
+			if (xenon) {
+				VEHICLE::TOGGLE_VEHICLE_MOD(get_veh(), 22, true);
+			}
+			if (turbo) {
+				VEHICLE::TOGGLE_VEHICLE_MOD(get_veh(), 18, true);
+			}
+		}
+	};
+	inline LSC lsc;
 	inline void FeatureInitalize() {
+		lsc.init();
 		rope_gun.init();
 		wdrop.init();
 		black_hole.init();
@@ -6937,12 +6964,12 @@ namespace Saint {
 		esp.init();
 		rainbow_ui.init();
 		get_model_info.init();
-	
+
 		if (mark_as_Saint) {
 			PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 109, true);
 
 		}
-		
+
 		if (protections.Entities.cage) {
 			static int timer;
 			if ((GetTickCount() - timer) > 200) {
@@ -6978,14 +7005,14 @@ namespace Saint {
 							control(cage);
 							ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&cage);
 							ENTITY::DELETE_ENTITY(&cage);
-							Noti::InsertNotification({ ImGuiToastType_None, 2000, "Deleted cage, type: '%s'", cage_name[i]});
+							Noti::InsertNotification({ ImGuiToastType_None, 2000, "Deleted cage, type: '%s'", cage_name[i] });
 							MISC::CLEAR_AREA(objcoords.x, objcoords.y, objcoords.z, 15.0f, 0, 0, 0, 0);
 						}
 					}
 				}
 				timer = GetTickCount();
 			}
-		
+
 		}
 		m_creator.init();
 		g_HandTrails.init();
