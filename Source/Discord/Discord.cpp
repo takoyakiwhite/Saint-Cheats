@@ -26,7 +26,11 @@ void discordhandler::Tick() {
     } else {
         discordPresence.state = "Story Mode";
     }
+#ifndef DEV
     discordPresence.details = "Modding With Saint [PAID]";
+#else
+    discordPresence.details = "Modding With Saint [DEV]";
+#endif	
     discordPresence.startTimestamp = StartTime;
     discordPresence.largeImageKey = "saint";
     discordPresence.largeImageText = "Saint Mod Menu";
