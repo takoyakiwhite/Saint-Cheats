@@ -6,9 +6,388 @@
 #include "Signatures.hpp"
 #include <GTAV-Classes/script/GtaThread.hpp>
 namespace rage {
-	
+	class CSyncDataBase
+	{
+	public:
+		virtual ~CSyncDataBase() = default;
+		virtual bool SerializeDword(uint32_t* dword, int size) = 0;
+		virtual bool SerializeWord(uint16_t* word, int size) = 0;
+		virtual bool SerializeByte(uint8_t* byte, int size) = 0;
+		virtual bool SerializeInt32(int32_t* i, int size) = 0;
+		virtual bool SerializeInt16(int16_t* i, int size) = 0;
+		virtual bool SerializeSignedByte(int8_t* byte, int size) = 0;
+		virtual bool SerializeBool(bool* flag) = 0;
+		virtual bool SerializeInt64(int64_t* i, int size) = 0;
+		virtual bool SerializeInt32Alt(int32_t* i, int size) = 0;
+		virtual bool SerializeInt16Alt(int16_t* i, int size) = 0;
+		virtual bool SerializeSignedByteAlt(int8_t* byte, int size) = 0;
+		virtual bool SerializeQword(uint64_t* qword, int size) = 0;
+		virtual bool SerializeDwordAlt(uint32_t* dword, int size) = 0;
+		virtual bool SerializeWordAlt(uint16_t* word, int size) = 0;
+		virtual bool SerializeByteAlt(uint8_t* byte, int size) = 0;
+		virtual bool SerializeSignedFloat(float* flt, float divisor, int size) = 0;
+		virtual bool SerializeFloat(float* flt, float divisor, int size) = 0;
+		virtual bool SerializeNetworkId(uint16_t* net_id) = 0;
+		virtual bool SerializeVector3(rage::fvector3* vec3, float divisor, int size) = 0;
+		virtual bool SerializeQuaternion(void* unk) = 0;// i have no clue what that is
+		virtual bool SerializeVector3SignedZComponent(rage::fvector3* vec3, float divisor, int size) = 0;
+		virtual bool SerializeOrientation(rage::fvector4* vec4, float size) = 0;// yes, the size is a float
+		virtual bool SerializeArray(void* array, int size) = 0;
+		virtual bool SerializeString(char* str, int max_length) = 0;
+		virtual bool IsSizeCalculator() = 0;
+		virtual bool IsSizeCalculator2() = 0;
 
-	static_assert(sizeof(GtaThread) == 0x160);
+		void* unk_0x8;
+		void* syncLog;
+		datBitBuffer* buffer;
+	};
+	enum class eNetMessage : uint32_t
+	{
+		MsgInvalid = 0xFFFFF,
+		MsgSessionAcceptChat = 0x62,
+		MsgStartMatchCmd = 0x2D,
+		MsgSetInvitableCmd = 0x1F,
+		MsgSessionMemberIds = 0x23,
+		MsgRequestGamerInfo = 0x54,
+		MsgRemoveGamersFromSessionCmd = 0x53,
+		MsgNotMigrating = 0x35,
+		MsgMigrateHostResponse = 0x12,
+		MsgMigrateHostRequest = 0x66,
+		MsgJoinResponse = 0x2A,
+		MsgJoinRequest = 0x41,
+		MsgHostLeftWhilstJoiningCmd = 0x58,
+		MsgConfigResponse = 0x5F,
+		MsgConfigRequest = 0x48,
+		MsgChangeSessionAttributesCmd = 0x5A,
+		MsgAddGamerToSessionCmd = 0x64,// this is where send net info to lobby is called, among other things
+		MsgReassignResponse = 0x10,
+		MsgReassignNegotiate = 0x01,
+		MsgReassignConfirm = 0x26,
+		MsgPlayerData = 0x18,
+		MsgPackedReliables = 0x30,
+		MsgPackedCloneSyncACKs = 0x3B,
+		MsgNonPhysicalData = 0x16,
+		MsgNetArrayMgrUpdateAck = 0x5D,
+		MsgNetArrayMgrUpdate = 0x60,
+		MsgNetArrayMgrSplitUpdateAck = 0x25,
+		MsgScriptVerifyHostAck = 0x0B,
+		MsgScriptVerifyHost = 0x3E,
+		MsgScriptNewHost = 0x0E,
+		MsgScriptMigrateHostFailAck = 0x1A,
+		MsgScriptMigrateHost = 0x33,
+		MsgScriptLeaveAck = 0x40,
+		MsgScriptLeave = 0x17,
+		MsgScriptJoinHostAck = 0x4D,
+		MsgScriptJoinAck = 0x43,
+		MsgScriptJoin = 0x5C,
+		MsgScriptHostRequest = 0x67,
+		MsgScriptHandshakeAck = 0x5B,
+		MsgScriptHandshake = 0x57,
+		MsgScriptBotLeave = 0x2B,// unused?
+		MsgScriptBotJoinAck = 0x63,// unused?
+		MsgScriptBotJoin = 0x1C,// unused?
+		MsgScriptBotHandshakeAck = 0x31,// unused?
+		MsgScriptBotHandshake = 0x4B,// unused?
+		MsgPartyLeaveGame = 0x3D,
+		MsgPartyEnterGame = 0x1E,
+		MsgCloneSync = 0x4E,// aka clone_create, clone_sync etc.
+		MsgActivateNetworkBot = 0x65,// unused?
+		MsgRequestObjectIds = 0x29,
+		MsgInformObjectIds = 0x09,
+		MsgTextMessage = 0x24,// this one is for chat
+		MsgPlayerIsTyping = 0x61,
+		MsgPackedEvents = 0x4F,// aka received_event
+		MsgPackedEventReliablesMsgs = 0x20,
+		MsgRequestKickFromHost = 0x0D,
+		MsgTransitionToGameStart = 0x50,
+		MsgTransitionToGameNotify = 0x02,
+		MsgTransitionToActivityStart = 0x06,
+		MsgTransitionToActivityFinish = 0x36,
+		MsgTransitionParameters = 0x3C,
+		MsgTransitionParameterString = 0x37,
+		MsgTransitionLaunchNotify = 0x1B,
+		MsgTransitionLaunch = 0x19,
+		MsgTransitionGamerInstruction = 0x14,
+		MsgTextMessage2 = 0x0A,// this one is for phone message
+		MsgSessionEstablishedRequest = 0x52,
+		MsgSessionEstablished = 0x07,
+		MsgRequestTransitionParameters = 0x42,
+		MsgRadioStationSyncRequest = 0x47,
+		MsgRadioStationSync = 0x46,
+		MsgPlayerCardSync = 0x3A,
+		MsgPlayerCardRequest = 0x6A,
+		MsgLostConnectionToHost = 0x81,
+		MsgKickPlayer = 0x34,// host kick
+		MsgDebugStall = 0x7E,// unused?
+		MsgCheckQueuedJoinRequestReply = 0x59,
+		MsgCheckQueuedJoinRequest = 0x51,
+		MsgBlacklist = 0x0C,
+		MsgRoamingRequestBubbleRequiredResponse = 0x83,
+		MsgRoamingRequestBubbleRequiredCheck = 0x82,
+		MsgRoamingRequestBubble = 0x2E,
+		MsgRoamingJoinBubble = 0x4C,
+		MsgRoamingJoinBubbleAck = 0x3F,
+		MsgRoamingInitialBubble = 0x32,
+		MsgVoiceStatus = 0x03,
+		MsgTextChatStatus = 0x00,
+		MsgJoinResponse2 = 0x08,
+		MsgJoinRequest2 = 0x68,
+		MsgNetTimeSync = 0x38,// ctor 40 53 48 83 EC 20 BA ? ? ? ? 4C 8D 0D ? ? ? ? 48 8B D9 44 8D 42 37
+		MsgNetComplaint = 0x55,// ctor 40 53 48 83 EC 20 BA ? ? ? ? 4C 8D 0D ? ? ? ? 48 8B D9 44 8D 42 54
+		MsgNetLagPing = 0x27,// unused? ctor 40 53 48 83 EC 20 BA ? ? ? ? 4C 8D 0D ? ? ? ? 48 8B D9 44 8D 42 26
+		MsgSearchResponse = 0x6B,// unused? ctor 40 53 48 83 EC 20 BA ? ? ? ? 4C 8D 0D ? ? ? ? 48 8B D9 44 8D 42 6A
+		MsgSearchRequest = 0x05,// unused?
+		MsgQosProbeResponse = 0x2C,// ctor 40 53 48 83 EC 20 BA ? ? ? ? 4C 8D 0D ? ? ? ? 48 8B D9 44 8D 42 2B
+		MsgQosProbeRequest = 0x1D,// ctor 40 53 48 83 EC 20 BA ? ? ? ? 4C 8D 0D ? ? ? ? 48 8B D9 44 8D 42 1C
+		MsgCxnRelayAddressChanged = 0x49,// ctor 40 53 48 83 EC 20 BA ? ? ? ? 4C 8D 0D ? ? ? ? 48 8B D9 44 8D 42 48
+		MsgCxnRequestRemoteTimeout = 0x2F,// ctor 40 53 48 83 EC 20 BA ? ? ? ? 4C 8D 0D ? ? ? ? 48 8B D9 44 8D 42 2E
+		MsgSessionDetailRequest = 0x22,// ctor 40 53 48 83 EC 20 BA ? ? ? ? 4C 8D 0D ? ? ? ? 48 8B D9 44 8D 42 21
+		MsgSessionDetailResponse = 0x13,// ctor 40 53 48 83 EC 20 BA ? ? ? ? 4C 8D 0D ? ? ? ? 48 8B D9 44 8D 42 12
+		MsgKeyExchangeOffer = 0x0F,// ctor 40 53 48 83 EC 20 BA ? ? ? ? 4C 8D 0D ? ? ? ? 48 8B D9 44 8D 42 0E (last result)
+		MsgKeyExchangeAnswer = 0x44,// ctor 40 53 48 83 EC 20 BA ? ? ? ? 4C 8D 0D ? ? ? ? 48 8B D9 44 8D 42 43
+		Msg_0x87 = 0x87,
+		Msg_0x88 = 0x88,
+		Msg_0x80 = 0x80,
+		Msg_0x28 = 0x28,
+		Msg_0x11 = 0x11,
+		Msg_0x45 = 0x45,
+		Msg_0x89 = 0x89,
+		Msg_0x86 = 0x86,
+	};
+	namespace netConnection
+	{
+		class InFrame
+		{
+		public:
+			enum class EventType
+			{
+				ConnectionClosed = 3,
+				FrameReceived = 4,
+				BandwidthExceeded = 6,
+				OutOfMemory = 7
+			};
+
+			virtual ~InFrame() = default;
+
+			virtual void destroy() = 0;
+			virtual EventType get_event_type() = 0;
+			virtual uint32_t _0x18() = 0;
+
+			uint32_t m_timestamp;            //0x0008
+			char pad_0008[52];               //0x000C
+			uint32_t m_msg_id;               //0x0040
+			uint32_t m_connection_identifier;//0x0044
+			InFrame* m_this;                 //0x0048
+			uint32_t m_peer_id;              //0x0050
+			char pad_0050[44];               //0x0058
+			uint32_t m_length;               //0x0080
+			char pad_007C[4];                //0x0084
+			void* m_data;                    //0x0088
+		};
+		static_assert(sizeof(rage::netConnection::InFrame) == 0x90);
+	}
+
+	class netSyncDataUnit_Dynamic
+	{
+	public:
+		virtual ~netSyncDataUnit_Dynamic() = default;// 0x00
+
+		virtual void _0x08() = 0;
+
+		virtual void _0x10() = 0;
+
+		virtual void set_data_counter(int index, uint16_t counter) = 0;// 0x18
+
+		virtual void reset_data_counter(int index) = 0;// 0x20
+
+		// ...
+
+		int m_players_need_ack; // 0x08
+		int m_players_need_sync;// 0x0C
+	};
+	class netSyncData_Dynamic
+	{
+	public:
+		virtual ~netSyncData_Dynamic() = default;// 0x00
+
+		virtual rage::datBitBuffer* _0x08() = 0;
+
+		virtual rage::datBitBuffer* _0x10() = 0;
+
+		virtual int get_num_receivers() = 0;// 0x18
+
+		virtual int _0x20() = 0;
+
+		virtual void _0x28() = 0;// same as get_sync_unit_for_element
+
+		virtual netSyncDataUnit_Dynamic* get_sync_unit_for_element(uint32_t element) = 0;// 0x30
+
+		// ...
+	};
+	class netArrayHandlerBase
+	{
+	public:
+		virtual ~netArrayHandlerBase() = default;// 0x00
+
+		virtual void _0x08() = 0;
+
+		virtual void _0x10() = 0;
+
+		virtual void _0x18() = 0;
+
+		virtual void _0x20() = 0;
+
+		virtual void _0x28() = 0;
+
+		virtual void _0x30() = 0;
+
+		virtual void _0x38() = 0;//
+
+		virtual void _0x40() = 0;//
+
+		virtual int _0x48(CNetGamePlayer* player, int max_size, uint32_t* a3, uint32_t* a4) = 0;//
+
+		virtual int get_size(CNetGamePlayer* player, int max_size, uint32_t element) = 0;// 0x50
+
+		virtual int pack_array_data(CNetGamePlayer* player, rage::datBitBuffer* bit_buffer, uint16_t counter, uint32_t* elem_start, bool silent) = 0;// 0x58
+
+		virtual void _0x60() = 0;//
+
+		virtual bool _0x68(CNetGamePlayer* player) = 0;// is_player_out_of_scope or something like that
+
+		virtual void _0x70() = 0;//
+
+		virtual bool can_send_update(CNetGamePlayer* player) = 0;// 0x78
+
+		virtual void _0x80() = 0;//
+
+		virtual void _0x88() = 0;//
+
+		virtual void* get_identifier() = 0;// 0x90
+
+		virtual void* _0x98() = 0;// same as get_identifier
+
+		virtual void _0xA0() = 0;//
+
+		virtual bool can_verify_array_data() = 0;// 0xA8
+
+		virtual void _0xB0() = 0;//
+
+		virtual void _0xB8() = 0;//
+
+		virtual void should_sync_element(uint32_t element) = 0;// 0xC0
+
+		virtual void _0xC8() = 0;//
+
+		virtual void _0xD0() = 0;//
+
+		virtual bool are_all_elements_in_scope() = 0;// 0xD8
+
+		virtual void _0xE0() = 0;//
+
+		virtual void verify_array_data() = 0;// 0xE8
+
+		virtual void _0xF0() = 0;//
+
+		virtual char* get_name() = 0;// 0xF8
+
+		virtual bool is_local_player_owner_of_array() = 0;// 0x100
+
+		virtual CNetGamePlayer* get_owner_of_array() = 0;// 0x108
+
+		virtual void _0x110() = 0;
+
+		virtual uint32_t get_array_hash() = 0;
+
+		virtual int _0x120() = 0;// gets array size for hashing
+
+		virtual netSyncData_Dynamic* _0x128() = 0;// same as get_dynamic_sync_data
+
+		virtual netSyncData_Dynamic* get_dynamic_sync_data() = 0;// 0x130
+
+		virtual void _0x138() = 0;
+
+		virtual bool is_element_in_scope(uint32_t element, CNetGamePlayer* player) = 0;// 0x140
+
+		virtual int get_receiver_index_from_player(CNetGamePlayer*) = 0;// 0x148
+
+		virtual void _0x150() = 0;
+
+		virtual void _0x158() = 0;
+
+		// pasted from fivem
+		virtual bool is_element_empty(uint32_t element) = 0;// 0x160
+
+		virtual void set_element_empty(uint32_t element) = 0;// 0x168
+
+		virtual void write_element_index(rage::datBitBuffer& buffer, uint32_t) = 0;// 0x170
+
+		virtual void read_element_index(rage::datBitBuffer& buffer, uint32_t&) = 0;// 0x178
+
+		virtual bool is_valid_index(uint32_t) = 0;// 0x180
+
+		virtual void recalculate_dirty_elements() = 0;// 0x188
+
+		virtual void reset_element_sync_data(uint32_t element) = 0;// 0x190
+
+		virtual void do_post_read_processing() = 0;// 0x198
+
+		virtual void do_post_element_read_processing(uint32_t element) = 0;// 0x1A0
+
+		virtual bool can_apply_element_data(uint32_t element, const rage::netPlayer& sender, bool force) = 0;// 0x1A8
+
+		virtual void extract_data_for_serializing(uint32_t elem) = 0;// 0x1B0
+
+		virtual void write_element(rage::datBitBuffer& buffer, uint32_t elem, void* logger) = 0;// 0x1B8
+
+		virtual void read_element(rage::datBitBuffer& buffer, uint32_t elem, void* logger) = 0;// 0x1C0
+
+		virtual void log_element(uint32_t elem, void* logger) = 0;// 0x1C8
+
+		virtual uint32_t get_current_element_size_in_bits(uint32_t elem) = 0;// 0x1D0
+
+		virtual void apply_element_data(uint32_t element, const rage::netPlayer& sender) = 0;// 0x1D8
+
+		virtual void _0x1E0() = 0;
+
+		virtual void _0x1E8(bool) = 0;// very important! changes send function to use some kind of cached buffer that prevents us from modifing array data per player
+
+		void* m_something;// 0x10
+
+		netArrayHandlerBase* m_next;// 0x18
+
+		uint8_t m_pad[100 - 0x18];// +8
+		uint32_t m_hash;
+		uint8_t m_pad2[244 - 104];// +8
+		uint16_t m_index;         // 244
+		uint16_t m_count;         // 246
+		uint8_t m_max_elements;   // 248
+		uint8_t m_element_size;   // 249
+		uint8_t m_element_size_2; // 250
+		uint8_t m_pad3[13];       // 251
+		void* m_array;            // 264
+
+#if 0
+		static inline netArrayHandlerBase* get_by_data(void* data)
+		{
+			if (auto array_mgr = *big::g_pointers->m_gta.m_game_array_mgr)
+			{
+				if (auto handler = array_mgr->m_start)
+				{
+					do
+					{
+						if (handler->m_array == data)
+							return handler;
+					} while (handler = handler->m_next);
+				}
+			}
+
+			return nullptr;
+		}
+#endif
+	};
+
+	static_assert(sizeof(netArrayHandlerBase) == 272);
 	enum class eEventNetworkType : int64_t
 	{
 		CEventNetworkPlayerJoinScript = 153,
@@ -253,6 +632,7 @@ namespace Saint {
 		std::uint8_t m_0xAE;       // 0xAE
 		std::uint8_t m_0xAF;       // 0xAF
 	};
+
 	class CGameScriptHandlerNetComponent
 	{
 	public:
@@ -372,6 +752,7 @@ namespace Saint {
 
 	};//Size: 0x01B0
 	static_assert(sizeof(CGameScriptHandlerNetComponent) == 0x1B0);
+
 	class CNetworkObjectMgr;
 #pragma pack(push, 8)
 	class CPickupCreationDataNode

@@ -567,6 +567,42 @@ namespace Saint
 						walk_style->change("move_f@sexy@a");
 
 					});
+				sub->draw_option<RegularOption>("Injured", nullptr, [=]
+					{
+
+						walk_style->change("move_injured_generic");
+
+					});
+				sub->draw_option<RegularOption>("Gangster", nullptr, [=]
+					{
+
+						walk_style->change("move_m@gangster@var_f");
+
+					});
+				sub->draw_option<RegularOption>("Drunk (Slightly)", nullptr, [=]
+					{
+
+						walk_style->change("MOVE_M@DRUNK@SLIGHTLYDRUNK");
+
+					});
+				sub->draw_option<RegularOption>("Drunk (Very)", nullptr, [=]
+					{
+
+						walk_style->change("MOVE_M@DRUNK@VERYDRUNK");
+
+					});
+				sub->draw_option<RegularOption>("Scared", nullptr, [=]
+					{
+
+						walk_style->change("move_f@scared");
+
+					});
+				sub->draw_option<RegularOption>("Flee", nullptr, [=]
+					{
+
+						walk_style->change("move_f@flee@a");
+
+					});
 
 
 
@@ -3587,6 +3623,9 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Gravity"), nullptr, &gravity.enabled, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Incendiary"), nullptr, &m_frame_flags.m_fire, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Aim Tracer"), nullptr, &features.aim_tracer, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Rope"), nullptr, &rope_gun.enabled, BoolDisplay::OnOff);
+				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Money", nullptr, &wdrop.money, &wdrop.money_model, &wdrop.money_model_data);
+				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("RP", nullptr, &wdrop.rp, &wdrop.rp_model, &wdrop.rp_model_data);
 				sub->draw_option<toggle<bool>>(("Shotgun"), nullptr, &m_shotgun.enabled, BoolDisplay::OnOff, false, [] {
 					if (!m_shotgun.enabled) {
 						m_shotgun.onDisable();
@@ -4074,6 +4113,16 @@ namespace Saint
 				sub->draw_option<submenu>("Heist Control", nullptr, HeistControl);
 				sub->draw_option<submenu>("Matchmaking", nullptr, rage::joaat("Matchmaking"));
 				sub->draw_option<toggle<bool>>(("No Idle Kick"), nullptr, &features.no_idle_kick, BoolDisplay::OnOff);
+				sub->draw_option<RegularOption>(("Force Script Host"), nullptr, [=]
+					{
+
+						g_FiberPool.queue([=] {
+							force_host(rage::joaat("freemode"));
+
+							force_host(rage::joaat("fmmc_launcher"));
+							
+						});
+					});
 			});
 		g_Render->draw_submenu<sub>("Matchmaking", rage::joaat("Matchmaking"), [](sub* sub)
 			{
@@ -4829,6 +4878,10 @@ namespace Saint
 					*script_global(2793046).at(6875).as<bool*>() = true;
 
 				});
+				sub->draw_option<RegularOption>(("Remove Loop"), "", [] {
+					*script_global(2793046).at(6874).as<bool*>() = false;
+					*script_global(2793046).at(6875).as<bool*>() = false;
+				});
 				
 
 			});
@@ -5199,6 +5252,15 @@ namespace Saint
 						}
 
 					});
+				sub->draw_option<RegularOption>("Gift Current", "", [] {
+					Vehicle vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					ENTITY::SET_ENTITY_AS_MISSION_ENTITY(vehicle, TRUE, TRUE);
+					DECORATOR::DECOR_REGISTER("PV_Slot", 3);
+					DECORATOR::DECOR_REGISTER("Player_Vehicle", 3);
+					DECORATOR::DECOR_SET_BOOL(vehicle, "IgnoredByQuickSave", FALSE);
+					DECORATOR::DECOR_SET_INT(vehicle, "Player_Vehicle", NETWORK::NETWORK_HASH_FROM_PLAYER_HANDLE(g_SelectedPlayer));
+					VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+				});
 				sub->draw_option<RegularOption>("Clone", nullptr, [=]
 					{
 						Vehicle pedVeh = NULL;
@@ -5554,6 +5616,7 @@ namespace Saint
 				sub->draw_option<submenu>("Jets", nullptr, SubmenuAllJets);
 				sub->draw_option<submenu>("Explode", nullptr, SubmenuAllExplode);
 				sub->draw_option<submenu>("ESP", nullptr, rage::joaat("ESP"));
+				
 				sub->draw_option<toggle<bool>>(("Off The Radar"), "Can cause crashes.", &all_players.off_the_radar, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Reveal"), nullptr, &features.reveal_all_players, BoolDisplay::OnOff, false, [] {
 					if (!features.reveal_all_players) {
@@ -5921,52 +5984,131 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Bodygaurds"), SubmenuBodyguards, [](sub* sub)
 			{
+				sub->draw_option<submenu>("Model", nullptr, rage::joaat("CustomModelB"));
 				sub->draw_option<toggle<bool>>(("Godmode"), nullptr, &bodygaurd.godmode, BoolDisplay::OnOff);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Weapon", nullptr, &all_weapons.name, &bodygaurd.WeaponInt);
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Model", nullptr, &bodygaurd.Models, &bodygaurd.ModelInt);
+				
 				sub->draw_option<toggle<bool>>(("Custom Firing Pattern"), nullptr, &bodygaurd.FiringPatternEnabled, BoolDisplay::OnOff);
 				if (bodygaurd.FiringPatternEnabled) {
 					sub->draw_option<ChooseOption<const char*, std::size_t>>("Firing Pattern", nullptr, &bodygaurd.FiringPattern, &bodygaurd.FiringPatternInt);
 				}
 				sub->draw_option<number<std::int32_t>>("Accuary", nullptr, &bodygaurd.accuary, 0, 100);
 				sub->draw_option<number<float>>("Damage Multiplier", nullptr, &bodygaurd.damagemultiplier, 0.0f, 150.f, 0.10f, 2);
-				sub->draw_option<RegularOption>(("Spawn"), nullptr, []
+				sub->draw_option<KeyboardOption>(("Selected"), nullptr, bodygaurd.selected_name, []
 					{
-						g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(bodygaurd.ModelHashes[bodygaurd.ModelInt]), [=] {
-							Ped ped;
-							NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
-							ped = PED::CREATE_PED(26, MISC::GET_HASH_KEY(bodygaurd.ModelHashes[bodygaurd.ModelInt]), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
-							NETWORK::NETWORK_FADE_IN_ENTITY(ped, true, false);
-							PED::SET_PED_AS_GROUP_LEADER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
-							PED::SET_PED_AS_GROUP_MEMBER(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
-							PED::SET_PED_NEVER_LEAVES_GROUP(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
-							PED::SET_PED_COMBAT_ABILITY(ped, 100);
-							WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, all_weapons.hash[bodygaurd.WeaponInt], 9998, true);
-							PED::SET_PED_CAN_SWITCH_WEAPON(ped, true);
-							PED::SET_GROUP_FORMATION(PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer), 3);
-							PED::SET_PED_MAX_HEALTH(ped, 5000);
-							PED::SET_PED_ACCURACY(ped, bodygaurd.accuary);
-							PLAYER::SET_PLAYER_WEAPON_DAMAGE_MODIFIER(ped, bodygaurd.damagemultiplier);
-							if (bodygaurd.FiringPatternEnabled) {
-								PED::SET_PED_FIRING_PATTERN(ped, bodygaurd.FiringPatternHashes[bodygaurd.FiringPatternInt]);
-							}
-							if (bodygaurd.godmode)
-							{
-								ENTITY::SET_ENTITY_INVINCIBLE(ped, bodygaurd.godmode);
-							}
-							});
+						
 					});
+				g_FiberPool.queue([=] {
+					for (uint8_t i = 0; !STREAMING::HAS_MODEL_LOADED(MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str())) && i < 100; i++)
+					{
+						STREAMING::REQUEST_MODEL(MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str()));
+						fbr::cur()->wait();
+					}
+				});
+				if (!STREAMING::HAS_MODEL_LOADED(MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str())))
+				{
+					sub->draw_option<RegularOption>(("Loading..."), "If the selected is a bunch of giberish, reselect the model", []
+						{
+						});
+				}
+				if (STREAMING::HAS_MODEL_LOADED(MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str()))) {
+					sub->draw_option<RegularOption>(("Spawn"), nullptr, []
+						{
+							g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str()), [=] {
+								Ped ped;
+								NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+								ped = PED::CREATE_PED(26, MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str()), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
+								NETWORK::NETWORK_FADE_IN_ENTITY(ped, true, false);
+								PED::SET_PED_AS_GROUP_LEADER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
+								PED::SET_PED_AS_GROUP_MEMBER(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
+								PED::SET_PED_NEVER_LEAVES_GROUP(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
+								PED::SET_PED_COMBAT_ABILITY(ped, 100);
+								WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, all_weapons.hash[bodygaurd.WeaponInt], 9998, true);
+								PED::SET_PED_CAN_SWITCH_WEAPON(ped, true);
+								PED::SET_GROUP_FORMATION(PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer), 3);
+								PED::SET_PED_MAX_HEALTH(ped, 5000);
+								PED::SET_PED_ACCURACY(ped, bodygaurd.accuary);
+								PLAYER::SET_PLAYER_WEAPON_DAMAGE_MODIFIER(ped, bodygaurd.damagemultiplier);
+								if (bodygaurd.FiringPatternEnabled) {
+									PED::SET_PED_FIRING_PATTERN(ped, bodygaurd.FiringPatternHashes[bodygaurd.FiringPatternInt]);
+								}
+								if (bodygaurd.godmode)
+								{
+									ENTITY::SET_ENTITY_INVINCIBLE(ped, bodygaurd.godmode);
+								}
+								});
+						});
+				}
+			});
+		g_Render->draw_submenu<sub>(("Model"), rage::joaat("CustomModelB"), [](sub* sub)
+			{
+				for (std::int32_t i = 0; i < m_ModelChanger.size; i++) {
+					sub->draw_option<submenu>(m_ModelChanger.get_class_name[i], nullptr, rage::joaat("FORTNITEISGOOD9992"), [=]
+						{
+							bodygaurd.selected_class = i;
+						});
+
+				}
+			});
+		g_Render->draw_submenu<sub>((m_ModelChanger.get_class_name[bodygaurd.selected_class]), rage::joaat("FORTNITEISGOOD9992"), [](sub* sub)
+			{
+				for (auto& model : m_ModelChanger.m_GetModels) {
+					if (bodygaurd.selected_class == model.m_class) {
+						sub->draw_option<RegularOption>(model.m_name.c_str(), nullptr, [=]
+							{
+								bodygaurd.selected_model = model.m_model;
+								bodygaurd.selected_name = model.m_name;
+
+							});
+					}
+				}
+
+
 			});
 		g_Render->draw_submenu<sub>(("Drops"), SubmenuDrops, [](sub* sub) {
+			sub->draw_option<submenu>("Custom Location", nullptr, rage::joaat("CLocation"));
 			sub->draw_option<toggle<bool>>(("Money"), nullptr, &drops.money, BoolDisplay::OnOff);
 			sub->draw_option<toggle<bool>>(("RP"), nullptr, &drops.rp, BoolDisplay::OnOff);
 			sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
 			sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize RP Model", nullptr, &drops.random_rp_model, &drops.model_delay, 0, 5000, 50);
+			sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize Money Model", nullptr, &drops.random_money_model, &drops.model_delay2, 0, 5000, 50);
 			sub->draw_option<ChooseOption<const char*, std::size_t>>("Location", nullptr, &drops.location, &drops.data);
 			sub->draw_option<ChooseOption<const char*, std::size_t>>("RP Model", nullptr, &drops.rp_model, &drops.rp_model_data);
 			sub->draw_option<ChooseOption<const char*, std::size_t>>("Money Model", nullptr, &drops.money_model, &drops.money_model_data);
 			sub->draw_option<number<std::int32_t>>("Height", nullptr, &drops.height, 0, 100);
 			sub->draw_option<number<std::int32_t>>("Delay", nullptr, &drops.delay, 0, 5000, 50);
+			});
+		g_Render->draw_submenu<sub>(("Custom Location"), rage::joaat("CLocation"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Money"), nullptr, &drops.custom.money, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("RP"), nullptr, &drops.custom.rp, BoolDisplay::OnOff);
+				sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize RP Model", nullptr, &drops.custom.random_rp_model, &drops.custom.model_delay, 0, 5000, 50);
+				sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize Money Model", nullptr, &drops.custom.random_money_model, &drops.custom.model_delay2, 0, 5000, 50);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Location", nullptr, &drops.custom.location, &drops.custom.data);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("RP Model", nullptr, &drops.custom.rp_model, &drops.custom.rp_model_data);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Money Model", nullptr, &drops.custom.money_model, &drops.custom.money_model_data);
+				sub->draw_option<number<std::int32_t>>("Height", nullptr, &drops.custom.height, 0, 100);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &drops.custom.delay, 0, 5000, 50);
+				sub->draw_option<RegularOption>(("Add"), nullptr, []
+					{
+						NativeVector3 b2 = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+						drops.custom.a.push_back(b2);
+					});
+				sub->draw_option<RegularOption>(("Remove All"), nullptr, []
+					{
+						drops.custom.a.clear();
+					});
+				sub->draw_option<UnclickOption>(("Current"), nullptr, [] {});
+				for (auto& drop : drops.custom.a) {
+					sub->draw_option<RegularOption>(std::format("{}, {}, {}", drop.x, drop.y, drop.z).c_str(), nullptr, [=]
+							{
+
+								
+
+							});
+					
+				}
+				
 			});
 		g_Render->draw_submenu<sub>(("Protection"), SubmenuProtections, [](sub* sub)
 			{
@@ -6211,6 +6353,8 @@ namespace Saint
 				sub->draw_option<submenu>("Sky", nullptr, rage::joaat("Sky"));
 				sub->draw_option<submenu>("Clouds", nullptr, rage::joaat("Clouds"));
 				sub->draw_option<submenu>("Ocean", nullptr, rage::joaat("Ocean"));
+				sub->draw_option<submenu>("Black Hole", nullptr, rage::joaat("BlackHole"));
+				sub->draw_option<submenu>("Spawner", nullptr, rage::joaat("SpawnerW"));
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Vehicle Density", nullptr, &features.veh_density, &features.vden_pos, true, -1, [] {
 					switch (features.vden_pos) {
 					case 0:
@@ -6223,6 +6367,62 @@ namespace Saint
 				});
 
 
+			});
+		g_Render->draw_submenu<sub>(("Spawner"), rage::joaat("SpawnerW"), [](sub* sub)
+			{
+				sub->draw_option<submenu>("Ped", nullptr, rage::joaat("SpawnerWPed"));
+			});
+		g_Render->draw_submenu<sub>(("Ped"), rage::joaat("SpawnerWPed"), [](sub* sub)
+			{
+				for (std::int32_t i = 0; i < m_ModelChanger.size; i++) {
+					sub->draw_option<submenu>(m_ModelChanger.get_class_name[i], nullptr, rage::joaat("FORTNITEISGOOD999"), [=]
+						{
+							ped_spawner.selected = i;
+						});
+
+				}
+			});
+		g_Render->draw_submenu<sub>((m_ModelChanger.get_class_name[ped_spawner.selected]), rage::joaat("FORTNITEISGOOD999"), [](sub* sub)
+			{
+				for (auto& model : m_ModelChanger.m_GetModels) {
+					if (ped_spawner.selected == model.m_class) {
+						sub->draw_option<RegularOption>(model.m_name.c_str(), nullptr, [=]
+							{
+								ped_spawner.change(MISC::GET_HASH_KEY(model.m_model.c_str()));
+
+							});
+					}
+				}
+
+
+			});
+		g_Render->draw_submenu<sub>(("Black Hole"), rage::joaat("BlackHole"), [](sub* sub)
+			{
+				sub->draw_option<submenu>("Color", nullptr, rage::joaat("BHoleColor"));
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &black_hole.enabled, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Peds"), nullptr, &black_hole.peds2, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Vehicles"), nullptr, &black_hole.vehicles, BoolDisplay::OnOff);
+				sub->draw_option<number<std::int32_t>>("Preview", nullptr, &black_hole.preview, 0, 43, 1, 3);
+				sub->draw_option<number<float>>("Force", nullptr, &black_hole.force, 0, 1000.0, 1.0, 3);
+				sub->draw_option<number<float>>("Size", nullptr, &black_hole.size, 0, 1000.0, 1.0, 3);
+				
+				sub->draw_option<UnclickOption>(("Location"), nullptr, [] {});
+				sub->draw_option<number<float>>("X", nullptr, &black_hole.c.x, -10000.f, 10000.f);
+				sub->draw_option<number<float>>("Y", nullptr, &black_hole.c.y, -10000.f, 10000.f);
+				sub->draw_option<number<float>>("Z", nullptr, &black_hole.c.z, -10000.f, 10000.f);
+				sub->draw_option<RegularOption>("Teleport To Me", "", []
+					{
+						black_hole.c = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 1);
+					});
+			});
+		g_Render->draw_submenu<sub>(("Color"), rage::joaat("BHoleColor"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Rainbow"), nullptr, &black_hole.rainbow, BoolDisplay::OnOff);
+				sub->draw_option<number<std::int32_t>>("Red", nullptr, &black_hole.r, 0, 255);
+				sub->draw_option<number<std::int32_t>>("Green", nullptr, &black_hole.g, 0, 255);
+				sub->draw_option<number<std::int32_t>>("Blue", nullptr, &black_hole.b, 0, 255);
+				sub->draw_option<number<std::int32_t>>("Alpha", nullptr, &black_hole.a, 0, 255);
+				
 			});
 		g_Render->draw_submenu<sub>(("Ocean"), rage::joaat("Ocean"), [](sub* sub)
 			{
@@ -6480,6 +6680,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Pedestrians"), NearbyPeds, [](sub* sub)
 			{
+				sub->draw_option<submenu>("ESP", nullptr, rage::joaat("PedESP"));
 				sub->draw_option<toggle<bool>>(("Grapple Hook"), nullptr, &m_nearby.m_peds.enabled, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Riot"), nullptr, &m_nearby.m_peds.riot, BoolDisplay::OnOff, false, [] {
 					if (!m_nearby.m_peds.riot) {
@@ -6554,6 +6755,11 @@ namespace Saint
 						delete peds;
 				});
 				
+			});
+		g_Render->draw_submenu<sub>(("ESP"), rage::joaat("PedESP"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Name"), nullptr, &m_nearby.m_peds.name_esp, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Rectangle"), nullptr, &m_nearby.m_peds.rectangle, BoolDisplay::OnOff);
 			});
 		g_Render->draw_submenu<sub>(("Traffic"), NearbyVehicles, [](sub* sub)
 			{

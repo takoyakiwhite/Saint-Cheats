@@ -25,7 +25,7 @@
 
 
 #pragma comment (lib, "urlmon.lib") 
-#define MENU_VERSION "1.2"
+#define MENU_VERSION "1.3"
 const char* meower = "";
 void load_dir() {
 	using namespace Saint;

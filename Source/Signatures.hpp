@@ -191,6 +191,10 @@ namespace Saint
 
 		rage::atArray<GtaThread*>* m_script_threads{};
 
+		PVOID m_received_array_update;
+		PVOID m_task_parachute_object_0x270{};
+		PVOID m_serialize_take_off_ped_variation_task;
+
 		
 
 		

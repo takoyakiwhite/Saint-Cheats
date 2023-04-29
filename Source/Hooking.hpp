@@ -8,6 +8,7 @@
 #include <GTAV-Classes/netsync/nodes/object/CObjectCreationDataNode.hpp>
 #include <GTAV-Classes/netsync/nodes/ped/CPedCreationDataNode.hpp>
 #include <GTAV-Classes/netsync/nodes/vehicle/CVehicleCreationDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/task/ClonedTakeOffPedVariationInfo.hpp>
 namespace Saint
 {
 	
@@ -78,7 +79,9 @@ namespace Saint
 		static bool hk_ped_creation_data_node(CPedCreationDataNode* node);
 		static bool hk_vehicle_creation_data_node(CVehicleCreationDataNode* node);
 
-		
+		static bool received_array_update(rage::netArrayHandlerBase* array, CNetGamePlayer* sender, rage::datBitBuffer* buffer, int size, std::int16_t cycle);
+		static uint64_t task_parachute_object_0x270(uint64_t _this, int a2, int a3);
+		static void serialize_take_off_ped_variation_task(ClonedTakeOffPedVariationInfo* info, rage::CSyncDataBase* serializer);
 
 		
 
@@ -141,6 +144,10 @@ namespace Saint
 		void* m_OriginalInvalidPlayer222{};
 		void* ped_creation{};
 		void* vehicle_creation{};
+		void* array_update{};
+		void* parachute{};
+		void* parachute2{};
+	
 
 
 	};

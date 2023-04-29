@@ -279,7 +279,53 @@ namespace Saint {
 		{ 0xD6FF6D61 , 0xC6EE6B4C, 0xA018DB8A, 0x00BAC39B, 0xE2CA3A71, 0x9C74B406, 0x7A845691 };
 		std::size_t FiringPatternInt = 0;
 
+		std::string selected_model = "s_m_y_blackops_01";
+		std::string selected_name = "";
+		int selected_class = 0;
+
 		float damagemultiplier = 1.0f;
+
+		bool spawn(const Hash hash)
+		{
+			g_FiberPool.queue([=] {
+				for (uint8_t i = 0; !STREAMING::HAS_MODEL_LOADED(hash) && i < 100; i++)
+				{
+					STREAMING::REQUEST_MODEL(hash);
+					fbr::cur()->wait();
+				}
+				if (!STREAMING::HAS_MODEL_LOADED(hash))
+				{
+					return false;
+				}
+				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+				Ped ped;
+				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+				ped = PED::CREATE_PED(26, hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
+				NETWORK::NETWORK_FADE_IN_ENTITY(ped, true, false);
+				PED::SET_PED_AS_GROUP_LEADER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
+				PED::SET_PED_AS_GROUP_MEMBER(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
+				PED::SET_PED_NEVER_LEAVES_GROUP(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
+				PED::SET_PED_COMBAT_ABILITY(ped, 100);
+				WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, all_weapons.hash[WeaponInt], 9998, true);
+				PED::SET_PED_CAN_SWITCH_WEAPON(ped, true);
+				PED::SET_GROUP_FORMATION(PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer), 3);
+				PED::SET_PED_MAX_HEALTH(ped, 5000);
+				PED::SET_PED_ACCURACY(ped, accuary);
+				PLAYER::SET_PLAYER_WEAPON_DAMAGE_MODIFIER(ped, damagemultiplier);
+				if (FiringPatternEnabled) {
+					PED::SET_PED_FIRING_PATTERN(ped, FiringPatternHashes[FiringPatternInt]);
+				}
+				if (godmode)
+				{
+					ENTITY::SET_ENTITY_INVINCIBLE(ped, godmode);
+				}
+				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+				fbr::cur()->wait();
+				STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
+
+				});
+			return true;
+		}
 	};
 	inline Bodygaurd bodygaurd;
 	inline bool disableLockOn = false;
@@ -1044,6 +1090,11 @@ namespace Saint {
 				ENTITY::FREEZE_ENTITY_POSITION(PED::GET_VEHICLE_PED_IS_USING(PLAYER::PLAYER_PED_ID()), true);
 
 				STREAMING::SET_FOCUS_ENTITY(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
+
+				if (PED::IS_PED_DEAD_OR_DYING(PLAYER::PLAYER_PED_ID(), 1))
+				{
+					NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, PLAYER::PLAYER_PED_ID());
+				}
 			}
 
 			if (infinite_ammo) {
@@ -1222,8 +1273,120 @@ namespace Saint {
 		}
 	};
 	inline NegitiveTorque negitiveTorque;
+	class CustomDrop {
+	public:
+		int height = 0;
+		int delay = 1100;
+		bool random_rp_model = false;
+		bool random_money_model = false;
+
+		const char* location[2] = { "Traditional", "Rain" };
+		std::size_t data = 0;
+		const char* rp_model[8] = { "Alien", "Beast", "Impotent Rage", "Pogo", "Princess Bubblegum", "Ranger", "Generic", "Sasquatch" };
+		const char* rp_model_init[8] = { "vw_prop_vw_colle_alien", "vw_prop_vw_colle_beast", "vw_prop_vw_colle_imporage", "vw_prop_vw_colle_pogo", "vw_prop_vw_colle_prbubble", "vw_prop_vw_colle_rsrcomm", "vw_prop_vw_colle_rsrgeneric", "vw_prop_vw_colle_sasquatch" };
+		std::size_t rp_model_data = 0;
+		const char* money_model[8] = { "Store Bag", "Bank Bag", "Single Stack", "Safe", "Beachball", "Crate", "Alien Egg", "Snow Tree" };
+		int money_model_init[8] = { -1666779307, 289396019, 1282927707, 1667175316, 1574107526, 1080468844, 1803116220, 546277594 };
+		std::size_t money_model_data = 0;
+		std::int32_t model_delay = 550;
+		std::int32_t model_delay2 = 550;
+		bool money = false;
+		bool rp = false;
+		std::vector<NativeVector3> a;
+		void init() {
+			if (random_rp_model) {
+				static int timer;
+				if (timer == 0 || (int)(GetTickCount64() - timer) > model_delay) {
+					if (rp_model_data == 7) {
+						rp_model_data = 0;
+
+					}
+					if (rp_model_data < 7) {
+						rp_model_data++;
+
+					}
+
+
+
+					timer = GetTickCount64();
+				}
+			}
+			if (random_money_model) {
+				static int timer;
+				if (timer == 0 || (int)(GetTickCount64() - timer) > model_delay2) {
+					if (money_model_data == 7) {
+						money_model_data = 0;
+
+					}
+					if (money_model_data < 7) {
+						money_model_data++;
+
+					}
+
+
+
+					timer = GetTickCount64();
+				}
+			}
+			for (auto pos : a) {
+				NativeVector3 rp_c;
+				NativeVector3 money_c;
+				if (data == 0) {
+					rp_c = pos;
+					money_c = pos;
+				}
+				if (data == 1) {
+					NativeVector3 pos_get = pos;
+					NativeVector3 pos = { pos_get.x - MISC::GET_RANDOM_INT_IN_RANGE(-20, 15), pos_get.y + MISC::GET_RANDOM_INT_IN_RANGE(-13, 6), pos_get.z };
+					rp_c = pos;
+
+					NativeVector3 pos_get2 = pos;
+					NativeVector3 pos2 = { pos_get2.x - MISC::GET_RANDOM_INT_IN_RANGE(-20, 15), pos_get2.y + MISC::GET_RANDOM_INT_IN_RANGE(-13, 6), pos_get2.z };
+					money_c = pos2;
+				}
+				static int delayfr3 = 0;
+				if (delayfr3 == 0 || (int)(GetTickCount64() - delayfr3) > delay)
+				{
+					if (rp) {
+						float dz = rp_c.z;
+						rp_c.z = dz + height;
+
+						g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), [=] {
+							*g_GameFunctions->should_sync_money_rewards = true;
+							OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, rp_c.x, rp_c.y, rp_c.z, 0, 10, MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), false, true);
+							*g_GameFunctions->should_sync_money_rewards = false;
+
+
+
+
+							delayfr3 = GetTickCount64();
+
+							});
+					}
+					if (money) {
+						float dz = money_c.z;
+						money_c.z = dz + height;
+						g_CallbackScript->AddCallback<ModelCallback>(money_model_init[money_model_data], [=] {
+							*g_GameFunctions->should_sync_money_rewards = true;
+							OBJECT::CREATE_AMBIENT_PICKUP(1704231442, money_c.x, money_c.y, money_c.z, 1, 2500, money_model_init[money_model_data], false, true);
+							*g_GameFunctions->should_sync_money_rewards = false;
+
+
+							//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(-1666779307);
+
+							delayfr3 = GetTickCount64();
+							});
+
+					}
+				}
+			}
+			
+		}
+
+	};
 	class Drops {
 	public:
+		CustomDrop custom;
 		bool money = false;
 		bool rp = false;
 		bool health = false;
@@ -1231,16 +1394,20 @@ namespace Saint {
 		int height = 0;
 		int delay = 1100;
 		bool random_rp_model = false;
+		bool random_money_model = false;
+
 		const char* location[2] = {"Traditional", "Rain"};
 		std::size_t data = 0;
 		const char* rp_model[8] = { "Alien", "Beast", "Impotent Rage", "Pogo", "Princess Bubblegum", "Ranger", "Generic", "Sasquatch"};
 		const char* rp_model_init[8] = { "vw_prop_vw_colle_alien", "vw_prop_vw_colle_beast", "vw_prop_vw_colle_imporage", "vw_prop_vw_colle_pogo", "vw_prop_vw_colle_prbubble", "vw_prop_vw_colle_rsrcomm", "vw_prop_vw_colle_rsrgeneric", "vw_prop_vw_colle_sasquatch"};
 		std::size_t rp_model_data = 0;
-		const char* money_model[3] = { "Store Bag", "Bank Bag", "Single Stack"};
-		int money_model_init[3] = { -1666779307, 289396019, 1282927707 };
+		const char* money_model[8] = { "Store Bag", "Bank Bag", "Single Stack", "Safe", "Beachball", "Crate", "Alien Egg", "Snow Tree"};
+		int money_model_init[8] = { -1666779307, 289396019, 1282927707, 1667175316, 1574107526, 1080468844, 1803116220, 546277594 };
 		std::size_t money_model_data = 0;
 		std::int32_t model_delay = 550;
+		std::int32_t model_delay2 = 550;
 		void init() {
+			custom.init();
 			if (random_rp_model) {
 				static int timer;
 				if (timer == 0 || (int)(GetTickCount64() - timer) > model_delay) {
@@ -1255,6 +1422,23 @@ namespace Saint {
 					
 
 					
+					timer = GetTickCount64();
+				}
+			}
+			if (random_money_model) {
+				static int timer;
+				if (timer == 0 || (int)(GetTickCount64() - timer) > model_delay2) {
+					if (money_model_data == 7) {
+						money_model_data = 0;
+
+					}
+					if (money_model_data < 7) {
+						money_model_data++;
+
+					}
+
+
+
 					timer = GetTickCount64();
 				}
 			}
@@ -4630,7 +4814,84 @@ namespace Saint {
 		float speed = 3.0f;
 		NativeVector3 coords;
 		bool riot = false;
+		bool name_esp = false;
+		bool rectangle = false;
 		void init() {
+			if (name_esp) {
+				Ped* peds = new Ped[(10 * 2 + 2)];
+				peds[0] = 10;
+				for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), peds, 0); i++)
+				{
+					Ped ped = peds[(i * 2 + 2)];
+					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(ped, false);
+					float xPos;
+					float yPos;
+
+					BOOL screencoords = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(c.x, c.y, c.z, &xPos, &yPos);
+
+					HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT((char*)"STRING");
+					HUD::SET_TEXT_COLOUR(255, 255, 255, 255);
+					HUD::SET_TEXT_FONT(0);
+					HUD::SET_TEXT_SCALE(0.3f, 0.3f);
+					HUD::SET_TEXT_CENTRE(true);
+
+					std::string name = "Ped";
+
+					HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(name.c_str());
+					HUD::END_TEXT_COMMAND_DISPLAY_TEXT(xPos, yPos, 0);
+				}
+				delete peds;
+				
+			}
+			if (rectangle) {
+				Ped* peds = new Ped[(10 * 2 + 2)];
+				peds[0] = 10;
+				for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), peds, 0); i++)
+				{
+					Ped ped = peds[(i * 2 + 2)];
+					NativeVector3 v0, v1;
+
+					NativeVector3 coords0from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, -(v1.x + 0.3f), v1.y - 0.3f, -0.9f);
+					NativeVector3 coords0to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, -(v1.x + 0.3f), v1.y + 0.3f, -0.9f);
+					NativeVector3 coords1from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, +(v1.x + 0.3f), v1.y - 0.3f, -0.9f);
+					NativeVector3 coords1to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, +(v1.x + 0.3f), v1.y + 0.3f, -0.9f);
+					NativeVector3 coords2from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + -0.3f, +(v1.y + 0.3f), -0.9f);
+					NativeVector3 coords2to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + 0.3f, +(v1.y + 0.3f), -0.9f);
+					NativeVector3 coords3from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + -0.3f, -(v1.y + 0.3f), -0.9f);
+					NativeVector3 coords3to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + 0.3f, -(v1.y + 0.3f), -0.9f);
+					NativeVector3 coords4from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, -(v1.x + 0.3f), v1.y - 0.3f, 0.9f);
+					NativeVector3 coords4to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, -(v1.x + 0.3f), v1.y + 0.3f, 0.9f);
+					NativeVector3 coords5from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, +(v1.x + 0.3f), v1.y - 0.3f, 0.9f);
+					NativeVector3 coords5to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, +(v1.x + 0.3f), v1.y + 0.3f, 0.9f);
+					NativeVector3 coords6from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + -0.3f, +(v1.y + 0.3f), 0.9f);
+					NativeVector3 coords6to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + 0.3f, +(v1.y + 0.3f), 0.9f);
+					NativeVector3 coords7from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + -0.3f, -(v1.y + 0.3f), 0.9f);
+					NativeVector3 coords7to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + 0.3f, -(v1.y + 0.3f), 0.9f);
+					NativeVector3 coords8from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + 0.3f, -(v1.y + 0.3f), -0.9f);
+					NativeVector3 coords8to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + 0.3f, -(v1.y + 0.3f), 0.9f);
+					NativeVector3 coords9from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + -0.3f, -(v1.y + -0.3f), -0.9f);
+					NativeVector3 coords9to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + -0.3f, -(v1.y + -0.3f), 0.9f);
+					NativeVector3 coords10from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + -0.3f, +(v1.y + -0.3f), -0.9f);
+					NativeVector3 coords10to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + -0.3f, +(v1.y + -0.3f), 0.9f);
+					NativeVector3 coords11from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + 0.3f, +(v1.y + 0.3f), -0.9f);
+					NativeVector3 coords11to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, v1.x + 0.3f, +(v1.y + 0.3f), 0.9f);
+
+					GRAPHICS::DRAW_LINE(coords0from.x, coords0from.y, coords0from.z, coords0to.x, coords0to.y, coords0to.z, 255, 255, 255, 255);
+					GRAPHICS::DRAW_LINE(coords1from.x, coords1from.y, coords1from.z, coords1to.x, coords1to.y, coords1to.z, 255, 255, 255, 255);
+					GRAPHICS::DRAW_LINE(coords2from.x, coords2from.y, coords2from.z, coords2to.x, coords2to.y, coords2to.z, 255, 255, 255, 255);
+					GRAPHICS::DRAW_LINE(coords3from.x, coords3from.y, coords3from.z, coords3to.x, coords3to.y, coords3to.z, 255, 255, 255, 255);
+					GRAPHICS::DRAW_LINE(coords4from.x, coords4from.y, coords4from.z, coords4to.x, coords4to.y, coords4to.z, 255, 255, 255, 255);
+					GRAPHICS::DRAW_LINE(coords5from.x, coords5from.y, coords5from.z, coords5to.x, coords5to.y, coords5to.z, 255, 255, 255, 255);
+					GRAPHICS::DRAW_LINE(coords6from.x, coords6from.y, coords6from.z, coords6to.x, coords6to.y, coords6to.z, 255, 255, 255, 255);
+					GRAPHICS::DRAW_LINE(coords7from.x, coords7from.y, coords7from.z, coords7to.x, coords7to.y, coords7to.z, 255, 255, 255, 255);
+					GRAPHICS::DRAW_LINE(coords8from.x, coords8from.y, coords8from.z, coords8to.x, coords8to.y, coords8to.z, 255, 255, 255, 255);
+					GRAPHICS::DRAW_LINE(coords9from.x, coords9from.y, coords9from.z, coords9to.x, coords9to.y, coords9to.z, 255, 255, 255, 255);
+					GRAPHICS::DRAW_LINE(coords10from.x, coords10from.y, coords10from.z, coords10to.x, coords10to.y, coords10to.z, 255, 255, 255, 255);
+					GRAPHICS::DRAW_LINE(coords11from.x, coords11from.y, coords11from.z, coords11to.x, coords11to.y, coords11to.z, 255, 255, 255, 255);
+				}
+				delete peds;
+
+			}
 			if (enabled) {
 				if (IsPedShooting(PLAYER::PLAYER_PED_ID()))
 				{
@@ -5436,6 +5697,7 @@ namespace Saint {
 			{ "a_f_y_bevhills_04", "Beverly Hills 6", ModelClass::Rich },
 			{ "a_m_m_bevhills_01", "Beverly Hills (Male)", ModelClass::Rich },
 			{ "a_m_m_bevhills_02", "Beverly Hills 2 (Male)", ModelClass::Rich },
+			{ "CSB_Billionaire", "Billionare", ModelClass::Rich },
 
 			{ "a_m_y_musclbeac_01", "Muscle", ModelClass::Bodybuilder },
 			{ "a_f_m_bodybuild_01", "Bikini (Semi-Fat)", ModelClass::Bodybuilder },
@@ -5551,6 +5813,7 @@ namespace Saint {
 			{ "s_m_y_hwaycop_01", "Highway", ModelClass::Police },
 			{ "s_m_y_swat_01", "Swat", ModelClass::Police },
 			{ "ig_casey", "Casey", ModelClass::Police },
+			{ "IG_Vincent_3", "Vincent", ModelClass::Police },
 
 			//medical
 			{ "s_f_y_scrubs_01", "Scrubs (Female)", ModelClass::Medical },
@@ -5591,6 +5854,7 @@ namespace Saint {
 			{ "u_m_m_jesus_01", "Jesus", ModelClass::Special },
 			{ "a_m_y_motox_01", "Motox", ModelClass::Special },
 			{ "a_m_m_tranvest_01", "Trans Vest", ModelClass::Special },
+			{ "ig_furry", "Furry", ModelClass::Special },
 
 			//prison
 			{ "csb_rashcosvki", "Rashcovski", ModelClass::Prison },
@@ -6416,7 +6680,246 @@ namespace Saint {
 		}
 	};
 	inline jforce jump_force;
+	class BHole {
+	public:
+		bool enabled = false;
+		float distanceBetween(NativeVector3 A, NativeVector3 B) {
+			return MISC::GET_DISTANCE_BETWEEN_COORDS(A.x, A.y, A.z, B.x, B.y, B.z, 1);
+		}
+		bool vehicles;
+		bool peds2;
+		std::vector<int32_t> vehs() {
+			if (vehicles) {
+				const int get = 100;
+				int nearby[get * 2 + 2] = { get * 2 + 2 };
+				auto count = PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), (int*)&nearby);
+				std::vector<int32_t> total;
+
+				for (int i = 0; i < count; i++) {
+					auto v = nearby[i * 2 + 2];
+					total.push_back(v);
+				}
+
+				return total;
+			}
+		}
+		std::vector<int32_t> peds() {
+			if (peds2) {
+				const int get = 100;
+				int nearby[get * 2 + 2] = { get * 2 + 2 };
+				auto count = PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), (int*)&nearby, PLAYER::PLAYER_PED_ID());
+				std::vector<int32_t> total;
+
+				for (int i = 0; i < count; i++) {
+					auto p = nearby[i * 2 + 2];
+					total.push_back(p);
+				}
+
+				return total;
+			}
+		}
+		int preview = 28;
+		NativeVector3 c;
+		float force = 1.f;
+		int r;
+		int g;
+		int b;
+		int a = 255;
+		bool rainbow = false;
+		float size = 1.0f;
+		void init() {
+			if (enabled) {
+				if (rainbow) {
+					if (r > 0 && b == 0) {
+						r--;
+						g++;
+					}
+					if (g > 0 && r == 0) {
+						g--;
+						b++;
+					}
+					if (b > 0 && g == 0) {
+						r++;
+						b--;
+					}
+				}
+				GRAPHICS::DRAW_MARKER(preview, c.x, c.y, c.z, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, size, size, size, r, g, b, a, false, false, 0, false, NULL, NULL, false);
+
+				auto get_nearby_vehs = vehs();
+				auto get_nearby_peds = peds();
+				get_nearby_vehs.insert(get_nearby_vehs.end(), get_nearby_peds.begin(), get_nearby_peds.end());
+				for (auto hole : get_nearby_vehs) {
+					if (hole && ENTITY::DOES_ENTITY_EXIST(hole)) {
+						auto first = ENTITY::GET_ENTITY_COORDS(hole, 1);
+						auto second = c;
+						first.z += 1.5f;
+						Vector3 total = { second.x - first.x, second.y - first.y, second.z - first.z };
+						if (distanceBetween(second, first) > 3.f) {
+							ENTITY::APPLY_FORCE_TO_ENTITY(hole, 1, (total.x / 13) * force, (total.y / 13) * force, total.z / 13, 0.f, 0.f, 0.f, 0, false, true, true, 0, 0);
+						}
+						else {
+							ENTITY::SET_ENTITY_VELOCITY(hole, 0.f, 0.f, 0.f);
+							ENTITY::APPLY_FORCE_TO_ENTITY(hole, 1, 0.f, 0.f, total.z / 15, 0.f, 0.f, 0.f, 0, false, true, true, 0, 0);
+						}
+					}
+				}
+			}
+			
+		}
+	};
+	inline BHole black_hole;
+	class ShootDrops {
+	public:
+		bool rp = false;
+		bool money = false;
+		const char* rp_model[8] = { "Alien", "Beast", "Impotent Rage", "Pogo", "Princess Bubblegum", "Ranger", "Generic", "Sasquatch" };
+		const char* rp_model_init[8] = { "vw_prop_vw_colle_alien", "vw_prop_vw_colle_beast", "vw_prop_vw_colle_imporage", "vw_prop_vw_colle_pogo", "vw_prop_vw_colle_prbubble", "vw_prop_vw_colle_rsrcomm", "vw_prop_vw_colle_rsrgeneric", "vw_prop_vw_colle_sasquatch" };
+		std::size_t rp_model_data = 0;
+		const char* money_model[8] = { "Store Bag", "Bank Bag", "Single Stack", "Safe", "Beachball", "Crate", "Alien Egg", "Snow Tree" };
+		int money_model_init[8] = { -1666779307, 289396019, 1282927707, 1667175316, 1574107526, 1080468844, 1803116220, 546277594 };
+		std::size_t money_model_data = 0;
+		void init() {
+			if (rp) {
+				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+				{
+					NativeVector3 c;
+					if (raycast(c)) {
+						g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), [=] {
+							*g_GameFunctions->should_sync_money_rewards = true;
+							OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, c.x, c.y, c.z, 0, 10, MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), false, true);
+							*g_GameFunctions->should_sync_money_rewards = false;
+
+
+
+
+							});
+					}
+				}
+			}
+			if (money) {
+					if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+					{
+						NativeVector3 c;
+						if (raycast(c)) {
+							g_CallbackScript->AddCallback<ModelCallback>(money_model_init[money_model_data], [=] {
+								*g_GameFunctions->should_sync_money_rewards = true;
+								OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 2500, money_model_init[money_model_data], false, true);
+								*g_GameFunctions->should_sync_money_rewards = false;
+
+								});
+						}
+					}
+
+			}
+		}
+		
+	};
+	inline ShootDrops wdrop;
+	class RopeGun {
+	public:
+		bool enabled = false;
+		Entity rope_ent0;
+		Object first_rope;
+		bool attached_first;
+		Ped myped;
+		Entity ENT, ENT2, TargettedEntity, TargettedEntity2;
+		NativeVector3 shootcoords;
+		Object ropes;
+		NativeVector3 handcoords;
+		int teleportActiveLineIndex = 0, bone = 0, onec = 0, MaxRadius = 8, MarkerRed = 255, markergreen = 60, markerblue = 0;
+		bool attached = false;
+		static float dist(NativeVector3 p1, NativeVector3 p2)
+		{
+			float x = p1.x - p2.x;
+			float y = p1.y - p2.y;
+			float z = p1.z - p2.z;
+			return SYSTEM::SQRT(x * x + y * y + z * z);
+		}
+		void init() {
+			if (enabled) {
+				if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &ENT))
+				{
+					myped = PLAYER::PLAYER_PED_ID();
+					if (WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(myped, &shootcoords))
+					{
+						if (ENT != 0)
+						{
+							if (!attached)
+							{
+								bone = PED::GET_PED_BONE_INDEX(myped, 28422);
+								handcoords = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(myped, bone);
+
+								NativeVector3 coords1 = ENTITY::GET_ENTITY_COORDS(ENT, true);
+
+								ropes = PHYSICS::ADD_ROPE(handcoords.x, handcoords.y, handcoords.z, shootcoords.x, shootcoords.y, shootcoords.z, dist(handcoords, coords1) + 3.0f, 1, 300, 0.5f, 0.5f, false, true, true, 1.0f, false, 0);
+								ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&ropes);
+
+								PHYSICS::ACTIVATE_PHYSICS(ropes);
+
+								PHYSICS::ROPE_LOAD_TEXTURES();
+								if (PHYSICS::ROPE_ARE_TEXTURES_LOADED())
+								{
+
+								}
+								ENT2 = ENT;
+								attached = true;
+							}
+							else
+							{
+								NativeVector3 coords1 = ENTITY::GET_ENTITY_COORDS(ENT, true);
+								NativeVector3 coords2 = ENTITY::GET_ENTITY_COORDS(ENT2, true);
+								float speed = ENTITY::GET_ENTITY_SPEED(ENT2);
+
+								if (speed < 3.0f)
+								{
+									PHYSICS::ATTACH_ENTITIES_TO_ROPE(ropes, ENT, ENT2, coords1.x, coords1.y, coords1.z, coords2.x, coords2.y, coords2.z, dist(coords1, coords2) + 1.0f, false, false, 0, 0);
+								}
+								else
+
+								{
+									PHYSICS::ATTACH_ENTITIES_TO_ROPE(ropes, ENT, ENT2, coords1.x, coords1.y, coords1.z, coords2.x, coords2.y, coords2.z, dist(coords1, coords2) + 3.3f, false, false, 0, 0);
+								}
+								attached = false;
+							}
+						}
+					}
+				}
+			}
+		}
+	};
+	inline RopeGun rope_gun;
+	class PedSpawner {
+	public:
+		int selected;
+		bool change(const Hash hash)
+		{
+			g_FiberPool.queue([=] {
+				for (uint8_t i = 0; !STREAMING::HAS_MODEL_LOADED(hash) && i < 100; i++)
+				{
+					STREAMING::REQUEST_MODEL(hash);
+					fbr::cur()->wait();
+				}
+				if (!STREAMING::HAS_MODEL_LOADED(hash))
+				{
+					return false;
+				}
+				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+				PED::CREATE_PED(0, hash, c.x, c.y, c.z, 0, true, false);
+				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+				fbr::cur()->wait();
+				STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
+				
+				});
+			return true;
+		}
+		
+	};
+	inline PedSpawner ped_spawner;
 	inline void FeatureInitalize() {
+		rope_gun.init();
+		wdrop.init();
+		black_hole.init();
 		jump_force.init();
 		cargobob.init();
 		rocket_boost.init();

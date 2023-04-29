@@ -95,6 +95,9 @@ namespace Saint
 		m_ped_creation_data_node(Signature("48 89 5C 24 10 55 48 8B EC 48 83 EC 20 8B 45 10 8B 89 C4 00 00 00").Scan().As<PVOID>()),
 		m_vehicle_creation_data_node(Signature("48 89 5C 24 ? 55 48 8B EC 48 83 EC 20 8B 45 10 8B 89 C8 00 00 00").Scan().As<PVOID>()),
 		m_player_appearance_data_node(Signature("48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B B1").Scan().As<PVOID>()),
+		m_received_array_update(Signature("48 89 5C 24 10 55 56 57 41 54 41 55 41 56 41 57 48 8B EC 48 83 EC 30 48 8B 05").Scan().As<PVOID>()),
+		m_task_parachute_object_0x270(Signature("0F 88 ? ? ? ? 75 34").Scan().Sub(6).As<PVOID>()),
+		m_serialize_take_off_ped_variation_task(Signature("40 55 53 57 41 56 48 8B EC 48 83 EC 68").Scan().As<PVOID>()),
 		m_invalid_player_crash_patch(Signature("48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC 20 48 8B 59 40 4C 8B F2 48 8B F1 48 85 DB 74 22 48 8B 02 48 8B CA FF 50 48 4C 8D 05 ? ? ? ? 48 8D 15 ? ? ? ? 4C 8B C8 48 8B CB E8 ? ? ? ? 44 0F B7 46 ? 33 DB 33 C9 49 63 D0 45 85 C0 7E 18 48 8B 46 50 48 8B 18 48 85 DB 75 0C 48 FF C1 48 83 C0 08 48 3B CA 7C EC 33 FF 33 C9 45 85 C0 7E 69 48 8B 46 50 48 8B 18 48 85 DB 75 10 48 FF C1 FF C7 48 83 C0 08 49 3B C8 7C EA EB 4D 48 8B 4B 08 48 85 C9 74 12 48 8B 49 48 48 85 C9 74 09 48 8B 01 49 8B D6 FF 50 10").Scan().As<PVOID>()),
 		//BreakupKick
 		m_get_connection_peer(Signature("8D 42 FF 83 F8 FD 77 3D").Scan().Add(23).Rip().As<get_connection_peer>()),

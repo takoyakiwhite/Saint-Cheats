@@ -1049,7 +1049,41 @@ namespace Saint
 
 		return result;
 	}
-	
+	bool Hooks::received_array_update(rage::netArrayHandlerBase* array, CNetGamePlayer* sender, rage::datBitBuffer* buffer, int size, std::int16_t cycle) {
+		static script_global gsbd(2648605);
+		auto result = static_cast<decltype(&received_array_update)>(g_Hooking->array_update)(array, sender, buffer, size, cycle);
+		if (array->m_array == gsbd.as<void*>() && *gsbd.as<eFreemodeState*>() == eFreemodeState::CLOSING)
+		{
+			*gsbd.as<eFreemodeState*>() = eFreemodeState::RUNNING;
+			char g_RemoveWeapons[64];
+			sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Kick");
+			g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+			return false;
+		}
+
+		return result;
+	}
+	uint64_t Hooks::task_parachute_object_0x270(uint64_t _this, int a2, int a3)
+	{
+		if (a2 == 1 && a3 == 1)
+		{
+			if (auto ptr = *(uint64_t*)(_this + 16))
+				if (auto ptr2 = *(uint64_t*)(ptr + 80))
+					if (auto ptr3 = *(uint64_t*)(ptr2 + 64))
+						return static_cast<decltype(&task_parachute_object_0x270)>(g_Hooking->parachute)(_this, a2, a3);
+			return 0;
+		}
+		return static_cast<decltype(&task_parachute_object_0x270)>(g_Hooking->parachute)(_this, a2, a3);
+	}
+	void Hooks::serialize_take_off_ped_variation_task(ClonedTakeOffPedVariationInfo* info, rage::CSyncDataBase* serializer)
+	{
+		static_cast<decltype(&serialize_take_off_ped_variation_task)>(g_Hooking->parachute2)(info, serializer);
+		if (info->m_prop_hash != 0 && info->m_variation_component == 5 && info->m_prop_hash != rage::joaat("p_parachute_s"))
+		{
+			// thanks yim (its open source so dont call me a skid)
+			info->m_prop_hash = 0;
+		}
+	}
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
@@ -1079,6 +1113,9 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_invalid_player_crash_patch, &Hooks::invalid_player_crash, &m_OriginalInvalidPlayer);
 		MH_CreateHook(g_GameFunctions->m_ped_creation_data_node, &Hooks::hk_ped_creation_data_node, &ped_creation);
 		MH_CreateHook(g_GameFunctions->m_vehicle_creation_data_node, &Hooks::hk_vehicle_creation_data_node, &vehicle_creation);
+		MH_CreateHook(g_GameFunctions->m_received_array_update, &Hooks::received_array_update, &array_update);
+		MH_CreateHook(g_GameFunctions->m_task_parachute_object_0x270, &Hooks::task_parachute_object_0x270, &parachute);
+		MH_CreateHook(g_GameFunctions->m_serialize_take_off_ped_variation_task, &Hooks::serialize_take_off_ped_variation_task, &parachute2);
 		//MH_CreateHook(g_GameFunctions->m_GetScriptEvent, &Hooks::NetworkEventHandler, &m_OriginalNetworkHandler);
 		//MH_CreateHook(g_GameFunctions->m_get_network_event_data, &Hooks::GetNetworkEventData, &originalDetection);
 		//MH_CreateHook(g_GameFunctions->m_received_event, &Hooks::GameEvent, &OriginalRecivied);
@@ -1113,6 +1150,9 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->m_invalid_player_crash_patch);
 		MH_RemoveHook(g_GameFunctions->m_ped_creation_data_node);
 		MH_RemoveHook(g_GameFunctions->m_vehicle_creation_data_node);
+		MH_RemoveHook(g_GameFunctions->m_received_array_update);
+		MH_RemoveHook(g_GameFunctions->m_task_parachute_object_0x270);
+		MH_RemoveHook(g_GameFunctions->m_serialize_take_off_ped_variation_task);
 		//MH_RemoveHook(g_GameFunctions->m_GetScriptEvent);
 		//MH_RemoveHook(g_GameFunctions->m_get_network_event_data);
 		//MH_RemoveHook(g_GameFunctions->m_received_event);

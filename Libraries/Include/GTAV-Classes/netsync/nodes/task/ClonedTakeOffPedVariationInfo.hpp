@@ -1,8 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "rage/vector.hpp"
-
+#include "CClonedGeneralSweepInfo.hpp"
 #pragma pack(push, 1)
 class ClonedTakeOffPedVariationInfo
 {
