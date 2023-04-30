@@ -118,7 +118,7 @@ namespace Saint::UserInterface
 		bool m_MouseLocked = false;
 		float m_PosX = 0.18f;
 		float m_PosY = 0.1f;
-		float m_Width = 0.22f;
+		float m_Width = 0.21;
 		std::size_t m_OptionsPerPage = 13;
 		bool m_Sounds = true;
 		bool welcomemessage = false;
@@ -139,7 +139,7 @@ namespace Saint::UserInterface
 		std::int32_t m_HorizontalDelay = 120;
 
 		int open_key = 0x73;
-		//ToolTi
+		//ToolTip
 		void RenderToolTip();
 		RGBA m_ToolTipColor = RGBA{ 255, 255, 255, 255 };
 		Font m_ToolTipFont = Font::ChaletLondon;
@@ -147,11 +147,11 @@ namespace Saint::UserInterface
 
 		// Header
 		float m_HeaderHeight = { 0.083f };
-		bool m_HeaderText = true;
-		bool m_HeaderNativeText = false;
+		bool m_HeaderText = false;
+		bool m_HeaderNativeText = true;
 		float m_HeaderTextSize = 1.f;
 		Font m_HeaderFont = Font::HouseScript;
-		Color m_HeaderBackgroundColor{ 138, 43, 226, 255 };
+		Color m_HeaderBackgroundColor{ 0, 131, 255, 255 };
 		Color m_HeaderTextColor{ 255, 255, 255, 255 };
 		HeaderType m_HeaderType = HeaderType::Static;
 
@@ -172,7 +172,7 @@ namespace Saint::UserInterface
 
 		//enables
 		bool footer_enabled = true;
-		bool lines_enabled = true;
+		bool lines_enabled = false;
 
 		// Smooth Scrolling
 		float lerp(float a, float b, float t)
@@ -219,13 +219,13 @@ namespace Saint::UserInterface
 		Font m_OptionFont = Font::ChaletLondon;
 		Font m_SeperatorFont = Font::HouseScript;
 		float m_OptionPadding = 2.1f;
-		Color m_OptionSelectedTextColor{ 255,255,255, 255 };
+		Color m_OptionSelectedTextColor{ 0,0,0, 255 };
 		Color m_OptionUnselectedTextColor{ 255,255,255, 255 };
-		Color m_OptionSelectedBackgroundColor{ 138, 43, 226, 255 };
+		Color m_OptionSelectedBackgroundColor{ 255, 255, 255, 255 };
 		Color m_OptionUnselectedBackgroundColor{ 0, 0, 0, 160 };
 
 		//submenubar
-		bool submenu_enabled = false;
+		bool submenu_enabled = true;
 
 		Color m_SubheaderBackground{ 0, 0, 0, 255 };
 		Color m_SubheaderText{ 255,255,255, 255 };
@@ -237,14 +237,14 @@ namespace Saint::UserInterface
 		std::string header_name = "Saint";
 
 		// Footer
-		bool m_dynamic_footer = { false };
+		bool m_dynamic_footer = { true };
 		int m_option_count;
 		int m_current_option;
 		int m_previous_option;
 
-		float m_FooterHeight = 0.030f;
-		float m_FooterSpriteSize = 0.025f;
-		Color m_FooterBackgroundColor{ 138, 43, 226, 255 };
+		float m_FooterHeight = 0.025000f;
+		float m_FooterSpriteSize = 0.032000f;
+		Color m_FooterBackgroundColor{ 0, 0, 0, 255 };
 		Color m_FooterSpriteColor{ 255,255,255, 255 };
 
 		//Enterable
@@ -271,24 +271,24 @@ namespace Saint::UserInterface
 			"Checkmarks",
 			"Custom",
 		};
-		std::size_t ToggleIterator = 0;
+		std::size_t ToggleIterator = 3;
 		std::string custom_toggle_dict_on = "commonmenu";
 		std::string custom_toggle_asset_on = "shop_tick_icon";
 		std::string custom_toggle_dict_off = "commonmenu";
 		std::string custom_toggle_asset_off = "shop_tick_icon";
-		float toggle_height = 0.0245f;
-		float toggle_width = 0.01296f;
-		float toggle_height_off = 0.037f;
-		float toggle_width_off = 0.022f;
+		float toggle_height = 0.032500f;
+		float toggle_width = 0.016960f;
+		float toggle_height_off = 0.041000f;
+		float toggle_width_off = 0.024000f;
 		bool toggle_show_on = true;
 		bool toggle_show_off = false;
 		float toggle_on_rotation = 5.0f;
 		float toggle_off_rotation = 45.000;
 
 		//Header
-		float header_x_offset = 0.0f;
+		float header_x_offset = -0.068;
 		//smooth scroll
-		float smooth_scroll_speed = 0.15f;
+		float smooth_scroll_speed = 1.00f;
 
 		//break
 		bool break_italic = true;
@@ -311,7 +311,7 @@ namespace Saint::UserInterface
 		float m_DescriptionPadding = 2.1f;
 		Color m_DescriptionSpriteColor{ 255,255,255, 255 };
 
-		float glare_x_offset = 0.007f;
+		float glare_x_offset = 0.007;
 
 		bool fov_circle = false;
 

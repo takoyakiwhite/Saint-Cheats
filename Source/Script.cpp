@@ -406,6 +406,7 @@ namespace Saint
 				sub->draw_option<submenu>("Hand Trails", nullptr, HandTrails);
 				sub->draw_option<submenu>("Walk Styles", nullptr, SubmenuWalkStyles);
 				sub->draw_option<submenu>("Parachute", nullptr, rage::joaat("ParachuteSelf"));
+				sub->draw_option<submenu>("Ragdoll", nullptr, rage::joaat("RagdollFort"));
 				sub->draw_option<toggle<bool>>(("Godmode"), nullptr, &godmode, BoolDisplay::OnOff, false, [] {
 					if (!godmode)
 					{
@@ -427,16 +428,10 @@ namespace Saint
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Explosive Melee"), "Allows you have the ability from director mode.", &m_frame_flags.m_explosive_melee, BoolDisplay::OnOff);
-				sub->draw_option<toggle<bool>>(("No Ragdoll"), "Disables ragdolls.", &features.no_ragdoll, BoolDisplay::OnOff, false, [] {
-					if (!features.no_ragdoll)
-					{
-						PED::SET_PED_RAGDOLL_ON_COLLISION(PLAYER::PLAYER_PED_ID(), true);
-						PED::SET_PED_CAN_RAGDOLL(PLAYER::PLAYER_PED_ID(), true);
-						PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(PLAYER::PLAYER_PED_ID(), true);
-					}
-					});
+				
 				sub->draw_option<toggle<bool>>(("Pickup Entities"), "Allows you to pickup & throw entities and players.", &features.pickup_mode, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Auto Clean"), "Automaticly cleans you're ped from visual damage.", &features.autoclean, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Forcefield"), "Automaticly cleans you're ped from visual damage.", &features.force_field, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Swim Anywhere"), nullptr, &features.swim_anywhere, BoolDisplay::OnOff, false, [] {
 					if (!features.swim_anywhere)
 					{
@@ -447,6 +442,12 @@ namespace Saint
 					if (!features.tiny_ped)
 					{
 						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 223, false);
+					}
+					});
+				sub->draw_option<toggle<bool>>(("Crouched"), "", &features.crouched, BoolDisplay::OnOff, false, [] {
+					if (!features.crouched)
+					{
+						PED::RESET_PED_MOVEMENT_CLIPSET(PLAYER::PLAYER_PED_ID(), 1.0f);
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Unlimited Special Ability"), "Automaticly refills your special ability bar.", &features.unlim, BoolDisplay::OnOff);
@@ -511,7 +512,7 @@ namespace Saint
 					});
 				sub->draw_option<toggle<bool>>(("Walk Underwater"), "Disables the swimming animation.", &features.walk_underwater, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Push Water Away"), "Pushes water away from you.", &features.push_water_away, BoolDisplay::OnOff);
-				sub->draw_option<toggle<bool>>(("Ragdoll On Q"), "", &features.ragdoll_on_q, BoolDisplay::OnOff);
+				
 				sub->draw_option<number<std::int32_t>>("Wanted Level", nullptr, &i_hate_niggers, 0, 5, 1, 3, true, "", "", [] {
 					(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_wanted_level = i_hate_niggers;
 					});
@@ -520,6 +521,35 @@ namespace Saint
 					});
 
 			});
+			g_Render->draw_submenu<sub>(("Ragdoll"), rage::joaat("RagdollFort"), [](sub* sub)
+				{
+					sub->draw_option<toggle<bool>>(("Disable"), "", &features.no_ragdoll, BoolDisplay::OnOff, false, [] {
+						if (!features.no_ragdoll)
+						{
+							PED::SET_PED_RAGDOLL_ON_COLLISION(PLAYER::PLAYER_PED_ID(), true);
+							PED::SET_PED_CAN_RAGDOLL(PLAYER::PLAYER_PED_ID(), true);
+							PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(PLAYER::PLAYER_PED_ID(), true);
+						}
+						});
+					if (features.no_ragdoll) {
+						sub->draw_option<UnclickOption>(("Ragdoll is disabled."), nullptr, [] {});
+					}
+					if (!features.no_ragdoll) {
+						sub->draw_option<toggle<bool>>(("On Q"), "", &features.ragdoll_on_q, BoolDisplay::OnOff);
+						sub->draw_option<toggle<bool>>(("On Jump"), "", &ragdoll.on_jump, BoolDisplay::OnOff);
+						sub->draw_option<toggle<bool>>(("On Collison"), "", &ragdoll.on_collison, BoolDisplay::OnOff, false, [] {
+							if (!ragdoll.on_collison)
+							{
+								PED::SET_PED_RAGDOLL_ON_COLLISION(PLAYER::PLAYER_PED_ID(), false);
+							}
+							});
+						sub->draw_option<RegularOption>(("Start"), nullptr, []
+							{
+								NativeVector3 v = ENTITY::GET_ENTITY_FORWARD_VECTOR(PLAYER::PLAYER_PED_ID());
+								PED::SET_PED_TO_RAGDOLL_WITH_FALL(PLAYER::PLAYER_PED_ID(), 1500, 2000, 1, -v.x, -v.y, -v.z, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
+							});
+					}
+				});
 		g_Render->draw_submenu<sub>(("Smoke Trail Color"), rage::joaat("SmokeTrail"), [](sub* sub)
 			{
 				sub->draw_option<number<std::int32_t>>("R", nullptr, &changeVehicleColor.r, 0, 255, 1, 3, true, "", "", [] {
@@ -611,6 +641,12 @@ namespace Saint
 					{
 
 						walk_style->change("move_f@flee@a");
+
+					});
+				sub->draw_option<RegularOption>("Crouched", nullptr, [=]
+					{
+
+						walk_style->change("move_ped_crouched");
 
 					});
 
@@ -783,6 +819,13 @@ namespace Saint
 
 
 					});
+				sub->draw_option<RegularOption>(("Dance"), nullptr, [=]
+					{
+						animation.start("oddjobs@assassinate@multi@yachttarget@lapdanc", "yacht_ld_f");
+
+
+					});
+				
 				for (std::int32_t i = 0; i < animation.scenarios.size; i++) {
 					sub->draw_option<RegularOption>(animation.scenarios.name[i], nullptr, [=]
 						{
@@ -1959,8 +2002,8 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Color"), SubmenuSelectedVehicleColor, [](sub* sub)
 			{
-				sub->draw_option<toggle<bool>>(("Randomize Primary"), nullptr, &max_loop.randomizeprimary, BoolDisplay::OnOff);
-				sub->draw_option<toggle<bool>>(("Randomize Secondary"), nullptr, &max_loop.randomizesecondary, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Primary"), nullptr, &max_loop.randomizeprimary, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Secondary"), nullptr, &max_loop.randomizesecondary, BoolDisplay::OnOff);
 			});
 		g_Render->draw_submenu<sub>(("Auto-Pilot"), SubmenuAutoPilot, [](sub* sub)
 			{
@@ -4449,6 +4492,7 @@ namespace Saint
 
 
 				sub->draw_option<submenu>("Nightclub", nullptr, rage::joaat("Nightclub"));
+				sub->draw_option<submenu>("ATM", nullptr, rage::joaat("ATM"));
 
 
 				sub->draw_option<submenu>("Detected Methods", nullptr, SubmenuDEmeth);
@@ -4492,7 +4536,30 @@ namespace Saint
 
 
 
-
+		g_Render->draw_submenu<sub>("ATM", rage::joaat("atm"), [](sub* sub)
+			{
+				script_global globalplayer_bd(2657589);
+				script_global gpbd_fm_3(1894573);
+				script_global gpbd_fm_1(1853910);
+				auto& stats = gpbd_fm_1.as<GPBD_FM*>()->Entries[PLAYER::PLAYER_ID()].PlayerStats;
+				static int max_bank = stats.Money - stats.WalletBalance;
+				static int max_wallet = stats.WalletBalance;
+				sub->draw_option<number<std::int32_t>>("Transfer To Wallet", nullptr, &features.transfer_to_wallet, 0, max_bank, 1, 3, false, "", "", [] {
+					NETSHOPPING::NET_GAMESERVER_TRANSFER_BANK_TO_WALLET(g_RecoveryManager.selected, features.transfer_to_wallet);
+				});
+				sub->draw_option<number<std::int32_t>>("Transfer To Bank", nullptr, &features.transfer_to_bank, 0, max_wallet, 1, 3, false, "", "", [] {
+					NETSHOPPING::NET_GAMESERVER_TRANSFER_WALLET_TO_BANK(g_RecoveryManager.selected, features.transfer_to_bank);
+				});
+				sub->draw_option<RegularOption>("Refresh", "Might take a few tries.", [=]
+					{
+						script_global gpbd_fm_12(1853910);
+						auto& stats2 = gpbd_fm_12.as<GPBD_FM*>()->Entries[PLAYER::PLAYER_ID()].PlayerStats;
+						features.transfer_to_wallet = 0;
+						features.transfer_to_bank = 0;
+						max_bank = stats2.Money - stats2.WalletBalance;
+						max_wallet = stats2.WalletBalance;
+					});
+			});
 		g_Render->draw_submenu<sub>("Money", SubmenuMoney, [](sub* sub)
 			{
 
@@ -6250,7 +6317,7 @@ namespace Saint
 				sub->draw_option<RegularOption>("Apply", nullptr, []
 					{
 						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_SET_RP_GIFT_ADMIN"), m_recovery.m_level.Levels[m_recovery.m_level.m_level], true);
-						Noti::InsertNotification({ ImGuiToastType_None, 2000, "Change session for the level to apply." });
+						Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Change session for the level to apply." });
 					});
 
 
@@ -6667,7 +6734,7 @@ namespace Saint
 		g_Render->draw_submenu<PlayerSubmenu>(&g_SelectedPlayer, SubmenuSelectedPlayer, [](PlayerSubmenu* sub)
 			{
 				sub->draw_option<submenu>("Trolling", nullptr, SubmenuTrolling);
-				sub->draw_option<submenu>("Bodygaurds", nullptr, SubmenuBodyguards);
+				sub->draw_option<submenu>("Bodyguards", nullptr, SubmenuBodyguards);
 				sub->draw_option<submenu>("Increment", nullptr, SubmenuIncrement);
 				sub->draw_option<submenu>("Friendly", nullptr, SubmenuFriendly);
 				sub->draw_option<submenu>("Vehicle", nullptr, SubmenuSelectedVehicle);
@@ -7285,11 +7352,11 @@ namespace Saint
 							if (m_saved_players.DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
 
 								if (number_failed < 2) {
-									Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s is already saved!", name });
+									Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  %s is already saved!", name });
 								}
 								if (number_failed > 2 && saved) {
 
-									Noti::InsertNotification({ ImGuiToastType_None, 2000, "2 or more players are already saved." });
+									Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  2 or more players are already saved." });
 									saved = false;
 								}
 								number_failed++;
@@ -7301,7 +7368,7 @@ namespace Saint
 								number_saved++;
 							}
 						}
-						Noti::InsertNotification({ ImGuiToastType_None, 2000, "Saved a total of %i, and %i already existed.", number_saved, number_failed });
+						Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Saved a total of %i, and %i already existed.", number_saved, number_failed });
 						saved = true;
 
 					});
@@ -7613,17 +7680,13 @@ namespace Saint
 					});
 
 			});
-		g_Render->draw_submenu<sub>(("Bodygaurds"), SubmenuBodyguards, [](sub* sub)
+		g_Render->draw_submenu<sub>(("Bodyguards"), SubmenuBodyguards, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Model", nullptr, rage::joaat("CustomModelB"));
 				sub->draw_option<toggle<bool>>(("Godmode"), nullptr, &bodygaurd.godmode, BoolDisplay::OnOff);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Weapon", nullptr, &all_weapons.name, &bodygaurd.WeaponInt);
-
-				sub->draw_option<toggle<bool>>(("Custom Firing Pattern"), nullptr, &bodygaurd.FiringPatternEnabled, BoolDisplay::OnOff);
-				if (bodygaurd.FiringPatternEnabled) {
-					sub->draw_option<ChooseOption<const char*, std::size_t>>("Firing Pattern", nullptr, &bodygaurd.FiringPattern, &bodygaurd.FiringPatternInt);
-				}
-				sub->draw_option<number<std::int32_t>>("Accuary", nullptr, &bodygaurd.accuary, 0, 100);
+				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Custom Firing Pattern", nullptr, &bodygaurd.FiringPatternEnabled, &bodygaurd.FiringPattern, &bodygaurd.FiringPatternInt);
+				sub->draw_option<number<std::int32_t>>("Accuracy", nullptr, &bodygaurd.accuary, 0, 100);
 				sub->draw_option<number<float>>("Damage Multiplier", nullptr, &bodygaurd.damagemultiplier, 0.0f, 150.f, 0.10f, 2);
 				sub->draw_option<KeyboardOption>(("Selected"), nullptr, bodygaurd.selected_name, []
 					{
@@ -7645,10 +7708,11 @@ namespace Saint
 				if (STREAMING::HAS_MODEL_LOADED(MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str()))) {
 					sub->draw_option<RegularOption>(("Spawn"), nullptr, []
 						{
+							
 							g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str()), [=] {
-								Ped ped;
 								NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
-								ped = PED::CREATE_PED(26, MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str()), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
+								Ped ped = PED::CREATE_PED(26, MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str()), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
+								
 								NETWORK::NETWORK_FADE_IN_ENTITY(ped, true, false);
 								PED::SET_PED_AS_GROUP_LEADER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
 								PED::SET_PED_AS_GROUP_MEMBER(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
@@ -7667,8 +7731,192 @@ namespace Saint
 								{
 									ENTITY::SET_ENTITY_INVINCIBLE(ped, bodygaurd.godmode);
 								}
-								});
+								bodygaurd.spawned.push_back({ ped, bodygaurd.selected_name, g_SelectedPlayer });
+							});
+
 						});
+				}
+				sub->draw_option<UnclickOption>(("Spawned"), nullptr, [] {});
+				sub->draw_option<submenu>("All", nullptr, rage::joaat("BodyAll"));
+				
+				for (auto& guard : bodygaurd.spawned) {
+					if (guard.m_owner == g_SelectedPlayer) {
+						if (sub->GetSelectedOption() == sub->GetNumOptions()) {
+							g_players.draw_info4(guard.m_id);
+							NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(guard.m_id, false);
+							GRAPHICS::DRAW_MARKER(20, coords.x, coords.y, coords.z + 1.3f, 0, 0, 0, 0, 180, 0, 0.3, 0.3, 0.3, 255, 0, 0, 200, 1, 1, 1, 0, 0, 0, 0);
+
+						}
+						sub->draw_option<submenu>(guard.m_name.c_str(), nullptr, rage::joaat("SelectedBodyGuard"), [=]
+							{
+								bodygaurd.selected_gaurd = guard.m_id;
+							});
+					}
+					
+				}
+			});
+		g_Render->draw_submenu<sub>(("All"), rage::joaat("BodyAll"), [](sub* sub)
+			{
+				
+				sub->draw_option<RegularOption>(("Teleport To Me"), nullptr, [=]
+					{
+						for (auto& guard : bodygaurd.spawned) {
+							if (guard.m_owner == g_SelectedPlayer) {
+								NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+								ENTITY::SET_ENTITY_COORDS(guard.m_id, coords.x, coords.y, coords.z, 0, 0, 0, 0);
+							}
+						}
+					});
+				sub->draw_option<RegularOption>(("Teleport Into Current Vehicle"), nullptr, [=]
+					{
+						if (VEHICLE::ARE_ANY_VEHICLE_SEATS_FREE(get_veh())) {
+							for (auto& guard : bodygaurd.spawned) {
+								if (guard.m_owner == g_SelectedPlayer) {
+									if (!PED::IS_PED_IN_ANY_VEHICLE(guard.m_id, false)) {
+										if (VEHICLE::ARE_ANY_VEHICLE_SEATS_FREE(get_veh())) {
+											for (int i = 0; i < 6; i++)
+											{
+												if (VEHICLE::IS_VEHICLE_SEAT_FREE(get_veh(), i, i))
+												{
+													PED::SET_PED_INTO_VEHICLE(guard.m_id, get_veh(), i);
+												}
+											}
+
+										}
+
+									}
+								}
+							}
+						}
+						else {
+							Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  No seats are free." });
+						}
+					});
+				sub->draw_option<RegularOption>(("Kill"), nullptr, [=]
+					{
+
+						for (auto& guard : bodygaurd.spawned) {
+							if (guard.m_owner == g_SelectedPlayer) {
+								PED::APPLY_DAMAGE_TO_PED(guard.m_id, PED::GET_PED_MAX_HEALTH(guard.m_id) * 2, false, 0);
+							}
+						}
+					});
+				sub->draw_option<RegularOption>(("Delete"), nullptr, []
+					{
+						for (auto& guard : bodygaurd.spawned) {
+							if (guard.m_owner == g_SelectedPlayer) {
+								PED::DELETE_PED(&guard.m_id);
+								bodygaurd.spawned.clear();
+							}
+						}
+						
+					});
+
+			});
+		g_Render->draw_submenu<sub>(("Seleced"), rage::joaat("SelectedBodyGuard"), [](sub* sub)
+			{
+				Ped ped = bodygaurd.selected_gaurd;
+				sub->draw_option<submenu>("Outfit Editor", nullptr, rage::joaat("OutfitEditorSelected"));
+				sub->draw_option<RegularOption>(("Teleport To Me"), nullptr, [=]
+					{
+						NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+						ENTITY::SET_ENTITY_COORDS(ped, coords.x, coords.y, coords.z, 0, 0, 0, 0);
+					});
+				sub->draw_option<RegularOption>(("Teleport Into Current Vehicle"), nullptr, [=]
+					{
+						if (!PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
+							if (VEHICLE::ARE_ANY_VEHICLE_SEATS_FREE(get_veh())) {
+								for (int i = 0; i < 6; i++)
+								{
+									if (VEHICLE::IS_VEHICLE_SEAT_FREE(get_veh(), i, i))
+									{
+										PED::SET_PED_INTO_VEHICLE(ped, get_veh(), i);
+									}
+								}
+
+							}
+							else {
+								Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  No seats are free." });
+							}
+						}
+					});
+				sub->draw_option<RegularOption>(("Kill"), nullptr, [=]
+					{
+						PED::APPLY_DAMAGE_TO_PED(ped, PED::GET_PED_MAX_HEALTH(ped) * 2, false, 0);
+					});
+				
+			});
+		g_Render->draw_submenu<sub>(("Outfit Editor"), rage::joaat("OutfitEditorSelected"), [](sub* sub)
+			{
+				Ped ped = bodygaurd.selected_gaurd;
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Component", nullptr, &Lists::HeaderTypesFrontend2, &Lists::HeaderTypesPosition22, true, -1, [] {
+					g_Render->outfits = Lists::HeaderTypesBackend2[Lists::HeaderTypesPosition22];
+					});
+				switch (g_Render->outfits) {
+				case Outfits::Face:
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets face variation.", &testa2, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(ped, 0), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 0, testa2, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets face texture variation.", &facetexture22222, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(ped, 0, testa2), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 0, testa2, facetexture22222, 0); }); break;
+				case Outfits::Head:
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets head variation.", &testb2, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(ped, 1), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 1, testb2, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets head texture variation.", &facetexture125, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(ped, 1, testb2), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 1, testb2, facetexture125, 0); }); break;
+				case Outfits::Hair:
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets hair variation.", &testc2, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(ped, 2), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 2, testc, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets hair texture variation.", &facetexture22, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(ped, 2, testc2), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 2, testc2, facetexture22, 0); }); break;
+				case Outfits::Torso:
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets torso variation.", &testd2, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(ped, 3), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 3, testd, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets torso texture variation.", &facetexture32, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(ped, 3, testd2), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 3, testd2, facetexture32, 0); }); break;
+				case Outfits::Torso2:
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets torso 2 variation.", &testl2, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(ped, 11), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 11, testl, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets torso 2 texture variation.", &facetexture42, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(ped, 11, testl2), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 11, testl2, facetexture42, 0); }); break;
+				case Outfits::Legs:
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets leg variation.", &teste2, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(ped, 4), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 4, teste, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets leg texture variation.", &facetexture52, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(ped, 4, teste2), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 4, teste2, facetexture52, 0); }); break;
+				case Outfits::Hands:
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets hand variation.", &testf2, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(ped, 5), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 5, testf, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets hand texture variation.", &facetexture62, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(ped, 5, testf2), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 5, testf2, facetexture62, 0); }); break;
+				case Outfits::Feet:
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets feet variation.", &testg2, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(ped, 6), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 6, testg, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets feet texture variation.", &facetexture72, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(ped, 6, testg2), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 6, testg2, facetexture72, 0); }); break;
+				case Outfits::Eyes:
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets eye variation.", &testh2, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(ped, 7), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 7, testh, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets eyes texture variation.", &facetexture82, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(ped, 7, testh2), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 7, testh2, facetexture82, 0); }); break;
+				case Outfits::Accessories:
+
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets accessories variation.", &testi2, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(ped, 8), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 8, testi, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets accessories texture variation.", &facetexture92, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(ped, 8, testi2), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 8, testi2, facetexture92, 0); }); break;
+				case Outfits::Vests:
+
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets vest variation.", &testj2, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(ped, 9), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 9, testj, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets vests texture variation.", &facetexture102, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(ped, 9, testj2), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 9, testj2, facetexture102, 0); }); break;
+				case Outfits::Decals:
+
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets texture variation.", &testk2, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(ped, 10), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 10, testk, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets decals texture variation.", &facetexture112, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(ped, 10, testk2), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 10, testk2, facetexture112, 0); }); break;
+				}
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Props", nullptr, &Lists::HeaderTypesFrontend3, &Lists::HeaderTypesPosition32, true, -1, [] {
+					g_Render->props = Lists::HeaderTypesBackend3[Lists::HeaderTypesPosition32];
+					});
+				switch (g_Render->props) {
+				case Props::Hats:
+					sub->draw_option<number<std::int32_t>>("Drawable", "", &hatDrawable2, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(ped, 0), 1, 3, true, "", "", [=] { PED::SET_PED_PROP_INDEX(ped, 0, hatDrawable2, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "", &hatTexture2, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(ped, 0, hatDrawable2), 1, 3, true, "", "", [=] { PED::SET_PED_PROP_INDEX(ped, 0, hatDrawable2, hatTexture2, 0); }); break;
+					break;
+				case Props::Glasses:
+					sub->draw_option<number<std::int32_t>>("Drawable", "", &glassesDrawable2, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(ped, 1), 1, 3, true, "", "", [=] { PED::SET_PED_PROP_INDEX(ped, 1, glassesDrawable2, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "", &glassesTexture2, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(ped, 1, glassesDrawable2), 1, 3, true, "", "", [=] { PED::SET_PED_PROP_INDEX(ped, 1, glassesDrawable2, glassesTexture2, 0); }); break;
+					break;
+				case Props::Ears:
+					sub->draw_option<number<std::int32_t>>("Drawable", "", &earsDrawable2, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(ped, 2), 1, 3, true, "", "", [=] { PED::SET_PED_PROP_INDEX(ped, 2, earsDrawable2, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "", &earsTexture2, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(ped, 2, earsDrawable2), 1, 3, true, "", "", [=] { PED::SET_PED_PROP_INDEX(ped, 2, earsDrawable2, earsTexture2, 0); }); break;
+					break;
+				case Props::Watches:
+					sub->draw_option<number<std::int32_t>>("Drawable", "", &watchesDrawable2, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(ped, 6), 1, 3, true, "", "", [=] { PED::SET_PED_PROP_INDEX(ped, 6, watchesDrawable2, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "", &watchesTexture2, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(ped, 6, watchesDrawable2), 1, 3, true, "", "", [=] { PED::SET_PED_PROP_INDEX(ped, 6, watchesDrawable2, watchesTexture2, 0); }); break;
+					break;
+				case Props::Bracelets:
+					sub->draw_option<number<std::int32_t>>("Drawable", "", &braceDrawable2, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(ped, 7), 1, 3, true, "", "", [=] { PED::SET_PED_PROP_INDEX(ped, 7, braceDrawable2, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "", &braceTexture2, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(ped, 7, braceDrawable2), 1, 3, true, "", "", [=] { PED::SET_PED_PROP_INDEX(ped, 7, braceDrawable2, braceTexture2, 0); }); break;
+					break;
 				}
 			});
 		g_Render->draw_submenu<sub>(("Model"), rage::joaat("CustomModelB"), [](sub* sub)
@@ -7860,20 +8108,37 @@ namespace Saint
 					});
 				sub->draw_option<UnclickOption>(("Locations"), nullptr, [] {});
 				sub->draw_option<submenu>("Popular", nullptr, rage::joaat("populartps"));
+				sub->draw_option<submenu>("Airfields", nullptr, rage::joaat("airfield"));
 				sub->draw_option<submenu>("Clubhouse & Warehouses", nullptr, rage::joaat("warhouse"));
 				sub->draw_option<submenu>("Indoors", nullptr, rage::joaat("indoors"));
 
+
+			});
+		g_Render->draw_submenu<sub>(("Airfields"), rage::joaat("airfield"), [](sub* sub)
+			{
+				sub->draw_option<RegularOption>("LSIA", "", []
+					{
+						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), -1336.0f, -3044.0f, 13.9f);
+					});
+				sub->draw_option<RegularOption>("Sandy Shores", "", []
+					{
+						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 1747.0f, 3273.7f, 41.1f);
+					});
+				sub->draw_option<RegularOption>("McKenzie", "", []
+					{
+						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 2121.7f, 4796.3f, 41.1f);
+					});
 
 			});
 		g_Render->draw_submenu<sub>(("Popular"), rage::joaat("populartps"), [](sub* sub)
 			{
 				sub->draw_option<RegularOption>("Maze Bank Roof", "", []
 					{
-						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), -75.015, -818.215, 326.176, false, false, false, false);
+						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), -75.015, -818.215, 326.176);
 					});
 				sub->draw_option<RegularOption>("Main LS Customs", "", []
 					{
-						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), -373.01, -124.91, 38.31, false, false, false, false);
+						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), -373.01, -124.91, 38.31);
 					});
 
 			});
@@ -8662,6 +8927,7 @@ namespace Saint
 					});
 				sub->draw_option<toggle<bool>>(("Stunt Jumps"), nullptr, &m_disables.stuntjumps, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Idle Camera"), nullptr, &m_disables.idle_cam, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Wanted Music"), "", &features.disable_wanted_music, BoolDisplay::OnOff);
 			});
 		g_Render->draw_submenu<sub>("FOV", SubmenuFOV, [](sub* sub)
 			{

@@ -180,6 +180,129 @@ namespace Saint {
 
 			return result;
 		}
+		bool is_in_current_vehicle(Ped ped) {
+			if (PED::IS_PED_IN_VEHICLE(ped, PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+			return false;
+		}
+		void info_part_1() {
+			float x = g_Render->m_PosX;
+			float y = g_Render->m_PosY;
+			Color col;
+
+			float offset = 0.023f;
+			float xfr = x + 0.205f + offset - 0.025f;
+			GRAPHICS::DRAW_RECT(xfr, y + -0.090 + 0.178, 0.183f, 0.178, g_Render->m_OptionUnselectedBackgroundColor.r, g_Render->m_OptionUnselectedBackgroundColor.g, g_Render->m_OptionUnselectedBackgroundColor.b, 160, false);
+			Color col2 = { 255, 255, 255, 190 };
+
+			switch (g_Render->ThemeIterator) {
+			case 0:
+				col = { 138, 43, 226, 255 };
+				break;
+			case 1:
+				col = { 255, 108, 116, 255 };
+				break;
+			case 2:
+				col = { 15, 82, 186, 255 };
+				break;
+			case 3:
+				col = { 24, 26, 24, 255 };
+				break;
+			case 4:
+				col = { 0, 155, 119, 255 };
+				break;
+			case 5:
+				col = { 70, 38, 180, 255 };
+			case 6:
+				col = { 255, 145, 164, 255 };
+				break;
+			case 7:
+				col = { 17, 17, 17, 255 };
+				break;
+			case 8:
+				col = { 234, 90, 81, 255 };
+				break;
+
+			}
+			GRAPHICS::DRAW_RECT(x - 0.510, y + -0.000, 0.183, -0.002, g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255, false);
+			GRAPHICS::DRAW_RECT(xfr, y + -0.000, 0.183f, -0.002, g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255, false);
+		}
+		void draw_info4(Ped gaurd) {
+
+			float x = g_Render->m_PosX;
+			float y = g_Render->m_PosY;
+			Color col;
+
+			float offset = 0.023f;
+			float xfr = x + 0.205f + offset - 0.025f;
+			GRAPHICS::DRAW_RECT(xfr, y + -0.090 + 0.178, 0.183f, 0.178, g_Render->m_OptionUnselectedBackgroundColor.r, g_Render->m_OptionUnselectedBackgroundColor.g, g_Render->m_OptionUnselectedBackgroundColor.b, 160, false);
+			Color col2 = { 255, 255, 255, 190 };
+
+			char timesince[128];
+			char max_speed[128];
+			char seats[64];
+			char price[128];
+			char make[128];
+			char make2[128];
+			script_global globalplayer_bd(2657589);
+			script_global gpbd_fm_3(1894573);
+			script_global gpbd_fm_1(1853910);
+			auto& stats = gpbd_fm_1.as<GPBD_FM*>()->Entries[PLAYER::PLAYER_ID()].PlayerStats;
+			auto& stats1 = gpbd_fm_1.as<GPBD_FM*>()->Entries[PLAYER::PLAYER_ID()];
+			auto& stats2 = gpbd_fm_3.as<GPBD_FM_3*>()->Entries[PLAYER::PLAYER_ID()];
+			auto& stats3 = globalplayer_bd.as<GlobalPlayerBD*>()->Entries[PLAYER::PLAYER_ID()];
+			NativeVector3 get_coords = ENTITY::GET_ENTITY_COORDS(gaurd, false);
+			sprintf(timesince, "%i", ENTITY::GET_ENTITY_HEALTH(gaurd));
+			sprintf(max_speed, "%s", is_in_current_vehicle(gaurd) ? "Yes" : "No");
+			sprintf(seats, "%s", ENTITY::IS_ENTITY_DEAD(gaurd, 0) ? "Yes" : "No");
+			Hash street[2]{};
+			PATHFIND::GET_STREET_NAME_AT_COORD(get_coords.x, get_coords.y, get_coords.z, &street[0], &street[1]);
+			const char* Street = HUD::GET_STREET_NAME_FROM_HASH_KEY(street[0]);
+			sprintf(price, "%s", Street);
+			//drawSprite(preview.dict, preview.texture, x + 0.3545595, y + -0.139, 0.1493f, 0.10f, { 255, 255, 255, 255 }, 0.0f);
+			draw_info_text("Health", timesince, 1, 0, true);
+			draw_info_text("In Current Vehicle", max_speed, 1, 0);
+			draw_info_text("Dead", seats, 2, 0);
+			draw_info_text("Street", price, 3, 0);
+
+
+
+			switch (g_Render->ThemeIterator) {
+			case 0:
+				col = { 138, 43, 226, 255 };
+				break;
+			case 1:
+				col = { 255, 108, 116, 255 };
+				break;
+			case 2:
+				col = { 15, 82, 186, 255 };
+				break;
+			case 3:
+				col = { 24, 26, 24, 255 };
+				break;
+			case 4:
+				col = { 0, 155, 119, 255 };
+				break;
+			case 5:
+				col = { 70, 38, 180, 255 };
+			case 6:
+				col = { 255, 145, 164, 255 };
+				break;
+			case 7:
+				col = { 17, 17, 17, 255 };
+				break;
+			case 8:
+				col = { 234, 90, 81, 255 };
+				break;
+
+			}
+			GRAPHICS::DRAW_RECT(x - 0.510, y + -0.000, 0.183, -0.002, g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255, false);
+			GRAPHICS::DRAW_RECT(xfr, y + -0.000, 0.183f, -0.002, g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255, false);
+		}
 		void draw_info3() {
 
 			float x = g_Render->m_PosX;
@@ -204,7 +327,7 @@ namespace Saint {
 			auto& stats1 = gpbd_fm_1.as<GPBD_FM*>()->Entries[PLAYER::PLAYER_ID()];
 			auto& stats2 = gpbd_fm_3.as<GPBD_FM_3*>()->Entries[PLAYER::PLAYER_ID()];
 			auto& stats3 = globalplayer_bd.as<GlobalPlayerBD*>()->Entries[PLAYER::PLAYER_ID()];
-			sprintf(timesince, "%s", separateByCommas(stats1.PropertyData.NightclubData.SafeCashValue));
+			sprintf(timesince, "$%s", separateByCommas(stats1.PropertyData.NightclubData.SafeCashValue));
 			sprintf(max_speed, "%i%", (int)stats1.PropertyData.NightclubData.Popularity);
 			sprintf(seats, "$%i", (int)stats1.PropertyData.NightclubData.EntryCost);
 			sprintf(price, "%i", (int)stats1.PropertyData.BusinessHubData.Upgrades);

@@ -72,12 +72,15 @@ namespace Saint::UserInterface
 			"Sexy Saint Cheats",
 			"what am i doing wrong??? - patek",
 			"Kiddions VIP On Top",
-			"Become you're inner vali."
+			"Become you're inner vali.",
+			"I've been on my KTM drip hopefully i dont fall off",
+			"We arent ozark..",
+			"stash doesn't like juice wrld ):"
 		};
 
 		if (!g_HasSetToolTip)
 		{
-			g_ToolTip = MISC::GET_RANDOM_INT_IN_RANGE(0, 4);
+			g_ToolTip = random(0, 6);
 			g_HasSetToolTip = true;
 		}
 
@@ -257,6 +260,7 @@ namespace Saint::UserInterface
 			openTimer.SetDelay(std::chrono::milliseconds(m_OpenDelay));
 			if (m_OpenKeyPressed && openTimer.Update())
 			{
+				g_HasSetToolTip = false;
 				if (!m_Opened) {
 					MenuOpeningAnimation();
 				}
@@ -271,6 +275,7 @@ namespace Saint::UserInterface
 			if (!PAD::IS_USING_KEYBOARD_AND_MOUSE(2)) {
 				if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 227) && PAD::IS_DISABLED_CONTROL_PRESSED(2, INPUT_CELLPHONE_RIGHT) && openTimer.Update())
 				{
+					g_HasSetToolTip = false;
 					if (!m_Opened) {
 						MenuOpeningAnimation();
 					}
@@ -284,6 +289,7 @@ namespace Saint::UserInterface
 			}
 			if (m_OpenKeyPressed2 && openTimer.Update())
 			{
+				g_HasSetToolTip = false;
 				if (!m_Opened) {
 					MenuOpeningAnimation();
 				}
@@ -347,6 +353,7 @@ namespace Saint::UserInterface
 				enterTimer.SetDelay(std::chrono::milliseconds(m_EnterDelay));
 				if (m_EnterKeyPressed && sub->GetNumOptions() != 0 && enterTimer.Update())
 				{
+					
 					if (m_Sounds)
 						AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
 
@@ -881,7 +888,7 @@ namespace Saint::UserInterface
 			}
 			else if (IndicatorIterator == 1)
 			{
-				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.003f, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f, m_OptionHeight, { m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, sub_alpha });
+				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.00355f, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f, m_OptionHeight, { m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, sub_alpha });
 			}
 		}
 		if (opt->GetFlag(OptionFlag::PlayerSub))

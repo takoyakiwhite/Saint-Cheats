@@ -260,6 +260,19 @@ namespace Saint {
 		}
 	};
 	inline Invisible invisible;
+	class BodygaurdHandler {
+	public:
+		BodygaurdHandler(Ped id, std::string name, std::uint32_t owner) {
+			m_id = id;
+			m_name = name;
+			m_owner = owner;
+
+		}
+	public:
+		Ped m_id = 0;
+		std::string m_name;
+		std::uint32_t m_owner;
+	};
 	class Bodygaurd {
 	public:
 		bool godmode = false;
@@ -287,6 +300,12 @@ namespace Saint {
 		int selected_class = 0;
 
 		float damagemultiplier = 1.0f;
+
+		std::vector<BodygaurdHandler> spawned = {
+			
+		};
+
+		Ped selected_gaurd;
 
 		bool spawn(const Hash hash)
 		{
@@ -736,7 +755,28 @@ namespace Saint {
 		bool ragdoll_on_q = false;
 		bool inf_c = false;
 		std::size_t bullet_int = 0;
+		bool force_field = false;
+		int transfer_to_wallet = 0;
+		int transfer_to_bank = 0;
+		bool crouched = false;
+		bool disable_wanted_music = false;
 		void init() {
+			if (disable_wanted_music) {
+				AUDIO::CANCEL_MUSIC_EVENT("OJDG1_GOING_WANTED");
+				AUDIO::CANCEL_MUSIC_EVENT("AH3B_NO_WANTED_ESCAPE_RT");
+				AUDIO::CANCEL_MUSIC_EVENT("AH3B_VAN_ENTERED_WANTED");
+			}
+			if (crouched) {
+				g_CallbackScript->AddCallback<WalkStyleCallback>("move_ped_crouched", [=] {
+							PED::SET_PED_MOVEMENT_CLIPSET(PLAYER::PLAYER_PED_ID(), "move_ped_crouched", 2.0f);
+					});
+				
+			}
+			if (force_field) {
+				Player p = PLAYER::PLAYER_PED_ID();
+				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(p, 0);
+				FIRE::ADD_EXPLOSION(c.x, c.y, c.z, 0, 100.f, false, true, 0.f, true);
+			}
 			if (inf_c) {
 				VEHICLE::SET_VEHICLE_COUNTERMEASURE_AMMO(get_veh(), 10);
 			}
@@ -2176,6 +2216,49 @@ namespace Saint {
 	inline int watchesTexture = 0;
 	inline int braceDrawable = 0;
 	inline int braceTexture = 0;
+
+	//selected bodyguard
+	inline int facetexture22222 = 0;
+	inline int facetexture125 = 0;
+	inline int facetexture22 = 0;
+	inline int facetexture32 = 0;
+	inline int facetexture42 = 0;
+	inline int facetexture52 = 0;
+	inline int facetexture62 = 0;
+	inline int facetexture72 = 0;
+	inline int facetexture82 = 0;
+	inline int facetexture92 = 0;
+	inline int facetexture102 = 0;
+	inline int facetexture112 = 0;
+	inline int facetexture122 = 0;
+	inline int testa2 = 0;
+	inline int testb2 = 0;
+	inline int testc2 = 0;
+	inline int testd2 = 0;
+	inline int testdtexture2 = 0;
+	inline int torso2texture2 = 0;
+	inline int teste2 = 0;
+	inline int testf2 = 0;
+	inline int testg2 = 0;
+	inline int testh2 = 0;
+	inline int testi2 = 0;
+	inline int testj2 = 0;
+	inline int testk2 = 0;
+	inline int testl2 = 0;
+	inline int testm2 = 0;
+	inline int testn2 = 0;
+	inline int testo2 = 0;
+
+	inline int hatDrawable2 = 0;
+	inline int hatTexture2 = 0;
+	inline int glassesDrawable2 = 0;
+	inline int glassesTexture2 = 0;
+	inline int earsDrawable2 = 0;
+	inline int earsTexture2 = 0;
+	inline int watchesDrawable2 = 0;
+	inline int watchesTexture2 = 0;
+	inline int braceDrawable2 = 0;
+	inline int braceTexture2 = 0;
 	inline std::string ModelInput;
 	inline std::string messageFriendInput = "";
 	class Owned_explosion {
@@ -4076,7 +4159,7 @@ namespace Saint {
 				g_Render->toggle_width = ColorIni->GetFloat("Toggles", "on_width");
 				g_Render->toggle_width_off = ColorIni->GetFloat("Toggles", "off_width");
 
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Loaded '%s'", name });
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Loaded '%s'", name });
 
 
 
@@ -4150,7 +4233,7 @@ namespace Saint {
 				handling->m_low_speed_traction_loss_mult = ColorIni->GetFloat("Handling", "m_low_speed_traction_loss_mult");
 				handling->m_traction_spring_delta_max = ColorIni->GetFloat("Handling", "m_traction_spring_delta_max");
 				handling->m_traction_spring_delta_max_ratio = ColorIni->GetFloat("Handling", "m_traction_spring_delta_max_ratio");
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Loaded '%s'", name });
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Loaded '%s'", name });
 
 
 
@@ -4286,7 +4369,7 @@ namespace Saint {
 				FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 					NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
 			}
-			Noti::InsertNotification({ ImGuiToastType_None, 2000, "Loaded!" });
+			Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Loaded!" });
 			return;
 		}
 	};
@@ -4639,7 +4722,7 @@ namespace Saint {
 				PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 2, ColorIni->GetInt("Ears", "index"), ColorIni->GetInt("Ears", "texture"), 0);
 				PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 6, ColorIni->GetInt("Watches", "index"), ColorIni->GetInt("Watches", "texture"), 0);
 				PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 7, ColorIni->GetInt("Bracelets", "index"), ColorIni->GetInt("Bracelets", "texture"), 0);
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Loaded '%s'", name });
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Loaded '%s'", name });
 
 
 
@@ -5160,7 +5243,7 @@ namespace Saint {
 			STREAMING::REMOVE_PTFX_ASSET();
 		}
 
-		const char* type[2] = { "Normal", "Sphere" };
+		const char* type[2] = { "Normal", "Sphere"};
 		std::size_t size = 0;
 		bool enabled = false;
 		bool rainbow = false;
@@ -5169,47 +5252,35 @@ namespace Saint {
 		int b = 255;
 		void init() {
 			if (enabled) {
-				if (size == 0) {
-					if (rainbow) {
-						if (r > 0 && b == 0) {
-							r--;
-							g++;
-						}
-						if (g > 0 && r == 0) {
-							g--;
-							b++;
-						}
-						if (b > 0 && g == 0) {
-							r++;
-							b--;
-						}
+				if (rainbow) {
+					if (r > 0 && b == 0) {
+						r--;
+						g++;
 					}
-					float r2 = r / 255.f;
-					float g2 = g / 255.f;
-					float b2 = b / 255.f;
+					if (g > 0 && r == 0) {
+						g--;
+						b++;
+					}
+					if (b > 0 && g == 0) {
+						r++;
+						b--;
+					}
+				}
+				float r2 = r / 255.f;
+				float g2 = g / 255.f;
+				float b2 = b / 255.f;
+				if (size == 0) {
+					
 					ParticleOnBone("scr_powerplay", "sp_powerplay_beast_appear_trails", SKEL_L_Hand, 0.2f, true, r2, g2, b2);
 					ParticleOnBone("scr_powerplay", "sp_powerplay_beast_appear_trails", SKEL_R_Hand, 0.2f, true, r2, g2, b2);
 				}
 				if (size == 1) {
-					if (rainbow) {
-						if (r > 0 && b == 0) {
-							r--;
-							g++;
-						}
-						if (g > 0 && r == 0) {
-							g--;
-							b++;
-						}
-						if (b > 0 && g == 0) {
-							r++;
-							b--;
-						}
-					}
-					float r2 = r / 255.f;
-					float g2 = g / 255.f;
-					float b2 = b / 255.f;
 					ParticleOnBone("scr_indep_fireworks", "scr_indep_firework_sparkle_spawn", SKEL_L_Hand, 0.5f, true, r2, g2, b2);
 					ParticleOnBone("scr_indep_fireworks", "scr_indep_firework_sparkle_spawn", SKEL_R_Hand, 0.5f, true, r2, g2, b2);
+				}
+				if (size == 2) {
+					ParticleOnBone("scr_minigametennis", "scr_tennis_ball_trail", SKEL_L_Hand, 0.5f, true, r2, g2, b2);
+					ParticleOnBone("scr_minigametennis", "scr_tennis_ball_trail", SKEL_R_Hand, 0.5f, true, r2, g2, b2);
 				}
 			}
 		}
@@ -5261,7 +5332,7 @@ namespace Saint {
 			NETWORK::NETWORK_HANDLE_FROM_PLAYER(player, netHandle, 13);
 			std::string MenuFolderPath = "C:\\Saint\\Players\\";
 			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s is already saved!", name });
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  %s is already saved!", name });
 			}
 			else {
 				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
@@ -5295,7 +5366,7 @@ namespace Saint {
 			join_type({ eSessionType::NEW_PUBLIC });
 			if (SCRIPT::GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(rage::joaat("maintransition")) == 0)
 			{
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Unknown error" });
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  Unknown error" });
 				join_queue = false;
 
 			}
@@ -5306,7 +5377,7 @@ namespace Saint {
 		{
 			if (SCRIPT::GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(rage::joaat("maintransition")) != 0 || STREAMING::IS_PLAYER_SWITCH_IN_PROGRESS())
 			{
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Unknown error" });
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  Unknown error" });
 				return;
 			}
 
@@ -5327,7 +5398,7 @@ namespace Saint {
 				}
 			}
 
-			Noti::InsertNotification({ ImGuiToastType_None, 2000, "Player is offline." });
+			Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  Player is offline." });
 		}
 	};
 	inline RIDToolkit rid_toolkit;
@@ -7080,9 +7151,11 @@ namespace Saint {
 					int upgradedelay = 0;
 					if (upgradedelay == 0 || (int)(GetTickCount64() - upgradedelay) > delay)
 					{
-						Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						Vehicle veh = get_veh();
 						if (!ENTITY::IS_ENTITY_IN_AIR(veh)) {
-							startc(random(0, 3));
+							if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(veh)) {
+								startc(random(0, 3));
+							}
 						}
 						upgradedelay = GetTickCount64();
 					}
@@ -7092,7 +7165,33 @@ namespace Saint {
 		}
 	};
 	inline Randomization randomization;
+	class Ragdoll {
+	public:
+		bool on_collison = false;
+		bool on_jump = false;
+		int threshold = 500;
+		void init() {
+			if (on_collison) {
+				PED::SET_PED_RAGDOLL_ON_COLLISION(PLAYER::PLAYER_PED_ID(), true);
+			}
+			if (on_jump) {
+				g_FiberPool.queue([=] {
+					if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false)) {
+						if (PAD::IS_CONTROL_JUST_PRESSED(0, 22))
+						{
+							fbr::cur()->wait(250ms);
+							NativeVector3 v = ENTITY::GET_ENTITY_FORWARD_VECTOR(PLAYER::PLAYER_PED_ID());
+							PED::SET_PED_TO_RAGDOLL_WITH_FALL(PLAYER::PLAYER_PED_ID(), 1500, 2000, 1, -v.x, -v.y, -v.z, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
+						}
+					}
+				});
+			}
+		}
+	};
+	inline Ragdoll ragdoll;
+	
 	inline void FeatureInitalize() {
+		ragdoll.init();
 		randomization.init();
 		lsc.init();
 		rope_gun.init();
@@ -7156,7 +7255,7 @@ namespace Saint {
 							control(cage);
 							ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&cage);
 							ENTITY::DELETE_ENTITY(&cage);
-							Noti::InsertNotification({ ImGuiToastType_None, 2000, "Deleted cage, type: '%s'", cage_name[i] });
+							Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_SHIELD_ALT"  Deleted cage, type: '%s'", cage_name[i] });
 							MISC::CLEAR_AREA(objcoords.x, objcoords.y, objcoords.z, 15.0f, 0, 0, 0, 0);
 						}
 					}

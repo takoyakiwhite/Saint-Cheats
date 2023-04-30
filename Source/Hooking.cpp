@@ -217,91 +217,91 @@ namespace Saint
 			{
 			case 0xE7072CD: {
 				char name[64];
-				sprintf(name, "%s reported you for hate", Source->PlayerInfo->m_net_player_data.m_name);
+				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for hate", Source->PlayerInfo->m_net_player_data.m_name);
 				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0xB722D6C0: {
 				char name[64];
-				sprintf(name, "%s reported you for hate", Source->PlayerInfo->m_net_player_data.m_name);
+				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for hate", Source->PlayerInfo->m_net_player_data.m_name);
 				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0x762F9994: {
 				char name[64];
-				sprintf(name, "%s reported you for being annoying", Source->PlayerInfo->m_net_player_data.m_name);
+				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for being annoying", Source->PlayerInfo->m_net_player_data.m_name);
 				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0x9F79BA0B: {
 				char name[64];
-				sprintf(name, "%s reported you for exploits", Source->PlayerInfo->m_net_player_data.m_name);
+				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for exploits", Source->PlayerInfo->m_net_player_data.m_name);
 				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0xCBFD04A4: {
 				char name[64];
-				sprintf(name, "%s reported you for exploits", Source->PlayerInfo->m_net_player_data.m_name);
+				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for exploits", Source->PlayerInfo->m_net_player_data.m_name);
 				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0x9C6A0C42: {
 				char name[64];
-				sprintf(name, "%s reported you for griefing", Source->PlayerInfo->m_net_player_data.m_name);
+				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for griefing", Source->PlayerInfo->m_net_player_data.m_name);
 				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0x3CDB43E2: {
 				char name[64];
-				sprintf(name, "%s reported you for offensive language", Source->PlayerInfo->m_net_player_data.m_name);
+				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for offensive language", Source->PlayerInfo->m_net_player_data.m_name);
 				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0xE8FB6DD5: {
 				char name[64];
-				sprintf(name, "%s reported you for offensive tag plate??", Source->PlayerInfo->m_net_player_data.m_name);
+				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for offensive tag plate??", Source->PlayerInfo->m_net_player_data.m_name);
 				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0xF3DE4879: {
 				char name[64];
-				sprintf(name, "%s reported you for ugc??", Source->PlayerInfo->m_net_player_data.m_name);
+				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for ugc??", Source->PlayerInfo->m_net_player_data.m_name);
 				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0xAA238FF0: {
 				char name[64];
-				sprintf(name, "%s reported you for bad crew name", Source->PlayerInfo->m_net_player_data.m_name);
+				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for bad crew name", Source->PlayerInfo->m_net_player_data.m_name);
 				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0x03511A79: {
 				char name[64];
-				sprintf(name, "%s reported you for bad crew moto", Source->PlayerInfo->m_net_player_data.m_name);
+				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for bad crew moto", Source->PlayerInfo->m_net_player_data.m_name);
 				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0x3B566D5C: {
 				char name[64];
-				sprintf(name, "%s reported you for bad crew status", Source->PlayerInfo->m_net_player_data.m_name);
+				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for bad crew status", Source->PlayerInfo->m_net_player_data.m_name);
 				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
 			}
 			case 0x368F6FD9: {
 				char name[64];
-				sprintf(name, "%s reported you for bad crew emblem", Source->PlayerInfo->m_net_player_data.m_name);
+				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for bad crew emblem", Source->PlayerInfo->m_net_player_data.m_name);
 				g_NotificationManager->add(name, 2000, 1);
 				return true;
 				break;
@@ -392,7 +392,7 @@ namespace Saint
 			{
 
 				char name[64];
-				sprintf(name, "%s is leaving slot %i", player->m_player_info->m_net_player_data.m_name, (int)player->m_player_id);
+				sprintf(name, ICON_FA_USER_MINUS"  %s is leaving slot %i", player->m_player_info->m_net_player_data.m_name, (int)player->m_player_id);
 				antiCheat.remove_as_modder(player->m_player_id);
 				protections.push_notification(name);
 				if (all_players.notifications.log) {
@@ -413,7 +413,7 @@ namespace Saint
 		{
 
 			char name[64];
-			sprintf(name, "%s is joining slot %i", player->m_player_info->m_net_player_data.m_name, (int)player->m_player_id);
+			sprintf(name, ICON_FA_USER_PLUS"  %s is joining slot %i", player->m_player_info->m_net_player_data.m_name, (int)player->m_player_id);
 			if (player->m_player_info->m_net_player_data.m_name == (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_net_player_data.m_name) {
 				
 				for (std::uint32_t i = 0; i < 32; ++i) {
@@ -665,16 +665,23 @@ namespace Saint
 				if (protections.GameEvents.explosion) {
 					if (source->m_player_id < 32)
 					{
+						const char* explode_type[81] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare",
+						"Unknown", "Extinguisher", "Unknown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
+						"Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
+						"Bomb (Wide)", "Explosive Ammo (Shotgun)", "Oppressor MK II", "Kinetic Mortar", "Kinetic Vehicle Mine", "EMP Vehicle Mine", "Spike Vehicle Mine", "Slick Vehicle Mine", "Tar Vehicle Mine", "Script Drone", "Up-n-Atomizer", "Burried Mine", "Script Missle", "RC Tank Rocket",
+						"Bomb (Water)", "Bomb (Water 2)", "Flash Grenade", "Stun Grenade", "Script Missle (Large)", "Submarine (Big)", "EMP Launcher" };
 						int NetworkID = buffer->Read<int>(13);
-
+						int32_t explosion_type{};
+						buffer->ReadInt32(&explosion_type, 8);
+						buffer->Seek(149);
 						if (GetPed() && GetPed()->m_net_object && GetPed()->m_net_object->m_object_id == NetworkID)
 						{
 							char name2324[64];
 							if (target->m_player_info->m_net_player_data.m_name == (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_net_player_data.m_name) {
-								sprintf(name2324, "Explosion from %s going to you blocked.", source->m_player_info->m_net_player_data.m_name);
+								sprintf(name2324, "Explosion from %s going to you blocked. Type: %s", source->m_player_info->m_net_player_data.m_name, explode_type[explosion_type]);
 							}
 							else {
-								sprintf(name2324, "Explosion from %s going to %s blocked.", source->m_player_info->m_net_player_data.m_name, target->m_player_info->m_net_player_data.m_name);
+								sprintf(name2324, "Explosion from %s going to %s blocked. Type: %s", source->m_player_info->m_net_player_data.m_name, target->m_player_info->m_net_player_data.m_name, explode_type[explosion_type]);
 							}
 
 							g_NotificationManager->add(name2324, 2000, 1);
@@ -713,13 +720,17 @@ namespace Saint
 			}
 			case eNetworkEvents::CNetworkPtfxEvent: {
 				if (protections.GameEvents.particle_spam) {
-					char g_PTFX[64];
-					sprintf(g_PTFX, "Particle spam from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+					int NetworkID = buffer->Read<int>(13);
+					if (GetPed() && GetPed()->m_net_object && GetPed()->m_net_object->m_object_id == NetworkID)
+					{
+						char g_PTFX[64];
+						sprintf(g_PTFX, "Particle spam from %s blocked.", source->m_player_info->m_net_player_data.m_name);
 
-					g_NotificationManager->add(g_PTFX, 2000, 1);
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-					return;
-					buffer->Seek(0);
+						g_NotificationManager->add(g_PTFX, 2000, 1);
+						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+						return;
+						buffer->Seek(0);
+					}
 				}
 				break;
 			}
@@ -1040,7 +1051,7 @@ namespace Saint
 			return result;
 		if (protections.Crashes.vehicle) {
 			if (Lists::crash_model_check(node->m_model)) {
-				protections.push_notification("Prevented crash | Vehicle");
+				protections.push_notification(ICON_FA_SHIELD_ALT"  Prevented crash | Vehicle");
 				return false;
 			}
 		}

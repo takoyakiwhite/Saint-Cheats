@@ -48,6 +48,7 @@ namespace Saint::Lists
 	};
 
 	inline std::size_t HeaderTypesPosition2 = 0;
+	inline std::size_t HeaderTypesPosition22 = 0;
 	inline const char* HeaderTypesFrontend2[]
 	{
 		"Face",
@@ -64,6 +65,7 @@ namespace Saint::Lists
 		"Decals",
 	};
 	inline std::size_t HeaderTypesPosition3 = 0;
+	inline std::size_t HeaderTypesPosition32 = 0;
 	inline const char* HeaderTypesFrontend3[]
 	{
 		"Hats",
