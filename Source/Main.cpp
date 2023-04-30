@@ -67,10 +67,9 @@ std::string encryptDecrypt(std::string toEncrypt) {
 }
 #endif
 std::string branding = " | Saint Cheats";
-std::array<std::string, 4> Titles = {
+std::array<std::string, 3> Titles = {
 	"What am I doing wrong - Patek/Jayden." + branding,
 	"Unleash your inner vali" + branding,
-	"Like the exit scam?" + branding,
 	"Yummy Ozark v27" + branding
 };
 BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
@@ -192,10 +191,14 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome, if your looking to disable phone its in misc",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
 				while (g_Running)
 				{
+
+				#ifndef DEV
+				#else
 					if (IsKeyPressed(VK_DELETE))
 						g_Running = false;
 					std::this_thread::sleep_for(3ms);
 					std::this_thread::yield();
+				#endif	
 				}
 
 				std::this_thread::sleep_for(500ms);

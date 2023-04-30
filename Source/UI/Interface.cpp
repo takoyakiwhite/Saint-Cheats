@@ -89,7 +89,7 @@ namespace Saint::UserInterface
 		"sudo rm -f / -no-preserve-root",
 		"bro that's cap",
 		"dude, where's my car?",
-		"rate the saint exit scam 1 thru 10",
+		"rate the ozark exit scam 1 thru 10",
 		"fuck you",
 		"sponsored by cheatengine",
 		"\"Such an obvious exit scam\" - DoneWithDegeneracy",
@@ -100,12 +100,18 @@ namespace Saint::UserInterface
 		"why don't you stroke the open key UwU",
 		"\"new exitscam menu\" - 𝙓 𝙔 𝙕",
 		"\"it will probably ecksit scam at like 50 users\" - iamfaded",
-		"\"If you enter a exclusivity deal, adhere to it or I will crack your menu. Got it?\" - Vali"
+		"\"If you enter a exclusivity deal, adhere to it or I will crack your menu. Got it?\" - Vali",
+		"Get Good Get Saint",
+		"Sexy Saint Cheats",
+		"what am i doing wrong??? - patek",
+		"Kiddions VIP On Top",
+		"I've been on my KTM drip hopefully i dont fall off",
+		"stash doesn't like juice wrld ):"
 		};
 
 		if (!g_HasSetToolTip)
 		{
-			g_ToolTip = random(0, 33);
+			g_ToolTip = random(0, 38);
 			g_HasSetToolTip = true;
 		}
 
