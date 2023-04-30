@@ -1,4 +1,4 @@
-#include "Interface.hpp"
+﻿#include "Interface.hpp"
 #include "../Timer.hpp"
 #include "../Natives.hpp"
 #include "../FiberHelper.hpp"
@@ -68,30 +68,56 @@ namespace Saint::UserInterface
 	void UIManager::RenderToolTip()
 	{
 		static const char* names[] = {
-			"Get Good Get Saint",
-			"Sexy Saint Cheats",
-			"what am i doing wrong??? - patek",
-			"Kiddions VIP On Top",
-			"Become you're inner vali.",
-			"I've been on my KTM drip hopefully i dont fall off",
-			"We arent ozark..",
-			"stash doesn't like juice wrld ):"
+		"put me in coach",
+		"i've made a severe and continuous lapse in my judgment",
+		"nothing. you get nothing here today. fuck you.",
+		"I'll have you know I graduated top of my class in the Navy Seals",
+		"penis size should be a volumetric measurement, let me explain...",
+		"there's no such thing as a \"simp\"",
+		"unleash your inner vali",
+		"ligma",
+		"sugma",
+		"hi sisters",
+		"one does not simply walk into mordor",
+		"if you spill cleaning product, did you make a mess?",
+		"welcome to the best menu you'll ever touch",
+		"bro where the fuck am i?",
+		"welcome to pogzark :tm:?",
+		"see, the wait paid off didn't it? no??? fuck you then",
+		"i aint ever gonna stop loving you, bitch",
+		"Saint update when?",
+		"sudo rm -f / -no-preserve-root",
+		"i love to skid i mean code -stash",
+		"bro that's cap",
+		"dude, where's my car?",
+		"rate the saint exit scam 1 thru 10",
+		"fuck you",
+		"sponsored by cheatengine",
+		"\"Such an obvious exit scam\" - DoneWithDegeneracy",
+		"wow we can edit the weather color, we're so cool",
+		"you humans put an insane amount of importance on age.",
+		"gotta love ozark, i mean saint",
+		"we love ida in this household",
+		"why don't you stroke the open key UwU",
+		"\"new exitscam menu\" - 𝙓 𝙔 𝙕",
+		"\"it will probably ecksit scam at like 50 users\" - iamfaded",
+		"\"If you enter a exclusivity deal, adhere to it or I will crack your menu. Got it?\" - Vali"
 		};
 
 		if (!g_HasSetToolTip)
 		{
-			g_ToolTip = random(0, 6);
+			g_ToolTip = random(0, 34);
 			g_HasSetToolTip = true;
 		}
 
 		char text[200];
 
 		if (PAD::IS_USING_KEYBOARD_AND_MOUSE(2)) {
-			sprintf_s(text, "%s\n~u~%s", names[g_ToolTip], "~c~F4");
+			sprintf_s(text, "%s\n~u~%s", names[g_ToolTip], "~b~F4");
 			RenderText(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
 		}
 		else {
-			sprintf_s(text, "%s\n~c~RB + RIGHT", names[g_ToolTip]);
+			sprintf_s(text, "%s\n~b~RB + RIGHT", names[g_ToolTip]);
 			RenderText(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
 		}
 	}
