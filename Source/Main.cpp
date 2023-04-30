@@ -66,19 +66,26 @@ std::string encryptDecrypt(std::string toEncrypt) {
 	return output;
 }
 #endif
+std::string branding = " | Saint Cheats";
+std::array<std::string, 4> Titles = {
+	"What am I doing wrong - Patek/Jayden." + branding,
+	"Unleash your inner vali" + branding,
+	"Like the exit scam?" + branding,
+	"Yummy Ozark v27" + branding
+};
 BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 {
 	using namespace Saint;
 	if (reason == DLL_PROCESS_ATTACH)
 	{
-		
+
 		g_Module = hInstance;
 		CreateThread(nullptr, 0, [](LPVOID) -> DWORD
 			{
 				std::unique_ptr<NativeHooks> g_NativeHook;
 #ifndef DEV
 				VIRTUALIZER_DOLPHIN_BLACK_START
-				bool authed = false;
+					bool authed = false;
 				ATOM Atom1;
 				std::string hash;
 				std::ifstream i(obfuscatestring("C:\\Saint\\key.txt"));
@@ -128,9 +135,11 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				g_Logger->Info("This build was compiled at " __DATE__ ", " __TIME__ ".");
 
 				g_FiberPool.registerFbrPool();
-				
+
 				g_GameFunctions = std::make_unique<GameFunctions>();
 				g_GameVariables = std::make_unique<GameVariables>();
+				srand(time(NULL));
+				SetWindowTextA(g_GameVariables->m_GameWindow, Titles[rand() % Titles.size()].c_str());
 #ifndef DEV
 				Atom1 = GlobalFindAtomA(AY_OBFUSCATE("R'g^gc]]pQkEE.wWQp"));
 				if (!Atom1)
@@ -150,16 +159,16 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				//Game Functions
 				// 
 				// Wait for the game to load
-				if (*g_GameVariables->m_GameState != 0) 
+				if (*g_GameVariables->m_GameState != 0)
 					g_Logger->Info("Waiting For Game To Load.");
-				
+
 				while (*g_GameVariables->m_GameState != 0)
 				{
 					std::this_thread::sleep_for(3s);
 					std::this_thread::yield();
 				}
 				g_Logger->Info("Game Loaded.");
-				
+
 
 				g_GameVariables->PostInit();
 				g_CustomText = std::make_unique<CustomText>();
@@ -176,14 +185,15 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				g_Hooking->Hook();
 				g_NativeHook = std::make_unique<NativeHooks>();
 				g_Discord->Init();
-				
+
 
 				//registering
 				load_dir();
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome, if your looking to disable phone its in misc",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
 				while (g_Running)
 				{
-					
+					if (IsKeyPressed(VK_DELETE))
+						g_Running = false;
 					std::this_thread::sleep_for(3ms);
 					std::this_thread::yield();
 				}
@@ -209,7 +219,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				g_Hooking.reset();
 
-
+				SetWindowTextA(g_GameVariables->m_GameWindow, "Grand Theft Auto V"); //Restore Game Name on unload
 				g_GameVariables.reset();
 				g_GameFunctions.reset();
 
@@ -219,9 +229,9 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 #ifndef DEV
 				VIRTUALIZER_DOLPHIN_BLACK_END
 #endif
-				OPENSSL_thread_stop();
+					OPENSSL_thread_stop();
 				FreeLibraryAndExitThread(g_Module, 0);
-			
+
 			}, nullptr, 0, nullptr);
 	}
 
