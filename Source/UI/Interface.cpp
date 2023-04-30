@@ -87,7 +87,6 @@ namespace Saint::UserInterface
 		"i aint ever gonna stop loving you, bitch",
 		"Saint update when?",
 		"sudo rm -f / -no-preserve-root",
-		"i love to skid i mean code -stash",
 		"bro that's cap",
 		"dude, where's my car?",
 		"rate the saint exit scam 1 thru 10",
@@ -106,7 +105,7 @@ namespace Saint::UserInterface
 
 		if (!g_HasSetToolTip)
 		{
-			g_ToolTip = random(0, 34);
+			g_ToolTip = random(0, 33);
 			g_HasSetToolTip = true;
 		}
 
