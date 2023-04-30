@@ -93,7 +93,7 @@ namespace Saint::UserInterface
 		"fuck you",
 		"sponsored by cheatengine",
 		"\"Such an obvious exit scam\" - DoneWithDegeneracy",
-		"wow we can edit the weather color, we're so cool",
+		"wow we can edit the sky color, we're so cool",
 		"you humans put an insane amount of importance on age.",
 		"gotta love ozark, i mean saint",
 		"we love ida in this household",

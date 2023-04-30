@@ -183,8 +183,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome, if your looking to disable phone its in misc",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
 				while (g_Running)
 				{
-					if (IsKeyPressed(VK_DELETE))
-						g_Running = false;
+					
 					std::this_thread::sleep_for(3ms);
 					std::this_thread::yield();
 				}
