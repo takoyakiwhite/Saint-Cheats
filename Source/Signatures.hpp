@@ -251,6 +251,9 @@ namespace Saint
 		using ReadBitbufDword = bool(datBitBuffer2* buffer, PVOID read, int bits);
 		ReadBitbufDword* m_ReadBitbufDword;
 
+		PVOID m_FallTaskConstructor;
+
+		
 		
 
 		

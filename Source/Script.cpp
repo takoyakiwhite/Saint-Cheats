@@ -432,6 +432,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Pickup Entities"), "Allows you to pickup & throw entities and players.", &features.pickup_mode, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Auto Clean"), "Automaticly cleans you're ped from visual damage.", &features.autoclean, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Forcefield"), "Automaticly cleans you're ped from visual damage.", &features.force_field, BoolDisplay::OnOff);
+				//sub->draw_option<toggle<bool>>(("Beast Landing"), "", &BeastLanding, BoolDisplay::OnOff); not sure what it does, dont seem to do anything
 				sub->draw_option<toggle<bool>>(("Swim Anywhere"), nullptr, &features.swim_anywhere, BoolDisplay::OnOff, false, [] {
 					if (!features.swim_anywhere)
 					{
@@ -905,6 +906,7 @@ namespace Saint
 						ENTITY::SET_ENTITY_ALPHA(PLAYER::PLAYER_PED_ID(), 255, false);
 					}
 					});
+				sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
 				sub->draw_option<toggle<bool>>(("Set Rotation"), nullptr, &no_clip.SetRotation, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Spin"), nullptr, &no_clip.spin, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Transparent"), "", &no_clip.transparent, BoolDisplay::OnOff, false, [] {
@@ -959,8 +961,13 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Super Jump"), SubmenuSuperjump, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &superjump.enabled, BoolDisplay::OnOff);
-				sub->draw_option<toggle<bool>>(("Add Force"), nullptr, &superjump.add_force, BoolDisplay::OnOff);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Animation", nullptr, &superjump.Jump_Type, &superjump.Jump_Int);
+				sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
+				sub->draw_option<toggle<bool>>(("Add Force"), nullptr, &superjump.add_force, BoolDisplay::OnOff);
+				if (superjump.Jump_Int == 2) {
+					sub->draw_option<ChooseOption<const char*, std::size_t>>("Direction", nullptr, &superjump.flip_type, &superjump.flip_int);
+					sub->draw_option<number<std::int32_t>>("Speed", nullptr, &superjump.speed, 0, 100);
+				}
 			});
 		g_Render->draw_submenu<sub>(("Vehicle"), SubmenuVehicle, [](sub* sub)
 			{
@@ -6303,12 +6310,14 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Level", SubmenuRP, [](sub* sub)
 			{
+
 				if (m_recovery.m_level.m_level > 8000) {
 					m_recovery.m_level.m_level = 8000;
 				}
 				if (m_recovery.m_level.m_level < 1) {
 					m_recovery.m_level.m_level = 1;
 				}
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &m_recovery.level_type, &m_recovery.pos);
 				sub->draw_option<KeyboardOption>(("Value"), nullptr, std::to_string(m_recovery.m_level.m_level), []
 					{
 						showKeyboard("Enter Something", "", 4, &m_recovery.m_level.m_level_buffer, [] {
@@ -6322,7 +6331,12 @@ namespace Saint
 					});
 				sub->draw_option<RegularOption>("Apply", nullptr, []
 					{
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_SET_RP_GIFT_ADMIN"), m_recovery.m_level.Levels[m_recovery.m_level.m_level], true);
+						if (m_recovery.pos == 0) {
+							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_SET_RP_GIFT_ADMIN"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], true);
+						}
+						if (m_recovery.pos == 1) {
+							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MPPLY_CURRENT_CREW_RANK"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], true);
+						}
 						Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Change session for the level to apply." });
 					});
 
@@ -6727,7 +6741,6 @@ namespace Saint
 
 
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
-
 				for (std::uint32_t i = 0; i < 32; ++i)
 				{
 

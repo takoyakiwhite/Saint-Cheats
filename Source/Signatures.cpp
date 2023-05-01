@@ -114,6 +114,8 @@ namespace Saint
 		m_zenith_transition_patch(Signature("0F 29 A2 E0 00 00 00").Scan().As<decltype(m_zenith_transition_patch)>()),
 		m_cloud_mid_patch(Signature("0F 29 8B 60 03 00 00").Scan().As<decltype(m_cloud_mid_patch)>()),
 		m_ReadBitbufDword(Signature("48 89 74 24 ? 57 48 83 EC 20 48 8B D9 33 C9 41 8B F0 8A").Scan().Sub(5).As<decltype(m_ReadBitbufDword)>()),
+		m_FallTaskConstructor(Signature("E8 ? ? ? ? B3 04 08 98 A0 00 00 00").Scan().Add(1).As<decltype(m_FallTaskConstructor)>()),
+		
 		m_script_threads(Signature("45 33 F6 8B E9 85 C9 B8").Scan().Sub(4).Rip().Sub(8).As<decltype(m_script_threads)>())
 
 	{

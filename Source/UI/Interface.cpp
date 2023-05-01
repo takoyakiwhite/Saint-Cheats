@@ -107,7 +107,7 @@ namespace Saint::UserInterface
 		"Kiddions VIP On Top",
 		"I've been on my KTM drip hopefully i dont fall off",
 		"stash doesn't like juice wrld ):",
-		"is this scooby?"
+		"\"is this scooby?\""
 		};
 
 		if (!g_HasSetToolTip)

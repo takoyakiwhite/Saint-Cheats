@@ -423,8 +423,11 @@ namespace Saint {
 	public:
 		bool enabled = false;
 		bool add_force = false;
-		const char* Jump_Type[2] = { "Normal", "Beast" };
+		const char* Jump_Type[3] = { "Normal", "Beast", "Roll"};
 		std::size_t Jump_Int = 0;
+		int speed = 10;
+		const char* flip_type[2] = { "Front", "Back" };
+		std::size_t flip_int = 0;
 		void init() {
 			if (enabled) {
 				if (Jump_Int == 0) {
@@ -434,6 +437,23 @@ namespace Saint {
 					if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false) && !ENTITY::IS_ENTITY_IN_AIR(PLAYER::PLAYER_PED_ID()) && !PED::IS_PED_DOING_A_BEAST_JUMP(PLAYER::PLAYER_PED_ID()))
 						if (PAD::IS_CONTROL_JUST_PRESSED(0, 22))
 							TASK::TASK_JUMP(PLAYER::PLAYER_PED_ID(), true, true, true);
+				}
+				static int flip;
+				if (Jump_Int == 2) {
+					MISC::SET_SUPER_JUMP_THIS_FRAME(PLAYER::PLAYER_ID());
+					if (PED::IS_PED_JUMPING(PLAYER::PLAYER_PED_ID()))
+					{
+						if (ENTITY::IS_ENTITY_IN_AIR(PLAYER::PLAYER_PED_ID()))
+						{
+							if (flip_int == 0) {
+								flip -= speed;
+							}
+							if (flip_int == 1) {
+								flip += speed;
+							}
+							ENTITY::SET_ENTITY_ROTATION(PLAYER::PLAYER_PED_ID(), flip, 0, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), 0, 0);
+						}
+					}
 				}
 				if (add_force) {
 					if (PED::IS_PED_JUMPING(PLAYER::PLAYER_PED_ID()) && !PED::IS_PED_RAGDOLL(PLAYER::PLAYER_PED_ID())) {
@@ -4090,6 +4110,11 @@ namespace Saint {
 			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.b, "BackgroundUnselected", "b");
 			ColorIni->WriteInt(g_Render->m_OptionUnselectedBackgroundColor.a, "BackgroundUnselected", "a");
 
+			ColorIni->WriteInt(g_Render->m_OptionSelectedTextColor.r, "SelectedText", "r");
+			ColorIni->WriteInt(g_Render->m_OptionSelectedTextColor.g, "SelectedText", "g");
+			ColorIni->WriteInt(g_Render->m_OptionSelectedTextColor.b, "SelectedText", "b");
+			ColorIni->WriteInt(g_Render->m_OptionSelectedTextColor.a, "SelectedText", "a");
+
 			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.r, "BackgroundSelected", "r");
 			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.g, "BackgroundSelected", "g");
 			ColorIni->WriteInt(g_Render->m_OptionSelectedBackgroundColor.b, "BackgroundSelected", "b");
@@ -4099,6 +4124,11 @@ namespace Saint {
 			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.g, "HeaderBackground", "g");
 			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.b, "HeaderBackground", "b");
 			ColorIni->WriteInt(g_Render->m_HeaderBackgroundColor.a, "HeaderBackground", "a");
+
+			ColorIni->WriteInt(g_Render->m_FooterBackgroundColor.r, "FooterBackground", "r");
+			ColorIni->WriteInt(g_Render->m_FooterBackgroundColor.g, "FooterBackground", "g");
+			ColorIni->WriteInt(g_Render->m_FooterBackgroundColor.b, "FooterBackground", "b");
+			ColorIni->WriteInt(g_Render->m_FooterBackgroundColor.a, "FooterBackground", "a");
 
 			ColorIni->WriteBool(g_Render->m_dynamic_footer, "Footer", "dynamic");
 			ColorIni->WriteBool(g_Render->lines_enabled, "Lines", "enabled");
@@ -4119,6 +4149,8 @@ namespace Saint {
 			ColorIni->WriteFloat(g_Render->toggle_width, "Toggles", "on_width");
 			ColorIni->WriteFloat(g_Render->toggle_width_off, "Toggles", "off_width");
 
+			ColorIni->WriteFloat(g_Render->header_x_offset, "Header", "text_x_offset");
+
 
 		}
 		void load(std::string name) {
@@ -4134,6 +4166,11 @@ namespace Saint {
 				g_Render->m_OptionUnselectedBackgroundColor.b = ColorIni->GetInt("BackgroundUnselected", "b");
 				g_Render->m_OptionUnselectedBackgroundColor.a = ColorIni->GetInt("BackgroundUnselected", "a");
 
+				g_Render->m_OptionSelectedTextColor.r = ColorIni->GetInt("SelectedText", "r");
+				g_Render->m_OptionSelectedTextColor.g = ColorIni->GetInt("SelectedText", "g");
+				g_Render->m_OptionSelectedTextColor.b = ColorIni->GetInt("SelectedText", "b");
+				g_Render->m_OptionSelectedTextColor.a = ColorIni->GetInt("SelectedText", "a");
+
 				g_Render->m_OptionSelectedBackgroundColor.r = ColorIni->GetInt("BackgroundSelected", "r");
 				g_Render->m_OptionSelectedBackgroundColor.g = ColorIni->GetInt("BackgroundSelected", "g");
 				g_Render->m_OptionSelectedBackgroundColor.b = ColorIni->GetInt("BackgroundSelected", "b");
@@ -4143,6 +4180,11 @@ namespace Saint {
 				g_Render->m_HeaderBackgroundColor.g = ColorIni->GetInt("HeaderBackground", "g");
 				g_Render->m_HeaderBackgroundColor.b = ColorIni->GetInt("HeaderBackground", "b");
 				g_Render->m_HeaderBackgroundColor.a = ColorIni->GetInt("HeaderBackground", "a");
+
+				g_Render->m_FooterBackgroundColor.r = ColorIni->GetInt("FooterBackground", "r");
+				g_Render->m_FooterBackgroundColor.g = ColorIni->GetInt("FooterBackground", "g");
+				g_Render->m_FooterBackgroundColor.b = ColorIni->GetInt("FooterBackground", "b");
+				g_Render->m_FooterBackgroundColor.a = ColorIni->GetInt("FooterBackground", "a");
 
 				g_Render->m_dynamic_footer = ColorIni->GetBool("Footer", "dynamic");
 				g_Render->lines_enabled = ColorIni->GetBool("Lines", "enabled");
@@ -4162,6 +4204,8 @@ namespace Saint {
 				g_Render->toggle_height_off = ColorIni->GetFloat("Toggles", "off_height");
 				g_Render->toggle_width = ColorIni->GetFloat("Toggles", "on_width");
 				g_Render->toggle_width_off = ColorIni->GetFloat("Toggles", "off_width");
+
+				g_Render->header_x_offset = ColorIni->GetFloat("Header", "text_x_offset");
 
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Loaded '%s'", name });
 
@@ -4584,6 +4628,8 @@ namespace Saint {
 	class CRecovery {
 	public:
 		CLevel m_level;
+		const char* level_type[2] = { "Character", "Crew"};
+		std::size_t pos = 0;
 	};
 	inline CRecovery m_recovery;
 	inline std::vector<std::string> outfitNames;
@@ -6414,6 +6460,14 @@ namespace Saint {
 		int b = 0;
 		float brightness = 1.0;
 	};
+	class MemoryEdit {
+	public:
+		uintptr_t Find(int address) {
+			return scan_address(g_base_address + address, {});
+		}
+
+	};
+	inline MemoryEdit* mem;
 	class SkyData {
 	public:
 		East east;
@@ -6423,9 +6477,11 @@ namespace Saint {
 		void change_effect() {
 			if (east.changed) {
 				
-				uintptr_t east_red = scan_address(g_base_address + 0x26CFAB0, {});
-				uintptr_t east_green = scan_address(g_base_address + 0x26CFAB4, {});
-				uintptr_t east_blue = scan_address(g_base_address + 0x26CFAB8, {});
+				uintptr_t east_red = mem->Find(0x26CFAB0);
+				uintptr_t east_green = mem->Find(0x26CFAB4);
+				
+				uintptr_t east_blue = mem->Find(0x26CFAB8);
+				
 
 
 				*(float*)east_red = (east.r / 255.f) * east.brightness;
@@ -6503,6 +6559,7 @@ namespace Saint {
 				*(float*)west_red = (cloud.r / 255.f) * cloud.brightness;
 				*(float*)west_green = (cloud.g / 255.f) * cloud.brightness;
 				*(float*)west_blue = (cloud.b / 255.f) * cloud.brightness;
+
 
 
 

@@ -1095,6 +1095,23 @@ namespace Saint
 			info->m_prop_hash = 0;
 		}
 	}
+	template<typename T>
+	constexpr void SetBit(T* value, T bit)
+	{
+		*value |= (1 << bit);
+	}
+
+	template<typename T, typename ...T2>
+	constexpr void SetBits(T* value, T2... bit)
+	{
+		(SetBit<T>(value, std::forward<T>(bit)), ...);
+	}
+	std::uint64_t* Hooks::FallTaskConstructor(std::uint64_t* _this, std::uint32_t flags)
+	{
+		if (BeastLanding)
+			SetBits<std::uint32_t>(&flags, 10, 11, 12, 16);
+		return static_cast<decltype(&FallTaskConstructor)>(g_Hooking->m_OriginalFallTaskConstructor)(_this, flags);
+	}
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
@@ -1127,6 +1144,7 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_received_array_update, &Hooks::received_array_update, &array_update);
 		MH_CreateHook(g_GameFunctions->m_task_parachute_object_0x270, &Hooks::task_parachute_object_0x270, &parachute);
 		MH_CreateHook(g_GameFunctions->m_serialize_take_off_ped_variation_task, &Hooks::serialize_take_off_ped_variation_task, &parachute2);
+		//MH_CreateHook(g_GameFunctions->m_FallTaskConstructor, &Hooks::FallTaskConstructor, &m_OriginalFallTaskConstructor);
 		//MH_CreateHook(g_GameFunctions->m_GetScriptEvent, &Hooks::NetworkEventHandler, &m_OriginalNetworkHandler);
 		//MH_CreateHook(g_GameFunctions->m_get_network_event_data, &Hooks::GetNetworkEventData, &originalDetection);
 		//MH_CreateHook(g_GameFunctions->m_received_event, &Hooks::GameEvent, &OriginalRecivied);
@@ -1164,6 +1182,7 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->m_received_array_update);
 		MH_RemoveHook(g_GameFunctions->m_task_parachute_object_0x270);
 		MH_RemoveHook(g_GameFunctions->m_serialize_take_off_ped_variation_task);
+		//MH_RemoveHook(g_GameFunctions->m_FallTaskConstructor);
 		//MH_RemoveHook(g_GameFunctions->m_GetScriptEvent);
 		//MH_RemoveHook(g_GameFunctions->m_get_network_event_data);
 		//MH_RemoveHook(g_GameFunctions->m_received_event);
