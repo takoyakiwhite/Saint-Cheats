@@ -168,6 +168,8 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				}
 				g_Logger->Info("Game Loaded.");
 
+				//everybody forgot me and the work i put in
+
 
 				g_GameVariables->PostInit();
 				g_CustomText = std::make_unique<CustomText>();
