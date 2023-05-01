@@ -6582,6 +6582,41 @@ namespace Saint
 					*script_global(2793046).at(6875).as<bool*>() = true;
 
 					});
+				sub->draw_option<RegularOption>(("MOC"), "", [] {
+
+					*script_global(2793046).at(925).as<bool*>() = true;
+
+					});
+				sub->draw_option<RegularOption>(("Avenger"), "", [] {
+
+					*script_global(2793046).at(933).as<bool*>() = true;
+
+					});
+				sub->draw_option<RegularOption>(("Terrobyte"), "", [] {
+
+					*script_global(2793046).at(937).as<bool*>() = true;
+
+					});
+				sub->draw_option<RegularOption>(("Kosatka"), "", [] {
+
+					*script_global(2793046).at(954).as<bool*>() = true;
+
+					});
+				sub->draw_option<RegularOption>(("Kosatka"), "", [] {
+
+					*script_global(2793046).at(954).as<bool*>() = true;
+
+					});
+				sub->draw_option<RegularOption>(("Acid Lab"), "", [] {
+
+					*script_global(2793046).at(938).as<bool*>() = true;
+
+					});
+				sub->draw_option<RegularOption>(("Delivery Bike"), "", [] {
+
+					*script_global(2793046).at(988).as<bool*>() = true;
+
+					});
 				sub->draw_option<RegularOption>(("Remove Loop"), "", [] {
 					*script_global(2793046).at(6874).as<bool*>() = false;
 					*script_global(2793046).at(6875).as<bool*>() = false;
@@ -9157,7 +9192,7 @@ namespace Saint
 				sub->draw_option<submenu>("Rainbow", nullptr, rage::joaat("RainbowGay"));
 				sub->draw_option<toggle<bool>>("Lines", nullptr, &g_Render->lines_enabled, BoolDisplay::OnOff);
 				sub->draw_option<number<float>>("Text Size", nullptr, &g_Render->m_OptionTextSize, 0.01f, 1.f, 0.01f, 2);
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Resolution", nullptr, &g_Render->Resolution, &g_Render->reso);
+				//sub->draw_option<ChooseOption<const char*, std::size_t>>("Resolution", nullptr, &g_Render->Resolution, &g_Render->reso);
 
 
 			});
