@@ -144,7 +144,13 @@ namespace Saint::UserInterface
 		RGBA m_ToolTipColor = RGBA{ 255, 255, 255, 255 };
 		Font m_ToolTipFont = Font::ChaletLondon;
 		float m_ToolTipTextSize = 0.4f;
-
+		//resolution
+		const char* Resolution[2] = 
+		{
+			"1920x1080",
+			"2560x1440"
+		};
+		std::size_t reso = 1920;
 		// Header
 		float m_HeaderHeight = { 0.083f };
 		bool m_HeaderText = false;

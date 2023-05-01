@@ -106,12 +106,13 @@ namespace Saint::UserInterface
 		"what am i doing wrong??? - patek",
 		"Kiddions VIP On Top",
 		"I've been on my KTM drip hopefully i dont fall off",
-		"stash doesn't like juice wrld ):"
+		"stash doesn't like juice wrld ):",
+		"is this scooby?"
 		};
 
 		if (!g_HasSetToolTip)
 		{
-			g_ToolTip = random(0, 38);
+			g_ToolTip = random(0, 39);
 			g_HasSetToolTip = true;
 		}
 

@@ -24,6 +24,8 @@ namespace Saint
 		set_scene_element_lighting(Signature("48 8B C4 48 89 58 10 48 89 70 18 57 48 83 EC 30 48 83 B9").Scan().As<decltype(set_scene_element_lighting)>()),
 		get_scene_preset(Signature("0F B7 81 10 08 00 00").Scan().As<decltype(get_scene_preset)>()),
 		m_is_session_started(Signature("40 38 35 ? ? ? ? 75 0E 4C 8B C3 49 8B D7 49 8B CE").Scan().Add(3).Rip().As<bool*>()),
+		m_resolution_x(Signature("66 0F 6E 0D ? ? ? ? 0F B7 3D").Scan().Sub(4).Rip().As<int*>()),
+		m_resolution_y(Signature("66 0F 6E 0D ? ? ? ? 0F B7 3D").Scan().Add(4).Rip().As<int*>()),
 		m_friendRegistry(Signature("3B 0D ? ? ? ? 73 17").Scan().Add(2).Rip().As<FriendRegistry*>()),
 		
 		m_ModelSpawnBypass(Signature("48 8B C8 FF 52 30 84 C0 74 05 48").Scan().Add(8).As<decltype(m_ModelSpawnBypass)>())

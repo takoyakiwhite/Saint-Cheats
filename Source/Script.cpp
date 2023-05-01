@@ -444,6 +444,12 @@ namespace Saint
 						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 223, false);
 					}
 					});
+				sub->draw_option<toggle<bool>>(("Take Less Damage"), "Headshots won't kill you instantly.", &features.take_less_damage, BoolDisplay::OnOff, false, [] {
+					if (!features.take_less_damage)
+					{
+						PED::SET_PED_SUFFERS_CRITICAL_HITS(PLAYER::PLAYER_PED_ID(), TRUE);
+					}
+					});
 				sub->draw_option<toggle<bool>>(("Crouched"), "", &features.crouched, BoolDisplay::OnOff, false, [] {
 					if (!features.crouched)
 					{
@@ -587,7 +593,7 @@ namespace Saint
 					sub->draw_option<RegularOption>((parachutes.types[i]), nullptr, [=]
 						{
 
-							parachutes.set_tint(i);
+							parachutes.set_tint(i - 1);
 
 
 						});
@@ -9151,6 +9157,7 @@ namespace Saint
 				sub->draw_option<submenu>("Rainbow", nullptr, rage::joaat("RainbowGay"));
 				sub->draw_option<toggle<bool>>("Lines", nullptr, &g_Render->lines_enabled, BoolDisplay::OnOff);
 				sub->draw_option<number<float>>("Text Size", nullptr, &g_Render->m_OptionTextSize, 0.01f, 1.f, 0.01f, 2);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Resolution", nullptr, &g_Render->Resolution, &g_Render->reso);
 
 
 			});

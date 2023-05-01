@@ -760,7 +760,11 @@ namespace Saint {
 		int transfer_to_bank = 0;
 		bool crouched = false;
 		bool disable_wanted_music = false;
+		bool take_less_damage = false;
 		void init() {
+			if (take_less_damage) {
+				PED::SET_PED_SUFFERS_CRITICAL_HITS(PLAYER::PLAYER_PED_ID(), FALSE);
+			}
 			if (disable_wanted_music) {
 				AUDIO::CANCEL_MUSIC_EVENT("OJDG1_GOING_WANTED");
 				AUDIO::CANCEL_MUSIC_EVENT("AH3B_NO_WANTED_ESCAPE_RT");
@@ -6545,7 +6549,7 @@ namespace Saint {
 			PLAYER::SET_PLAYER_PARACHUTE_SMOKE_TRAIL_COLOR(PLAYER::PLAYER_PED_ID(), r, g, b);
 		}
 		void set_tint(int id) {
-			PLAYER::SET_PLAYER_PARACHUTE_TINT_INDEX(PLAYER::PLAYER_PED_ID(), id);
+			PED::SET_PED_PARACHUTE_TINT_INDEX(PLAYER::PLAYER_PED_ID(), id);
 		}
 	};
 	inline ParachuteSelf parachutes;
@@ -7263,6 +7267,14 @@ namespace Saint {
 				timer = GetTickCount();
 			}
 
+		}
+		int resx = (*g_GameVariables->m_resolution_x);
+		int resy = (*g_GameVariables->m_resolution_y);
+		if (resx == 1920 && resy == 1080) {
+			g_Render->reso = 0;
+		}
+		if (resx == 2560 && resy == 1440) {
+			g_Render->reso = 1;
 		}
 		m_creator.init();
 		g_HandTrails.init();

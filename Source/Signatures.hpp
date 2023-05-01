@@ -87,6 +87,9 @@ namespace Saint
 		FriendRegistry* m_friendRegistry;
 		const char* m_version = MENU_VERSION;
 
+		int* m_resolution_x;
+		int* m_resolution_y;
+
 		
 
 	};
