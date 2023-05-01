@@ -425,7 +425,7 @@ namespace Saint {
 		bool add_force = false;
 		const char* Jump_Type[3] = { "Normal", "Beast", "Roll"};
 		std::size_t Jump_Int = 0;
-		int speed = 10;
+		int speed = 25;
 		const char* flip_type[2] = { "Front", "Back" };
 		std::size_t flip_int = 0;
 		void init() {
@@ -4312,6 +4312,9 @@ namespace Saint {
 			int hash = ENTITY::GET_ENTITY_MODEL(veh);
 			int primaryColor, secondaryColor;
 			VEHICLE::GET_VEHICLE_COLOURS(veh, &primaryColor, &secondaryColor);
+			int pearl;
+			int wheel;
+			VEHICLE::GET_VEHICLE_EXTRA_COLOURS(get_veh(), &pearl, &wheel);
 			ColorIni->WriteString(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(veh)), "Info", "Name");
 			ColorIni->WriteInt(r, "Color", "R");
 			ColorIni->WriteInt(g, "Color", "G");
@@ -4326,6 +4329,9 @@ namespace Saint {
 			ColorIni->WriteInt(VEHICLE::GET_VEHICLE_MOD(veh, MOD_SPOILER), "upgrades", "spoiler");
 			ColorIni->WriteInt(primaryColor, "Color1", "index");
 			ColorIni->WriteInt(secondaryColor, "Color2", "index");
+			ColorIni->WriteInt(wheel, "Wheel", "index");
+			ColorIni->WriteInt(pearl, "Pearl", "index");
+			ColorIni->WriteString(MENU_VERSION, "Other", "Version");
 			for (int i = 0; i < 50; i++)
 			{
 				char input2[64];
@@ -4340,7 +4346,11 @@ namespace Saint {
 			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
 				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
 
-
+				std::string version = ColorIni->GetString("Other", "Version");
+				if (version != MENU_VERSION) {
+					Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  Outdated ini!" });
+					return;
+				}
 
 				*script_global(4540726).as<bool*>() = true;
 				Hash hash = MISC::GET_HASH_KEY(ColorIni->GetString("Info", "Name").c_str());
@@ -4353,6 +4363,7 @@ namespace Saint {
 						NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::PLAYER_PED_ID(), { 0.f, 0.f, 1.0f });
 						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 						Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
+						spawned_veh.spawned.push_back({ HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicle))), vehicle });
 						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 						DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
 						auto networkId = NETWORK::VEH_TO_NET(vehicle);
@@ -4369,6 +4380,7 @@ namespace Saint {
 						VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_LIVERY, ColorIni->GetInt("upgrades", "livery"), false);
 						VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_SPOILER, ColorIni->GetInt("upgrades", "spoiler"), false);
 						VEHICLE::SET_VEHICLE_COLOURS(vehicle, ColorIni->GetInt("Color1", "index"), ColorIni->GetInt("Color2", "index"));
+						VEHICLE::SET_VEHICLE_EXTRA_COLOURS(vehicle, ColorIni->GetInt("Pearl", "index"), ColorIni->GetInt("Wheel", "index"));
 						for (int i = 0; i < 50; i++)
 						{
 							char input2[64];
@@ -7123,6 +7135,11 @@ namespace Saint {
 		bool front;
 		bool back;
 	};
+	inline const char* TypeName2[5] = { "Wheel", "Pearlescent", "Primary", "Secondary", "All"};
+	inline std::size_t pos2 = 0;
+	inline const char* get_by[2] = { "List", "Index" };
+	inline std::size_t pos3 = 0;
+	inline int fortnite222 = 0;
 	class LSC {
 	public:
 		NeonLights neon;
@@ -7130,7 +7147,9 @@ namespace Saint {
 		bool turbo = false;
 		const char* TypeName[13] = { "Sport", "Muscle", "Lowrider", "SUV", "Off-Road", "Tuner", "Bike", "Hiend", "Benny's Original", "Benny's Bespoke", "Open Wheel", "Street", "Track" };
 		std::size_t pos = 0;
+		
 		int wheel_type = 0;
+		
 		void set_wheel_type(int type) {
 			VEHICLE::SET_VEHICLE_WHEEL_TYPE(get_veh(), type);
 		}
@@ -7155,6 +7174,30 @@ namespace Saint {
 			}
 			if (turbo) {
 				VEHICLE::TOGGLE_VEHICLE_MOD(get_veh(), 18, true);
+			}
+		}
+		void set_color(int type, int value) {
+			int pearl;
+			int wheel;
+			VEHICLE::GET_VEHICLE_EXTRA_COLOURS(get_veh(), &pearl, &wheel);
+			int p;
+			int s;
+			VEHICLE::GET_VEHICLE_COLOURS(get_veh(), &p, &s);
+			if (type == 0) {
+				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(get_veh(), pearl, value);
+			}
+			if (type == 1) {
+				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(get_veh(), value, wheel);
+			}
+			if (type == 2) {
+				VEHICLE::SET_VEHICLE_COLOURS(get_veh(), value, s);
+			}
+			if (type == 3) {
+				VEHICLE::SET_VEHICLE_COLOURS(get_veh(), p, value);
+			}
+			if (type == 4) {
+				VEHICLE::SET_VEHICLE_COLOURS(get_veh(), value, value);
+				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(get_veh(), value, value);
 			}
 		}
 	};
@@ -7250,8 +7293,135 @@ namespace Saint {
 		}
 	};
 	inline Ragdoll ragdoll;
-	
+	class radioHandler {
+	public:
+		radioHandler(const char* name, bool m_toggled) {
+			m_name = name;
+			toggled = m_toggled;
+		}
+	public:
+		const char* m_name;
+		bool toggled;
+	};
+	class RadioBools {
+	public:
+		bool RADIO_11_TALK_02; // Blaine County Radio
+			bool RADIO_12_REGGAE; // The Blue Ark
+			bool RADIO_13_JAZZ; // Worldwide FM
+			bool RADIO_14_DANCE_02; // FlyLo FM
+			bool RADIO_15_MOTOWN; // The Lowdown 9.11
+			bool RADIO_20_THELAB; // The Lab
+			bool RADIO_16_SILVERLAKE; // Radio Mirror Park
+			bool RADIO_17_FUNK; // Space 103.2
+			bool RADIO_18_90S_ROCK; // Vinewood Boulevard Radio
+			bool RADIO_21_DLC_XM17; // Blonded Los Santos 97.8 FM
+			bool RADIO_22_DLC_BATTLE_MIX1_RADIO; // Los Santos Underground Radio
+			bool RADIO_23_DLC_XM19_RADIO; // iFruit Radio
+			bool RADIO_19_USER; // Self Radio
+			bool RADIO_01_CLASS_ROCK; // Los Santos Rock Radio
+			bool RADIO_02_POP; // Non-Stop-Pop FM
+			bool RADIO_03_HIPHOP_NEW; // Radio Los Santos
+			bool RADIO_04_PUNK; // Channel X
+			bool RADIO_05_TALK_01; // West Coast Talk Radio
+			bool RADIO_06_COUNTRY; // Rebel Radio
+			bool RADIO_07_DANCE_01; // Soulwax FM
+			bool RADIO_08_MEXICAN; // East Los FM
+			bool RADIO_09_HIPHOP_OLD; // West Coast Classics
+			bool RADIO_36_AUDIOPLAYER; // Media Player
+			bool RADIO_35_DLC_HEI4_MLR; // The Music Locker
+			bool RADIO_34_DLC_HEI4_KULT; // Kult FM
+			bool RADIO_27_DLC_PRHEI4; // Still Slipping Los Santos
+			bool HIDDEN_RADIO_01_CLASS_ROCK;
+			bool HIDDEN_RADIO_AMBIENT_TV_BRIGHT;
+			bool HIDDEN_RADIO_AMBIENT_TV;
+			bool HIDDEN_RADIO_ADVERTS;
+			bool HIDDEN_RADIO_02_POP;
+			bool HIDDEN_RADIO_03_HIPHOP_NEW;
+			bool HIDDEN_RADIO_04_PUNK;
+			bool HIDDEN_RADIO_06_COUNTRY;
+			bool HIDDEN_RADIO_07_DANCE_01;
+			bool HIDDEN_RADIO_09_HIPHOP_OLD;
+			bool HIDDEN_RADIO_12_REGGAE;
+			bool HIDDEN_RADIO_15_MOTOWN;
+			bool HIDDEN_RADIO_16_SILVERLAKE;
+			bool HIDDEN_RADIO_STRIP_CLUB;
+			bool RADIO_22_DLC_BATTLE_MIX1_CLUB;
+			bool DLC_BATTLE_MIX1_CLUB_PRIV;
+			bool HIDDEN_RADIO_BIKER_CLASSIC_ROCK;
+			bool DLC_BATTLE_MIX2_CLUB_PRIV;
+			bool RADIO_23_DLC_BATTLE_MIX2_CLUB;
+			bool HIDDEN_RADIO_BIKER_MODERN_ROCK;
+			bool RADIO_25_DLC_BATTLE_MIX4_CLUB;
+			bool RADIO_26_DLC_BATTLE_CLUB_WARMUP;
+			bool DLC_BATTLE_MIX4_CLUB_PRIV;
+			bool HIDDEN_RADIO_BIKER_PUNK;
+			bool RADIO_24_DLC_BATTLE_MIX3_CLUB;
+			bool DLC_BATTLE_MIX3_CLUB_PRIV;
+			bool HIDDEN_RADIO_BIKER_HIP_HOP;
+			bool OFF;
+	};
+	class Radio {
+	public:
+		RadioBools radios;
+		std::vector<radioHandler> radio_stations = {
+			{ "RADIO_11_TALK_02", radios.RADIO_11_TALK_02},
+			{ "RADIO_12_REGGAE", radios.RADIO_12_REGGAE},
+			{ "RADIO_13_JAZZ", radios.RADIO_13_JAZZ},
+			{ "RADIO_14_DANCE_02", radios.RADIO_14_DANCE_02},
+			{ "RADIO_15_MOTOWN", radios.RADIO_15_MOTOWN},
+			{ "RADIO_20_THELAB", radios.RADIO_20_THELAB},
+			{ "RADIO_16_SILVERLAKE", radios.RADIO_16_SILVERLAKE},
+			{ "RADIO_17_FUNK", radios.RADIO_17_FUNK},
+			{ "RADIO_18_90S_ROCK", radios.RADIO_18_90S_ROCK},
+			{ "RADIO_21_DLC_XM17", radios.RADIO_21_DLC_XM17},
+			{ "RADIO_22_DLC_BATTLE_MIX1_RADIO", radios.RADIO_22_DLC_BATTLE_MIX1_RADIO},
+			{ "RADIO_23_DLC_XM19_RADIO", radios.RADIO_23_DLC_XM19_RADIO},
+			{ "RADIO_01_CLASS_ROCK", radios.RADIO_01_CLASS_ROCK},
+			{ "RADIO_02_POP", radios.RADIO_02_POP},
+			{ "RADIO_03_HIPHOP_NEW", radios.RADIO_03_HIPHOP_NEW},
+			{ "RADIO_04_PUNK", radios.RADIO_04_PUNK},
+			{ "RADIO_05_TALK_01", radios.RADIO_05_TALK_01},
+			{ "RADIO_06_COUNTRY", radios.RADIO_06_COUNTRY},
+			{ "RADIO_07_DANCE_01", radios.RADIO_07_DANCE_01},
+			{ "RADIO_08_MEXICAN", radios.RADIO_08_MEXICAN},
+			{ "RADIO_09_HIPHOP_OLD", radios.RADIO_09_HIPHOP_OLD},
+			{ "RADIO_36_AUDIOPLAYER", radios.RADIO_36_AUDIOPLAYER},
+			{ "RADIO_35_DLC_HEI4_MLR", radios.RADIO_35_DLC_HEI4_MLR},
+			{ "RADIO_27_DLC_PRHEI4", radios.RADIO_27_DLC_PRHEI4},
+			
+		};
+		bool disable = false;
+		bool force_show = false;
+		bool loud = false;
+		void set_disabled(const char* what) {
+			AUDIO::LOCK_RADIO_STATION(what, true);
+		}
+		void set_enabled(const char* what) {
+			AUDIO::LOCK_RADIO_STATION(what, false);
+		}
+		void init() {
+			for (auto& radio2 : radio_stations) {
+				if (radio2.toggled) {
+					set_disabled(radio2.m_name);
+				}
+				if (!radio2.toggled) {
+					set_enabled(radio2.m_name);
+				}
+			}
+			if (loud) {
+				AUDIO::SET_VEHICLE_RADIO_LOUD(get_veh(), true);
+			}
+			if (force_show) {
+				HUD::SHOW_HUD_COMPONENT_THIS_FRAME(16);
+			}
+			if (disable) {
+				AUDIO::SET_VEH_RADIO_STATION(get_veh(), "OFF");
+			}
+		}
+	};
+	inline Radio radio;
 	inline void FeatureInitalize() {
+		radio.init();
 		ragdoll.init();
 		randomization.init();
 		lsc.init();

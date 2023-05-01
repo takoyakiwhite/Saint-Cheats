@@ -70,7 +70,7 @@ std::string branding = " | Saint Cheats";
 std::array<std::string, 3> Titles = {
 	"What am I doing wrong - Patek/Jayden." + branding,
 	"Unleash your inner vali" + branding,
-	"Yummy Ozark v27" + branding
+	"\"is this scooby?\"" + branding
 };
 BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 {

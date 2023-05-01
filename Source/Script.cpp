@@ -598,7 +598,7 @@ namespace Saint
 					sub->draw_option<RegularOption>((parachutes.types[i]), nullptr, [=]
 						{
 
-							parachutes.set_tint(i - 1);
+							parachutes.set_tint(i + 1);
 
 
 						});
@@ -996,6 +996,7 @@ namespace Saint
 				sub->draw_option<submenu>("Jump Force", nullptr, rage::joaat("JUNPFORCE"));
 				sub->draw_option<submenu>("Bike Lean", nullptr, rage::joaat("BIKE_LEAN"));
 				sub->draw_option<submenu>("Doors", nullptr, rage::joaat("DOORS"));
+				sub->draw_option<submenu>("Radio", nullptr, rage::joaat("Radio"));
 				//sub->draw_option<submenu>("Cargobob", nullptr, rage::joaat("CARGO_BOB"));
 				sub->draw_option<toggle<bool>>(("Godmode"), "Prevents your vehicle from taking damage.", &features.vehicle_godmode, BoolDisplay::OnOff, false, [] {
 					if (!features.vehicle_godmode) {
@@ -1086,6 +1087,25 @@ namespace Saint
 					});
 
 			});
+			g_Render->draw_submenu<sub>(("Radio"), rage::joaat("Radio"), [](sub* sub)
+				{
+					sub->draw_option<toggle<bool>>(("Disable"), "", &radio.disable, BoolDisplay::OnOff);
+					sub->draw_option<toggle<bool>>(("Force Show"), "", &radio.force_show, BoolDisplay::OnOff);
+					sub->draw_option<toggle<bool>>(("Loud"), nullptr, &radio.loud, BoolDisplay::OnOff, false, [] {
+						if (!radio.loud) {
+							AUDIO::SET_VEHICLE_RADIO_LOUD(get_veh(), false);
+						}
+						});
+					sub->draw_option<UnclickOption>(("Hide"), nullptr, [] {});
+					for (auto& radio2 : radio.radio_stations) {
+						
+						sub->draw_option<toggle<bool>>(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(radio2.m_name), nullptr, &radio2.toggled, BoolDisplay::OnOff, false, [=] {
+							if (!radio2.toggled) {
+								radio.set_enabled(radio2.m_name);
+							}
+						});
+					}
+				});
 		g_Render->draw_submenu<sub>(("Jump Force"), rage::joaat("JUNPFORCE"), [](sub* sub)
 			{
 				sub->draw_option<submenu>("Compatible Vehicles", nullptr, rage::joaat("COMPVEHICLES2"));
@@ -1694,6 +1714,29 @@ namespace Saint
 				sub->draw_option<number<std::int32_t>>("B", nullptr, &changeVehicleColor.b, 0, 255, 1, 3, true, "", "", [] {
 					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), changeVehicleColor.r, changeVehicleColor.g, changeVehicleColor.b);
 					});
+				sub->draw_option<UnclickOption>(("Game"), nullptr, [] {});
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &TypeName2, &pos2);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("View", nullptr, &get_by, &pos3);
+				
+				if (pos3 == 0) {
+					sub->draw_option<RegularOption>("Black", "", []
+						{
+							lsc.set_color(pos2, 0);
+						});
+					sub->draw_option<RegularOption>("White", "", []
+						{
+							lsc.set_color(pos2, 134);
+						});
+					sub->draw_option<RegularOption>("Secret Gold", "", []
+						{
+							lsc.set_color(pos2, 91);
+						});
+				}
+				if (pos3 == 1) {
+					sub->draw_option<number<std::int32_t>>("Value", nullptr, &fortnite222, 0, 159, 1, 3, true, "", "", [] {
+						lsc.set_color(pos2, fortnite222);
+						});
+				}
 
 
 
@@ -2590,7 +2633,7 @@ namespace Saint
 						}
 						});
 				});
-			g_Render->draw_submenu<sub>("Wheels", rage::joaat("NeonLights"), [](sub* sub)
+			g_Render->draw_submenu<sub>("Neon", rage::joaat("NeonLights"), [](sub* sub)
 				{
 					sub->draw_option<toggle<bool>>(("Front"), nullptr, &lsc.neon.front, BoolDisplay::OnOff, false, [] {
 						if (!lsc.neon.front)
@@ -2629,6 +2672,7 @@ namespace Saint
 				sub->draw_option<number<std::int32_t>>("Index", nullptr, &lsc.wheel_type, 0, VEHICLE::GET_NUM_VEHICLE_MODS(get_veh(), 23), 1, 3, true, "", "", [] {
 					lsc.set_wheel(lsc.wheel_type);
 					});
+				
 				//crash the gate doing 98 (american song v98 and tim wouldent understand)
 			});
 		g_Render->draw_submenu<sub>("Windows", LosSantosWindows, [](sub* sub)
@@ -4512,7 +4556,7 @@ namespace Saint
 				//sub->draw_option<submenu>("Money", nullptr, SubmenuMoney); not finished
 
 
-				sub->draw_option<submenu>("Arena War", nullptr, SubmenuAWar);
+				//sub->draw_option<submenu>("Arena War", nullptr, SubmenuAWar);
 
 				sub->draw_option<submenu>("Nightclub", nullptr, rage::joaat("Nightclub"));
 				sub->draw_option<submenu>("ATM", nullptr, rage::joaat("ATM"));
@@ -4534,7 +4578,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Stats", SubmenuCstats, [](sub* sub)
 			{
 
-		sub->draw_option<RegularOption>("Max Stats", "", []
+		sub->draw_option<RegularOption>("Max", "", []
 			{
 				STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STAM"), 100, 1);
 		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STRN"), 100, 1);
@@ -4560,7 +4604,7 @@ namespace Saint
 			});
 
 
-
+		sub->draw_option<UnclickOption>(("Single"), nullptr, [] {});
 		sub->draw_option<RegularOption>("Max Stamina", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STAM"), 100, 0); });
 		sub->draw_option<RegularOption>("Max Strength", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STRN"), 100, 0); });
 		sub->draw_option<RegularOption>("Max Loungh", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_LUNG"), 100, 0); });
@@ -4579,69 +4623,68 @@ namespace Saint
 
 
 		
-		sub->draw_option<RegularOption>("Max Arena Level", "", []
+		sub->draw_option<RegularOption>("Max Level", "", []
 			{
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_ARENAWARS_SKILL_LEVEL"), 19);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_ARENAWARS_SKILL_LEVEL"), 19);
+		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_ARENAWARS_SKILL_LEVEL"), 19, true);
+		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_ARENAWARS_SKILL_LEVEL"), 19, true);
 			});
 
 
 				sub->draw_option<RegularOption>("Free RC & Mini Tank", "", []
 					{
-						STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL4"), true, 19);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL8"), true, 42); 
+						STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_ARENAWARSPSTAT_BOOL4"), true, true);
+						STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_ARENAWARSPSTAT_BOOL8"), true, true); 
 					});
 
 
 		sub->draw_option<UnclickOption>(("Special Vehicle Unlocks"), nullptr, [] {});
-		sub->draw_option<RegularOption>("Taxi Custom", nullptr, [] { STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 30; });
-		sub->draw_option<RegularOption>("Dozer", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 31); });
-		sub->draw_option<RegularOption>("Clown Van", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 32); });
-		sub->draw_option<RegularOption>("Trashmaster", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 33); });
-		sub->draw_option<RegularOption>("Barracks Semi", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 34); });
-		sub->draw_option<RegularOption>("Mixer", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 35); });
-		sub->draw_option<RegularOption>("Space Docker", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 36); });
-		sub->draw_option<RegularOption>("Rusty Tractor", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 37); });
+		sub->draw_option<RegularOption>("Taxi Custom", nullptr, [] { STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 30, true); });
+		sub->draw_option<RegularOption>("Dozer", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 31, true); });
+		sub->draw_option<RegularOption>("Clown Van", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 32, true); });
+		sub->draw_option<RegularOption>("Trashmaster", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 33, true); });
+		sub->draw_option<RegularOption>("Barracks Semi", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 34, true); });
+		sub->draw_option<RegularOption>("Mixer", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 35, true); });
+		sub->draw_option<RegularOption>("Space Docker", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 36, true); });
+		sub->draw_option<RegularOption>("Rusty Tractor", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 37, true); });
 
 
 		sub->draw_option<UnclickOption>(("Trade Prices"), nullptr, [] {});
 
-		sub->draw_option<RegularOption>("All parts & vehicles", "", []
+		sub->draw_option<RegularOption>("Parts & Vehicles", "", []
 			{
 				//vehicles
-				STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 1);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 2);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 3);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 4);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 5);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 6);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 7);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 8);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 9);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 10);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL2"), true, 11);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL2"), true, 12);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL2"), true, 13);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL2"), true, 14);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL2"), true, 15);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL2"), true, 16);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL2"), true, 17);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL2"), true, 18);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL2"), true, 19);
+				STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL1"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL2"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL3"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL4"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL5"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL6"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL7"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL8"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL9"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL10"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL11"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL12"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL13"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL14"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL15"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL16"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL17"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL18"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL19"), true, true);
 
 		//parts
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 18);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 19);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 20);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 21);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 22);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 23);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 24);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 25);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 26);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 27);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 28);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), true, 29);
+		
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL20"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL21"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL22"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL23"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL24"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL25"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL26"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL27"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL28"), true, true);
+		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL29"), true, true);
 
 			});
 
@@ -6416,23 +6459,23 @@ namespace Saint
 
 
 					sub->draw_option<RegularOption>("LS Summer", "", [] {
-						STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_KINGOFQUB3D"), true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_QUBISM"), true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_QUIBITS"), true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_GODOFQUB3D"), true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_ELEVENELEVEN"), true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_GOFOR11TH"), true);
-					STATS::STAT_SET_MASKED_INT(MISC::GET_HASH_KEY("MP0_SU20PSTAT_INT"), 1, 35, 8);
+						STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_KINGOFQUB3D"), true, true);
+					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_QUBISM"), true, true);
+					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_QUIBITS"), true, true);
+					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_GODOFQUB3D"), true, true);
+					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_ELEVENELEVEN"), true, true);
+					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_GOFOR11TH"), true, true);
+					STATS::STAT_SET_MASKED_INT(MISC::GET_HASH_KEY("MP0_SU20PSTAT_INT"), 1, 35, 8, true);
 
 
 					// -------------- chara 2
 
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_KINGOFQUB3D"), true); 
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_QUBISM"), true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_QUIBITS"), true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_GODOFQUB3D"), true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_ELEVENELEVEN"), true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_GOFOR11TH"), true);
+					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_KINGOFQUB3D"), true, true);
+					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_QUBISM"), true, true);
+					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_QUIBITS"), true, true);
+					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_GODOFQUB3D"), true, true);
+					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_ELEVENELEVEN"), true, true);
+					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_GOFOR11TH"), true, true);
 		/*			STATS::STAT_SET_MASKED_INT(MISC::GET_HASH_KEY("MP1_SU20PSTAT_INT"), 1, 35, 8);*/
 
 
@@ -6442,23 +6485,23 @@ namespace Saint
 
 
 					sub->draw_option<RegularOption>("LS Tuner", "", [] {
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_CAR_CLUB_MEM"), 100);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_SPRINTRACER"), 50);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_STREETRACER"), 50);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_PURSUITRACERD"), 240);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_AUTO_SHOP"), 50);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_GROUNDWORK"), 40);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_GROUNDWORK"), 40);
+						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_CAR_CLUB_MEM"), 100, true);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_SPRINTRACER"), 50, true);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_STREETRACER"), 50, true);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_PURSUITRACERD"), 240, true);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_AUTO_SHOP"), 50, true);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_GROUNDWORK"), 40, true);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_GROUNDWORK"), 40, true);
 
 
 					// -------------- Chara 2
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_CAR_CLUB_MEM"), 100);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_SPRINTRACER"), 50);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_STREETRACER"), 50);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_PURSUITRACERD"), 240);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_AUTO_SHOP"), 50);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_GROUNDWORK"), 40);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_CAR_CLUB_MEM"), 100, true);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_SPRINTRACER"), 50, true);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_STREETRACER"), 50, true);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_PURSUITRACERD"), 240, true);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_AUTO_SHOP"), 50, true);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_GROUNDWORK"), 40, true);
 					//STATS::STAT_SET_MASKED_INT(MISC::GET_HASH_KEY("MP1_SU20PSTAT_INT"), 1, 35, 8);
 
 
@@ -6496,7 +6539,7 @@ namespace Saint
 							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_SET_RP_GIFT_ADMIN"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], true);
 						}
 						if (m_recovery.pos == 1) {
-							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MPPLY_CURRENT_CREW_RANK"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], true);
+							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CURRENT_CREW_RANK"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], true);
 						}
 						Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Change session for the level to apply." });
 					});
