@@ -6571,6 +6571,10 @@ namespace Saint
 							break;
 						}
 					});
+				sub->draw_option<RegularOption>(("Remove Loop"), "Removes the loop from RC and Mini Tank", [] {
+					*script_global(2793046).at(6874).as<bool*>() = false;
+					*script_global(2793046).at(6875).as<bool*>() = false;
+					});
 				sub->draw_option<UnclickOption>(("Other"), nullptr, [] {});
 				sub->draw_option<RegularOption>(("RC"), "", [] {
 
@@ -6602,11 +6606,7 @@ namespace Saint
 					*script_global(2793046).at(954).as<bool*>() = true;
 
 					});
-				sub->draw_option<RegularOption>(("Kosatka"), "", [] {
-
-					*script_global(2793046).at(954).as<bool*>() = true;
-
-					});
+				
 				sub->draw_option<RegularOption>(("Acid Lab"), "", [] {
 
 					*script_global(2793046).at(938).as<bool*>() = true;
@@ -6617,10 +6617,7 @@ namespace Saint
 					*script_global(2793046).at(988).as<bool*>() = true;
 
 					});
-				sub->draw_option<RegularOption>(("Remove Loop"), "", [] {
-					*script_global(2793046).at(6874).as<bool*>() = false;
-					*script_global(2793046).at(6875).as<bool*>() = false;
-					});
+				
 
 
 			});
