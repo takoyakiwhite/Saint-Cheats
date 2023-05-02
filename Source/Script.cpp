@@ -414,7 +414,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Godmode"), nullptr, &godmode, BoolDisplay::OnOff, false, [] {
 					if (!godmode)
 					{
-						(*g_GameFunctions->m_pedFactory)->m_local_ped->m_damage_bits = 0;
+						Game->CPed()->m_damage_bits = 0;
 
 					}
 					});
@@ -427,8 +427,8 @@ namespace Saint
 
 				sub->draw_option<toggle<bool>>(("Seatbelt"), "Click you're seatbelt so you don't fly out of the vehicle.", &features.seatbelt, BoolDisplay::OnOff, false, [] {
 					if (!features.seatbelt) {
-						PED::SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(PLAYER::PLAYER_PED_ID(), false);
-						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 32, true);
+						PED::SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(Game->Self(), false);
+						PED::SET_PED_CONFIG_FLAG(Game->Self(), 32, true);
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Explosive Melee"), "Allows you have the ability from director mode.", &m_frame_flags.m_explosive_melee, BoolDisplay::OnOff);
@@ -440,44 +440,44 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Swim Anywhere"), nullptr, &features.swim_anywhere, BoolDisplay::OnOff, false, [] {
 					if (!features.swim_anywhere)
 					{
-						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 65, false);
+						PED::SET_PED_CONFIG_FLAG(Game->Self(), 65, false);
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Tiny Ped"), "Shrinks you're ped.", &features.tiny_ped, BoolDisplay::OnOff, false, [] {
 					if (!features.tiny_ped)
 					{
-						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 223, false);
+						PED::SET_PED_CONFIG_FLAG(Game->Self(), 223, false);
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Take Less Damage"), "Headshots won't kill you instantly.", &features.take_less_damage, BoolDisplay::OnOff, false, [] {
 					if (!features.take_less_damage)
 					{
-						PED::SET_PED_SUFFERS_CRITICAL_HITS(PLAYER::PLAYER_PED_ID(), TRUE);
+						PED::SET_PED_SUFFERS_CRITICAL_HITS(Game->Self(), TRUE);
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Crouched"), "", &features.crouched, BoolDisplay::OnOff, false, [] {
 					if (!features.crouched)
 					{
-						PED::RESET_PED_MOVEMENT_CLIPSET(PLAYER::PLAYER_PED_ID(), 1.0f);
+						PED::RESET_PED_MOVEMENT_CLIPSET(Game->Self(), 1.0f);
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Unlimited Special Ability"), "Automaticly refills your special ability bar.", &features.unlim, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Attack Friendly"), "Allows you to shoot teammates.", &features.attack_friendly, BoolDisplay::OnOff, false, [] {
 					if (!features.attack_friendly)
 					{
-						PED::SET_CAN_ATTACK_FRIENDLY(PLAYER::PLAYER_PED_ID(), false, true);
+						PED::SET_CAN_ATTACK_FRIENDLY(Game->Self(), false, true);
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Reduced Collision"), "Allows you to walk through walls and such.", &features.reduced, BoolDisplay::OnOff, false, [] {
 					if (!features.reduced)
 					{
-						PED::SET_PED_CAPSULE(PLAYER::PLAYER_PED_ID(), false);
+						PED::SET_PED_CAPSULE(Game->Self(), false);
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Bound Ankles"), "Makes it so when you ragdoll, You cannot get up.", &features.bound_ankles, BoolDisplay::OnOff, false, [] {
 					if (!features.bound_ankles)
 					{
-						PED::SET_ENABLE_BOUND_ANKLES(PLAYER::PLAYER_PED_ID(), false);
+						PED::SET_ENABLE_BOUND_ANKLES(Game->Self(), false);
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Ignored By Peds"), "Makes pedestrains around you ignore your actions.", &features.ignored, BoolDisplay::OnOff, false, [] {
@@ -505,19 +505,19 @@ namespace Saint
 					{
 						NativeVector3 c = CAM::GET_CAM_COORD(blink.freecamCamera);
 						NativeVector3 rot = CAM::GET_CAM_ROT(blink.freecamCamera, 2);
-						ENTITY::SET_ENTITY_ROTATION(PLAYER::PLAYER_PED_ID(), rot.x, rot.y, rot.z, 2, 1);
-						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(PLAYER::PLAYER_PED_ID(), c.x, c.y, c.z, true, true, true);
+						ENTITY::SET_ENTITY_ROTATION(Game->Self(), rot.x, rot.y, rot.z, 2, 1);
+						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), c.x, c.y, c.z, true, true, true);
 						CAM::RENDER_SCRIPT_CAMS(false, true, 700, true, true, true);
 						CAM::SET_CAM_ACTIVE(blink.freecamCamera, false);
 						CAM::DESTROY_CAM(blink.freecamCamera, true);
-						PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), true);
+						PLAYER::DISABLE_PLAYER_FIRING(Game->Self(), true);
 
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Wet"), "", &features.wet, BoolDisplay::OnOff, false, [] {
 					if (!features.wet)
 					{
-						PED::SET_PED_WETNESS_HEIGHT(PLAYER::PLAYER_PED_ID(), 0);
+						PED::SET_PED_WETNESS_HEIGHT(Game->Self(), 0);
 
 					}
 					});
@@ -528,7 +528,7 @@ namespace Saint
 					(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_wanted_level = i_hate_niggers;
 					});
 				sub->draw_option<number<float>>("Move Rate", nullptr, &move_rate, 0, 10.0, 1.0, 3, true, "", "", [] {
-					PED::SET_PED_MOVE_RATE_OVERRIDE(PLAYER::PLAYER_PED_ID(), move_rate);
+					PED::SET_PED_MOVE_RATE_OVERRIDE(Game->Self(), move_rate);
 					});
 
 			});
@@ -537,9 +537,9 @@ namespace Saint
 					sub->draw_option<toggle<bool>>(("Disable"), "", &features.no_ragdoll, BoolDisplay::OnOff, false, [] {
 						if (!features.no_ragdoll)
 						{
-							PED::SET_PED_RAGDOLL_ON_COLLISION(PLAYER::PLAYER_PED_ID(), true);
-							PED::SET_PED_CAN_RAGDOLL(PLAYER::PLAYER_PED_ID(), true);
-							PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(PLAYER::PLAYER_PED_ID(), true);
+							PED::SET_PED_RAGDOLL_ON_COLLISION(Game->Self(), true);
+							PED::SET_PED_CAN_RAGDOLL(Game->Self(), true);
+							PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(Game->Self(), true);
 						}
 						});
 					if (features.no_ragdoll) {
@@ -551,13 +551,13 @@ namespace Saint
 						sub->draw_option<toggle<bool>>(("On Collison"), "", &ragdoll.on_collison, BoolDisplay::OnOff, false, [] {
 							if (!ragdoll.on_collison)
 							{
-								PED::SET_PED_RAGDOLL_ON_COLLISION(PLAYER::PLAYER_PED_ID(), false);
+								PED::SET_PED_RAGDOLL_ON_COLLISION(Game->Self(), false);
 							}
 							});
 						sub->draw_option<RegularOption>(("Start"), nullptr, []
 							{
-								NativeVector3 v = ENTITY::GET_ENTITY_FORWARD_VECTOR(PLAYER::PLAYER_PED_ID());
-								PED::SET_PED_TO_RAGDOLL_WITH_FALL(PLAYER::PLAYER_PED_ID(), 1500, 2000, 1, -v.x, -v.y, -v.z, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
+								NativeVector3 v = ENTITY::GET_ENTITY_FORWARD_VECTOR(Game->Self());
+								PED::SET_PED_TO_RAGDOLL_WITH_FALL(Game->Self(), 1500, 2000, 1, -v.x, -v.y, -v.z, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
 							});
 					}
 				});
@@ -579,7 +579,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Give When In Plane"), "", &parachutes.give_when_in_plane, BoolDisplay::OnOff, false, [] {
 					if (!parachutes.give_when_in_plane)
 					{
-						PLAYER::SET_AUTO_GIVE_PARACHUTE_WHEN_ENTER_PLANE(PLAYER::PLAYER_PED_ID(), false);
+						PLAYER::SET_AUTO_GIVE_PARACHUTE_WHEN_ENTER_PLANE(Game->Self(), false);
 
 
 					}
@@ -587,7 +587,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Use Reserved"), "", &parachutes.use_reservered, BoolDisplay::OnOff, false, [] {
 					if (!parachutes.use_reservered)
 					{
-						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 363, false);
+						PED::SET_PED_CONFIG_FLAG(Game->Self(), 363, false);
 
 
 					}
@@ -598,7 +598,7 @@ namespace Saint
 					sub->draw_option<RegularOption>((parachutes.types[i]), nullptr, [=]
 						{
 
-							parachutes.set_tint(i + 1);
+							parachutes.set_tint(i + 1 - 2);
 
 
 						});
@@ -608,7 +608,7 @@ namespace Saint
 			{
 				sub->draw_option<RegularOption>(("Reset"), nullptr, []
 					{
-						PED::RESET_PED_MOVEMENT_CLIPSET(PLAYER::PLAYER_PED_ID(), 1.0f);
+						PED::RESET_PED_MOVEMENT_CLIPSET(Game->Self(), 1.0f);
 
 					});
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
@@ -713,68 +713,68 @@ namespace Saint
 					});
 				switch (g_Render->outfits) {
 				case Outfits::Face:
-					sub->draw_option<number<std::int32_t>>("Drawable", "Sets face variation.", &testa, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 0), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 0, testa, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "Sets face texture variation.", &facetexture, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 0, testa), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 0, testa, facetexture, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets face variation.", &testa, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Game->Self(), 0), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 0, testa, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets face texture variation.", &facetexture, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(Game->Self(), 0, testa), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 0, testa, facetexture, 0); }); break;
 				case Outfits::Head:
-					sub->draw_option<number<std::int32_t>>("Drawable", "Sets head variation.", &testb, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 1), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 1, testb, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "Sets head texture variation.", &facetexture1, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 1, testb), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 1, testb, facetexture1, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets head variation.", &testb, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Game->Self(), 1), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 1, testb, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets head texture variation.", &facetexture1, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(Game->Self(), 1, testb), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 1, testb, facetexture1, 0); }); break;
 				case Outfits::Hair:
-					sub->draw_option<number<std::int32_t>>("Drawable", "Sets hair variation.", &testc, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 2), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 2, testc, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "Sets hair texture variation.", &facetexture2, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 2, testc), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 2, testc, facetexture2, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets hair variation.", &testc, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Game->Self(), 2), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 2, testc, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets hair texture variation.", &facetexture2, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(Game->Self(), 2, testc), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 2, testc, facetexture2, 0); }); break;
 				case Outfits::Torso:
-					sub->draw_option<number<std::int32_t>>("Drawable", "Sets torso variation.", &testd, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 3), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 3, testd, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "Sets torso texture variation.", &facetexture3, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 3, testd), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 3, testd, facetexture3, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets torso variation.", &testd, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Game->Self(), 3), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 3, testd, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets torso texture variation.", &facetexture3, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(Game->Self(), 3, testd), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 3, testd, facetexture3, 0); }); break;
 				case Outfits::Torso2:
-					sub->draw_option<number<std::int32_t>>("Drawable", "Sets torso 2 variation.", &testl, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 11), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 11, testl, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "Sets torso 2 texture variation.", &facetexture4, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 11, testl), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 11, testl, facetexture4, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets torso 2 variation.", &testl, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Game->Self(), 11), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 11, testl, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets torso 2 texture variation.", &facetexture4, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(Game->Self(), 11, testl), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 11, testl, facetexture4, 0); }); break;
 				case Outfits::Legs:
-					sub->draw_option<number<std::int32_t>>("Drawable", "Sets leg variation.", &teste, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 4), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 4, teste, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "Sets leg texture variation.", &facetexture5, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 4, teste), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 4, teste, facetexture5, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets leg variation.", &teste, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Game->Self(), 4), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 4, teste, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets leg texture variation.", &facetexture5, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(Game->Self(), 4, teste), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 4, teste, facetexture5, 0); }); break;
 				case Outfits::Hands:
-					sub->draw_option<number<std::int32_t>>("Drawable", "Sets hand variation.", &testf, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 5), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 5, testf, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "Sets hand texture variation.", &facetexture6, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 5, testf), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 5, testf, facetexture6, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets hand variation.", &testf, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Game->Self(), 5), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 5, testf, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets hand texture variation.", &facetexture6, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(Game->Self(), 5, testf), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 5, testf, facetexture6, 0); }); break;
 				case Outfits::Feet:
-					sub->draw_option<number<std::int32_t>>("Drawable", "Sets feet variation.", &testg, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 6), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 6, testg, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "Sets feet texture variation.", &facetexture7, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 6, testg), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 6, testg, facetexture7, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets feet variation.", &testg, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Game->Self(), 6), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 6, testg, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets feet texture variation.", &facetexture7, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(Game->Self(), 6, testg), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 6, testg, facetexture7, 0); }); break;
 				case Outfits::Eyes:
-					sub->draw_option<number<std::int32_t>>("Drawable", "Sets eye variation.", &testh, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 7), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 7, testh, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "Sets eyes texture variation.", &facetexture8, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 7, testh), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 7, testh, facetexture8, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets eye variation.", &testh, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Game->Self(), 7), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 7, testh, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets eyes texture variation.", &facetexture8, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(Game->Self(), 7, testh), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 7, testh, facetexture8, 0); }); break;
 				case Outfits::Accessories:
 
-					sub->draw_option<number<std::int32_t>>("Drawable", "Sets accessories variation.", &testi, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 8), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 8, testi, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "Sets accessories texture variation.", &facetexture9, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 8, testi), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 8, testi, facetexture9, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets accessories variation.", &testi, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Game->Self(), 8), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 8, testi, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets accessories texture variation.", &facetexture9, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(Game->Self(), 8, testi), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 8, testi, facetexture9, 0); }); break;
 				case Outfits::Vests:
 
-					sub->draw_option<number<std::int32_t>>("Drawable", "Sets vest variation.", &testj, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 9), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 9, testj, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "Sets vests texture variation.", &facetexture10, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 9, testj), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 9, testj, facetexture10, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets vest variation.", &testj, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Game->Self(), 9), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 9, testj, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets vests texture variation.", &facetexture10, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(Game->Self(), 9, testj), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 9, testj, facetexture10, 0); }); break;
 				case Outfits::Decals:
 
-					sub->draw_option<number<std::int32_t>>("Drawable", "Sets texture variation.", &testk, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 10), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 10, testk, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "Sets decals texture variation.", &facetexture11, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 10, testk), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 10, testk, facetexture11, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "Sets texture variation.", &testk, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Game->Self(), 10), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 10, testk, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "Sets decals texture variation.", &facetexture11, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(Game->Self(), 10, testk), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 10, testk, facetexture11, 0); }); break;
 				}
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Props", nullptr, &Lists::HeaderTypesFrontend3, &Lists::HeaderTypesPosition3, true, -1, [] {
 					g_Render->props = Lists::HeaderTypesBackend3[Lists::HeaderTypesPosition3];
 					});
 				switch (g_Render->props) {
 				case Props::Hats:
-					sub->draw_option<number<std::int32_t>>("Drawable", "", &hatDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 0), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 0, hatDrawable, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "", &hatTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 0, hatDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 0, hatDrawable, hatTexture, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "", &hatDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(Game->Self(), 0), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(Game->Self(), 0, hatDrawable, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "", &hatTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(Game->Self(), 0, hatDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(Game->Self(), 0, hatDrawable, hatTexture, 0); }); break;
 					break;
 				case Props::Glasses:
-					sub->draw_option<number<std::int32_t>>("Drawable", "", &glassesDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 1), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 1, glassesDrawable, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "", &glassesTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 1, glassesDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 1, glassesDrawable, glassesTexture, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "", &glassesDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(Game->Self(), 1), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(Game->Self(), 1, glassesDrawable, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "", &glassesTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(Game->Self(), 1, glassesDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(Game->Self(), 1, glassesDrawable, glassesTexture, 0); }); break;
 					break;
 				case Props::Ears:
-					sub->draw_option<number<std::int32_t>>("Drawable", "", &earsDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 2), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 2, earsDrawable, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "", &earsTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 2, earsDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 2, earsDrawable, earsTexture, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "", &earsDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(Game->Self(), 2), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(Game->Self(), 2, earsDrawable, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "", &earsTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(Game->Self(), 2, earsDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(Game->Self(), 2, earsDrawable, earsTexture, 0); }); break;
 					break;
 				case Props::Watches:
-					sub->draw_option<number<std::int32_t>>("Drawable", "", &watchesDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 6), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 6, watchesDrawable, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "", &watchesTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 6, watchesDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 6, watchesDrawable, watchesTexture, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "", &watchesDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(Game->Self(), 6), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(Game->Self(), 6, watchesDrawable, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "", &watchesTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(Game->Self(), 6, watchesDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(Game->Self(), 6, watchesDrawable, watchesTexture, 0); }); break;
 					break;
 				case Props::Bracelets:
-					sub->draw_option<number<std::int32_t>>("Drawable", "", &braceDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 7), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 7, braceDrawable, 0, 0); });
-					sub->draw_option<number<std::int32_t>>("Texture", "", &braceTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), 7, braceDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 7, braceDrawable, braceTexture, 0); }); break;
+					sub->draw_option<number<std::int32_t>>("Drawable", "", &braceDrawable, 0, PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(Game->Self(), 7), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(Game->Self(), 7, braceDrawable, 0, 0); });
+					sub->draw_option<number<std::int32_t>>("Texture", "", &braceTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(Game->Self(), 7, braceDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(Game->Self(), 7, braceDrawable, braceTexture, 0); }); break;
 					break;
 				}
 
@@ -785,7 +785,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Controllable"), nullptr, &animation.controllable, BoolDisplay::OnOff);
 				sub->draw_option<RegularOption>(("Stop"), nullptr, [=]
 					{
-						TASK::CLEAR_PED_TASKS_IMMEDIATELY(PLAYER::PLAYER_PED_ID());
+						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
 
 					});
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
@@ -896,7 +896,7 @@ namespace Saint
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &invisible.enabled, BoolDisplay::OnOff, false, [] {
 					if (!invisible.enabled) {
-						ENTITY::SET_ENTITY_VISIBLE(PLAYER::PLAYER_PED_ID(), true, false);
+						ENTITY::SET_ENTITY_VISIBLE(Game->Self(), true, false);
 
 					}
 					});
@@ -907,7 +907,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &no_clip.enabled, BoolDisplay::OnOff, false, [] {
 					if (!no_clip.enabled) {
 						no_clip.onDisable();
-						ENTITY::SET_ENTITY_ALPHA(PLAYER::PLAYER_PED_ID(), 255, false);
+						ENTITY::SET_ENTITY_ALPHA(Game->Self(), 255, false);
 					}
 					});
 				sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
@@ -916,7 +916,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Transparent"), "", &no_clip.transparent, BoolDisplay::OnOff, false, [] {
 					if (!no_clip.transparent)
 					{
-						ENTITY::SET_ENTITY_ALPHA(PLAYER::PLAYER_PED_ID(), 255, true);
+						ENTITY::SET_ENTITY_ALPHA(Game->Self(), 255, true);
 
 
 					}
@@ -927,7 +927,7 @@ namespace Saint
 					sub->draw_option<toggle<bool>>(("Disable Collision"), nullptr, &no_clip.DisableCollision, BoolDisplay::OnOff);
 				}
 
-				if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), 0)) {
+				if (!PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), 0)) {
 					sub->draw_option<ChooseOption<const char*, std::size_t>>("Animation", nullptr, &no_clip.FlyType, &no_clip.FlyInt);
 				}
 				sub->draw_option<number<float>>("Speed", nullptr, &no_clip.speed, 0.1f, 50.f, 0.01f, 2);
@@ -969,6 +969,7 @@ namespace Saint
 				sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
 				sub->draw_option<toggle<bool>>(("Add Force"), nullptr, &superjump.add_force, BoolDisplay::OnOff);
 				if (superjump.Jump_Int == 2) {
+					sub->draw_option<toggle<bool>>(("Uses Super Jump"), nullptr, &superjump.use_super_jump, BoolDisplay::OnOff);
 					sub->draw_option<ChooseOption<const char*, std::size_t>>("Direction", nullptr, &superjump.flip_type, &superjump.flip_int);
 					sub->draw_option<number<std::int32_t>>("Speed", nullptr, &superjump.speed, 0, 100);
 				}
@@ -1000,9 +1001,9 @@ namespace Saint
 				//sub->draw_option<submenu>("Cargobob", nullptr, rage::joaat("CARGO_BOB"));
 				sub->draw_option<toggle<bool>>(("Godmode"), "Prevents your vehicle from taking damage.", &features.vehicle_godmode, BoolDisplay::OnOff, false, [] {
 					if (!features.vehicle_godmode) {
-						if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+						if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false))
 						{
-							Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), true);
+							Vehicle playerVehicle = Game->Vehicle();
 							ENTITY::SET_ENTITY_INVINCIBLE(playerVehicle, false);
 							ENTITY::SET_ENTITY_PROOFS(playerVehicle, false, false, false, false, false, false, false, false);
 							VEHICLE::SET_VEHICLE_DAMAGE(playerVehicle, 0.0f, 0.0f, 0.0f, 0.0f, 200.0f, false);
@@ -1028,16 +1029,17 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Infinite Countermeasures"), "", &features.inf_c, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("No Plane Turbulence"), "Removes your plane's turbulance. When turning off, it can make turbulance levels a little messed up.", &NoPlaneTurbulance, BoolDisplay::OnOff);
 				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>(auto_repair.name, "Automaticly repairs you're vehicle.", &features.auto_repair, &features.auto_repair_type, &features.get_repair_type);
+				sub->draw_option<toggle_number_option<float, bool>>("Acceleration", nullptr, &acceleration.enabled, &acceleration.speed, 0.1f, 10000.f, 0.1f, 2);
 				sub->draw_option<toggle<bool>>(("Can Be Used By Fleeing Peds"), nullptr, &features.can_be_used_by_peds, BoolDisplay::OnOff, false, [] {
 					if (!features.can_be_used_by_peds) {
-						VEHICLE::SET_VEHICLE_CAN_BE_USED_BY_FLEEING_PEDS(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false);
+						VEHICLE::SET_VEHICLE_CAN_BE_USED_BY_FLEEING_PEDS(Game->Vehicle(), false);
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Remove Deformation"), "Removes deformation from you're vehicle.", &features.remove_def, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Stick To Ground"), "Creates a weird wheel effect, and makes it so you're vehicle stays on the ground.", &features.stick_to_ground, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Burned"), "Displays you're vehicle as destroyed like you blew it up.", &features.burned, BoolDisplay::OnOff, false, [] {
 					if (!features.burned) {
-						ENTITY::SET_ENTITY_RENDER_SCORCHED(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false);
+						ENTITY::SET_ENTITY_RENDER_SCORCHED(Game->Vehicle(), false);
 					}
 					});
 
@@ -1055,7 +1057,7 @@ namespace Saint
 					});
 				sub->draw_option<toggle<bool>>(("Disable Camber"), nullptr, &features.disable_camber, BoolDisplay::OnOff, false, [] {
 					if (!features.disable_camber) {
-						VEHICLE::SET_CAN_USE_HYDRAULICS(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true);
+						VEHICLE::SET_CAN_USE_HYDRAULICS(Game->Vehicle(), true);
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Force Skidmarks"), nullptr, &features.show_skidmarks, BoolDisplay::OnOff, false, [] {
@@ -1065,16 +1067,16 @@ namespace Saint
 					});
 				sub->draw_option<toggle<bool>>(("No Gravity"), nullptr, &features.no_grav_veh, BoolDisplay::OnOff, false, [] {
 					if (!features.no_grav_veh) {
-						VEHICLE::SET_VEHICLE_GRAVITY(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true);
+						VEHICLE::SET_VEHICLE_GRAVITY(Game->Vehicle(), true);
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Auto Clean"), "", &features.clean_veh, BoolDisplay::OnOff);
-				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false)) {
-					sub->draw_option<KeyboardOption>(("Liscene Plate"), nullptr, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), true)), []
+				if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false)) {
+					sub->draw_option<KeyboardOption>(("Liscene Plate"), nullptr, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle()), []
 						{
 
 							showKeyboard("Enter Something", "", 8, &Bufferfrrrr, [=] {
-								VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), Bufferfrrrr.c_str());
+								VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle(), Bufferfrrrr.c_str());
 								});
 						});
 				}
@@ -1083,7 +1085,7 @@ namespace Saint
 					m_upgrades.apply(m_upgrades.data);
 					});
 				sub->draw_option<number<float>>("Forklift Height", nullptr, &features.forklight_height, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
-					VEHICLE::SET_FORKLIFT_FORK_HEIGHT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), features.forklight_height);
+					VEHICLE::SET_FORKLIFT_FORK_HEIGHT(Game->Vehicle(), features.forklight_height);
 					});
 
 			});
@@ -1093,7 +1095,7 @@ namespace Saint
 					sub->draw_option<toggle<bool>>(("Force Show"), "", &radio.force_show, BoolDisplay::OnOff);
 					sub->draw_option<toggle<bool>>(("Loud"), nullptr, &radio.loud, BoolDisplay::OnOff, false, [] {
 						if (!radio.loud) {
-							AUDIO::SET_VEHICLE_RADIO_LOUD(get_veh(), false);
+							AUDIO::SET_VEHICLE_RADIO_LOUD(Game->Vehicle(), false);
 						}
 						});
 					sub->draw_option<UnclickOption>(("Hide"), nullptr, [] {});
@@ -1111,7 +1113,7 @@ namespace Saint
 				sub->draw_option<submenu>("Compatible Vehicles", nullptr, rage::joaat("COMPVEHICLES2"));
 				sub->draw_option<toggle<bool>>(("Increase"), "", &jump_force.increase, BoolDisplay::OnOff, false, [] {
 					if (!jump_force.increase) {
-						VEHICLE::SET_USE_HIGHER_CAR_JUMP(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false);
+						VEHICLE::SET_USE_HIGHER_CAR_JUMP(Game->Vehicle(), false);
 					}
 					});
 			});
@@ -1120,114 +1122,114 @@ namespace Saint
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Action", nullptr, &jump_force.action, &jump_force.pos);
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("ruiner2")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("ruiner2")))), nullptr, [=]
 					{
 						if (jump_force.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("ruiner2"), &veh);
+							veh_spawner.spawn(Game->HashKey("ruiner2"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("scramjet")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("scramjet")))), nullptr, [=]
 					{
 						if (jump_force.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("scramjet"), &veh);
+							veh_spawner.spawn(Game->HashKey("scramjet"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("scarab")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("scarab")))), nullptr, [=]
 					{
 						if (jump_force.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("scarab"), &veh);
+							veh_spawner.spawn(Game->HashKey("scarab"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("monster3")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("monster3")))), nullptr, [=]
 					{
 						if (jump_force.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("monster3"), &veh);
+							veh_spawner.spawn(Game->HashKey("monster3"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("slamvan4")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("slamvan4")))), nullptr, [=]
 					{
 						if (jump_force.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("slamvan4"), &veh);
+							veh_spawner.spawn(Game->HashKey("slamvan4"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("issi4")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("issi4")))), nullptr, [=]
 					{
 						if (jump_force.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("issi4"), &veh);
+							veh_spawner.spawn(Game->HashKey("issi4"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("imperator")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("imperator")))), nullptr, [=]
 					{
 						if (jump_force.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("imperator"), &veh);
+							veh_spawner.spawn(Game->HashKey("imperator"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("dominator4")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("dominator4")))), nullptr, [=]
 					{
 						if (jump_force.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("dominator4"), &veh);
+							veh_spawner.spawn(Game->HashKey("dominator4"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("deathbike")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("deathbike")))), nullptr, [=]
 					{
 						if (jump_force.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("deathbike"), &veh);
+							veh_spawner.spawn(Game->HashKey("deathbike"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("cerberus")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("cerberus")))), nullptr, [=]
 					{
 						if (jump_force.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("cerberus"), &veh);
+							veh_spawner.spawn(Game->HashKey("cerberus"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("brutus")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("brutus")))), nullptr, [=]
 					{
 						if (jump_force.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("brutus"), &veh);
+							veh_spawner.spawn(Game->HashKey("brutus"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("bruiser")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("bruiser")))), nullptr, [=]
 					{
 						if (jump_force.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("bruiser"), &veh);
+							veh_spawner.spawn(Game->HashKey("bruiser"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("zr380")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("zr380")))), nullptr, [=]
 					{
 						if (jump_force.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("zr380"), &veh);
+							veh_spawner.spawn(Game->HashKey("zr380"), &veh);
 						}
 
 					});
 			});
 		g_Render->draw_submenu<sub>(("Cargobob"), rage::joaat("CARGO_BOB"), [](sub* sub)
 			{
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				Vehicle veh = Game->Vehicle();
 				sub->draw_option<toggle<bool>>(("Magnet"), nullptr, &cargobob.magnet, BoolDisplay::OnOff, false, [=] {
 					if (!cargobob.magnet) {
 						VEHICLE::SET_CARGOBOB_PICKUP_MAGNET_ACTIVE(veh, false);
@@ -1245,18 +1247,18 @@ namespace Saint
 					});
 				sub->draw_option<RegularOption>("Detach Current Vehicle From Magnet", nullptr, [=]
 					{
-						Vehicle get = VEHICLE::GET_VEHICLE_ATTACHED_TO_CARGOBOB(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false));
-						VEHICLE::DETACH_VEHICLE_FROM_CARGOBOB(get, PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false));
+						Vehicle get = VEHICLE::GET_VEHICLE_ATTACHED_TO_CARGOBOB(Game->Vehicle());
+						VEHICLE::DETACH_VEHICLE_FROM_CARGOBOB(get, Game->Vehicle());
 
 					});
 			});
 		g_Render->draw_submenu<sub>(("Bike Lean"), rage::joaat("BIKE_LEAN"), [](sub* sub)
 			{
 				sub->draw_option<number<std::int32_t>>("X", nullptr, &bike_lean, -1, 1, 1, 3, true, "", "", [] {
-					VEHICLE::SET_BIKE_ON_STAND(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), bike_lean, bike_lean2);
+					VEHICLE::SET_BIKE_ON_STAND(Game->Vehicle(), bike_lean, bike_lean2);
 					});
 				sub->draw_option<number<std::int32_t>>("Y", nullptr, &bike_lean2, -1, 1, 1, 3, true, "", "", [] {
-					VEHICLE::SET_BIKE_ON_STAND(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), bike_lean, bike_lean2);
+					VEHICLE::SET_BIKE_ON_STAND(Game->Vehicle(), bike_lean, bike_lean2);
 					});
 			});
 		g_Render->draw_submenu<sub>(("Doors"), rage::joaat("DOORS"), [](sub* sub)
@@ -1265,72 +1267,72 @@ namespace Saint
 				sub->draw_option<RegularOption>("Driver Side (Front)", nullptr, [=]
 					{
 						if (doors.pos == 0) {
-							VEHICLE::SET_VEHICLE_DOOR_OPEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 0, true, false);
+							VEHICLE::SET_VEHICLE_DOOR_OPEN(Game->Vehicle(), 0, true, false);
 						}
 						if (doors.pos == 1) {
-							VEHICLE::SET_VEHICLE_DOOR_SHUT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 0, false);
+							VEHICLE::SET_VEHICLE_DOOR_SHUT(Game->Vehicle(), 0, false);
 						}
 						if (doors.pos == 2) {
-							VEHICLE::SET_VEHICLE_DOOR_BROKEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 0, true);
+							VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 0, true);
 						}
 
 					});
-				if (VEHICLE::GET_IS_DOOR_VALID(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 1)) {
+				if (VEHICLE::GET_IS_DOOR_VALID(Game->Vehicle(), 1)) {
 					sub->draw_option<RegularOption>("Driver Side (Rear)", nullptr, [=]
 						{
 							if (doors.pos == 0) {
-								VEHICLE::SET_VEHICLE_DOOR_OPEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 1, false, false);
+								VEHICLE::SET_VEHICLE_DOOR_OPEN(Game->Vehicle(), 1, false, false);
 							}
 							if (doors.pos == 1) {
-								VEHICLE::SET_VEHICLE_DOOR_SHUT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 1, false);
+								VEHICLE::SET_VEHICLE_DOOR_SHUT(Game->Vehicle(), 1, false);
 							}
 							if (doors.pos == 2) {
-								VEHICLE::SET_VEHICLE_DOOR_BROKEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 1, true);
+								VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 1, true);
 							}
 
 						});
 				}
-				if (VEHICLE::GET_IS_DOOR_VALID(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 2)) {
+				if (VEHICLE::GET_IS_DOOR_VALID(Game->Vehicle(), 2)) {
 					sub->draw_option<RegularOption>("Passenger Side (Front)", nullptr, [=]
 						{
 							if (doors.pos == 0) {
-								VEHICLE::SET_VEHICLE_DOOR_OPEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 2, false, false);
+								VEHICLE::SET_VEHICLE_DOOR_OPEN(Game->Vehicle(), 2, false, false);
 							}
 							if (doors.pos == 1) {
-								VEHICLE::SET_VEHICLE_DOOR_SHUT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 2, false);
+								VEHICLE::SET_VEHICLE_DOOR_SHUT(Game->Vehicle(), 2, false);
 							}
 							if (doors.pos == 2) {
-								VEHICLE::SET_VEHICLE_DOOR_BROKEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 2, true);
+								VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 2, true);
 							}
 
 						});
 				}
-				if (VEHICLE::GET_IS_DOOR_VALID(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 3)) {
+				if (VEHICLE::GET_IS_DOOR_VALID(Game->Vehicle(), 3)) {
 					sub->draw_option<RegularOption>("Passenger Side (Rear)", nullptr, [=]
 						{
 							if (doors.pos == 0) {
-								VEHICLE::SET_VEHICLE_DOOR_OPEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 3, false, false);
+								VEHICLE::SET_VEHICLE_DOOR_OPEN(Game->Vehicle(), 3, false, false);
 							}
 							if (doors.pos == 1) {
-								VEHICLE::SET_VEHICLE_DOOR_SHUT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 3, false);
+								VEHICLE::SET_VEHICLE_DOOR_SHUT(Game->Vehicle(), 3, false);
 							}
 							if (doors.pos == 2) {
-								VEHICLE::SET_VEHICLE_DOOR_BROKEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 3, true);
+								VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 3, true);
 							}
 
 						});
 				}
-				if (VEHICLE::GET_IS_DOOR_VALID(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 4)) {
+				if (VEHICLE::GET_IS_DOOR_VALID(Game->Vehicle(), 4)) {
 					sub->draw_option<RegularOption>("Hood", nullptr, [=]
 						{
 							if (doors.pos == 0) {
-								VEHICLE::SET_VEHICLE_DOOR_OPEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 4, false, false);
+								VEHICLE::SET_VEHICLE_DOOR_OPEN(Game->Vehicle(), 4, false, false);
 							}
 							if (doors.pos == 1) {
-								VEHICLE::SET_VEHICLE_DOOR_SHUT(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 4, false);
+								VEHICLE::SET_VEHICLE_DOOR_SHUT(Game->Vehicle(), 4, false);
 							}
 							if (doors.pos == 2) {
-								VEHICLE::SET_VEHICLE_DOOR_BROKEN(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 4, true);
+								VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 4, true);
 							}
 
 						});
@@ -1338,12 +1340,12 @@ namespace Saint
 				sub->draw_option<UnclickOption>(("Bomb Bay"), nullptr, [] {});
 				sub->draw_option<RegularOption>("Open", nullptr, [=]
 					{
-						VEHICLE::OPEN_BOMB_BAY_DOORS(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false));
+						VEHICLE::OPEN_BOMB_BAY_DOORS(Game->Vehicle());
 
 					});
 				sub->draw_option<RegularOption>("Close", nullptr, [=]
 					{
-						VEHICLE::CLOSE_BOMB_BAY_DOORS(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false));
+						VEHICLE::CLOSE_BOMB_BAY_DOORS(Game->Vehicle());
 
 					});
 			});
@@ -1353,10 +1355,10 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Infinite"), "Instantly refills your vehicle's rocket boost.", &features.infiniter, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Always Active"), "", &rocket_boost.always_active, BoolDisplay::OnOff);
 				sub->draw_option<number<float>>("Percentage", nullptr, &rocket_boost.percentage, 0.0f, 100.f, 1.f, 0, true, "", "", [] {
-					VEHICLE::SET_ROCKET_BOOST_FILL(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), rocket_boost.percentage);
+					VEHICLE::SET_ROCKET_BOOST_FILL(Game->Vehicle(), rocket_boost.percentage);
 					});
 				sub->draw_option<number<float>>("Refill Time", nullptr, &rocket_boost.refill_time, 0.0f, 1000.f, 1.f, 0, true, "", "", [] {
-					VEHICLE::SET_SCRIPT_ROCKET_BOOST_RECHARGE_TIME(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), rocket_boost.refill_time);
+					VEHICLE::SET_SCRIPT_ROCKET_BOOST_RECHARGE_TIME(Game->Vehicle(), rocket_boost.refill_time);
 					});
 			});
 		g_Render->draw_submenu<sub>(("Compatible Vehicles"), rage::joaat("COMP_VEHICLES"), [](sub* sub)
@@ -1364,164 +1366,164 @@ namespace Saint
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Action", nullptr, &rocket_boost.action, &rocket_boost.pos);
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("voltic2")))), nullptr, [=]
+				sub->draw_option<RegularOption>(Game->VehicleName("voltic2"), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("voltic2"), &veh);
+							veh_spawner.spawn(Game->HashKey("voltic2"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("vigilante")))), nullptr, [=]
+				sub->draw_option<RegularOption>(Game->VehicleName("vigilante"), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("vigilante"), &veh);
+							veh_spawner.spawn(Game->HashKey("vigilante"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("oppressor")))), nullptr, [=]
+				sub->draw_option<RegularOption>(Game->VehicleName("oppressor"), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("oppressor"), &veh);
+							veh_spawner.spawn(Game->HashKey("oppressor"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("oppressor2")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("oppressor2")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("oppressor2"), &veh);
+							veh_spawner.spawn(Game->HashKey("oppressor2"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("toreador")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("toreador")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("toreador"), &veh);
+							veh_spawner.spawn(Game->HashKey("toreador"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("scramjet")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("scramjet")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("scramjet"), &veh);
+							veh_spawner.spawn(Game->HashKey("scramjet"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("scarab")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("scarab")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("scarab"), &veh);
+							veh_spawner.spawn(Game->HashKey("scarab"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("monster3")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("monster3")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("monster3"), &veh);
+							veh_spawner.spawn(Game->HashKey("monster3"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("slamvan4")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("slamvan4")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("slamvan4"), &veh);
+							veh_spawner.spawn(Game->HashKey("slamvan4"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("issi4")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("issi4")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("issi4"), &veh);
+							veh_spawner.spawn(Game->HashKey("issi4"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("imperator")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("imperator")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("imperator"), &veh);
+							veh_spawner.spawn(Game->HashKey("imperator"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("dominator4")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("dominator4")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("dominator4"), &veh);
+							veh_spawner.spawn(Game->HashKey("dominator4"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("deathbike")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("deathbike")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("deathbike"), &veh);
+							veh_spawner.spawn(Game->HashKey("deathbike"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("cerberus")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("cerberus")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("cerberus"), &veh);
+							veh_spawner.spawn(Game->HashKey("cerberus"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("brutus")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("brutus")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("brutus"), &veh);
+							veh_spawner.spawn(Game->HashKey("brutus"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("bruiser")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("bruiser")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("bruiser"), &veh);
+							veh_spawner.spawn(Game->HashKey("bruiser"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("zr380")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("zr380")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("zr380"), &veh);
+							veh_spawner.spawn(Game->HashKey("zr380"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("starling")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("starling")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("starling"), &veh);
+							veh_spawner.spawn(Game->HashKey("starling"), &veh);
 						}
 
 					});
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("thruster")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("thruster")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("thruster"), &veh);
+							veh_spawner.spawn(Game->HashKey("thruster"), &veh);
 						}
 
 					});
 
-				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(MISC::GET_HASH_KEY("tula")))), nullptr, [=]
+				sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("tula")))), nullptr, [=]
 					{
 						if (rocket_boost.pos == 1) {
 							Vehicle veh;
-							veh_spawner.spawn(MISC::GET_HASH_KEY("tula"), &veh);
+							veh_spawner.spawn(Game->HashKey("tula"), &veh);
 						}
 
 					});
@@ -1545,13 +1547,13 @@ namespace Saint
 							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
 								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
 								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
-								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(MISC::GET_HASH_KEY(model_ptr.c_str())) == forge_model.selected_class) {
+								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(Game->HashKey(model_ptr.c_str())) == forge_model.selected_class) {
 									std::stringstream ss;
 									std::string make(make_ptr);
 									std::string model(model_ptr);
 									if (make[0] || model[0]) {
-										make = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(make.c_str());
-										model = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(model.c_str());
+										make = Game->Label(make.c_str());
+										model = Game->Label(model.c_str());
 										if (make != "NULL" && model != "NULL") {
 											ss << make << " " << model;
 										}
@@ -1562,14 +1564,15 @@ namespace Saint
 											ss << "Unknown";
 										}
 									}
+									Hash hash = *(std::uint32_t*)(info + 0x18);
 									if (sub->GetSelectedOption() == sub->GetNumOptions()) {
-										g_players.draw_info2(*(std::uint32_t*)(info + 0x18));
+										g_players.draw_info2(hash);
 									}
 
-									sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(*(std::uint32_t*)(info + 0x18)))), nullptr, [=]
+									sub->draw_option<RegularOption>(Game->VehicleNameHash(hash), nullptr, [=]
 										{
-											if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), 0)) {
-												forge_model.change(*(std::uint32_t*)(info + 0x18));
+											if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), 0)) {
+												forge_model.change(hash);
 												Noti::InsertNotification({ ImGuiToastType_None, 4000, ICON_FA_CHECK"  Done!" });
 											}
 
@@ -1587,15 +1590,15 @@ namespace Saint
 
 					if (personal_vehicle.size == 0) {
 						Vehicle veh = personal_vehicle.get();
-						NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+						NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
 						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(veh, coords.x, coords.y, coords.z, false, false, false);
 
 					}
 					if (personal_vehicle.size == 1) {
 						Vehicle veh = personal_vehicle.get();
-						NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+						NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
 						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(veh, coords.x, coords.y, coords.z, false, false, false);
-						PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), veh, -1);
+						PED::SET_PED_INTO_VEHICLE(Game->Self(), veh, -1);
 					}
 
 					});
@@ -1620,7 +1623,7 @@ namespace Saint
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &features.invisible_car, BoolDisplay::OnOff, false, [] {
 					if (!features.invisible_car) {
-						ENTITY::SET_ENTITY_VISIBLE(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true, false);
+						ENTITY::SET_ENTITY_VISIBLE(Game->Vehicle(), true, false);
 
 					}
 					});
@@ -1686,12 +1689,12 @@ namespace Saint
 						m_vehicle_ramps.m_remove();
 						break;
 					case 1:
-						Hash ramp = MISC::GET_HASH_KEY("prop_mp_ramp_01");
-						Hash ramp2 = MISC::GET_HASH_KEY("lts_prop_lts_ramp_02");
-						Hash ramp3 = MISC::GET_HASH_KEY("lts_prop_lts_ramp_03");
+						Hash ramp = Game->HashKey("prop_mp_ramp_01");
+						Hash ramp2 = Game->HashKey("lts_prop_lts_ramp_02");
+						Hash ramp3 = Game->HashKey("lts_prop_lts_ramp_03");
 
 
-						NativeVector3 pedpos = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 0);
+						NativeVector3 pedpos = ENTITY::GET_ENTITY_COORDS(Game->Self(), 0);
 						Object ObjToDelete = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(pedpos.x, pedpos.y, pedpos.z, 10.f, ramp, 0, 1, 1);
 						OBJECT::DELETE_OBJECT(&ObjToDelete);
 						Object ObjToDelete2 = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(pedpos.x, pedpos.y, pedpos.z, 10.f, ramp2, 0, 1, 1);
@@ -1706,13 +1709,13 @@ namespace Saint
 			{
 				sub->draw_option<submenu>("Rainbow", nullptr, Submenu::SubmenuRaimbow);
 				sub->draw_option<number<std::int32_t>>("R", nullptr, &changeVehicleColor.r, 0, 255, 1, 3, true, "", "", [] {
-					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), changeVehicleColor.r, changeVehicleColor.g, changeVehicleColor.b);
+					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(Game->Vehicle(), changeVehicleColor.r, changeVehicleColor.g, changeVehicleColor.b);
 					});
 				sub->draw_option<number<std::int32_t>>("G", nullptr, &changeVehicleColor.g, 0, 255, 1, 3, true, "", "", [] {
-					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), changeVehicleColor.r, changeVehicleColor.g, changeVehicleColor.b);
+					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(Game->Vehicle(), changeVehicleColor.r, changeVehicleColor.g, changeVehicleColor.b);
 					});
 				sub->draw_option<number<std::int32_t>>("B", nullptr, &changeVehicleColor.b, 0, 255, 1, 3, true, "", "", [] {
-					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), changeVehicleColor.r, changeVehicleColor.g, changeVehicleColor.b);
+					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(Game->Vehicle(), changeVehicleColor.r, changeVehicleColor.g, changeVehicleColor.b);
 					});
 				sub->draw_option<UnclickOption>(("Game"), nullptr, [] {});
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &TypeName2, &pos2);
@@ -1795,7 +1798,7 @@ namespace Saint
 						sub->draw_option<RegularOption>("Teleport To You", nullptr, [=]
 							{
 
-								NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+								NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
 								ENTITY::SET_ENTITY_COORDS(model.m_id, coords.x, coords.y, coords.z, 0, 0, 0, 0);
 
 							});
@@ -1808,7 +1811,7 @@ namespace Saint
 			{
 				sub->draw_option<RegularOption>(("Save"), nullptr, []
 					{
-						if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false)) {
+						if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false)) {
 							showKeyboard("Enter Something", "", 25, &VehNameBuffer, [] {
 								m_VehicleLoad.save(VehNameBuffer);
 								});
@@ -1865,8 +1868,8 @@ namespace Saint
 								std::string make(make_ptr);
 								std::string model(model_ptr);
 								if (make[0] || model[0]) {
-									make = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(make.c_str());
-									model = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(model.c_str());
+									make = Game->Label(make.c_str());
+									model = Game->Label(model.c_str());
 									if (make != "NULL" && model != "NULL") {
 										ss << make << " " << model;
 									}
@@ -1877,11 +1880,11 @@ namespace Saint
 										ss << "Unknown";
 									}
 								}
-
-								sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(*(std::uint32_t*)(info + 0x18)))), nullptr, [=]
+								Hash hash = *(std::uint32_t*)(info + 0x18);
+								sub->draw_option<RegularOption>(Game->VehicleNameHash(hash), nullptr, [=]
 									{
 										Vehicle veh;
-										veh_spawner.spawn(*(std::uint32_t*)(info + 0x18), &veh);
+										veh_spawner.spawn(hash, &veh);
 
 									});
 
@@ -1936,13 +1939,13 @@ namespace Saint
 							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
 								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
 								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
-								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(MISC::GET_HASH_KEY(model_ptr.c_str())) == m_selected_vehicle_class) {
+								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(Game->HashKey(model_ptr.c_str())) == m_selected_vehicle_class) {
 									std::stringstream ss;
 									std::string make(make_ptr);
 									std::string model(model_ptr);
 									if (make[0] || model[0]) {
-										make = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(make.c_str());
-										model = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(model.c_str());
+										make = Game->Label(make.c_str());
+										model = Game->Label(model.c_str());
 										if (make != "NULL" && model != "NULL") {
 											ss << make << " " << model;
 										}
@@ -1953,14 +1956,15 @@ namespace Saint
 											ss << "Unknown";
 										}
 									}
+									Hash hash = *(std::uint32_t*)(info + 0x18);
 									if (sub->GetSelectedOption() == sub->GetNumOptions()) {
-										g_players.draw_info2(*(std::uint32_t*)(info + 0x18));
+										g_players.draw_info2(hash);
 									}
 
-									sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(*(std::uint32_t*)(info + 0x18)))), nullptr, [=]
+									sub->draw_option<RegularOption>(Game->VehicleNameHash(hash), nullptr, [=]
 										{
 											Vehicle veh;
-											veh_spawner.spawn(*(std::uint32_t*)(info + 0x18), &veh);
+											veh_spawner.spawn(hash, &veh);
 
 										});
 								}
@@ -1979,7 +1983,7 @@ namespace Saint
 							});
 					});
 				if (search_completed) {
-					Hash vehicleHash2 = MISC::GET_HASH_KEY(ModelInput.c_str());
+					Hash vehicleHash2 = Game->HashKey(ModelInput.c_str());
 					if (STREAMING::IS_MODEL_VALID(vehicleHash2)) {
 						sub->draw_option<UnclickOption>(("Found ~r~1 ~w~Result."), nullptr, [] {});
 					}
@@ -1998,9 +2002,9 @@ namespace Saint
 
 
 
-							sub->draw_option<RegularOption>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(vehicleHash2))), nullptr, [=]
+							sub->draw_option<RegularOption>(Game->VehicleNameHash(vehicleHash2), nullptr, [=]
 								{
-									NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+									NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
 									*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 									Vehicle vehicle = VEHICLE::CREATE_VEHICLE(vehicleHash2, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, false, false);
 									*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
@@ -2009,7 +2013,7 @@ namespace Saint
 									if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
 										NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
 									VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
-									PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
+									PED::SET_PED_INTO_VEHICLE(Game->Self(), vehicle, -1);
 
 								});
 
@@ -2080,10 +2084,10 @@ namespace Saint
 
 						int WaypointHandle = HUD::GET_FIRST_BLIP_INFO_ID(8);
 						NativeVector3 destination = HUD::GET_BLIP_INFO_ID_COORD(HUD::GET_FIRST_BLIP_INFO_ID(8));
-						Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						Vehicle veh = Game->Vehicle();
 						if (autopilot.destination_i == 0) {
-							PED::SET_DRIVER_ABILITY(PLAYER::PLAYER_PED_ID(), 100.f);
-							TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(PLAYER::PLAYER_PED_ID(), veh, destination.x, destination.y, destination.z, autopilot.speed, autopilot.wreckless ? autopilot.wreckless_flag : autopilot.nonwreckless_flag, autopilot.stop_range);
+							PED::SET_DRIVER_ABILITY(Game->Self(), 100.f);
+							TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(Game->Self(), veh, destination.x, destination.y, destination.z, autopilot.speed, autopilot.wreckless ? autopilot.wreckless_flag : autopilot.nonwreckless_flag, autopilot.stop_range);
 
 						}
 						if (autopilot.destination_i == 1) {
@@ -2091,33 +2095,33 @@ namespace Saint
 
 							get_objective_location(location);
 							if (autopilot.wreckless) {
-								PED::SET_DRIVER_ABILITY(PLAYER::PLAYER_PED_ID(), 100.f);
-								TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(PLAYER::PLAYER_PED_ID(), veh, location.x, location.y, location.z, autopilot.speed, autopilot.avoid_roads ? autopilot.avoid_roads_flag : autopilot.wreckless_flag, autopilot.stop_range);
+								PED::SET_DRIVER_ABILITY(Game->Self(), 100.f);
+								TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(Game->Self(), veh, location.x, location.y, location.z, autopilot.speed, autopilot.avoid_roads ? autopilot.avoid_roads_flag : autopilot.wreckless_flag, autopilot.stop_range);
 
 							}
 							else {
-								TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(PLAYER::PLAYER_PED_ID(), veh, location.x, location.y, location.z, autopilot.speed, autopilot.nonwreckless_flag, autopilot.stop_range);
+								TASK::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(Game->Self(), veh, location.x, location.y, location.z, autopilot.speed, autopilot.nonwreckless_flag, autopilot.stop_range);
 							}
 						}
 						if (autopilot.destination_i == 2) {
 
 							if (autopilot.wreckless) {
 
-								PED::SET_DRIVER_ABILITY(PLAYER::PLAYER_PED_ID(), 100.f);
-								TASK::TASK_VEHICLE_DRIVE_WANDER(PLAYER::PLAYER_PED_ID(), veh, autopilot.speed, autopilot.avoid_roads ? autopilot.avoid_roads_flag : autopilot.wreckless_flag);
+								PED::SET_DRIVER_ABILITY(Game->Self(), 100.f);
+								TASK::TASK_VEHICLE_DRIVE_WANDER(Game->Self(), veh, autopilot.speed, autopilot.avoid_roads ? autopilot.avoid_roads_flag : autopilot.wreckless_flag);
 
 							}
 							else {
-								TASK::TASK_VEHICLE_DRIVE_WANDER(PLAYER::PLAYER_PED_ID(), veh, autopilot.speed, autopilot.nonwreckless_flag);
+								TASK::TASK_VEHICLE_DRIVE_WANDER(Game->Self(), veh, autopilot.speed, autopilot.nonwreckless_flag);
 
 							}
 						}
 					});
 				sub->draw_option<RegularOption>(("Stop"), nullptr, []
 					{
-						Vehicle oldveh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-						TASK::CLEAR_PED_TASKS_IMMEDIATELY(PLAYER::PLAYER_PED_ID());
-						PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), oldveh, -1);
+						Vehicle oldveh = Game->Vehicle();
+						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
+						PED::SET_PED_INTO_VEHICLE(Game->Self(), oldveh, -1);
 
 					});
 				sub->draw_option<UnclickOption>(("Current Flags"), nullptr, [] {});
@@ -2359,7 +2363,7 @@ namespace Saint
 					{
 						if (acrobatic_int == 0) {
 
-							Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+							Vehicle playerVehicle = Game->Vehicle();
 							ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
 							ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
 							ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
@@ -2367,7 +2371,7 @@ namespace Saint
 						}
 						if (acrobatic_int == 1) {
 
-							Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+							Vehicle playerVehicle = Game->Vehicle();
 							ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
 							ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
 							ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
@@ -2375,13 +2379,13 @@ namespace Saint
 						}
 						if (acrobatic_int == 2) {
 
-							Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+							Vehicle playerVehicle = Game->Vehicle();
 							ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 10.0f, 20.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1);
 
 						}
 						if (acrobatic_int == 3) {
 
-							Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+							Vehicle playerVehicle = Game->Vehicle();
 							ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 7.0f, 0, 0, 0, true, true, true, true, false, true);
 
 
@@ -2427,9 +2431,9 @@ namespace Saint
 			{
 				sub->draw_option<submenu>("Settings", "", rage::joaat("SetitngsForLsc"));
 				sub->draw_option<UnclickOption>(("Modifications"), nullptr, [] {});
-				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false))
 				{
-					Vehicle veh; veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+					Vehicle veh; veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 					VEHICLE::SET_VEHICLE_MOD_KIT(veh, 0);
 					if (VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_ARMOR) > 0)
 					{
@@ -2611,7 +2615,7 @@ namespace Saint
 					sub->draw_option<toggle<bool>>(("Turbo"), nullptr, &lsc.turbo, BoolDisplay::OnOff, false, [] {
 						if (!lsc.turbo)
 						{
-							VEHICLE::TOGGLE_VEHICLE_MOD(get_veh(), 18, false);
+							VEHICLE::TOGGLE_VEHICLE_MOD(Game->Vehicle(), 18, false);
 
 						}
 						});
@@ -2628,7 +2632,7 @@ namespace Saint
 					sub->draw_option<toggle<bool>>(("Xenon"), nullptr, &lsc.xenon, BoolDisplay::OnOff, false, [] {
 						if (!lsc.xenon)
 						{
-							VEHICLE::TOGGLE_VEHICLE_MOD(get_veh(), 22, false);
+							VEHICLE::TOGGLE_VEHICLE_MOD(Game->Vehicle(), 22, false);
 
 						}
 						});
@@ -2638,28 +2642,28 @@ namespace Saint
 					sub->draw_option<toggle<bool>>(("Front"), nullptr, &lsc.neon.front, BoolDisplay::OnOff, false, [] {
 						if (!lsc.neon.front)
 						{
-							VEHICLE::TOGGLE_VEHICLE_MOD(get_veh(), 2, false);
+							VEHICLE::TOGGLE_VEHICLE_MOD(Game->Vehicle(), 2, false);
 
 						}
 						});
 					sub->draw_option<toggle<bool>>(("Back"), nullptr, &lsc.neon.back, BoolDisplay::OnOff, false, [] {
 						if (!lsc.neon.back)
 						{
-							VEHICLE::SET_VEHICLE_NEON_ENABLED(get_veh(), 3, false);
+							VEHICLE::SET_VEHICLE_NEON_ENABLED(Game->Vehicle(), 3, false);
 
 						}
 						});
 					sub->draw_option<toggle<bool>>(("Left"), nullptr, &lsc.neon.left, BoolDisplay::OnOff, false, [] {
 						if (!lsc.neon.left)
 						{
-							VEHICLE::SET_VEHICLE_NEON_ENABLED(get_veh(), 0, false);
+							VEHICLE::SET_VEHICLE_NEON_ENABLED(Game->Vehicle(), 0, false);
 
 						}
 						});
 					sub->draw_option<toggle<bool>>(("Right"), nullptr, &lsc.neon.right, BoolDisplay::OnOff, false, [] {
 						if (!lsc.neon.right)
 						{
-							VEHICLE::SET_VEHICLE_NEON_ENABLED(get_veh(), 1, false);
+							VEHICLE::SET_VEHICLE_NEON_ENABLED(Game->Vehicle(), 1, false);
 
 						}
 						});
@@ -2669,7 +2673,7 @@ namespace Saint
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &lsc.TypeName, &lsc.pos, true, -1, [] {
 					lsc.set_wheel_type(lsc.pos);
 					});
-				sub->draw_option<number<std::int32_t>>("Index", nullptr, &lsc.wheel_type, 0, VEHICLE::GET_NUM_VEHICLE_MODS(get_veh(), 23), 1, 3, true, "", "", [] {
+				sub->draw_option<number<std::int32_t>>("Index", nullptr, &lsc.wheel_type, 0, VEHICLE::GET_NUM_VEHICLE_MODS(Game->Vehicle(), 23), 1, 3, true, "", "", [] {
 					lsc.set_wheel(lsc.wheel_type);
 					});
 				
@@ -2936,7 +2940,7 @@ namespace Saint
 					{
 						VehicleModifier(MOD_EXHAUST, -1);
 					});
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				for (int i = 0; i < VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_EXHAUST); i++)
 				{
 					sub->draw_option<RegularOption>(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_MOD_TEXT_LABEL(veh, MOD_EXHAUST, i)), "", [i]
@@ -2951,7 +2955,7 @@ namespace Saint
 					{
 						VehicleModifier(MOD_FRONTBUMPER, -1);
 					});
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				for (int i = 0; i < VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_FRONTBUMPER); i++)
 				{
 					sub->draw_option<RegularOption>(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_MOD_TEXT_LABEL(veh, MOD_FRONTBUMPER, i)), "", [i]
@@ -2966,7 +2970,7 @@ namespace Saint
 					{
 						VehicleModifier(MOD_REARBUMPER, -1);
 					});
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				for (int i = 0; i < VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_REARBUMPER); i++)
 				{
 					sub->draw_option<RegularOption>(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_MOD_TEXT_LABEL(veh, MOD_REARBUMPER, i)), "", [i]
@@ -2981,7 +2985,7 @@ namespace Saint
 					{
 						VehicleModifier(MOD_LIVERY, -1);
 					});
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				for (int i = 0; i < VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_LIVERY); i++)
 				{
 					sub->draw_option<RegularOption>(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_MOD_TEXT_LABEL(veh, MOD_LIVERY, i)), "", [i]
@@ -2996,7 +3000,7 @@ namespace Saint
 					{
 						VehicleModifier(MOD_FENDER, -1);
 					});
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_FENDER);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3014,7 +3018,7 @@ namespace Saint
 					{
 						VehicleModifier(MOD_RIGHTFENDER, -1);
 					});
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_RIGHTFENDER);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3032,7 +3036,7 @@ namespace Saint
 					{
 						VehicleModifier(MOD_GRILLE, -1);
 					});
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_GRILLE);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3050,7 +3054,7 @@ namespace Saint
 					{
 						VehicleModifier(MOD_HOOD, -1);
 					});
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_HOOD);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3068,7 +3072,7 @@ namespace Saint
 					{
 						VehicleModifier(0, -1);
 					});
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, 0);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3086,7 +3090,7 @@ namespace Saint
 					{
 						VehicleModifier(MOD_ROOF, -1);
 					});
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_ROOF);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3104,7 +3108,7 @@ namespace Saint
 					{
 						VehicleModifier(MOD_CHASSIS, -1);
 					});
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_CHASSIS);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3122,7 +3126,7 @@ namespace Saint
 					{
 						VehicleModifier(MOD_SIDESKIRT, -1);
 					});
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_SIDESKIRT);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3178,7 +3182,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Plate Holder", PLATEHOLDER25, [](sub* sub)
 			{
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_PLATEHOLDER);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3193,7 +3197,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Vanity Plates", VANITY_PLATES26, [](sub* sub)
 			{
 				int buffer = MOD_VANITY_PLATES;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3208,7 +3212,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Trim", TRIM27, [](sub* sub)
 			{
 				int buffer = MOD_TRIM;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3223,7 +3227,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Ornaments", ORNAMENTS28, [](sub* sub)
 			{
 				int buffer = MOD_ORNAMENTS;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3238,7 +3242,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Dashboard", DASHBOARD29, [](sub* sub)
 			{
 				int buffer = MOD_DASHBOARD;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3253,7 +3257,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Dial", DIAL30, [](sub* sub)
 			{
 				int buffer = MOD_DIAL;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3268,7 +3272,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Door Speaker", DOOR_SPEAKER31, [](sub* sub)
 			{
 				int buffer = MOD_DASHBOARD;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3283,7 +3287,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Seats", SEATS32, [](sub* sub)
 			{
 				int buffer = MOD_SEATS;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3298,7 +3302,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Steering Wheel", STEERINGWHEEL33, [](sub* sub)
 			{
 				int buffer = MOD_STEERINGWHEEL;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3313,7 +3317,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Shifter Leavers", SHIFTER_LEAVERS34, [](sub* sub)
 			{
 				int buffer = MOD_SHIFTER_LEAVERS;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3328,7 +3332,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Plaques", PLAQUES35, [](sub* sub)
 			{
 				int buffer = MOD_PLAQUES;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3343,7 +3347,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Speakers", SPEAKERS36, [](sub* sub)
 			{
 				int buffer = MOD_SPEAKERS;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3358,7 +3362,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Trunk", TRUNK37, [](sub* sub)
 			{
 				int buffer = MOD_TRUNK;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3373,7 +3377,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Hydrualics", HYDRAULICS38, [](sub* sub)
 			{
 				int buffer = MOD_HYDRAULICS;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3388,7 +3392,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Hydrualics", HYDRAULICS38, [](sub* sub)
 			{
 				int buffer = MOD_HYDRAULICS;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3403,7 +3407,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Engine Block", ENGINE_BLOCK39, [](sub* sub)
 			{
 				int buffer = MOD_ENGINE_BLOCK;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3418,7 +3422,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Air Filter", AIR_FILTER, [](sub* sub)
 			{
 				int buffer = MOD_AIR_FILTER;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3433,7 +3437,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Struts", STRUTS, [](sub* sub)
 			{
 				int buffer = MOD_STRUTS;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3448,7 +3452,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Arch Cover", ARCH_COVER, [](sub* sub)
 			{
 				int buffer = MOD_ARCH_COVER;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3463,7 +3467,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Arials", AERIALS, [](sub* sub)
 			{
 				int buffer = MOD_AERIALS;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3478,7 +3482,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Trim 2", TRIM_2, [](sub* sub)
 			{
 				int buffer = MOD_TRIM_2;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3493,7 +3497,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Tank", TANK, [](sub* sub)
 			{
 				int buffer = MOD_TANK;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3508,7 +3512,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Windows", WINDOWS, [](sub* sub)
 			{
 				int buffer = MOD_WINDOWS;
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				int AmountOfVehicleMods = VEHICLE::GET_NUM_VEHICLE_MODS(veh, buffer);
 				for (int i = 0; i < AmountOfVehicleMods; i++)
 				{
@@ -3526,7 +3530,7 @@ namespace Saint
 					{
 						VehicleModifier(MOD_EXHAUST, -1);
 					});
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
+				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), 0);
 				for (int i = 0; i < VEHICLE::GET_NUM_VEHICLE_MODS(veh, MOD_EXHAUST); i++)
 				{
 					sub->draw_option<RegularOption>(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_MOD_TEXT_LABEL(veh, MOD_EXHAUST, i)), "", [i]
@@ -3541,7 +3545,7 @@ namespace Saint
 
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &negitiveTorque.enabled, BoolDisplay::OnOff, false, [] {
 					if (!negitiveTorque.enabled) {
-						VEHICLE::SET_VEHICLE_CHEAT_POWER_INCREASE(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 1.0);
+						VEHICLE::SET_VEHICLE_CHEAT_POWER_INCREASE(Game->Vehicle(), 1.0);
 					}
 					});
 				sub->draw_option<number<float>>("Multiplier", nullptr, &negitiveTorque.multiplier, 0.1f, 100.f, 0.10f, 2);
@@ -3554,7 +3558,7 @@ namespace Saint
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &sound_type, &sound_int);
 				sub->draw_option<RegularOption>(("Apply"), nullptr, []
 					{
-						Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						Vehicle veh = Game->Vehicle();
 						AUDIO::FORCE_USE_AUDIO_GAME_OBJECT(veh, sound_data[sound_int]);
 					});
 
@@ -3564,7 +3568,7 @@ namespace Saint
 			{
 				sub->draw_option<submenu>("Presets", nullptr, SubmenuPresets);
 				sub->draw_option<UnclickOption>(("Edit"), nullptr, [] {});
-				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false))
 				{
 					auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
 					sub->draw_option<submenu>("Miscellaneous", nullptr, HandlingMisc);
@@ -3806,7 +3810,7 @@ namespace Saint
 				sub->draw_option<submenu>("Bullet Changer", nullptr, rage::joaat("BULLET_CHANGER"));
 				sub->draw_option<toggle<bool>>(("Infinite Ammo"), nullptr, &features.infinite_ammo, BoolDisplay::OnOff, false, [] {
 					if (!features.infinite_ammo) {
-						WEAPON::SET_PED_INFINITE_AMMO_CLIP(PLAYER::PLAYER_PED_ID(), false);
+						WEAPON::SET_PED_INFINITE_AMMO_CLIP(Game->Self(), false);
 					}
 					});
 				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Teleport", nullptr, &features.teleport_gun, &features.teleport_gun_type, &features.teleport_gun_int);
@@ -3830,7 +3834,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Bullet Changer"), rage::joaat("BULLET_CHANGER"), [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &bullet_changer.enabled, BoolDisplay::OnOff);
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &all_weapons.name, &bullet_changer.weapon_pos);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &Game->Weapon->Name, &bullet_changer.weapon_pos);
 				sub->draw_option<UnclickOption>("Attributes", nullptr, [] {});
 				sub->draw_option<toggle<bool>>(("Audible"), nullptr, &bullet_changer.Audible, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Invisible"), nullptr, &bullet_changer.Invisible, BoolDisplay::OnOff);
@@ -3891,7 +3895,7 @@ namespace Saint
 							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
 								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
 								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
-								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(MISC::GET_HASH_KEY(model_ptr.c_str())) == m_entity_shooter.selected_class) {
+								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(Game->HashKey(model_ptr.c_str())) == m_entity_shooter.selected_class) {
 									std::stringstream ss;
 									std::string make(make_ptr);
 									std::string model(model_ptr);
@@ -4174,7 +4178,7 @@ namespace Saint
 				int Maxammo = 0;
 
 				if (give_weapon.type_int != 0) {
-					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), all_weapons.hash_all[give_weapon.type_int], &Maxammo);
+					WEAPON::GET_MAX_AMMO(Game->Self(), all_weapons.hash_all[give_weapon.type_int], &Maxammo);
 				}
 				if (give_weapon.type_int == 0) {
 					Maxammo = 9999;
@@ -4185,11 +4189,11 @@ namespace Saint
 				sub->draw_option<RegularOption>(("Apply"), nullptr, []
 					{
 						if (give_weapon.type_int != 0) {
-							WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), all_weapons.hash_all[give_weapon.type_int], 9999, false);
+							Game->GiveWeapon(Game->Self(), all_weapons.hash_all[give_weapon.type_int], 9999);
 						}
 						if (give_weapon.type_int == 0) {
 							for (int x = 0; x < 106; x++) {
-								WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), all_weapons.hash[x], give_weapon.amount, false);
+								Game->GiveWeapon(Game->Self(), Game->Weapon->Hash[x], give_weapon.amount);
 							}
 						}
 					});
@@ -4201,8 +4205,8 @@ namespace Saint
 				if (give_ammo.type_int == 1) {
 					Hash weaponhash;
 					int Maxammo = 0;
-					WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
-					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), weaponhash, &Maxammo);
+					WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
+					WEAPON::GET_MAX_AMMO(Game->Self(), weaponhash, &Maxammo);
 					sub->draw_option<number<std::int32_t>>("Amount", nullptr, &give_ammo.amount, 1, Maxammo);
 				}
 				else {
@@ -4219,13 +4223,13 @@ namespace Saint
 							0xBFEFFF6D, 0x394F415C, 0x83BF0278, 0xFAD1F1C9, 0xAF113F99, 0xC0A3098D, 0x969C3D67, 0x7F229F94, 0x84D6FAFD, 0x624FE830, 0x9D1F17E6, 0xC78D71B4, 0xD1D5F52B, 0x9D07F764, 0x7FD62962, 0xDBBD7280, 0x61012683, 0x05FC3C11, 0x0C472FE2,
 							0xA914799, 0xC734385A, 0x6A6C02E0, 0x6E7DDDEC, 0xB1CA77B1, 0xA284510B, 0x4DD2DC56, 0x42BF8A85, 0x7F7497E5, 0x6D544C99, 0x63AB0442, 0x0781FE4A, 0xB62D1F67, 0xDB26713A };
 							for (int x = 0; x < 89; x++) {
-								WEAPON::ADD_AMMO_TO_PED(PLAYER::PLAYER_PED_ID(), wephashes[x], give_ammo.amount);
+								WEAPON::ADD_AMMO_TO_PED(Game->Self(), wephashes[x], give_ammo.amount);
 							}
 						}
 						if (give_ammo.type_int == 1) {
 							Hash weaponhash;
-							WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
-							WEAPON::ADD_AMMO_TO_PED(PLAYER::PLAYER_PED_ID(), weaponhash, give_ammo.amount);
+							WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
+							WEAPON::ADD_AMMO_TO_PED(Game->Self(), weaponhash, give_ammo.amount);
 						}
 					});
 
@@ -4235,7 +4239,7 @@ namespace Saint
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &animation_type, &animation_int);
 				sub->draw_option<RegularOption>(("Apply"), nullptr, []
 					{
-						WEAPON::SET_WEAPON_ANIMATION_OVERRIDE(PLAYER::PLAYER_PED_ID(), MISC::GET_HASH_KEY(animation_data[animation_int]));
+						WEAPON::SET_WEAPON_ANIMATION_OVERRIDE(Game->Self(), Game->HashKey(animation_data[animation_int]));
 					});
 
 			});
@@ -4269,7 +4273,7 @@ namespace Saint
 				}
 				for (std::uint32_t i = 0; i < 32; ++i)
 				{
-					if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))
+					if (auto ped = Game->PlayerIndex(i))
 					{
 
 						std::string name = PLAYER::GET_PLAYER_NAME(i);
@@ -4380,91 +4384,91 @@ namespace Saint
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Target", nullptr, &Aproach3, &Opreracogh223, false, -1, [=] {
 					switch (Opreracogh223) {
 					case 0:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4CNF_TARGET"), 0, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4CNF_TARGET"), 0, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H4CNF_TARGET"), 0, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_H4CNF_TARGET"), 0, true);
 						break;
 					case 1:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4CNF_TARGET"), 1, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4CNF_TARGET"), 1, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H4CNF_TARGET"), 1, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_H4CNF_TARGET"), 1, true);
 						break;
 					case 2:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4CNF_TARGET"), 2, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4CNF_TARGET"), 2, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H4CNF_TARGET"), 2, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_H4CNF_TARGET"), 2, true);
 						break;
 					case 3:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4CNF_TARGET"), 3, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4CNF_TARGET"), 3, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H4CNF_TARGET"), 3, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_H4CNF_TARGET"), 3, true);
 						break;
 					case 4:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4CNF_TARGET"), 5, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4CNF_TARGET"), 5, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H4CNF_TARGET"), 5, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_H4CNF_TARGET"), 5, true);
 						break;
 					}
 					});
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Approach Vehicle", nullptr, &AproachVeh, &Opreracogh2232, false, -1, [=] {
 					switch (Opreracogh223) {
 					case 0:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4_MISSIONS"), 65283, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4_MISSIONS"), 65283, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H4_MISSIONS"), 65283, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_H4_MISSIONS"), 65283, true);
 						break;
 					case 1:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4_MISSIONS"), 65413, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4_MISSIONS"), 65413, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H4_MISSIONS"), 65413, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_H4_MISSIONS"), 65413, true);
 						break;
 					case 2:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4_MISSIONS"), 65289, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4_MISSIONS"), 65289, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H4_MISSIONS"), 65289, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_H4_MISSIONS"), 65289, true);
 						break;
 					case 3:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4_MISSIONS"), 65425, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4_MISSIONS"), 65425, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H4_MISSIONS"), 65425, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_H4_MISSIONS"), 65425, true);
 						break;
 					case 4:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4_MISSIONS"), 65313, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4_MISSIONS"), 65313, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H4_MISSIONS"), 65313, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_H4_MISSIONS"), 65313, true);
 						break;
 					case 5:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4_MISSIONS"), 65345, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4_MISSIONS"), 65345, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H4_MISSIONS"), 65345, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_H4_MISSIONS"), 65345, true);
 						break;
 					}
 					});
 				sub->draw_option<RegularOption>("Remove Cooldown", "", [] {
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4_TARGET_POSIX"), 1659643454, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4_COOLDOWN"), 0, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4_COOLDOWN_HARD"), 0, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_H4_TARGET_POSIX"), 1659643454, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_H4_COOLDOWN"), 0, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_H4_COOLDOWN_HARD"), 0, true);
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4_TARGET_POSIX"), 1659643454, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4_COOLDOWN"), 0, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4_COOLDOWN_HARD"), 0, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_H4_TARGET_POSIX"), 1659643454, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_H4_COOLDOWN"), 0, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_H4_COOLDOWN_HARD"), 0, true);
 					});
 				sub->draw_option<RegularOption>("Scope POIS", "", [] {
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4CNF_BS_GEN"), -1, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4CNF_BS_ENTR"), 63, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4CNF_APPROAC"), -1, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4CNF_BS_GEN"), -1, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4CNF_BS_ENTR"), 63, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4CNF_APPROAC"), -1, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_H4CNF_BS_GEN"), -1, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_H4CNF_BS_ENTR"), 63, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_H4CNF_APPROAC"), -1, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_H4CNF_BS_GEN"), -1, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_H4CNF_BS_ENTR"), 63, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_H4CNF_APPROAC"), -1, true);
 					});
 				sub->draw_option<RegularOption>("Hard Mode", "Puts heist on hard mode.", [] {
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H4_PROGRESS"), 131055, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_H4_PROGRESS"), 131055, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_H4_PROGRESS"), 131055, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_H4_PROGRESS"), 131055, true);
 					});
 				sub->draw_option<UnclickOption>(("Teleports"), nullptr, [] {});
 				sub->draw_option<RegularOption>("Main Dock", "", [] {
-					PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 4947.496094, -5168.458008, 1.234270);
+					PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), 4947.496094, -5168.458008, 1.234270);
 					});
 				sub->draw_option<RegularOption>("Vault", "", [] {
-					PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 4999.764160, -5747.863770, 14.840000);
+					PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), 4999.764160, -5747.863770, 14.840000);
 					});
 				sub->draw_option<RegularOption>("Communication Tower", "", [] {
-					PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 5266.018555, -5427.736328, 64.297134);
+					PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), 5266.018555, -5427.736328, 64.297134);
 					});
 				sub->draw_option<RegularOption>("Power Station", "", [] {
-					PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 4477.102539, -4597.295898, 4.283014);
+					PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), 4477.102539, -4597.295898, 4.283014);
 					});
 				sub->draw_option<RegularOption>("Exit", "", [] {
-					PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 4990.778809, -5716.004395, 18.580210);
+					PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), 4990.778809, -5716.004395, 18.580210);
 					});
 			});
 		g_Render->draw_submenu<sub>("Diamond Casino", DiamondCasino, [](sub* sub)
@@ -4473,52 +4477,52 @@ namespace Saint
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Driver", nullptr, &Aproach2, &Opreracogh22, false, -1, [=] {
 					switch (Opreracogh22) {
 					case 0:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_CREWDRIVER"), 5, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_CREWDRIVER"), 5, true);
 						break;
 					case 1:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_CREWDRIVER"), 3, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_CREWDRIVER"), 3, true);
 						break;
 					case 2:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_CREWDRIVER"), 2, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_CREWDRIVER"), 2, true);
 						break;
 					case 3:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_CREWDRIVER"), 4, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_CREWDRIVER"), 4, true);
 						break;
 					case 4:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_CREWDRIVER"), 1, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_CREWDRIVER"), 1, true);
 						break;
 					}
 					});
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Target", nullptr, &Aproach, &Opreracogh2, true, -1, [=] {
 					switch (Opreracogh2) {
 					case 0:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_TARGET"), 3, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_TARGET"), 3, true);
 						break;
 					case 1:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_TARGET"), 1, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_TARGET"), 1, true);
 						break;
 					case 2:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_TARGET"), 2, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_TARGET"), 2, true);
 						break;
 					case 3:
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_TARGET"), 4, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_TARGET"), 4, true);
 						break;
 					}
 					});
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Teleport", nullptr, &casino_teleport, &casino_tp, false, -1, [=] {
 					switch (casino_tp) {
 					case 0:
-						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 2465.4746, -279.2276, -70.694145);
+						PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), 2465.4746, -279.2276, -70.694145);
 						break;
 					case 1:
-						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 2515.1252, -238.91661, -70.73713);
+						PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), 2515.1252, -238.91661, -70.73713);
 						break;
 					case 2:
-						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 917.24634, 48.989567, 80.89892);
+						PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), 917.24634, 48.989567, 80.89892);
 						break;
 
 					case 3:
-						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 2711.773, -369.458, -54.781);
+						PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), 2711.773, -369.458, -54.781);
 						break;
 
 
@@ -4527,11 +4531,11 @@ namespace Saint
 
 					});
 				sub->draw_option<RegularOption>("Hard Mode", "Puts heist on hard mode.", [] {
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3_HARD_APPROACH"), 3, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_H3_HARD_APPROACH"), 3, true);
 					});
 				sub->draw_option<RegularOption>("Scope POIS", "", [] {
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_POI"), 268435455, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_ACCESSPOINTS"), 2047, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_POI"), 268435455, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_ACCESSPOINTS"), 2047, true);
 					});
 
 
@@ -4580,38 +4584,38 @@ namespace Saint
 
 		sub->draw_option<RegularOption>("Max", "", []
 			{
-				STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STAM"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STRN"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_LUNG"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_DRIV"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_FLY"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_SHO"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STL"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STAM"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STRN"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_LUNG"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_DRIV"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_FLY"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_SHO"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STL"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP2_SCRIPT_INCREASE_STAM"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP2_SCRIPT_INCREASE_STRN"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP2_SCRIPT_INCREASE_LUNG"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP2_SCRIPT_INCREASE_DRIV"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP2_SCRIPT_INCREASE_FLY"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP2_SCRIPT_INCREASE_SHO"), 100, 1);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP2_SCRIPT_INCREASE_STL"), 100, 1);
+				STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STAM"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STRN"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_LUNG"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_DRIV"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_FLY"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_SHO"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STL"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_STAM"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_STRN"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_LUNG"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_DRIV"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_FLY"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_SHO"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_STL"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP2_SCRIPT_INCREASE_STAM"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP2_SCRIPT_INCREASE_STRN"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP2_SCRIPT_INCREASE_LUNG"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP2_SCRIPT_INCREASE_DRIV"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP2_SCRIPT_INCREASE_FLY"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP2_SCRIPT_INCREASE_SHO"), 100, 1);
+		STATS::STAT_SET_INT(Game->HashKey("MP2_SCRIPT_INCREASE_STL"), 100, 1);
 			});
 
 
 		sub->draw_option<UnclickOption>(("Single"), nullptr, [] {});
-		sub->draw_option<RegularOption>("Max Stamina", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STAM"), 100, 0); });
-		sub->draw_option<RegularOption>("Max Strength", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STRN"), 100, 0); });
-		sub->draw_option<RegularOption>("Max Loungh", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_LUNG"), 100, 0); });
-		sub->draw_option<RegularOption>("Max Driving", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_DRIV"), 100, 0); });
-		sub->draw_option<RegularOption>("Max Flying", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_FLY"), 100, 0); });
-		sub->draw_option<RegularOption>("Max Shooting", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_SHO"), 100, 0); });
-		sub->draw_option<RegularOption>("Max Stealth", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STL"), 100, 0); });
+		sub->draw_option<RegularOption>("Max Stamina", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STAM"), 100, 0); });
+		sub->draw_option<RegularOption>("Max Strength", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STRN"), 100, 0); });
+		sub->draw_option<RegularOption>("Max Loungh", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_LUNG"), 100, 0); });
+		sub->draw_option<RegularOption>("Max Driving", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_DRIV"), 100, 0); });
+		sub->draw_option<RegularOption>("Max Flying", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_FLY"), 100, 0); });
+		sub->draw_option<RegularOption>("Max Shooting", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_SHO"), 100, 0); });
+		sub->draw_option<RegularOption>("Max Stealth", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STL"), 100, 0); });
 
 					});
 
@@ -4625,27 +4629,27 @@ namespace Saint
 		
 		sub->draw_option<RegularOption>("Max Level", "", []
 			{
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_ARENAWARS_SKILL_LEVEL"), 19, true);
-		STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_ARENAWARS_SKILL_LEVEL"), 19, true);
+		STATS::STAT_SET_INT(Game->HashKey("MP0_ARENAWARS_SKILL_LEVEL"), 19, true);
+		STATS::STAT_SET_INT(Game->HashKey("MP1_ARENAWARS_SKILL_LEVEL"), 19, true);
 			});
 
 
 				sub->draw_option<RegularOption>("Free RC & Mini Tank", "", []
 					{
-						STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_ARENAWARSPSTAT_BOOL4"), true, true);
-						STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_ARENAWARSPSTAT_BOOL8"), true, true); 
+						STATS::STAT_SET_BOOL(Game->HashKey("MP0_ARENAWARSPSTAT_BOOL4"), true, true);
+						STATS::STAT_SET_BOOL(Game->HashKey("MP0_ARENAWARSPSTAT_BOOL8"), true, true); 
 					});
 
 
 		sub->draw_option<UnclickOption>(("Special Vehicle Unlocks"), nullptr, [] {});
-		sub->draw_option<RegularOption>("Taxi Custom", nullptr, [] { STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 30, true); });
-		sub->draw_option<RegularOption>("Dozer", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 31, true); });
-		sub->draw_option<RegularOption>("Clown Van", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 32, true); });
-		sub->draw_option<RegularOption>("Trashmaster", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 33, true); });
-		sub->draw_option<RegularOption>("Barracks Semi", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 34, true); });
-		sub->draw_option<RegularOption>("Mixer", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 35, true); });
-		sub->draw_option<RegularOption>("Space Docker", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 36, true); });
-		sub->draw_option<RegularOption>("Rusty Tractor", nullptr, [] { STATS::STAT_SET_INT(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL0"), 37, true); });
+		sub->draw_option<RegularOption>("Taxi Custom", nullptr, [] { STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL0"), 30, true); });
+		sub->draw_option<RegularOption>("Dozer", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("ARENAWARSPSTAT_BOOL0"), 31, true); });
+		sub->draw_option<RegularOption>("Clown Van", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("ARENAWARSPSTAT_BOOL0"), 32, true); });
+		sub->draw_option<RegularOption>("Trashmaster", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("ARENAWARSPSTAT_BOOL0"), 33, true); });
+		sub->draw_option<RegularOption>("Barracks Semi", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("ARENAWARSPSTAT_BOOL0"), 34, true); });
+		sub->draw_option<RegularOption>("Mixer", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("ARENAWARSPSTAT_BOOL0"), 35, true); });
+		sub->draw_option<RegularOption>("Space Docker", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("ARENAWARSPSTAT_BOOL0"), 36, true); });
+		sub->draw_option<RegularOption>("Rusty Tractor", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("ARENAWARSPSTAT_BOOL0"), 37, true); });
 
 
 		sub->draw_option<UnclickOption>(("Trade Prices"), nullptr, [] {});
@@ -4653,38 +4657,38 @@ namespace Saint
 		sub->draw_option<RegularOption>("Parts & Vehicles", "", []
 			{
 				//vehicles
-				STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL1"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL2"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL3"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL4"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL5"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL6"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL7"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL8"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL9"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL10"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL11"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL12"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL13"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL14"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL15"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL16"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL17"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL18"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL19"), true, true);
+				STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL1"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL2"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL3"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL4"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL5"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL6"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL7"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL8"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL9"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL10"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL11"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL12"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL13"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL14"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL15"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL16"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL17"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL18"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL19"), true, true);
 
 		//parts
 		
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL20"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL21"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL22"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL23"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL24"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL25"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL26"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL27"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL28"), true, true);
-		STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("ARENAWARSPSTAT_BOOL29"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL20"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL21"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL22"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL23"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL24"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL25"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL26"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL27"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL28"), true, true);
+		STATS::STAT_SET_BOOL(Game->HashKey("ARENAWARSPSTAT_BOOL29"), true, true);
 
 			});
 
@@ -4742,12 +4746,12 @@ namespace Saint
 					{
 						*script_global(262145 + 24045).as<int*>() = 300000;
 						*script_global(262145 + 24041).as<int*>() = 300000;
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLUB_POPULARITY"), 10000, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLUB_PAY_TIME_LEFT"), -1, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLUB_POPULARITY"), 100000, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLUB_POPULARITY"), 10000, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLUB_PAY_TIME_LEFT"), -1, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLUB_POPULARITY"), 100000, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_CLUB_POPULARITY"), 10000, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_CLUB_PAY_TIME_LEFT"), -1, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_CLUB_POPULARITY"), 100000, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_CLUB_POPULARITY"), 10000, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_CLUB_PAY_TIME_LEFT"), -1, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_CLUB_POPULARITY"), 100000, true);
 					});
 			});
 
@@ -4892,10 +4896,10 @@ namespace Saint
 				sub->draw_option<RegularOption>("Remove Badsport", "", []
 					{
 						Any date[12];
-						STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MPPLY_CHAR_IS_BADSPORT "), false, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_BAD_SPORT_BITSET"), false, true);
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_BAD_SPORT_BITSET"), false, true);
-						STATS::STAT_SET_DATE(MISC::GET_HASH_KEY("MPPLY_BECAME_BADSPORT_DT"), &date[0], 7, true);
+						STATS::STAT_SET_BOOL(Game->HashKey("MPPLY_CHAR_IS_BADSPORT "), false, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_BAD_SPORT_BITSET"), false, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP1_BAD_SPORT_BITSET"), false, true);
+						STATS::STAT_SET_DATE(Game->HashKey("MPPLY_BECAME_BADSPORT_DT"), &date[0], 7, true);
 					});
 
 
@@ -4922,10 +4926,10 @@ namespace Saint
 					{
 						switch (g_RecoveryManager.selected) {
 						case 0:
-							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_PROP_HANGAR_VALUE"), 1999000000, true);
+							STATS::STAT_SET_INT(Game->HashKey("MP0_PROP_HANGAR_VALUE"), 1999000000, true);
 							break;
 						case 1:
-							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_PROP_HANGAR_VALUE"), 1999000000, true);
+							STATS::STAT_SET_INT(Game->HashKey("MP1_PROP_HANGAR_VALUE"), 1999000000, true);
 							break;
 						}
 						*script_global(262145 + 1574918).as<int*>() = 1999000000;
@@ -4936,10 +4940,10 @@ namespace Saint
 					{
 						switch (g_RecoveryManager.selected) {
 						case 0:
-							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_PROP_NIGHTCLUB_VALUE"), 1999000000, true);
+							STATS::STAT_SET_INT(Game->HashKey("MP0_PROP_NIGHTCLUB_VALUE"), 1999000000, true);
 							break;
 						case 1:
-							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_PROP_NIGHTCLUB_VALUE"), 1999000000, true);
+							STATS::STAT_SET_INT(Game->HashKey("MP1_PROP_NIGHTCLUB_VALUE"), 1999000000, true);
 							break;
 						}
 						*script_global(262145 + 1574918).as<int*>() = 1999000000;
@@ -4950,10 +4954,10 @@ namespace Saint
 					{
 						switch (g_RecoveryManager.selected) {
 						case 0:
-							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_PROP_ARCADE_VALUE"), 1999000000, true);
+							STATS::STAT_SET_INT(Game->HashKey("MP0_PROP_ARCADE_VALUE"), 1999000000, true);
 							break;
 						case 1:
-							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_PROP_ARCADE_VALUE"), 1999000000, true);
+							STATS::STAT_SET_INT(Game->HashKey("MP1_PROP_ARCADE_VALUE"), 1999000000, true);
 							break;
 						}
 						*script_global(262145 + 1574918).as<int*>() = 1999000000;
@@ -5215,498 +5219,498 @@ namespace Saint
 
 				sub->draw_option<RegularOption>("All", "", [] {
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STAM"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STRN"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_LUNG"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_DRIV"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_FLY"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_SHO"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STL"), 100, 1);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_FMRACEWORLDRECHOLDER"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_ENEMYDRIVEBYKILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_USJS_COMPLETED"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_USJS_FOUND"), 50, 1);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_FMWINALLRACEMODES"), 1, 1);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_FMWINEVERYGAMEMODE"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_DB_PLAYER_KILLS"), 1000, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_KILLS_PLAYERS"), 1000, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FMHORDWAVESSURVIVE"), 21, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_CAR_BOMBS_ENEMY_KILLS"), 25, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_TDM_MVP"), 60, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_HOLD_UP_SHOPS"), 20, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_RACES_WON"), 101, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_NO_ARMWRESTLING_WINS"), 21, 1);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_FMATTGANGHQ"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FMBBETWIN"), 50000, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_DM_WINS"), 51, 1);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_FMFULLYMODDEDCAR"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_DM_TOTALKILLS"), 500, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MPPLY_DM_TOTAL_DEATHS"), 412, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MPPLY_TIMES_FINISH_DM_TOP_3"), 36, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_PLAYER_HEADSHOTS"), 623, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_DM_WINS"), 63, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_TDM_WINS"), 13, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_GTA_RACES_WON"), 12, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_GOLF_WON"), 2, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_SHOOTRANG_TG_WON"), 2, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_SHOOTRANG_RT_WON"), 2, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_SHOOTRANG_CT_WON"), 2, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_SHOOTRANG_GRAN_WON"), 2, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_TENNIS_WON"), 2, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MPPLY_TENNIS_MATCHES_WON"), 2, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MPPLY_TOTAL_TDEATHMATCH_WON"), 63, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MPPLY_TOTAL_RACES_WON"), 101, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MPPLY_TOTAL_DEATHMATCH_LOST"), 23, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MPPLY_TOTAL_RACES_LOST"), 36, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_25_KILLS_STICKYBOMBS"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_50_KILLS_GRENADES"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_GRENADE_ENEMY_KILLS"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_20_KILLS_MELEE"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MOLOTOV_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CMBTPISTOL_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_PISTOL50_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_APPISTOL_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MICROSMG_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SMG_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_ASLTSMG_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_ASLTRIFLE_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CRBNRIFLE_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_ADVRIFLE_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MG_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CMBTMG_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_ASLTMG_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_PUMP_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SAWNOFF_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_BULLPUP_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_ASLTSHTGN_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SNIPERRFL_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_HVYSNIPER_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_GRNLAUNCH_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_RPG_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MINIGUNS_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_GRENADE_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SMKGRENADE_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_STKYBMB_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MOLOTOV_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STAM"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STRN"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_LUNG"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_DRIV"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_FLY"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_SHO"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STL"), 100, 1);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP0_AWD_FMRACEWORLDRECHOLDER"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_ENEMYDRIVEBYKILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_USJS_COMPLETED"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_USJS_FOUND"), 50, 1);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP0_AWD_FMWINALLRACEMODES"), 1, 1);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP0_AWD_FMWINEVERYGAMEMODE"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_DB_PLAYER_KILLS"), 1000, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_KILLS_PLAYERS"), 1000, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FMHORDWAVESSURVIVE"), 21, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_CAR_BOMBS_ENEMY_KILLS"), 25, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_TDM_MVP"), 60, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_HOLD_UP_SHOPS"), 20, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_RACES_WON"), 101, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_NO_ARMWRESTLING_WINS"), 21, 1);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP0_AWD_FMATTGANGHQ"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FMBBETWIN"), 50000, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_DM_WINS"), 51, 1);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP0_AWD_FMFULLYMODDEDCAR"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_DM_TOTALKILLS"), 500, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MPPLY_DM_TOTAL_DEATHS"), 412, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MPPLY_TIMES_FINISH_DM_TOP_3"), 36, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_PLAYER_HEADSHOTS"), 623, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_DM_WINS"), 63, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_TDM_WINS"), 13, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_GTA_RACES_WON"), 12, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_GOLF_WON"), 2, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_SHOOTRANG_TG_WON"), 2, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_SHOOTRANG_RT_WON"), 2, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_SHOOTRANG_CT_WON"), 2, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_SHOOTRANG_GRAN_WON"), 2, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_TENNIS_WON"), 2, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MPPLY_TENNIS_MATCHES_WON"), 2, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MPPLY_TOTAL_TDEATHMATCH_WON"), 63, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MPPLY_TOTAL_RACES_WON"), 101, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MPPLY_TOTAL_DEATHMATCH_LOST"), 23, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MPPLY_TOTAL_RACES_LOST"), 36, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_25_KILLS_STICKYBOMBS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_50_KILLS_GRENADES"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_GRENADE_ENEMY_KILLS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_20_KILLS_MELEE"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MOLOTOV_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CMBTPISTOL_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_PISTOL50_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_APPISTOL_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MICROSMG_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SMG_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_ASLTSMG_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_ASLTRIFLE_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CRBNRIFLE_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_ADVRIFLE_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MG_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CMBTMG_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_ASLTMG_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_PUMP_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SAWNOFF_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_BULLPUP_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_ASLTSHTGN_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SNIPERRFL_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_HVYSNIPER_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_GRNLAUNCH_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_RPG_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MINIGUNS_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_GRENADE_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SMKGRENADE_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_STKYBMB_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MOLOTOV_ENEMY_KILLS"), 600, 1);
 
 
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_1_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_2_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_3_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_4_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_5_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_6_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_7_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FMRALLYWONDRIVE"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FMRALLYWONNAV"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FMWINSEARACE"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FMWINAIRRACE"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_NUMBER_TURBO_STARTS_IN_RACE"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_USJS_COMPLETED"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_RACES_FASTEST_LAP"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_NUMBER_SLIPSTREAMS_IN_RACE"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_WIN_CAPTURES"), 25, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_DROPOFF_CAP_PACKAGES"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_KILL_CARRIER_CAPTURE"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FINISH_HEISTS"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FINISH_HEIST_SETUP_JOB"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_WIN_LAST_TEAM_STANDINGS"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_ONLY_PLAYER_ALIVE_LTS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_1_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_2_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_3_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_4_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_5_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_6_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_7_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FMRALLYWONDRIVE"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FMRALLYWONNAV"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FMWINSEARACE"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FMWINAIRRACE"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_NUMBER_TURBO_STARTS_IN_RACE"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_USJS_COMPLETED"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_RACES_FASTEST_LAP"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_NUMBER_SLIPSTREAMS_IN_RACE"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_WIN_CAPTURES"), 25, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_DROPOFF_CAP_PACKAGES"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_KILL_CARRIER_CAPTURE"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FINISH_HEISTS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FINISH_HEIST_SETUP_JOB"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_WIN_LAST_TEAM_STANDINGS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_ONLY_PLAYER_ALIVE_LTS"), 50, 1);
 
 
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_1_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_2_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_3_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_4_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_5_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_6_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_7_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FMRALLYWONDRIVE"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FMRALLYWONNAV"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FMWINSEARACE"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FMWINAIRRACE"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_NUMBER_TURBO_STARTS_IN_RACE"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_USJS_COMPLETED"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_RACES_FASTEST_LAP"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_NUMBER_SLIPSTREAMS_IN_RACE"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_WIN_CAPTURES"), 25, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_DROPOFF_CAP_PACKAGES"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_KILL_CARRIER_CAPTURE"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FINISH_HEISTS"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FINISH_HEIST_SETUP_JOB"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_WIN_LAST_TEAM_STANDINGS"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_ONLY_PLAYER_ALIVE_LTS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_1_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_2_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_3_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_4_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_5_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_6_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_7_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FMRALLYWONDRIVE"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FMRALLYWONNAV"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FMWINSEARACE"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FMWINAIRRACE"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_NUMBER_TURBO_STARTS_IN_RACE"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_USJS_COMPLETED"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_RACES_FASTEST_LAP"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_NUMBER_SLIPSTREAMS_IN_RACE"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_WIN_CAPTURES"), 25, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_DROPOFF_CAP_PACKAGES"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_KILL_CARRIER_CAPTURE"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FINISH_HEISTS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FINISH_HEIST_SETUP_JOB"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_WIN_LAST_TEAM_STANDINGS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_ONLY_PLAYER_ALIVE_LTS"), 50, 1);
 
 
 
 
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_FEET_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_JBIB"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_JBIB_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_JBIB_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_JBIB_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_JBIB_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_JBIB_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_JBIB_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_JBIB_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_LEGS"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_LEGS_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_LEGS_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_LEGS_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_LEGS_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_LEGS_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_LEGS_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_LEGS_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_FEET"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_FEET_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_FEET_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_FEET_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_FEET_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_FEET_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_FEET_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_FEET_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_BERD"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_BERD_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_BERD_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_BERD_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_BERD_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_BERD_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_BERD_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_BERD_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_PROPS"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_PROPS_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_PROPS_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_PROPS_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_PROPS_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_PROPS_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_PROPS_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_PROPS_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_PROPS_8"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_PROPS_9"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_PROPS_10"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_OUTFIT"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_HAIR"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_HAIR_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_HAIR_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_HAIR_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_HAIR_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_HAIR_5"), -1, 1);;
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_HAIR_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_HAIR_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_JBIB"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_JBIB_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_JBIB_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_JBIB_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_JBIB_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_JBIB_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_JBIB_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_JBIB_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_LEGS"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_LEGS_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_LEGS_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_LEGS_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_LEGS_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_LEGS_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_LEGS_6"), -1, 1);;
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_LEGS_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_FEET"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_FEET_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_FEET_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_FEET_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_FEET_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_FEET_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_FEET_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_FEET_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_BERD"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_BERD_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_BERD_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_BERD_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_BERD_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_BERD_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_BERD_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_BERD_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_PROPS"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_PROPS_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_PROPS_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_PROPS_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_PROPS_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_PROPS_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_PROPS_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_PROPS_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_PROPS_8"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_PROPS_9"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_PROPS_10"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_OUTFIT"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_TORSO"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_SPECIAL"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_SPECIAL_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_SPECIAL_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_SPECIAL_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_SPECIAL_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_SPECIAL_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_SPECIAL_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_SPECIAL_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_SPECIAL2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_SPECIAL2_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_DECL"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_TEETH"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_TEETH_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_TEETH_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_TORSO"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_SPECIAL"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_SPECIAL_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_SPECIAL_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_SPECIAL_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_SPECIAL_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_SPECIAL_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_SPECIAL_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_SPECIAL_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_SPECIAL2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_SPECIAL2_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_DECL"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_ACQUIRED_TEETH"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STAM"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STRN"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_LUNG"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_DRIV"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_FLY"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_SHO"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STL"), 100, 1);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_FMRACEWORLDRECHOLDER"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_ENEMYDRIVEBYKILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_USJS_COMPLETED"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_USJS_FOUND"), 50, 1);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_FMWINALLRACEMODES"), 1, 1);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_FMWINEVERYGAMEMODE"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_DB_PLAYER_KILLS"), 1000, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_KILLS_PLAYERS"), 1000, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FMHORDWAVESSURVIVE"), 21, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_CAR_BOMBS_ENEMY_KILLS"), 25, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FM_TDM_MVP"), 60, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_HOLD_UP_SHOPS"), 20, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_RACES_WON"), 101, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_NO_ARMWRESTLING_WINS"), 21, 1);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_FMATTGANGHQ"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FMBBETWIN"), 50000, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FM_DM_WINS"), 51, 1);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_FMFULLYMODDEDCAR"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FM_DM_TOTALKILLS"), 500, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MPPLY_DM_TOTAL_DEATHS"), 412, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MPPLY_TIMES_FINISH_DM_TOP_3"), 36, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_PLAYER_HEADSHOTS"), 623, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FM_DM_WINS"), 63, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FM_TDM_WINS"), 13, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FM_GTA_RACES_WON"), 12, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FM_GOLF_WON"), 2, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FM_SHOOTRANG_TG_WON"), 2, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FM_SHOOTRANG_RT_WON"), 2, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FM_SHOOTRANG_CT_WON"), 2, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FM_SHOOTRANG_GRAN_WON"), 2, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FM_TENNIS_WON"), 2, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MPPLY_TENNIS_MATCHES_WON"), 2, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MPPLY_TOTAL_TDEATHMATCH_WON"), 63, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MPPLY_TOTAL_RACES_WON"), 101, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MPPLY_TOTAL_DEATHMATCH_LOST"), 23, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MPPLY_TOTAL_RACES_LOST"), 36, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_25_KILLS_STICKYBOMBS"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_50_KILLS_GRENADES"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_GRENADE_ENEMY_KILLS"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_20_KILLS_MELEE"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MOLOTOV_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CMBTPISTOL_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_PISTOL50_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_APPISTOL_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MICROSMG_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SMG_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_ASLTSMG_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_ASLTRIFLE_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CRBNRIFLE_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_ADVRIFLE_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MG_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CMBTMG_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_ASLTMG_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_PUMP_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SAWNOFF_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_BULLPUP_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_ASLTSHTGN_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SNIPERRFL_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_HVYSNIPER_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_GRNLAUNCH_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_RPG_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MINIGUNS_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_GRENADE_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SMKGRENADE_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_STKYBMB_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MOLOTOV_ENEMY_KILLS"), 600, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_FEET_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_JBIB"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_JBIB_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_JBIB_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_JBIB_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_JBIB_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_JBIB_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_JBIB_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_JBIB_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_LEGS"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_LEGS_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_LEGS_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_LEGS_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_LEGS_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_LEGS_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_LEGS_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_LEGS_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_FEET"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_FEET_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_FEET_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_FEET_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_FEET_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_FEET_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_FEET_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_FEET_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_BERD"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_BERD_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_BERD_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_BERD_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_BERD_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_BERD_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_BERD_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_BERD_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_PROPS"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_PROPS_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_PROPS_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_PROPS_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_PROPS_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_PROPS_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_PROPS_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_PROPS_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_PROPS_8"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_PROPS_9"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_PROPS_10"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_OUTFIT"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_HAIR"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_HAIR_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_HAIR_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_HAIR_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_HAIR_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_HAIR_5"), -1, 1);;
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_HAIR_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_HAIR_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_JBIB"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_JBIB_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_JBIB_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_JBIB_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_JBIB_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_JBIB_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_JBIB_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_JBIB_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_LEGS"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_LEGS_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_LEGS_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_LEGS_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_LEGS_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_LEGS_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_LEGS_6"), -1, 1);;
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_LEGS_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_FEET"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_FEET_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_FEET_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_FEET_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_FEET_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_FEET_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_FEET_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_FEET_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_BERD"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_BERD_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_BERD_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_BERD_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_BERD_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_BERD_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_BERD_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_BERD_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_PROPS"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_PROPS_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_PROPS_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_PROPS_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_PROPS_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_PROPS_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_PROPS_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_PROPS_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_PROPS_8"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_PROPS_9"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_PROPS_10"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_OUTFIT"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_TORSO"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_SPECIAL"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_SPECIAL_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_SPECIAL_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_SPECIAL_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_SPECIAL_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_SPECIAL_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_SPECIAL_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_SPECIAL_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_SPECIAL2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_SPECIAL2_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_DECL"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_TEETH"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_TEETH_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_TEETH_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_TORSO"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_SPECIAL"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_SPECIAL_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_SPECIAL_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_SPECIAL_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_SPECIAL_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_SPECIAL_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_SPECIAL_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_SPECIAL_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_SPECIAL2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_SPECIAL2_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_DECL"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_ACQUIRED_TEETH"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_REV_DA_IN_POSSESSION"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STAM"), 100, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STRN"), 100, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_LUNG"), 100, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_DRIV"), 100, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_FLY"), 100, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_SHO"), 100, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STL"), 100, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STAM"), 100, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STRN"), 100, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_LUNG"), 100, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_DRIV"), 100, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_FLY"), 100, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_SHO"), 100, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STL"), 100, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MPPLY_VEHICLE_ID_ADMIN_WEB"), 117401876, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_FEET_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_JBIB"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_JBIB_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_JBIB_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_JBIB_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_JBIB_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_JBIB_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_JBIB_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_JBIB_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_LEGS"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_LEGS_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_LEGS_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_LEGS_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_LEGS_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_LEGS_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_LEGS_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_LEGS_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_FEET"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_FEET_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_FEET_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_FEET_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_FEET_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_FEET_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_FEET_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_FEET_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_BERD"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_BERD_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_BERD_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_BERD_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_BERD_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_BERD_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_BERD_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_BERD_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_PROPS"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_PROPS_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_PROPS_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_PROPS_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_PROPS_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_PROPS_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_PROPS_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_PROPS_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_PROPS_8"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_PROPS_9"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_PROPS_10"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_OUTFIT"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_HAIR"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_HAIR_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_HAIR_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_HAIR_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_HAIR_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_HAIR_5"), -1, 1);;
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_HAIR_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_HAIR_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_JBIB"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_JBIB_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_JBIB_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_JBIB_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_JBIB_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_JBIB_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_JBIB_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_JBIB_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_LEGS"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_LEGS_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_LEGS_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_LEGS_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_LEGS_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_LEGS_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_LEGS_6"), -1, 1);;
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_LEGS_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_FEET"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_FEET_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_FEET_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_FEET_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_FEET_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_FEET_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_FEET_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_FEET_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_BERD"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_BERD_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_BERD_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_BERD_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_BERD_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_BERD_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_BERD_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_BERD_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_PROPS"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_PROPS_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_PROPS_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_PROPS_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_PROPS_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_PROPS_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_PROPS_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_PROPS_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_PROPS_8"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_PROPS_9"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_PROPS_10"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_OUTFIT"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_TORSO"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_SPECIAL"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_SPECIAL_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_SPECIAL_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_SPECIAL_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_SPECIAL_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_SPECIAL_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_SPECIAL_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_SPECIAL_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_SPECIAL2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_SPECIAL2_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_DECL"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_TEETH"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_TEETH_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_TEETH_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_TORSO"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_SPECIAL"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_SPECIAL_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_SPECIAL_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_SPECIAL_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_SPECIAL_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_SPECIAL_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_SPECIAL_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_SPECIAL_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_SPECIAL2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_SPECIAL2_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_DECL"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_ACQUIRED_TEETH"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_STAM"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_STRN"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_LUNG"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_DRIV"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_FLY"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_SHO"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_STL"), 100, 1);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP1_AWD_FMRACEWORLDRECHOLDER"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_ENEMYDRIVEBYKILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_USJS_COMPLETED"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_USJS_FOUND"), 50, 1);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP1_AWD_FMWINALLRACEMODES"), 1, 1);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP1_AWD_FMWINEVERYGAMEMODE"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_DB_PLAYER_KILLS"), 1000, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_KILLS_PLAYERS"), 1000, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FMHORDWAVESSURVIVE"), 21, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_CAR_BOMBS_ENEMY_KILLS"), 25, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FM_TDM_MVP"), 60, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_HOLD_UP_SHOPS"), 20, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_RACES_WON"), 101, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_NO_ARMWRESTLING_WINS"), 21, 1);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP1_AWD_FMATTGANGHQ"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FMBBETWIN"), 50000, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FM_DM_WINS"), 51, 1);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP1_AWD_FMFULLYMODDEDCAR"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FM_DM_TOTALKILLS"), 500, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MPPLY_DM_TOTAL_DEATHS"), 412, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MPPLY_TIMES_FINISH_DM_TOP_3"), 36, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_PLAYER_HEADSHOTS"), 623, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FM_DM_WINS"), 63, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FM_TDM_WINS"), 13, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FM_GTA_RACES_WON"), 12, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FM_GOLF_WON"), 2, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FM_SHOOTRANG_TG_WON"), 2, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FM_SHOOTRANG_RT_WON"), 2, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FM_SHOOTRANG_CT_WON"), 2, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FM_SHOOTRANG_GRAN_WON"), 2, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FM_TENNIS_WON"), 2, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MPPLY_TENNIS_MATCHES_WON"), 2, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MPPLY_TOTAL_TDEATHMATCH_WON"), 63, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MPPLY_TOTAL_RACES_WON"), 101, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MPPLY_TOTAL_DEATHMATCH_LOST"), 23, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MPPLY_TOTAL_RACES_LOST"), 36, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_25_KILLS_STICKYBOMBS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_50_KILLS_GRENADES"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_GRENADE_ENEMY_KILLS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_20_KILLS_MELEE"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MOLOTOV_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CMBTPISTOL_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_PISTOL50_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_APPISTOL_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MICROSMG_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SMG_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_ASLTSMG_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_ASLTRIFLE_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CRBNRIFLE_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_ADVRIFLE_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MG_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CMBTMG_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_ASLTMG_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_PUMP_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SAWNOFF_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_BULLPUP_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_ASLTSHTGN_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SNIPERRFL_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_HVYSNIPER_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_GRNLAUNCH_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_RPG_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MINIGUNS_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_GRENADE_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SMKGRENADE_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_STKYBMB_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MOLOTOV_ENEMY_KILLS"), 600, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_FEET_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_JBIB"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_JBIB_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_JBIB_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_JBIB_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_JBIB_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_JBIB_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_JBIB_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_JBIB_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_LEGS"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_LEGS_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_LEGS_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_LEGS_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_LEGS_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_LEGS_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_LEGS_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_LEGS_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_FEET"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_FEET_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_FEET_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_FEET_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_FEET_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_FEET_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_FEET_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_FEET_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_BERD"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_BERD_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_BERD_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_BERD_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_BERD_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_BERD_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_BERD_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_BERD_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_PROPS"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_PROPS_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_PROPS_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_PROPS_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_PROPS_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_PROPS_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_PROPS_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_PROPS_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_PROPS_8"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_PROPS_9"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_PROPS_10"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_OUTFIT"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_HAIR"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_HAIR_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_HAIR_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_HAIR_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_HAIR_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_HAIR_5"), -1, 1);;
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_HAIR_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_HAIR_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_JBIB"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_JBIB_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_JBIB_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_JBIB_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_JBIB_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_JBIB_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_JBIB_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_JBIB_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_LEGS"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_LEGS_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_LEGS_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_LEGS_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_LEGS_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_LEGS_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_LEGS_6"), -1, 1);;
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_LEGS_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_FEET"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_FEET_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_FEET_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_FEET_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_FEET_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_FEET_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_FEET_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_FEET_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_BERD"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_BERD_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_BERD_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_BERD_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_BERD_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_BERD_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_BERD_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_BERD_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_PROPS"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_PROPS_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_PROPS_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_PROPS_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_PROPS_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_PROPS_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_PROPS_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_PROPS_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_PROPS_8"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_PROPS_9"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_PROPS_10"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_OUTFIT"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_TORSO"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_SPECIAL"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_SPECIAL_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_SPECIAL_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_SPECIAL_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_SPECIAL_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_SPECIAL_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_SPECIAL_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_SPECIAL_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_SPECIAL2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_SPECIAL2_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_DECL"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_TEETH"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_TEETH_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_TEETH_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_TORSO"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_SPECIAL"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_SPECIAL_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_SPECIAL_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_SPECIAL_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_SPECIAL_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_SPECIAL_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_SPECIAL_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_SPECIAL_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_SPECIAL2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_SPECIAL2_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_DECL"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_ACQUIRED_TEETH"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_REV_DA_IN_POSSESSION"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STAM"), 100, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STRN"), 100, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_LUNG"), 100, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_DRIV"), 100, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_FLY"), 100, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_SHO"), 100, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STL"), 100, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_STAM"), 100, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_STRN"), 100, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_LUNG"), 100, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_DRIV"), 100, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_FLY"), 100, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_SHO"), 100, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SCRIPT_INCREASE_STL"), 100, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MPPLY_VEHICLE_ID_ADMIN_WEB"), 117401876, 1);
 
 
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_VEHICLE_1_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_VEHICLE_2_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_VEHICLE_1_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_VEHICLE_2_UNLCK"), -1, 1);
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SHOOTING_ABILITY"), 150, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SHOOTING_ABILITY"), 15000, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SHOOTING_ABILITY"), 1000, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SHOOTING_ABILITY"), 150, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SHOOTING_ABILITY"), 15000, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SHOOTING_ABILITY"), 1000, 0);
 
 
 					});
@@ -5716,54 +5720,54 @@ namespace Saint
 
 				sub->draw_option<RegularOption>("LSC/Vehicle", "", [] {
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_1_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_2_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_3_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_4_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_5_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_6_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_FM_CARMOD_7_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FMRALLYWONDRIVE"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FMRALLYWONNAV"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FMWINSEARACE"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FMWINAIRRACE"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_NUMBER_TURBO_STARTS_IN_RACE"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_USJS_COMPLETED"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FM_RACES_FASTEST_LAP"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_NUMBER_SLIPSTREAMS_IN_RACE"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_WIN_CAPTURES"), 25, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_DROPOFF_CAP_PACKAGES"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_KILL_CARRIER_CAPTURE"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FINISH_HEISTS"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_FINISH_HEIST_SETUP_JOB"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_WIN_LAST_TEAM_STANDINGS"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_ONLY_PLAYER_ALIVE_LTS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_1_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_2_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_3_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_4_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_5_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_6_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_FM_CARMOD_7_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FMRALLYWONDRIVE"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FMRALLYWONNAV"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FMWINSEARACE"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FMWINAIRRACE"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_NUMBER_TURBO_STARTS_IN_RACE"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_USJS_COMPLETED"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FM_RACES_FASTEST_LAP"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_NUMBER_SLIPSTREAMS_IN_RACE"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_WIN_CAPTURES"), 25, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_DROPOFF_CAP_PACKAGES"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_KILL_CARRIER_CAPTURE"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FINISH_HEISTS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_FINISH_HEIST_SETUP_JOB"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_WIN_LAST_TEAM_STANDINGS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_ONLY_PLAYER_ALIVE_LTS"), 50, 1);
 
 					/// ----------------
 
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CHAR_FM_CARMOD_1_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CHAR_FM_CARMOD_2_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CHAR_FM_CARMOD_3_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CHAR_FM_CARMOD_4_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CHAR_FM_CARMOD_5_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CHAR_FM_CARMOD_6_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CHAR_FM_CARMOD_7_UNLCK"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FMRALLYWONDRIVE"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FMRALLYWONNAV"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FMWINSEARACE"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FMWINAIRRACE"), 1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_NUMBER_TURBO_STARTS_IN_RACE"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_USJS_COMPLETED"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FM_RACES_FASTEST_LAP"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_NUMBER_SLIPSTREAMS_IN_RACE"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_WIN_CAPTURES"), 25, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_DROPOFF_CAP_PACKAGES"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_KILL_CARRIER_CAPTURE"), 100, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FINISH_HEISTS"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_FINISH_HEIST_SETUP_JOB"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_WIN_LAST_TEAM_STANDINGS"), 50, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_ONLY_PLAYER_ALIVE_LTS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CHAR_FM_CARMOD_1_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CHAR_FM_CARMOD_2_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CHAR_FM_CARMOD_3_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CHAR_FM_CARMOD_4_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CHAR_FM_CARMOD_5_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CHAR_FM_CARMOD_6_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CHAR_FM_CARMOD_7_UNLCK"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FMRALLYWONDRIVE"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FMRALLYWONNAV"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FMWINSEARACE"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FMWINAIRRACE"), 1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_NUMBER_TURBO_STARTS_IN_RACE"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_USJS_COMPLETED"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FM_RACES_FASTEST_LAP"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_NUMBER_SLIPSTREAMS_IN_RACE"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_WIN_CAPTURES"), 25, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_DROPOFF_CAP_PACKAGES"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_KILL_CARRIER_CAPTURE"), 100, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FINISH_HEISTS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_FINISH_HEIST_SETUP_JOB"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_WIN_LAST_TEAM_STANDINGS"), 50, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_ONLY_PLAYER_ALIVE_LTS"), 50, 1);
 
 					});
 
@@ -5771,58 +5775,58 @@ namespace Saint
 
 				sub->draw_option<RegularOption>("Tattoos", "", [] {
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_tattoo_fm_unlocks_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_tattoo_fm_unlocks_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_tattoo_fm_unlocks_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_tattoo_fm_unlocks_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_tattoo_fm_unlocks_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_tattoo_fm_unlocks_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_tattoo_fm_unlocks_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_tattoo_fm_unlocks_8"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_tattoo_fm_unlocks_9"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_tattoo_fm_unlocks_10"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_tattoo_fm_unlocks_11"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_tattoo_fm_unlocks_12"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_tattoo_fm_unlocks_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_tattoo_fm_unlocks_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_tattoo_fm_unlocks_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_tattoo_fm_unlocks_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_tattoo_fm_unlocks_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_tattoo_fm_unlocks_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_tattoo_fm_unlocks_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_tattoo_fm_unlocks_8"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_tattoo_fm_unlocks_9"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_tattoo_fm_unlocks_10"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_tattoo_fm_unlocks_11"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_tattoo_fm_unlocks_12"), -1, 1);
 
 					//----------------------------
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_tattoo_fm_unlocks_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_tattoo_fm_unlocks_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_tattoo_fm_unlocks_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_tattoo_fm_unlocks_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_tattoo_fm_unlocks_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_tattoo_fm_unlocks_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_tattoo_fm_unlocks_7"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_tattoo_fm_unlocks_8"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_tattoo_fm_unlocks_9"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_tattoo_fm_unlocks_10"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_tattoo_fm_unlocks_11"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_tattoo_fm_unlocks_12"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_tattoo_fm_unlocks_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_tattoo_fm_unlocks_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_tattoo_fm_unlocks_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_tattoo_fm_unlocks_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_tattoo_fm_unlocks_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_tattoo_fm_unlocks_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_tattoo_fm_unlocks_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_tattoo_fm_unlocks_8"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_tattoo_fm_unlocks_9"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_tattoo_fm_unlocks_10"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_tattoo_fm_unlocks_11"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_tattoo_fm_unlocks_12"), -1, 1);
 					});
 
 
 				sub->draw_option<RegularOption>("Haircuts", "", [] {
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLTHS_AVAILABLE_HAIR_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CLTHS_AVAILABLE_HAIR_7"), -1, 1);
 
 
 					// --------------
 
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR_1"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR_2"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR_3"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR_4"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR_5"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR_6"), -1, 1);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLTHS_AVAILABLE_HAIR_7"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR_1"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR_2"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR_3"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR_4"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR_5"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR_6"), -1, 1);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CLTHS_AVAILABLE_HAIR_7"), -1, 1);
 
 
 
@@ -5831,32 +5835,32 @@ namespace Saint
 
 				sub->draw_option<RegularOption>("Weapons", "", [] {
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MOLOTOV _ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CMBTPISTOL_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_PISTOL50_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_APPISTOL_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MICROSMG_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SMG_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_ASLTSMG_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_ASLTRIFLE_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CRBNRIFLE_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_ADVRIFLE_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MG_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CMBTMG_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_ASLTMG_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_PUMP_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SAWNOFF_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_BULLPUP_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_ASLTSHTGN_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SNIPERRFL_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_HVYSNIPER_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_GRNLAUNCH_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_RPG_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MINIGUNS_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_GRENADE_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SMKGRENADE_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_STKYBMB_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_MOLOTOV_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MOLOTOV _ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CMBTPISTOL_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_PISTOL50_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_APPISTOL_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MICROSMG_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SMG_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_ASLTSMG_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_ASLTRIFLE_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CRBNRIFLE_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_ADVRIFLE_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MG_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_CMBTMG_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_ASLTMG_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_PUMP_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SAWNOFF_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_BULLPUP_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_ASLTSHTGN_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SNIPERRFL_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_HVYSNIPER_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_GRNLAUNCH_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_RPG_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MINIGUNS_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_GRENADE_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_SMKGRENADE_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_STKYBMB_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_MOLOTOV_ENEMY_KILLS"), 600, 0);
 
 
 
@@ -5864,32 +5868,32 @@ namespace Saint
 
 					// -------------------
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MOLOTOV _ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CMBTPISTOL_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_PISTOL50_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_APPISTOL_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MICROSMG_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SMG_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_ASLTSMG_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_ASLTRIFLE_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CRBNRIFLE_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_ADVRIFLE_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MG_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CMBTMG_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_ASLTMG_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_PUMP_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SAWNOFF_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_BULLPUP_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_ASLTSHTGN_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SNIPERRFL_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_HVYSNIPER_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_GRNLAUNCH_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_RPG_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MINIGUNS_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_GRENADE_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SMKGRENADE_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_STKYBMB_ENEMY_KILLS"), 600, 0);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_MOLOTOV_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MOLOTOV _ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CMBTPISTOL_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_PISTOL50_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_APPISTOL_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MICROSMG_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SMG_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_ASLTSMG_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_ASLTRIFLE_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CRBNRIFLE_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_ADVRIFLE_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MG_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_CMBTMG_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_ASLTMG_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_PUMP_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SAWNOFF_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_BULLPUP_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_ASLTSHTGN_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SNIPERRFL_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_HVYSNIPER_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_GRNLAUNCH_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_RPG_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MINIGUNS_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_GRENADE_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_SMKGRENADE_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_STKYBMB_ENEMY_KILLS"), 600, 0);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_MOLOTOV_ENEMY_KILLS"), 600, 0);
 					});
 
 
@@ -6464,24 +6468,24 @@ namespace Saint
 
 
 					sub->draw_option<RegularOption>("LS Summer", "", [] {
-						STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_KINGOFQUB3D"), true, true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_QUBISM"), true, true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_QUIBITS"), true, true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_GODOFQUB3D"), true, true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_ELEVENELEVEN"), true, true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP0_AWD_GOFOR11TH"), true, true);
-					STATS::STAT_SET_MASKED_INT(MISC::GET_HASH_KEY("MP0_SU20PSTAT_INT"), 1, 35, 8, true);
+						STATS::STAT_SET_BOOL(Game->HashKey("MP0_AWD_KINGOFQUB3D"), true, true);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP0_AWD_QUBISM"), true, true);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP0_AWD_QUIBITS"), true, true);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP0_AWD_GODOFQUB3D"), true, true);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP0_AWD_ELEVENELEVEN"), true, true);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP0_AWD_GOFOR11TH"), true, true);
+					STATS::STAT_SET_MASKED_INT(Game->HashKey("MP0_SU20PSTAT_INT"), 1, 35, 8, true);
 
 
 					// -------------- chara 2
 
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_KINGOFQUB3D"), true, true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_QUBISM"), true, true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_QUIBITS"), true, true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_GODOFQUB3D"), true, true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_ELEVENELEVEN"), true, true);
-					STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MP1_AWD_GOFOR11TH"), true, true);
-		/*			STATS::STAT_SET_MASKED_INT(MISC::GET_HASH_KEY("MP1_SU20PSTAT_INT"), 1, 35, 8);*/
+					STATS::STAT_SET_BOOL(Game->HashKey("MP1_AWD_KINGOFQUB3D"), true, true);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP1_AWD_QUBISM"), true, true);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP1_AWD_QUIBITS"), true, true);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP1_AWD_GODOFQUB3D"), true, true);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP1_AWD_ELEVENELEVEN"), true, true);
+					STATS::STAT_SET_BOOL(Game->HashKey("MP1_AWD_GOFOR11TH"), true, true);
+		/*			STATS::STAT_SET_MASKED_INT(Game->HashKey("MP1_SU20PSTAT_INT"), 1, 35, 8);*/
 
 
 
@@ -6490,24 +6494,24 @@ namespace Saint
 
 
 					sub->draw_option<RegularOption>("LS Tuner", "", [] {
-						STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_CAR_CLUB_MEM"), 100, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_SPRINTRACER"), 50, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_STREETRACER"), 50, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_PURSUITRACERD"), 240, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_AUTO_SHOP"), 50, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_GROUNDWORK"), 40, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_AWD_GROUNDWORK"), 40, true);
+						STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_CAR_CLUB_MEM"), 100, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_SPRINTRACER"), 50, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_STREETRACER"), 50, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_PURSUITRACERD"), 240, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_AUTO_SHOP"), 50, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_GROUNDWORK"), 40, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP0_AWD_GROUNDWORK"), 40, true);
 
 
 					// -------------- Chara 2
 
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_CAR_CLUB_MEM"), 100, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_SPRINTRACER"), 50, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_STREETRACER"), 50, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_PURSUITRACERD"), 240, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_AUTO_SHOP"), 50, true);
-					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_AWD_GROUNDWORK"), 40, true);
-					//STATS::STAT_SET_MASKED_INT(MISC::GET_HASH_KEY("MP1_SU20PSTAT_INT"), 1, 35, 8);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_CAR_CLUB_MEM"), 100, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_SPRINTRACER"), 50, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_STREETRACER"), 50, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_PURSUITRACERD"), 240, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_AUTO_SHOP"), 50, true);
+					STATS::STAT_SET_INT(Game->HashKey("MP1_AWD_GROUNDWORK"), 40, true);
+					//STATS::STAT_SET_MASKED_INT(Game->HashKey("MP1_SU20PSTAT_INT"), 1, 35, 8);
 
 
 
@@ -6541,10 +6545,10 @@ namespace Saint
 				sub->draw_option<RegularOption>("Apply", nullptr, []
 					{
 						if (m_recovery.pos == 0) {
-							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CHAR_SET_RP_GIFT_ADMIN"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], true);
+							STATS::STAT_SET_INT(Game->HashKey("MP0_CHAR_SET_RP_GIFT_ADMIN"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], true);
 						}
 						if (m_recovery.pos == 1) {
-							STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CURRENT_CREW_RANK"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], true);
+							STATS::STAT_SET_INT(Game->HashKey("MP0_CURRENT_CREW_RANK"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], true);
 						}
 						Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Change session for the level to apply." });
 					});
@@ -6630,7 +6634,7 @@ namespace Saint
 			{
 				sub->draw_option<toggle<bool>>(("Override Restrictions"), nullptr, &team.override_restrictions, BoolDisplay::OnOff, false, [] {
 					if (!team.override_restrictions) {
-						NETWORK::NETWORK_OVERRIDE_TEAM_RESTRICTIONS(PLAYER::GET_PLAYER_TEAM(PLAYER::PLAYER_PED_ID()), false);
+						NETWORK::NETWORK_OVERRIDE_TEAM_RESTRICTIONS(PLAYER::GET_PLAYER_TEAM(Game->Self()), false);
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Use Freemode Colour Instead Of Team"), nullptr, &team.use_player_colour_instead_of_team, BoolDisplay::OnOff, false, [] {
@@ -6639,12 +6643,12 @@ namespace Saint
 					}
 					});
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Team", nullptr, &team.type, &team.data, true, -1, [] {
-					PLAYER::SET_PLAYER_TEAM(PLAYER::PLAYER_PED_ID(), team.data);
+					PLAYER::SET_PLAYER_TEAM(Game->Self(), team.data);
 					});
 				sub->draw_option<UnclickOption>(("Players"), nullptr, [] {});
 				for (std::uint32_t i = 0; i < 32; ++i)
 				{
-					if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))
+					if (auto ped = Game->PlayerIndex(i))
 					{
 						if (PLAYER::GET_PLAYER_TEAM(ped) == 0) {
 							std::string name = PLAYER::GET_PLAYER_NAME(i);
@@ -6715,7 +6719,7 @@ namespace Saint
 				}
 				for (std::uint32_t i = 0; i < 32; ++i)
 				{
-					if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))
+					if (auto ped = Game->PlayerIndex(i))
 					{
 
 						std::string name = PLAYER::GET_PLAYER_NAME(i);
@@ -6954,7 +6958,7 @@ namespace Saint
 				{
 
 
-					if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))
+					if (auto ped = Game->PlayerIndex(i))
 					{
 						if (sub->GetSelectedOption() == sub->GetNumOptions()) {
 							if (hide_information.all) {
@@ -7016,10 +7020,10 @@ namespace Saint
 							NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, -1);
 							HUD::SET_MINIMAP_IN_SPECTATOR_MODE(false, -1);
 
-							ENTITY::FREEZE_ENTITY_POSITION(PLAYER::PLAYER_PED_ID(), false);
-							ENTITY::FREEZE_ENTITY_POSITION(PED::GET_VEHICLE_PED_IS_USING(PLAYER::PLAYER_PED_ID()), false);
+							ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), false);
+							ENTITY::FREEZE_ENTITY_POSITION(PED::GET_VEHICLE_PED_IS_USING(Game->Self()), false);
 
-							STREAMING::SET_FOCUS_ENTITY(PLAYER::PLAYER_PED_ID());
+							STREAMING::SET_FOCUS_ENTITY(Game->Self());
 
 						}
 						});
@@ -7029,7 +7033,7 @@ namespace Saint
 						switch (c_clipboard.data) {
 						case 0:
 							int netHandle[13];
-							NETWORK::NETWORK_HANDLE_FROM_PLAYER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), netHandle, 13);
+							NETWORK::NETWORK_HANDLE_FROM_PLAYER(Game->PlayerIndex(g_SelectedPlayer), netHandle, 13);
 							copytoclipboard(NETWORK::NETWORK_MEMBER_ID_FROM_GAMER_HANDLE(&netHandle[0]));
 							break;
 						case 1:
@@ -7068,7 +7072,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("More Information", rage::joaat("MoreInformation"), [](sub* sub)
 			{
-				if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer))
+				if (auto ped = Game->PlayerIndex(g_SelectedPlayer))
 				{
 					script_global globalplayer_bd(2657589);
 					script_global gpbd_fm_3(1894573);
@@ -7174,44 +7178,44 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Vehicle", SubmenuSelectedVehicle, [](sub* sub)
 			{
 				sub->draw_option<number<std::int32_t>>("Boost", nullptr, &features.boost_speed, 0, 300, 10, 3, false, "", "", [] {
-					if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false))) {
+					if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false))) {
 
-						Vehicle get_veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+						Vehicle get_veh = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false);
 						VEHICLE::SET_VEHICLE_FORWARD_SPEED(get_veh, features.boost_speed);
 					}
 					});
 				sub->draw_option<RegularOption>("Stop", nullptr, [=]
 					{
-						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false))) {
+						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false))) {
 
-							Vehicle get_veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+							Vehicle get_veh = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false);
 							VEHICLE::SET_VEHICLE_FORWARD_SPEED(get_veh, 0);
 						}
 
 					});
 				sub->draw_option<RegularOption>("Launch", nullptr, [=]
 					{
-						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false))) {
+						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false))) {
 
-							ENTITY::APPLY_FORCE_TO_ENTITY(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false), 1, 0, 0, 300, 0, 0, 0, 1, false, true, true, true, true);
+							ENTITY::APPLY_FORCE_TO_ENTITY(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false), 1, 0, 0, 300, 0, 0, 0, 1, false, true, true, true, true);
 						}
 
 					});
 				sub->draw_option<RegularOption>("Downgrade", nullptr, [=]
 					{
-						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false))) {
+						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false))) {
 
 							for (int i = 0; i < 50; i++)
 							{
 
-								Vehicle vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+								Vehicle vehicle = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false);
 								VEHICLE::REMOVE_VEHICLE_MOD(vehicle, i);
 							}
 						}
 
 					});
 				sub->draw_option<RegularOption>("Gift Current", "", [] {
-					Vehicle vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					Vehicle vehicle = Game->Vehicle();
 					ENTITY::SET_ENTITY_AS_MISSION_ENTITY(vehicle, TRUE, TRUE);
 					DECORATOR::DECOR_REGISTER("PV_Slot", 3);
 					DECORATOR::DECOR_REGISTER("Player_Vehicle", 3);
@@ -7222,7 +7226,7 @@ namespace Saint
 				sub->draw_option<RegularOption>("Clone", nullptr, [=]
 					{
 						Vehicle pedVeh = NULL;
-						Ped playerPed = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
+						Ped playerPed = Game->PlayerIndex(g_SelectedPlayer);
 						if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, FALSE))
 						{
 							pedVeh = PED::GET_VEHICLE_PED_IS_IN(playerPed, FALSE);
@@ -7237,9 +7241,9 @@ namespace Saint
 
 
 										Vehicle playerVeh;
-										NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::PLAYER_PED_ID(), { 0.f, 0.f, (VEHICLE::IS_THIS_MODEL_A_PLANE(vehicleModelHash) || VEHICLE::IS_THIS_MODEL_A_HELI(vehicleModelHash)) ? 1.0f + 50.f : 1.0f });
+										NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(Game->Self(), { 0.f, 0.f, (VEHICLE::IS_THIS_MODEL_A_PLANE(vehicleModelHash) || VEHICLE::IS_THIS_MODEL_A_HELI(vehicleModelHash)) ? 1.0f + 50.f : 1.0f });
 										*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-										Vehicle vehicle = VEHICLE::CREATE_VEHICLE(vehicleModelHash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
+										Vehicle vehicle = VEHICLE::CREATE_VEHICLE(vehicleModelHash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(Game->Self()), true, false, false);
 										spawned_veh.spawned.push_back({ HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicle))), vehicle });
 										playerVeh = vehicle;
 										*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
@@ -7248,7 +7252,7 @@ namespace Saint
 										if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
 											NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
 										VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
-										PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
+										PED::SET_PED_INTO_VEHICLE(Game->Self(), vehicle, -1);
 
 										int primaryColor, secondaryColor;
 										VEHICLE::GET_VEHICLE_COLOURS(pedVeh, &primaryColor, &secondaryColor);
@@ -7352,7 +7356,7 @@ namespace Saint
 							});
 					});
 				if (search_completed) {
-					Hash vehicleHash2 = MISC::GET_HASH_KEY(ModelInput.c_str());
+					Hash vehicleHash2 = Game->HashKey(ModelInput.c_str());
 					if (STREAMING::IS_MODEL_VALID(vehicleHash2)) {
 						sub->draw_option<UnclickOption>(("Found ~r~1 ~w~Result."), nullptr, [] {});
 					}
@@ -7398,7 +7402,7 @@ namespace Saint
 							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
 								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
 								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
-								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(MISC::GET_HASH_KEY(model_ptr.c_str())) == m_selected_player_vehicle_class) {
+								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(Game->HashKey(model_ptr.c_str())) == m_selected_player_vehicle_class) {
 									std::stringstream ss;
 									std::string make(make_ptr);
 									std::string model(model_ptr);
@@ -7459,7 +7463,7 @@ namespace Saint
 				sub->draw_option<submenu>("Give Weapons", nullptr, SubmenuGiveWeapons);
 				sub->draw_option<toggle<bool>>(("Flash Blip"), nullptr, &g_players.get_selected.flash_blip.enabled, BoolDisplay::OnOff, false, [] {
 					if (!g_players.get_selected.flash_blip.enabled) {
-						Blip b = HUD::GET_BLIP_FROM_ENTITY(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
+						Blip b = HUD::GET_BLIP_FROM_ENTITY(Game->PlayerIndex(g_SelectedPlayer));
 						HUD::SET_BLIP_FLASHES(b, false);
 					}
 					});
@@ -7472,7 +7476,7 @@ namespace Saint
 				int Maxammo = 0;
 
 				if (give_weapon.type_int != 0) {
-					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), all_weapons.hash[give_weapon.type_int], &Maxammo);
+					WEAPON::GET_MAX_AMMO(Game->Self(), Game->Weapon->Hash[give_weapon.type_int], &Maxammo);
 				}
 				if (give_weapon.type_int == 0) {
 					Maxammo = 9999;
@@ -7482,12 +7486,12 @@ namespace Saint
 				sub->draw_option<RegularOption>(("Apply"), nullptr, []
 					{
 						if (give_weapon.type_int != 0) {
-							WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), all_weapons.hash[give_weapon.type_int], 9999, false);
+							Game->GiveWeapon(Game->PlayerIndex(g_SelectedPlayer), all_weapons.hash_all[give_weapon.type_int], 9999);
 						}
 						if (give_weapon.type_int == 0) {
 
 							for (int x = 0; x < 106; x++) {
-								WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), all_weapons.hash[x], give_weapon.amount, false);
+								Game->GiveWeapon(Game->PlayerIndex(g_SelectedPlayer), Game->Weapon->Hash[give_weapon.type_int], give_weapon.amount);
 							}
 						}
 					});
@@ -7589,9 +7593,9 @@ namespace Saint
 				sub->draw_option<RegularOption>(("Teleport To You"), nullptr, [=]
 					{
 						for (std::uint32_t i = 0; i < PLAYER::GET_NUMBER_OF_PLAYERS(); ++i) {
-							if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false))) {
-								Entity ent = PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
-								NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+							if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(i), false))) {
+								Entity ent = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(i), false);
+								NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
 								ENTITY::SET_ENTITY_COORDS(ent, coords.x, coords.y, coords.z, 0, 0, 0, 0);
 							}
 						}
@@ -7671,7 +7675,7 @@ namespace Saint
 				}
 				for (std::uint32_t i = 0; i < 32; ++i)
 				{
-					if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))
+					if (auto ped = Game->PlayerIndex(i))
 					{
 
 						std::string name = PLAYER::GET_PLAYER_NAME(i);
@@ -7737,9 +7741,9 @@ namespace Saint
 					{
 
 						for (std::uint32_t i = 0; i < PLAYER::GET_NUMBER_OF_PLAYERS(); ++i) {
-							NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
+							NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(i), false);
 							*(unsigned short*)g_GameFunctions->m_owned_explosion = 0xE990;
-							FIRE::ADD_OWNED_EXPLOSION(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), c.x, c.y, c.z, 0, 500, true, false, 0);
+							FIRE::ADD_OWNED_EXPLOSION(Game->PlayerIndex(g_SelectedPlayer), c.x, c.y, c.z, 0, 500, true, false, 0);
 							*(unsigned short*)g_GameFunctions->m_owned_explosion = 0x850F;
 						}
 
@@ -7769,18 +7773,18 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Shoot Single Bullet"), rage::joaat("SHOOT_BULLET"), [](sub* sub)
 			{
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Weapon", nullptr, &all_weapons.name, &features.bullet_int);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Weapon", nullptr, &Game->Weapon->Name, &features.bullet_int);
 				sub->draw_option<RegularOption>(("Shoot"), nullptr, [=]
 					{
-						std::int32_t hash = all_weapons.hash[features.bullet_int];
+						std::int32_t hash = Game->Weapon->Hash[features.bullet_int];
 						WEAPON::REQUEST_WEAPON_ASSET(hash, 31, 0);
 						g_FiberPool.queue([=] {
 							while (!WEAPON::HAS_WEAPON_ASSET_LOADED(hash))
 								fbr::cur()->wait();
 							});
-						NativeVector3 destination = PED::GET_PED_BONE_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), SKEL_ROOT, 0.0f, 0.0f, 0.0f);
-						NativeVector3 origin = PED::GET_PED_BONE_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), SKEL_R_Hand, 0.0f, 0.0f, 0.2f);
-						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(origin.x, origin.y, origin.z, destination.x, destination.y, destination.z, 1, 0, hash, PLAYER::PLAYER_PED_ID(), false, false, 100.f);
+						NativeVector3 destination = PED::GET_PED_BONE_COORDS(Game->PlayerIndex(g_SelectedPlayer), SKEL_ROOT, 0.0f, 0.0f, 0.0f);
+						NativeVector3 origin = PED::GET_PED_BONE_COORDS(Game->PlayerIndex(g_SelectedPlayer), SKEL_R_Hand, 0.0f, 0.0f, 0.2f);
+						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(origin.x, origin.y, origin.z, destination.x, destination.y, destination.z, 1, 0, hash, Game->Self(), false, false, 100.f);
 					});
 			});
 		g_Render->draw_submenu<sub>(("Send To Interior"), SubmenuSendToInt, [](sub* sub) {
@@ -7809,12 +7813,12 @@ namespace Saint
 				});
 			sub->draw_option<RegularOption>(("Delete"), nullptr, []
 				{
-					Player ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
+					Player ped = Game->PlayerIndex(g_SelectedPlayer);
 					NativeVector3 pedpos = ENTITY::GET_ENTITY_COORDS(ped, 0);
-					Hash ramp3 = MISC::GET_HASH_KEY("stt_prop_stunt_tube_l");
+					Hash ramp3 = Game->HashKey("stt_prop_stunt_tube_l");
 					Object ObjToDelete3 = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(pedpos.x, pedpos.y, pedpos.z, 10.f, ramp3, 0, 1, 1);
 					OBJECT::DELETE_OBJECT(&ObjToDelete3);
-					Hash ramp = MISC::GET_HASH_KEY("prop_gold_cont_01");
+					Hash ramp = Game->HashKey("prop_gold_cont_01");
 					Object ObjToDelete = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(pedpos.x, pedpos.y, pedpos.z, 10.f, ramp, 0, 1, 1);
 					OBJECT::DELETE_OBJECT(&ObjToDelete);
 				});
@@ -7852,11 +7856,11 @@ namespace Saint
 			sub->draw_option<RegularOption>(("Once"), nullptr, []
 				{
 					if (owned_explosion.blame) {
-						NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+						NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), false);
 						owned_explosion.add(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(owned_explosion.blamed_person), c, owned_explosion.data_i, owned_explosion.damage_scale, owned_explosion.sound, owned_explosion.invisible, owned_explosion.cameraShake);
 					}
 					else {
-						NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+						NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), false);
 						FIRE::ADD_EXPLOSION(c.x, c.y, c.z, owned_explosion.data_i, owned_explosion.damage_scale, owned_explosion.sound, owned_explosion.invisible, owned_explosion.cameraShake, false);
 					}
 				});
@@ -7871,7 +7875,7 @@ namespace Saint
 				}
 				for (std::uint32_t i = 0; i < 32; ++i)
 				{
-					if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))
+					if (auto ped = Game->PlayerIndex(i))
 					{
 
 						std::string name = PLAYER::GET_PLAYER_NAME(i);
@@ -7910,26 +7914,26 @@ namespace Saint
 			{
 				sub->draw_option<RegularOption>(("To Player"), nullptr, []
 					{
-						if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false)) {
+						if (PED::IS_PED_IN_ANY_VEHICLE(Game->PlayerIndex(g_SelectedPlayer), false)) {
 							for (int i = -1; i < 16; i++)
 							{
-								if (VEHICLE::IS_VEHICLE_SEAT_FREE(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false), i, i))
+								if (VEHICLE::IS_VEHICLE_SEAT_FREE(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false), i, i))
 								{
-									PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false), i);
+									PED::SET_PED_INTO_VEHICLE(Game->Self(), PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false), i);
 								}
 							}
 						}
 						else {
-							NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
-							PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), c.x, c.y, c.z);
+							NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), false);
+							PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), c.x, c.y, c.z);
 						}
 					});
 				sub->draw_option<RegularOption>(("Their Vehicle To Me"), nullptr, [=]
 					{
 
-						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false))) {
-							Entity ent = PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
-							NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false))) {
+							Entity ent = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false);
+							NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
 							ENTITY::SET_ENTITY_COORDS(ent, coords.x, coords.y, coords.z, 0, 0, 0, 0);
 
 						}
@@ -7944,7 +7948,7 @@ namespace Saint
 			{
 				sub->draw_option<submenu>("Model", nullptr, rage::joaat("CustomModelB"));
 				sub->draw_option<toggle<bool>>(("Godmode"), nullptr, &bodygaurd.godmode, BoolDisplay::OnOff);
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Weapon", nullptr, &all_weapons.name, &bodygaurd.WeaponInt);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Weapon", nullptr, &Game->Weapon->Name, &bodygaurd.WeaponInt);
 				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Custom Firing Pattern", nullptr, &bodygaurd.FiringPatternEnabled, &bodygaurd.FiringPattern, &bodygaurd.FiringPatternInt);
 				sub->draw_option<number<std::int32_t>>("Accuracy", nullptr, &bodygaurd.accuary, 0, 100);
 				sub->draw_option<number<float>>("Damage Multiplier", nullptr, &bodygaurd.damagemultiplier, 0.0f, 150.f, 0.10f, 2);
@@ -7953,32 +7957,32 @@ namespace Saint
 
 					});
 				g_FiberPool.queue([=] {
-					for (uint8_t i = 0; !STREAMING::HAS_MODEL_LOADED(MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str())) && i < 100; i++)
+					for (uint8_t i = 0; !STREAMING::HAS_MODEL_LOADED(Game->HashKey(bodygaurd.selected_model.c_str())) && i < 100; i++)
 					{
-						STREAMING::REQUEST_MODEL(MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str()));
+						STREAMING::REQUEST_MODEL(Game->HashKey(bodygaurd.selected_model.c_str()));
 						fbr::cur()->wait();
 					}
 					});
-				if (!STREAMING::HAS_MODEL_LOADED(MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str())))
+				if (!STREAMING::HAS_MODEL_LOADED(Game->HashKey(bodygaurd.selected_model.c_str())))
 				{
 					sub->draw_option<RegularOption>(("Loading..."), "If the selected is a bunch of giberish, reselect the model", []
 						{
 						});
 				}
-				if (STREAMING::HAS_MODEL_LOADED(MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str()))) {
+				if (STREAMING::HAS_MODEL_LOADED(Game->HashKey(bodygaurd.selected_model.c_str()))) {
 					sub->draw_option<RegularOption>(("Spawn"), nullptr, []
 						{
 							
-							g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str()), [=] {
-								NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
-								Ped ped = PED::CREATE_PED(26, MISC::GET_HASH_KEY(bodygaurd.selected_model.c_str()), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
+							g_CallbackScript->AddCallback<ModelCallback>(Game->HashKey(bodygaurd.selected_model.c_str()), [=] {
+								NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), false);
+								Ped ped = PED::CREATE_PED(26, Game->HashKey(bodygaurd.selected_model.c_str()), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
 								
 								NETWORK::NETWORK_FADE_IN_ENTITY(ped, true, false);
-								PED::SET_PED_AS_GROUP_LEADER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
+								PED::SET_PED_AS_GROUP_LEADER(Game->PlayerIndex(g_SelectedPlayer), PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
 								PED::SET_PED_AS_GROUP_MEMBER(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
 								PED::SET_PED_NEVER_LEAVES_GROUP(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
 								PED::SET_PED_COMBAT_ABILITY(ped, 100);
-								WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, all_weapons.hash[bodygaurd.WeaponInt], 9998, true);
+								Game->GiveWeapon(ped, Game->Weapon->Hash[bodygaurd.WeaponInt], 9998);
 								PED::SET_PED_CAN_SWITCH_WEAPON(ped, true);
 								PED::SET_GROUP_FORMATION(PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer), 3);
 								PED::SET_PED_MAX_HEALTH(ped, 5000);
@@ -8022,23 +8026,23 @@ namespace Saint
 					{
 						for (auto& guard : bodygaurd.spawned) {
 							if (guard.m_owner == g_SelectedPlayer) {
-								NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+								NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
 								ENTITY::SET_ENTITY_COORDS(guard.m_id, coords.x, coords.y, coords.z, 0, 0, 0, 0);
 							}
 						}
 					});
 				sub->draw_option<RegularOption>(("Teleport Into Current Vehicle"), nullptr, [=]
 					{
-						if (VEHICLE::ARE_ANY_VEHICLE_SEATS_FREE(get_veh())) {
+						if (VEHICLE::ARE_ANY_VEHICLE_SEATS_FREE(Game->Vehicle())) {
 							for (auto& guard : bodygaurd.spawned) {
 								if (guard.m_owner == g_SelectedPlayer) {
 									if (!PED::IS_PED_IN_ANY_VEHICLE(guard.m_id, false)) {
-										if (VEHICLE::ARE_ANY_VEHICLE_SEATS_FREE(get_veh())) {
+										if (VEHICLE::ARE_ANY_VEHICLE_SEATS_FREE(Game->Vehicle())) {
 											for (int i = 0; i < 6; i++)
 											{
-												if (VEHICLE::IS_VEHICLE_SEAT_FREE(get_veh(), i, i))
+												if (VEHICLE::IS_VEHICLE_SEAT_FREE(Game->Vehicle(), i, i))
 												{
-													PED::SET_PED_INTO_VEHICLE(guard.m_id, get_veh(), i);
+													PED::SET_PED_INTO_VEHICLE(guard.m_id, Game->Vehicle(), i);
 												}
 											}
 
@@ -8079,18 +8083,18 @@ namespace Saint
 				sub->draw_option<submenu>("Outfit Editor", nullptr, rage::joaat("OutfitEditorSelected"));
 				sub->draw_option<RegularOption>(("Teleport To Me"), nullptr, [=]
 					{
-						NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+						NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
 						ENTITY::SET_ENTITY_COORDS(ped, coords.x, coords.y, coords.z, 0, 0, 0, 0);
 					});
 				sub->draw_option<RegularOption>(("Teleport Into Current Vehicle"), nullptr, [=]
 					{
 						if (!PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
-							if (VEHICLE::ARE_ANY_VEHICLE_SEATS_FREE(get_veh())) {
+							if (VEHICLE::ARE_ANY_VEHICLE_SEATS_FREE(Game->Vehicle())) {
 								for (int i = 0; i < 6; i++)
 								{
-									if (VEHICLE::IS_VEHICLE_SEAT_FREE(get_veh(), i, i))
+									if (VEHICLE::IS_VEHICLE_SEAT_FREE(Game->Vehicle(), i, i))
 									{
-										PED::SET_PED_INTO_VEHICLE(ped, get_veh(), i);
+										PED::SET_PED_INTO_VEHICLE(ped, Game->Vehicle(), i);
 									}
 								}
 
@@ -8230,7 +8234,7 @@ namespace Saint
 				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &drops.custom.delay, 0, 5000, 50);
 				sub->draw_option<RegularOption>(("Add"), nullptr, []
 					{
-						NativeVector3 b2 = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+						NativeVector3 b2 = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
 						drops.custom.a.push_back(b2);
 					});
 				sub->draw_option<RegularOption>(("Remove All"), nullptr, []
@@ -8378,15 +8382,15 @@ namespace Saint
 			{
 				sub->draw_option<RegularOption>("LSIA", "", []
 					{
-						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), -1336.0f, -3044.0f, 13.9f);
+						PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), -1336.0f, -3044.0f, 13.9f);
 					});
 				sub->draw_option<RegularOption>("Sandy Shores", "", []
 					{
-						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 1747.0f, 3273.7f, 41.1f);
+						PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), 1747.0f, 3273.7f, 41.1f);
 					});
 				sub->draw_option<RegularOption>("McKenzie", "", []
 					{
-						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), 2121.7f, 4796.3f, 41.1f);
+						PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), 2121.7f, 4796.3f, 41.1f);
 					});
 
 			});
@@ -8394,11 +8398,11 @@ namespace Saint
 			{
 				sub->draw_option<RegularOption>("Maze Bank Roof", "", []
 					{
-						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), -75.015, -818.215, 326.176);
+						PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), -75.015, -818.215, 326.176);
 					});
 				sub->draw_option<RegularOption>("Main LS Customs", "", []
 					{
-						PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), -373.01, -124.91, 38.31);
+						PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), -373.01, -124.91, 38.31);
 					});
 
 			});
@@ -8408,34 +8412,34 @@ namespace Saint
 					{
 						NativeVector3 Coords;
 						Coords.x = -6, 54853; Coords.y = 520, 445007; Coords.z = 174, 627792;
-						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS2(Game->Self(), Coords, false, false, false, false);
 					});
 				sub->draw_option<RegularOption>("Franklin's First House", "", []
 					{
 						NativeVector3 Coords;
 						Coords.x = -14, 577254; Coords.y = -1427, 414917; Coords.z = 31, 101492;
 
-						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS2(Game->Self(), Coords, false, false, false, false);
 					});
 				sub->draw_option<RegularOption>("Trevor's Truck", "", []
 					{
 						NativeVector3 Coords;
 						Coords.x = 1973, 865845; Coords.y = 3819, 97168; Coords.z = 33, 436317;
-						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS2(Game->Self(), Coords, false, false, false, false);
 					});
 
 				sub->draw_option<RegularOption>("Michael's House", "", []
 					{
 						NativeVector3 Coords;
 						Coords.x = -812, 573303; Coords.y = 180, 043457; Coords.z = 72, 159172;
-						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS2(Game->Self(), Coords, false, false, false, false);
 					});
 
 				sub->draw_option<RegularOption>("Lester's House", "", []
 					{
 						NativeVector3 Coords;
 						Coords.x = 1269, 541504; Coords.y = -1710, 447876; Coords.z = 54, 771492;
-						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS2(Game->Self(), Coords, false, false, false, false);
 					});
 
 
@@ -8445,26 +8449,26 @@ namespace Saint
 						NativeVector3 Coords;
 						Coords.x = 1739.5726; Coords.y = 2576.4565; Coords.z = 45.0334;
 
-						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS2(Game->Self(), Coords, false, false, false, false);
 					});
 				sub->draw_option<RegularOption>("Humane Labs", "", []
 					{
 						NativeVector3 Coords;
 						Coords.x = 3614, 394775; Coords.y = 3744, 803467; Coords.z = 28, 690090;
-						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS2(Game->Self(), Coords, false, false, false, false);
 					});
 				sub->draw_option<RegularOption>("FIB Building", "", []
 					{
 						NativeVector3 Coords;
 						Coords.x = 128, 572662; Coords.y = -727, 923401; Coords.z = 254, 152115;
-						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS2(Game->Self(), Coords, false, false, false, false);
 					});
 
 				sub->draw_option<RegularOption>("Floyd's Appartement", "", []
 					{
 						NativeVector3 Coords;
 						Coords.x = -1155, 725952; Coords.y = -1518, 761719; Coords.z = 10, 632728;
-						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS2(Game->Self(), Coords, false, false, false, false);
 					});
 				sub->draw_option<RegularOption>("Strip Club", "", []
 					{
@@ -8472,30 +8476,30 @@ namespace Saint
 						Coords.x = 126.135;
 						Coords.y = -1278.583;
 						Coords.z = 29.270;
-						ENTITY::SET_ENTITY_COORDS2(PLAYER::PLAYER_PED_ID(), Coords, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS2(Game->Self(), Coords, false, false, false, false);
 					});
 			});
 		g_Render->draw_submenu<sub>(("Clubhouse & Warehouses"), rage::joaat("warhouse"), [](sub* sub)
 			{
 				sub->draw_option<RegularOption>(("Clubhouse 1"), nullptr, []
 					{
-						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 1107.04, -3157.399, -37.51859, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS(Game->Self(), 1107.04, -3157.399, -37.51859, false, false, false, false);
 					});
 				sub->draw_option<RegularOption>(("Clubhouse 2"), nullptr, []
 					{
-						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 998.4809, -3164.711, -38.90733, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS(Game->Self(), 998.4809, -3164.711, -38.90733, false, false, false, false);
 					});
 				sub->draw_option<RegularOption>(("Methlab"), nullptr, []
 					{
-						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 1009.5, -3196.6, -38.99682, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS(Game->Self(), 1009.5, -3196.6, -38.99682, false, false, false, false);
 					});
 				sub->draw_option<RegularOption>(("Weed Farm"), nullptr, []
 					{
-						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 1051.491, -3196.536, -39.14842, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS(Game->Self(), 1051.491, -3196.536, -39.14842, false, false, false, false);
 					});
 				sub->draw_option<RegularOption>(("Cocaine Lockup"), nullptr, []
 					{
-						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 1093.6, -3196.6, -38.99841, false, false, false, false);
+						ENTITY::SET_ENTITY_COORDS(Game->Self(), 1093.6, -3196.6, -38.99841, false, false, false, false);
 					});
 			});
 
@@ -8544,7 +8548,7 @@ namespace Saint
 					if (ped_spawner.selected == model.m_class) {
 						sub->draw_option<RegularOption>(model.m_name.c_str(), nullptr, [=]
 							{
-								ped_spawner.change(MISC::GET_HASH_KEY(model.m_model.c_str()));
+								ped_spawner.change(Game->HashKey(model.m_model.c_str()));
 
 							});
 					}
@@ -8568,7 +8572,7 @@ namespace Saint
 				sub->draw_option<number<float>>("Z", nullptr, &black_hole.c.z, -10000.f, 10000.f);
 				sub->draw_option<RegularOption>("Teleport To Me", "", []
 					{
-						black_hole.c = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 1);
+						black_hole.c = ENTITY::GET_ENTITY_COORDS(Game->Self(), 1);
 					});
 			});
 		g_Render->draw_submenu<sub>(("Color"), rage::joaat("BHoleColor"), [](sub* sub)
@@ -8779,8 +8783,8 @@ namespace Saint
 						CAM::RENDER_SCRIPT_CAMS(false, true, 700, true, true, true);
 						CAM::SET_CAM_ACTIVE(m_creator.creator_cam, false);
 						CAM::DESTROY_CAM(m_creator.creator_cam, true);
-						PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), true);
-						ENTITY::FREEZE_ENTITY_POSITION(PLAYER::PLAYER_PED_ID(), false);
+						PLAYER::DISABLE_PLAYER_FIRING(Game->Self(), true);
+						ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), false);
 
 
 
@@ -8809,7 +8813,7 @@ namespace Saint
 				sub->draw_option<KeyboardOption>(("Add To List"), nullptr, m_creator.selected_object_name, []
 					{
 						showKeyboard("Enter Something", "", 25, &m_creator.selected_buffer, [] {
-							Hash hash = MISC::GET_HASH_KEY(m_creator.selected_buffer.c_str());
+							Hash hash = Game->HashKey(m_creator.selected_buffer.c_str());
 							if (STREAMING::IS_MODEL_VALID(hash) && !STREAMING::IS_MODEL_A_PED(hash) && !STREAMING::IS_MODEL_A_VEHICLE(hash)) {
 								m_creator.m_Objects.push_back({ m_creator.selected_buffer });
 
@@ -8850,7 +8854,7 @@ namespace Saint
 					{
 						Ped* peds = new Ped[(10 * 2 + 2)];
 						peds[0] = 10;
-						for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), peds, 0); i++)
+						for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(Game->Self(), peds, 0); i++)
 						{
 							Ped ped = peds[(i * 2 + 2)];
 							NativeVector3 c = ENTITY::GET_ENTITY_COORDS(ped, false);
@@ -8863,7 +8867,7 @@ namespace Saint
 					{
 						Ped* peds = new Ped[(10 * 2 + 2)];
 						peds[0] = 10;
-						for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), peds, 0); i++)
+						for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(Game->Self(), peds, 0); i++)
 						{
 							Ped ped = peds[(i * 2 + 2)];
 							PED::APPLY_DAMAGE_TO_PED(ped, PED::GET_PED_MAX_HEALTH(ped) * 2, false, 0);
@@ -8875,7 +8879,7 @@ namespace Saint
 					{
 						Ped* peds = new Ped[(10 * 2 + 2)];
 						peds[0] = 10;
-						for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), peds, 0); i++)
+						for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(Game->Self(), peds, 0); i++)
 						{
 							Ped ped = peds[(i * 2 + 2)];
 							ENTITY::DELETE_ENTITY(&ped);
@@ -8887,10 +8891,10 @@ namespace Saint
 					{
 						Ped* peds = new Ped[(10 * 2 + 2)];
 						peds[0] = 10;
-						for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), peds, 0); i++)
+						for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(Game->Self(), peds, 0); i++)
 						{
 							Ped ped = peds[(i * 2 + 2)];
-							TASK::TASK_HANDS_UP(ped, 5000, PLAYER::PLAYER_PED_ID(), 0, 0);
+							TASK::TASK_HANDS_UP(ped, 5000, Game->Self(), 0, 0);
 
 						}
 						delete peds;
@@ -8898,7 +8902,7 @@ namespace Saint
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Jump", nullptr, &jump_type, &jump_int, false, -1, [] {
 					Ped* peds = new Ped[(10 * 2 + 2)];
 					peds[0] = 10;
-					for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), peds, 0); i++)
+					for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(Game->Self(), peds, 0); i++)
 					{
 						Ped ped = peds[(i * 2 + 2)];
 						switch (jump_int) {
@@ -8929,7 +8933,7 @@ namespace Saint
 					if (m_nearby.m_traffic.acrobatic == 0) {
 						Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
 						vehicles[0] = 10;
-						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), vehicles); i++)
+						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(Game->Self(), vehicles); i++)
 						{
 							Vehicle playerVehicle = vehicles[(i * 2 + 2)];
 							ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
@@ -8944,7 +8948,7 @@ namespace Saint
 					if (m_nearby.m_traffic.acrobatic == 1) {
 						Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
 						vehicles[0] = 10;
-						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), vehicles); i++)
+						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(Game->Self(), vehicles); i++)
 						{
 							Vehicle playerVehicle = vehicles[(i * 2 + 2)];
 							ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
@@ -8958,7 +8962,7 @@ namespace Saint
 					if (m_nearby.m_traffic.acrobatic == 2) {
 						Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
 						vehicles[0] = 10;
-						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), vehicles); i++)
+						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(Game->Self(), vehicles); i++)
 						{
 							Vehicle playerVehicle = vehicles[(i * 2 + 2)];
 							ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 10.0f, 20.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1);
@@ -8970,7 +8974,7 @@ namespace Saint
 					if (m_nearby.m_traffic.acrobatic == 3) {
 						Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
 						vehicles[0] = 10;
-						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), vehicles); i++)
+						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(Game->Self(), vehicles); i++)
 						{
 							Vehicle playerVehicle = vehicles[(i * 2 + 2)];
 							ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 7.0f, 0, 0, 0, true, true, true, true, false, true);
@@ -8988,10 +8992,10 @@ namespace Saint
 					{
 						Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
 						vehicles[0] = 10;
-						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), vehicles); i++)
+						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(Game->Self(), vehicles); i++)
 						{
 							Vehicle playerVehicle = vehicles[(i * 2 + 2)];
-							NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+							NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
 							ENTITY::SET_ENTITY_COORDS2(playerVehicle, self_coords, false, false, false, false);
 
 						}
@@ -9001,7 +9005,7 @@ namespace Saint
 					{
 						Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
 						vehicles[0] = 10;
-						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), vehicles); i++)
+						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(Game->Self(), vehicles); i++)
 						{
 							Vehicle playerVehicle = vehicles[(i * 2 + 2)];
 							VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
@@ -9220,7 +9224,7 @@ namespace Saint
 				sub->draw_option<RegularOption>(("Replace"), nullptr, []
 					{
 						if (replaced || replaced2) {
-							g_CustomText->AddText(MISC::GET_HASH_KEY(replaceTextBuffer.c_str()), replaceTextBuffer2.c_str());
+							g_CustomText->AddText(Game->HashKey(replaceTextBuffer.c_str()), replaceTextBuffer2.c_str());
 						}
 
 					});
@@ -9315,7 +9319,7 @@ namespace Saint
 					});
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 				for (auto& hotkey : m_Hotkeys) {
-					sub->draw_option<KeyboardOption>((hotkey.name.c_str()), nullptr, std::to_string(hotkey.key), []
+					sub->draw_option<KeyboardOption>((hotkey.name.c_str()), nullptr, hotkey.key_name, []
 						{
 
 						});
@@ -9512,11 +9516,17 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Header"), CustomizationHeader, [](sub* sub)
 			{
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &Lists::HeaderTypesFrontend, &Lists::HeaderTypesPosition, true, -1, []
+					{
+						g_Render->m_HeaderType2 = Lists::HeaderTypesBackend[Lists::HeaderTypesPosition];
+					});
 				sub->draw_option<toggle<bool>>("Center", nullptr, &g_Render->center_head, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>("Dynamic", nullptr, &g_Render->dynamic_text, BoolDisplay::OnOff);
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Font", nullptr, &g_Render->HeaderFont, &g_Render->HeaderFontIterator, true, -1, []
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Font", nullptr, &g_Render->HeaderFont2, &g_Render->HeaderFontIterator, true, -1, []
 					{
 						if (g_Render->HeaderFontIterator == 0) {
+							g_Render->m_HeaderText = false;
+							g_Render->m_HeaderNativeText = true;
 							g_Render->m_HeaderFont = Font::ChaletLondon;
 						}
 						if (g_Render->HeaderFontIterator == 1) {
@@ -9532,7 +9542,13 @@ namespace Saint
 							g_Render->m_HeaderFont = Font::ChaletComprimeCologne;
 						}
 						if (g_Render->HeaderFontIterator == 5) {
+							g_Render->m_HeaderText = false;
+							g_Render->m_HeaderNativeText = true;
 							g_Render->m_HeaderFont = Font::Pricedown;
+						}
+						if (g_Render->HeaderFontIterator == 6) {
+							g_Render->m_HeaderText = true;
+							g_Render->m_HeaderNativeText = false;
 						}
 					});
 				

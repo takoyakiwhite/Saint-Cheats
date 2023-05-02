@@ -160,6 +160,7 @@ namespace Saint::UserInterface
 		Color m_HeaderBackgroundColor{ 0, 131, 255, 255 };
 		Color m_HeaderTextColor{ 255, 255, 255, 255 };
 		HeaderType m_HeaderType = HeaderType::Static;
+		HeaderType m_HeaderType2 = HeaderType::Static;
 
 		bool m_HeaderGradientTransparent = false;
 		bool m_HeaderGradientFlip = false;
@@ -212,6 +213,16 @@ namespace Saint::UserInterface
 			"Chalet Comprime Cologne",
 			"Pricedown"
 		};
+		const char* HeaderFont2[7]
+		{
+			"Chalet London",
+			"House Script",
+			"Monospace",
+			"Wingdings",
+			"Chalet Comprime Cologne",
+			"Pricedown",
+			"Custom"
+		};
 		std::size_t HeaderFontIterator = 3;
 		std::size_t HeaderFontIterator2 = 3;
 		bool center_head = false;
@@ -235,6 +246,8 @@ namespace Saint::UserInterface
 		bool submenu_enabled = true;
 
 		bool dynamic_text = false;
+
+		bool ytd_header = false;
 
 		Color m_SubheaderBackground{ 0, 0, 0, 255 };
 		Color m_SubheaderText{ 255,255,255, 255 };

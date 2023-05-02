@@ -304,10 +304,10 @@ namespace Saint::UserInterface
 				}
 
 				if (m_Sounds)
-					AUDIO::PLAY_SOUND_FRONTEND(-1, m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+					Game->PlaySound(m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 			}
 			if (!PAD::IS_USING_KEYBOARD_AND_MOUSE(2)) {
-				if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 227) && PAD::IS_DISABLED_CONTROL_PRESSED(2, INPUT_CELLPHONE_RIGHT) && openTimer.Update())
+				if (Game->DisabledControlPressed(227) && Game->DisabledControlPressed(INPUT_CELLPHONE_RIGHT) && openTimer.Update())
 				{
 					g_HasSetToolTip = false;
 					if (!m_Opened) {
@@ -318,7 +318,7 @@ namespace Saint::UserInterface
 					}
 
 					if (m_Sounds)
-						AUDIO::PLAY_SOUND_FRONTEND(-1, m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+						Game->PlaySound(m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 				}
 			}
 			if (m_OpenKeyPressed2 && openTimer.Update())
@@ -332,14 +332,14 @@ namespace Saint::UserInterface
 				}
 
 				if (m_Sounds)
-					AUDIO::PLAY_SOUND_FRONTEND(-1, m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+					Game->PlaySound(m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 			}
 			static Timer backTimer(0ms);
 			backTimer.SetDelay(std::chrono::milliseconds(m_BackDelay));
 			if (m_Opened && m_BackKeyPressed && backTimer.Update())
 			{
 				if (m_Sounds)
-					AUDIO::PLAY_SOUND_FRONTEND(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+					Game->PlaySound("BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 				if (m_SubmenuStack.size() <= 1)
 				{
@@ -351,10 +351,10 @@ namespace Saint::UserInterface
 					m_SubmenuStack.pop();
 				}
 			}
-			if (m_Opened && PAD::IS_DISABLED_CONTROL_PRESSED(2, 194) && backTimer.Update())
+			if (m_Opened && Game->DisabledControlPressed(194) && backTimer.Update())
 			{
 				if (m_Sounds)
-					AUDIO::PLAY_SOUND_FRONTEND(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+					Game->PlaySound("BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 				if (m_SubmenuStack.size() <= 1)
 				{
@@ -369,18 +369,18 @@ namespace Saint::UserInterface
 			if (m_Opened && !m_SubmenuStack.empty())
 			{
 
-				PAD::DISABLE_CONTROL_ACTION(2, 0, true);
-				PAD::DISABLE_CONTROL_ACTION(2, 19, true);
-				PAD::DISABLE_CONTROL_ACTION(2, 140, true);
-				PAD::DISABLE_CONTROL_ACTION(2, 20, true);
-				PAD::DISABLE_CONTROL_ACTION(2, 27, true);
-				PAD::DISABLE_CONTROL_ACTION(2, 80, true);
-				PAD::DISABLE_CONTROL_ACTION(2, 337, true);
-				PAD::DISABLE_CONTROL_ACTION(2, 27, true);
-				PAD::DISABLE_CONTROL_ACTION(2, 85, true);
-				PAD::DISABLE_CONTROL_ACTION(2, 74, true);
-				PAD::DISABLE_CONTROL_ACTION(2, 58, true);
-				PAD::DISABLE_CONTROL_ACTION(2, 70, true);
+				Game->DisableControl(0, true);
+				Game->DisableControl(19, true);
+				Game->DisableControl(140, true);
+				Game->DisableControl(20, true);
+				Game->DisableControl(27, true);
+				Game->DisableControl(80, true);
+				Game->DisableControl(337, true);
+				Game->DisableControl(27, true);
+				Game->DisableControl(85, true);
+				Game->DisableControl(74, true);
+				Game->DisableControl(58, true);
+				Game->DisableControl(70, true);
 				auto sub = m_SubmenuStack.top();
 
 				static Timer enterTimer(0ms);
@@ -389,23 +389,23 @@ namespace Saint::UserInterface
 				{
 					
 					if (m_Sounds)
-						AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+						Game->PlaySound("SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
 						opt->HandleAction(OptionAction::EnterPress);
 					}
 				}
-				if (GetAsyncKeyState(0x56)) {
+				if (Game->KeyPress(0x56)) {
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
 						opt->HandleAction(OptionAction::HotkeyPress);
 					}
 				}
-				if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 191) && sub->GetNumOptions() != 0 && enterTimer.Update())
+				if (Game->DisabledControlPressed(191) && sub->GetNumOptions() != 0 && enterTimer.Update())
 				{
 					if (m_Sounds)
-						AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+						Game->PlaySound("SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
@@ -417,7 +417,7 @@ namespace Saint::UserInterface
 				if (m_UpKeyPressed && sub->GetNumOptions() != 0 && upTimer.Update())
 				{
 					if (m_Sounds)
-						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+						Game->PlaySound("NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					sub->ScrollBackward();
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
@@ -428,10 +428,10 @@ namespace Saint::UserInterface
 						}
 					}
 				}
-				if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 172) && sub->GetNumOptions() != 0 && upTimer.Update())
+				if (Game->DisabledControlPressed(172) && sub->GetNumOptions() != 0 && upTimer.Update())
 				{
 					if (m_Sounds)
-						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+						Game->PlaySound("NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					sub->ScrollBackward();
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
@@ -447,7 +447,7 @@ namespace Saint::UserInterface
 				if (m_DownKeyPressed && sub->GetNumOptions() != 0 && downTimer.Update())
 				{
 					if (m_Sounds)
-						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+						Game->PlaySound("NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					sub->ScrollForward();
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
@@ -459,10 +459,10 @@ namespace Saint::UserInterface
 					}
 
 				}
-				if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 173) && sub->GetNumOptions() != 0 && downTimer.Update())
+				if (Game->DisabledControlPressed(173) && sub->GetNumOptions() != 0 && downTimer.Update())
 				{
 					if (m_Sounds)
-						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+						Game->PlaySound("NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					sub->ScrollForward();
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
@@ -479,17 +479,17 @@ namespace Saint::UserInterface
 				if (m_LeftKeyPressed && sub->GetNumOptions() != 0 && leftTimer.Update())
 				{
 					if (m_Sounds)
-						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+						Game->PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
 						opt->HandleAction(OptionAction::LeftPress);
 					}
 				}
-				if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 174) && sub->GetNumOptions() != 0 && leftTimer.Update())
+				if (Game->DisabledControlPressed(174) && sub->GetNumOptions() != 0 && leftTimer.Update())
 				{
 					if (m_Sounds)
-						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+						Game->PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
@@ -501,17 +501,17 @@ namespace Saint::UserInterface
 				if (m_RightKeyPressed && sub->GetNumOptions() != 0 && rightTimer.Update())
 				{
 					if (m_Sounds)
-						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+						Game->PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
 						opt->HandleAction(OptionAction::RightPress);
 					}
 				}
-				if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 175) && !PAD::IS_CONTROL_PRESSED(2, 227) && sub->GetNumOptions() != 0 && rightTimer.Update())
+				if (Game->DisabledControlPressed(175) && !Game->ControlPressed(227) && sub->GetNumOptions() != 0 && rightTimer.Update())
 				{
 					if (m_Sounds)
-						AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+						Game->PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
@@ -561,7 +561,7 @@ namespace Saint::UserInterface
 			}
 			break;
 
-			break;
+
 		}
 		if (m_HeaderNativeText)
 		{
@@ -676,7 +676,6 @@ namespace Saint::UserInterface
 				m_OptionSelectedBackgroundColor);
 
 		}
-
 		GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(3);
 		if (opt->GetFlag(OptionFlag::PlayerSub)) {
 

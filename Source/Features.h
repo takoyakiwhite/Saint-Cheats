@@ -27,12 +27,7 @@ namespace Saint {
 	inline std::string replaceTextBuffer2 = "";
 	inline bool replaced = false;
 	inline bool replaced2 = false;
-	inline Vehicle get_veh() {
-		return PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-	}
-	inline CVehicle* get_ped_vehicle() {
-		return (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle;
-	}
+	
 	inline bool raycast_with_cam(Cam cam, NativeVector3& raycastHitCoords) {
 		bool raycastHit;
 		NativeVector3 surfaceNormal;
@@ -72,9 +67,15 @@ namespace Saint {
 	}
 	inline bool neverWantedBool = false;
 	inline bool godmode = false;
-	class m_all_weapons {
+	class Camera {
 	public:
-		const char* name[106]
+		NativeVector3 Rotation() {
+			return CAM::GET_GAMEPLAY_CAM_ROT(0);
+		}
+	};
+	class Weapon {
+	public:
+		const char* Name[106]
 		{ "Antique Cavalry Dagger", "Baseball Bat", "Broken Bottle", "Crowbar", "Unarmed", "Flashlight", "Golf Club", "Hammer", "Hatchet", "Brass Knucles", "Knife", "Machete", "Switchblade", "Nightstick", "Pipe Wrench",
 			"Battle Axe", "Pool Cue", "Stone Hatchet", "Pistol", "Pistol Mk II", "Combat Pistol", "AP Pistol", "Stun Gun", "Pistol .50", "SNS Pistol", "SNS Pistol Mk II", "Heavy Pistol", "Vintage Pistol", "Flare Gun", "Marksman Pistol",
 			"Heavy Revolver", "Heavy Revolver Mk II", "Double Action Revolver", "Up-n-Atomizer", "Ceramic Pistol", "Navy Revolver", "Perico Pistol", "Stun Gun",
@@ -85,7 +86,7 @@ namespace Saint {
 			"Sniper Rifle", "Heavy Sniper", "Heavy Sniper Mk II", "Marksman Rifle", "Marksman Rifle Mk II", "Precision Rifle",
 			"RPG", "Grenade Launcher", "Grenade Launcher Smoke", "Minigun", "Firework Launcher", "Railgun", "Homing Launcher", "Compact Grenade Launcher","Widowmaker","Compact EMP Launcher", "Grenade", "BZ Gas", "Molotov Cocktail", "Molotov Cocktail", "Proximity Mines",
 			"Snowballs", "Pipe Bombs", "Baseball", "Tear Gas", "Flare", "Jerry Can", "Parachute", "Fire Extinguisher", "Hazardous Jerry Can", "Fertilizer Can", "Candy Cane", "Acid Package" };
-		std::uint32_t hash[106]
+		std::uint32_t Hash[106]
 		{ 0x92A27487, 0x958A4A8F, 0xF9E6AA4B, 0x84BD7BFD, 0xA2719263, 0x8BB05FD7, 0x440E4788, 0x4E875F73, 0xF9DCBF2D, 0xD8DF3C3C, 0x99B507EA, 0xDD5DF8D9, 0xDFE37640, 0x678B81B1, 0x19044EE0, 0xCD274149, 0x94117305, 0x3813FC08,
 			0x1B06D571, 0xBFE256D4, 0x5EF9FEC4, 0x22D8FE39, 0x3656C8C1, 0x99AEEB3B, 0xBFD21232, 0x88374054, 0xD205520E, 0x83839C4, 0x47757124, 0xDC4DB296, 0xC1B3C3D1, 0xCB96392F, 0x97EA20B8, 0xAF3696A1, 0x2B5EF5EC, 0x917F6C8C, 0x57A4368C,
 			0x45CD9CF3, 0x13532244, 0x2BE6766B, 0x78A97CD0, 0xEFE7E2DF, 0x0A3D4D34, 0xDB1AA450, 0xBD248B55, 0x476BF155, 0x1D073A89, 0x555AF99A, 0x7846A318, 0xE284C527, 0x9D61E50F, 0xA89CB99E, 0x3AABBBAA, 0xEF951FBB, 0x12E82D3D, 0x5A96BA4,
@@ -93,6 +94,164 @@ namespace Saint {
 			0xA914799, 0xC734385A, 0x6A6C02E0, 0x6E7DDDEC, 0xB1CA77B1, 0xA284510B, 0x4DD2DC56, 0x42BF8A85, 0x7F7497E5, 0x6D544C99, 0x63AB0442, 0x0781FE4A, 0xB62D1F67, 0xDB26713A, 0x93E220BD, 0xA0973D5E, 0x24B17070, 0x2C3731D9, 0xAB564B93, 0xAB564B93,
 			0xBA45E8B8, 0x23C9F95C, 0xFDBC8A50, 0x497FACC3, 0x34A67B97, 0xFBAB5776, 0xFBAB5776, 0xBA536372, 0x184140A1, 0x6589186A, 0xF7F1E25E
 		};
+	};
+	class Stats {
+	public:
+		void SetInt(const char* stat, int value) {
+			STATS::STAT_SET_INT(rage::joaat(stat), value, true);
+		}
+		void SetFloat(const char* stat, float value) {
+			STATS::STAT_SET_FLOAT(rage::joaat(stat), value, true);
+		}
+		void SetBool(const char* stat, bool value) {
+			STATS::STAT_SET_BOOL(rage::joaat(stat), value, true);
+		}
+	};
+	class game {
+	public:
+		Weapon* Weapon;
+		Stats* Stats;
+		Player Id() {
+			return PLAYER::PLAYER_ID();
+		}
+		Ped Self() {
+			return PLAYER::PLAYER_PED_ID();
+		}
+		Vehicle Vehicle() {
+			return PED::GET_VEHICLE_PED_IS_IN(Self(), false);
+		}
+		CVehicle* CVehicle() {
+			return (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle;
+		}
+		CPed* CPed() {
+			return (*g_GameFunctions->m_pedFactory)->m_local_ped;
+		}
+		NativeVector3 Coords(Entity entity) {
+			return ENTITY::GET_ENTITY_COORDS(entity, false);
+		}
+		NativeVector3 SCoords() {
+			return ENTITY::GET_ENTITY_COORDS(Self(), false);
+		}
+		int PlayerIndex(int player) {
+			return PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player);
+		}
+		void GiveWeapon(Ped ped, Hash hash, int ammo) {
+			WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, hash, ammo, true);
+		}
+		Hash HashKey(const char* value) {
+			return rage::joaat(value);
+		}
+		Entity HitEntity() {
+			Entity hit;
+			if (raycast(hit)) {
+				return hit;
+			};
+		}
+		NativeVector3 HitCoords() {
+			NativeVector3 hit;
+			if (raycast(hit)) {
+				return hit;
+			};
+		}
+		bool Shooting() {
+			return PED::IS_PED_SHOOTING(Self());
+		}
+		bool InVehicle() {
+			return PED::IS_PED_IN_ANY_VEHICLE(Self(), 0);
+		}
+		bool ControlPressed(int control) {
+			return PAD::IS_CONTROL_PRESSED(2, control);
+		}
+		bool DisabledControlPressed(int control) {
+			return PAD::IS_DISABLED_CONTROL_PRESSED(2, control);
+		}
+		Hash GetHash(Entity model) {
+			return ENTITY::GET_ENTITY_MODEL(model);
+		}
+		void ParticleOnBone(const char* dict, const char* particle, PedBones bone, float scale, bool color = false, float r = 1.f, float g = 1.f, float b = 1.f)
+		{
+			STREAMING::REQUEST_NAMED_PTFX_ASSET(dict);
+			GRAPHICS::USE_PARTICLE_FX_ASSET(dict);
+			GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE(particle, Self(), 0.00f, 0.00f, 0.00f, 0.00f, 0.00f, 0.0f, bone, scale, TRUE, TRUE, TRUE);
+			if (color)
+				GRAPHICS::SET_PARTICLE_FX_NON_LOOPED_COLOUR(r, g, b);
+			STREAMING::REMOVE_PTFX_ASSET();
+		}
+		void Wait(std::optional<std::chrono::high_resolution_clock::duration> time = std::nullopt) {
+			fbr::cur()->wait(time);
+		}
+		void PlaySound(const char* first, const char* second) {
+			AUDIO::PLAY_SOUND_FRONTEND(-1, first, second, false);
+		}
+		void DisableControl(int control, bool related) {
+			PAD::DISABLE_CONTROL_ACTION(2, control, related);
+		}
+		bool KeyPress(std::uint16_t keycode, bool only_once = false) {
+			if (GetForegroundWindow() == g_GameVariables->m_GameWindow)
+				{
+					if (only_once) {
+						if (GetAsyncKeyState(keycode) & 1)
+						{
+							return true;
+						}
+					}
+					else {
+						if (GetAsyncKeyState(keycode) & 0x8000)
+						{
+							return true;
+						}
+					}
+				}
+
+				return false;
+			
+		}
+		const char* VehicleName(const char* model) {
+			return HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(HashKey(model)));
+		}
+		const char* VehicleNameHash(Hash model) {
+			return HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
+		}
+		const char* Label(const char* value) {
+			return HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(value);
+		}
+
+		std::vector<int32_t> NearbyVehicles(bool* toggled) {
+			if (toggled) {
+				const int get = 100;
+				int nearby[get * 2 + 2] = { get * 2 + 2 };
+				auto count = PED::GET_PED_NEARBY_VEHICLES(Self(), (int*)&nearby);
+				std::vector<int32_t> total;
+
+				for (int i = 0; i < count; i++) {
+					auto v = nearby[i * 2 + 2];
+					total.push_back(v);
+				}
+
+				return total;
+			}
+		}
+		std::vector<int32_t> NearbyPeds(bool* toggled) {
+			if (toggled) {
+				const int get = 100;
+				int nearby[get * 2 + 2] = { get * 2 + 2 };
+				auto count = PED::GET_PED_NEARBY_PEDS(Self(), (int*)&nearby, Self());
+				std::vector<int32_t> total;
+
+				for (int i = 0; i < count; i++) {
+					auto p = nearby[i * 2 + 2];
+					total.push_back(p);
+				}
+
+				return total;
+			}
+		}
+
+	};
+	inline game* Game;
+	class m_all_weapons {
+	public:
+		
 
 		const char* name_all[107]
 		{ "All", "Antique Cavalry Dagger", "Baseball Bat", "Broken Bottle", "Crowbar", "Unarmed", "Flashlight", "Golf Club", "Hammer", "Hatchet", "Brass Knucles", "Knife", "Machete", "Switchblade", "Nightstick", "Pipe Wrench",
@@ -132,25 +291,25 @@ namespace Saint {
 
 		std::size_t FlyInt = 0;
 		void onDisable() {
-			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-			if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), 0)) {
+			
+			if (Game->InVehicle()) {
 				if (DisableCollision) {
-					ENTITY::SET_ENTITY_COLLISION(veh, true, true);
+					ENTITY::SET_ENTITY_COLLISION(Game->Vehicle(), true, true);
 				}
 			}
 		}
 		void init() {
 			if (enabled) {
-				if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				if (!Game->InVehicle())
 				{
 					static bool turnoff = true;
 					if (!transparent)
 					{
-						ENTITY::SET_ENTITY_ALPHA(PLAYER::PLAYER_PED_ID(), 255, false);
+						ENTITY::SET_ENTITY_ALPHA(Game->Self(), 255, false);
 						turnoff = false;
 					}
 					if (transparent) {
-						ENTITY::SET_ENTITY_ALPHA(PLAYER::PLAYER_PED_ID(), 180, false);
+						ENTITY::SET_ENTITY_ALPHA(Game->Self(), 180, false);
 					}
 					if (spin) {
 						static int Heading;
@@ -166,12 +325,12 @@ namespace Saint {
 						Heading++;
 						Heading++;
 						Heading++;
-						ENTITY::SET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID(), Heading);
+						ENTITY::SET_ENTITY_HEADING(Game->Self(), Heading);
 					}
 
-					NativeVector3 coords4 = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+					NativeVector3 coords4 = Game->SCoords();
 					NativeVector3 coords5 = CAM::GET_GAMEPLAY_CAM_COORD();
-					auto ped = PLAYER::PLAYER_PED_ID();
+					auto ped = Game->Self();
 					auto startDist = std::distance(&coords5, &coords4);
 					auto pos = ENTITY::GET_ENTITY_COORDS(ped, false);
 					if (FlyInt == 1) {
@@ -185,26 +344,26 @@ namespace Saint {
 					NativeVector3 coords6 = multiply(&meow, speed);
 
 
-					if (GetAsyncKeyState(0x57) || PAD::IS_CONTROL_PRESSED(2, 32))
+					if (Game->KeyPress(0x57) || Game->ControlPressed(32))
 					{
 						NativeVector3 pos = addn(&coords4, &coords6);
 						if (FlyInt == 1) {
-							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(PLAYER::PLAYER_PED_ID(), pos.x, pos.y, pos.z, false, false, false);
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), pos.x, pos.y, pos.z, false, false, false);
 						}
 						if (FlyInt == 0) {
-							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(PLAYER::PLAYER_PED_ID(), pos.x, pos.y, pos.z, true, true, true);
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), pos.x, pos.y, pos.z, true, true, true);
 						}
 					}
 					if (SetRotation) {
 						NativeVector3 rotation = CAM::GET_GAMEPLAY_CAM_ROT(0);
-						ENTITY::SET_ENTITY_ROTATION(PLAYER::PLAYER_PED_ID(), rotation.x, rotation.y, rotation.z, 2, 1);
+						ENTITY::SET_ENTITY_ROTATION(Game->Self(), rotation.x, rotation.y, rotation.z, 2, 1);
 					}
 				}
 				else
 				{
 					if (WorkForVehicles)
 					{
-						Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						Vehicle veh = Game->Vehicle();
 						VEHICLE::SET_VEHICLE_GRAVITY(veh, !(enabled && !StopAfterNoInput));
 						NativeVector3 cam_pos = CAM::GET_GAMEPLAY_CAM_ROT(0);
 						ENTITY::SET_ENTITY_ROTATION(veh, cam_pos.x, cam_pos.y, cam_pos.z, 1, TRUE);
@@ -212,24 +371,24 @@ namespace Saint {
 							ENTITY::SET_ENTITY_COLLISION(veh, false, false);
 						}
 						if (!DisableCollision) {
-							if (ENTITY::GET_ENTITY_COLLISION_DISABLED(PLAYER::PLAYER_PED_ID())) {
+							if (ENTITY::GET_ENTITY_COLLISION_DISABLED(Game->Self())) {
 								ENTITY::SET_ENTITY_COLLISION(veh, true, true);
 							}
 						}
-						Player play(PLAYER::PLAYER_ID());
-						if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 32))
+						Player play(Game->Id());
+						if (Game->DisabledControlPressed(32))
 						{
 							!StopAfterNoInput ? ENTITY::APPLY_FORCE_TO_ENTITY(veh, 1, 0.0f, 150.f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1) : VEHICLE::SET_VEHICLE_FORWARD_SPEED(veh, !IsKeyPressed(VK_SHIFT) ? speed * 200 : speed * 200 * 2);
 						}
-						if (PAD::IS_CONTROL_PRESSED(2, 33))
+						if (Game->ControlPressed(33))
 						{
 							!StopAfterNoInput ? ENTITY::APPLY_FORCE_TO_ENTITY(veh, 1, 0.0f, 0 - (!IsKeyPressed(VK_SHIFT) ? speed : speed * 2), 0.0f, 0.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1) : VEHICLE::SET_VEHICLE_FORWARD_SPEED(veh, 0 - (!IsKeyPressed(VK_SHIFT) ? speed * 200 : speed * 200 * 2));
 						}
-						if (PAD::IS_CONTROL_PRESSED(2, 63))
+						if (Game->ControlPressed(63))
 						{
 							!StopAfterNoInput ? ENTITY::APPLY_FORCE_TO_ENTITY(veh, 1, (!IsKeyPressed(VK_SHIFT) ? 0 - speed : (0 - speed) * 2), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1) : ENTITY::APPLY_FORCE_TO_ENTITY(veh, 1, 0 - (!IsKeyPressed(VK_SHIFT) ? speed * 200 : speed * 200 * 2), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1);
 						}
-						if (PAD::IS_CONTROL_PRESSED(2, 64))
+						if (Game->ControlPressed(64))
 						{
 							!StopAfterNoInput ? ENTITY::APPLY_FORCE_TO_ENTITY(veh, 1, !IsKeyPressed(VK_SHIFT) ? speed : speed * 2, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1) : ENTITY::APPLY_FORCE_TO_ENTITY(veh, 1, !IsKeyPressed(VK_SHIFT) ? speed * 200 : speed * 200 * 2, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1);
 						}
@@ -252,9 +411,9 @@ namespace Saint {
 		void init() {
 			if (enabled) {
 				if (local_visible) {
-					NETWORK::SET_ENTITY_LOCALLY_VISIBLE(PLAYER::PLAYER_PED_ID());
+					NETWORK::SET_ENTITY_LOCALLY_VISIBLE(Game->Self());
 				}
-				ENTITY::SET_ENTITY_VISIBLE(PLAYER::PLAYER_PED_ID(), false, false);
+				ENTITY::SET_ENTITY_VISIBLE(Game->Self(), false, false);
 			}
 
 		}
@@ -321,14 +480,14 @@ namespace Saint {
 				}
 				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 				Ped ped;
-				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), false);
 				ped = PED::CREATE_PED(26, hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
 				NETWORK::NETWORK_FADE_IN_ENTITY(ped, true, false);
-				PED::SET_PED_AS_GROUP_LEADER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
+				PED::SET_PED_AS_GROUP_LEADER(Game->PlayerIndex(g_SelectedPlayer), PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
 				PED::SET_PED_AS_GROUP_MEMBER(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
 				PED::SET_PED_NEVER_LEAVES_GROUP(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
 				PED::SET_PED_COMBAT_ABILITY(ped, 100);
-				WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, all_weapons.hash[WeaponInt], 9998, true);
+				Game->GiveWeapon(ped, Game->Weapon->Hash[WeaponInt], 9998);
 				PED::SET_PED_CAN_SWITCH_WEAPON(ped, true);
 				PED::SET_GROUP_FORMATION(PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer), 3);
 				PED::SET_PED_MAX_HEALTH(ped, 5000);
@@ -357,14 +516,14 @@ namespace Saint {
 		float speed = 5.0f;
 		void init() {
 			if (enabled) {
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-				if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(veh, -1, 1) == PLAYER::PLAYER_PED_ID())
+				
+				if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(Game->Vehicle(), -1, 1) == Game->Self())
 				{
 
-					if (PAD::IS_CONTROL_PRESSED(2, 71)) {
-						if (!VEHICLE::IS_THIS_MODEL_A_HELI(ENTITY::GET_ENTITY_MODEL(veh))) {
-							if (VEHICLE::IS_THIS_MODEL_A_PLANE(ENTITY::GET_ENTITY_MODEL(veh)) || VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(veh)) {
-								ENTITY::APPLY_FORCE_TO_ENTITY(veh, 1, 0.0, (float)(((speed - 1.0f) * 2.1f) / 69.0f), 0.0, 0.0, 0.0, 0.0, 0, 1, 1, 1, 0, 1);
+					if (Game->ControlPressed(71)) {
+						if (!VEHICLE::IS_THIS_MODEL_A_HELI(ENTITY::GET_ENTITY_MODEL(Game->Vehicle()))) {
+							if (VEHICLE::IS_THIS_MODEL_A_PLANE(ENTITY::GET_ENTITY_MODEL(Game->Vehicle())) || VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(Game->Vehicle())) {
+								ENTITY::APPLY_FORCE_TO_ENTITY(Game->Vehicle(), 1, 0.0, (float)(((speed - 1.0f) * 2.1f) / 69.0f), 0.0, 0.0, 0.0, 0.0, 0, 1, 1, 1, 0, 1);
 							}
 						}
 					}
@@ -385,22 +544,22 @@ namespace Saint {
 		float boost_power = 1.0f;
 		void init() {
 			if (enabled) {
-				if (PLAYER::IS_PLAYER_PRESSING_HORN(PLAYER::PLAYER_ID()))
+				if (PLAYER::IS_PLAYER_PRESSING_HORN(Game->Id()))
 				{
 					if (Boost_Int == 0)
 					{
-						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-						if (onlyOnGround && !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(playerVehicle)) {
+						
+						if (onlyOnGround && !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(Game->Vehicle())) {
 
 						}
 						else {
 							if (smooth) {
-								if (ENTITY::GET_ENTITY_SPEED(playerVehicle) < speed) {
-									VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVehicle, ENTITY::GET_ENTITY_SPEED(playerVehicle) + boost_power);
+								if (ENTITY::GET_ENTITY_SPEED(Game->Vehicle()) < speed) {
+									VEHICLE::SET_VEHICLE_FORWARD_SPEED(Game->Vehicle(), ENTITY::GET_ENTITY_SPEED(Game->Vehicle()) + boost_power);
 								}
 							}
 							else {
-								VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVehicle, speed);
+								VEHICLE::SET_VEHICLE_FORWARD_SPEED(Game->Vehicle(), speed);
 							}
 						}
 
@@ -408,8 +567,7 @@ namespace Saint {
 					}
 					if (Boost_Int == 1)
 					{
-						Vehicle vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), 0);
-						ENTITY::APPLY_FORCE_TO_ENTITY(vehicle, 1, 0 + ENTITY::GET_ENTITY_FORWARD_X(vehicle), 0 + ENTITY::GET_ENTITY_FORWARD_Y(vehicle), 0.5f, 0, 0, 0, 1, 0, 1, 1, 1, 1);
+						ENTITY::APPLY_FORCE_TO_ENTITY(Game->Vehicle(), 1, 0 + ENTITY::GET_ENTITY_FORWARD_X(Game->Vehicle()), 0 + ENTITY::GET_ENTITY_FORWARD_Y(Game->Vehicle()), 0.5f, 0, 0, 0, 1, 0, 1, 1, 1, 1);
 
 					}
 				}
@@ -428,22 +586,25 @@ namespace Saint {
 		int speed = 25;
 		const char* flip_type[2] = { "Front", "Back" };
 		std::size_t flip_int = 0;
+		bool use_super_jump = true;
 		void init() {
 			if (enabled) {
 				if (Jump_Int == 0) {
-					MISC::SET_SUPER_JUMP_THIS_FRAME(PLAYER::PLAYER_ID());
+					MISC::SET_SUPER_JUMP_THIS_FRAME(Game->Id());
 				}
 				if (Jump_Int == 1) {
-					if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false) && !ENTITY::IS_ENTITY_IN_AIR(PLAYER::PLAYER_PED_ID()) && !PED::IS_PED_DOING_A_BEAST_JUMP(PLAYER::PLAYER_PED_ID()))
+					if (!PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false) && !ENTITY::IS_ENTITY_IN_AIR(Game->Self()) && !PED::IS_PED_DOING_A_BEAST_JUMP(Game->Self()))
 						if (PAD::IS_CONTROL_JUST_PRESSED(0, 22))
-							TASK::TASK_JUMP(PLAYER::PLAYER_PED_ID(), true, true, true);
+							TASK::TASK_JUMP(Game->Self(), true, true, true);
 				}
 				static int flip;
 				if (Jump_Int == 2) {
-					MISC::SET_SUPER_JUMP_THIS_FRAME(PLAYER::PLAYER_ID());
-					if (PED::IS_PED_JUMPING(PLAYER::PLAYER_PED_ID()))
+					if (use_super_jump) {
+						MISC::SET_SUPER_JUMP_THIS_FRAME(Game->Id());
+					}
+					if (PED::IS_PED_JUMPING(Game->Self()))
 					{
-						if (ENTITY::IS_ENTITY_IN_AIR(PLAYER::PLAYER_PED_ID()))
+						if (ENTITY::IS_ENTITY_IN_AIR(Game->Self()))
 						{
 							if (flip_int == 0) {
 								flip -= speed;
@@ -451,13 +612,13 @@ namespace Saint {
 							if (flip_int == 1) {
 								flip += speed;
 							}
-							ENTITY::SET_ENTITY_ROTATION(PLAYER::PLAYER_PED_ID(), flip, 0, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), 0, 0);
+							ENTITY::SET_ENTITY_ROTATION(Game->Self(), flip, 0, ENTITY::GET_ENTITY_HEADING(Game->Self()), 0, 0);
 						}
 					}
 				}
 				if (add_force) {
-					if (PED::IS_PED_JUMPING(PLAYER::PLAYER_PED_ID()) && !PED::IS_PED_RAGDOLL(PLAYER::PLAYER_PED_ID())) {
-						ENTITY::APPLY_FORCE_TO_ENTITY(PLAYER::PLAYER_PED_ID(), 1, 0.f, 1.5f, 0.f, 0.f, 0.f, 0.f, 1, true, true, true, false, true);
+					if (PED::IS_PED_JUMPING(Game->Self()) && !PED::IS_PED_RAGDOLL(Game->Self())) {
+						ENTITY::APPLY_FORCE_TO_ENTITY(Game->Self(), 1, 0.f, 1.5f, 0.f, 0.f, 0.f, 0.f, 1, true, true, true, false, true);
 					}
 				}
 			}
@@ -472,9 +633,9 @@ namespace Saint {
 
 			switch (type) {
 			case 0:
-				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				if (Game->InVehicle())
 				{
-					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 					VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
 					for (int i = 0; i < 50; i++)
 					{
@@ -486,9 +647,9 @@ namespace Saint {
 					VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
 				}
 			case 1:
-				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				if (Game->InVehicle())
 				{
-					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 					VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
 					for (int i = 0; i < 10; i++)
 					{
@@ -505,9 +666,9 @@ namespace Saint {
 					VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
 				}
 			case 2:
-				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				if (Game->InVehicle())
 				{
-					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 					VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
 					for (int i = 11; i < 18; i++)
 					{
@@ -750,7 +911,7 @@ namespace Saint {
 		bool walk_underwater = false;
 		bool push_water_away = false;
 		bool is_free_aiming() {
-			return PED::GET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 78, true);
+			return PED::GET_PED_CONFIG_FLAG(Game->Self(), 78, true);
 		}
 		bool slide_run = false;
 		bool force_gun = false;
@@ -783,7 +944,7 @@ namespace Saint {
 		bool take_less_damage = false;
 		void init() {
 			if (take_less_damage) {
-				PED::SET_PED_SUFFERS_CRITICAL_HITS(PLAYER::PLAYER_PED_ID(), FALSE);
+				PED::SET_PED_SUFFERS_CRITICAL_HITS(Game->Self(), FALSE);
 			}
 			if (disable_wanted_music) {
 				AUDIO::CANCEL_MUSIC_EVENT("OJDG1_GOING_WANTED");
@@ -792,32 +953,32 @@ namespace Saint {
 			}
 			if (crouched) {
 				g_CallbackScript->AddCallback<WalkStyleCallback>("move_ped_crouched", [=] {
-							PED::SET_PED_MOVEMENT_CLIPSET(PLAYER::PLAYER_PED_ID(), "move_ped_crouched", 2.0f);
+							PED::SET_PED_MOVEMENT_CLIPSET(Game->Self(), "move_ped_crouched", 2.0f);
 					});
 				
 			}
 			if (force_field) {
-				Player p = PLAYER::PLAYER_PED_ID();
+				Player p = Game->Self();
 				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(p, 0);
 				FIRE::ADD_EXPLOSION(c.x, c.y, c.z, 0, 100.f, false, true, 0.f, true);
 			}
 			if (inf_c) {
-				VEHICLE::SET_VEHICLE_COUNTERMEASURE_AMMO(get_veh(), 10);
+				VEHICLE::SET_VEHICLE_COUNTERMEASURE_AMMO(Game->Vehicle(), 10);
 			}
 			if (ragdoll_on_q) {
-				if (GetAsyncKeyState(0x51) & 1) {
-					NativeVector3 v = ENTITY::GET_ENTITY_FORWARD_VECTOR(PLAYER::PLAYER_PED_ID());
-					PED::SET_PED_TO_RAGDOLL_WITH_FALL(PLAYER::PLAYER_PED_ID(), 1500, 2000, 1, -v.x, -v.y, -v.z, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
+				if (Game->KeyPress(0x51) & 1) {
+					NativeVector3 v = ENTITY::GET_ENTITY_FORWARD_VECTOR(Game->Self());
+					PED::SET_PED_TO_RAGDOLL_WITH_FALL(Game->Self(), 1500, 2000, 1, -v.x, -v.y, -v.z, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
 				}
 			}
 			if (can_be_used_by_peds) {
-				VEHICLE::SET_VEHICLE_CAN_BE_USED_BY_FLEEING_PEDS(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true);
+				VEHICLE::SET_VEHICLE_CAN_BE_USED_BY_FLEEING_PEDS(PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false), true);
 			}
 			if (clean_veh) {
-				VEHICLE::SET_VEHICLE_DIRT_LEVEL(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 0.0);
+				VEHICLE::SET_VEHICLE_DIRT_LEVEL(PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false), 0.0);
 			}
 			if (no_grav_veh) {
-				VEHICLE::SET_VEHICLE_GRAVITY(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false);
+				VEHICLE::SET_VEHICLE_GRAVITY(PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false), false);
 			}
 			if (stop_cut) {
 				CUTSCENE::STOP_CUTSCENE_IMMEDIATELY();
@@ -825,12 +986,12 @@ namespace Saint {
 			if (nigthclub300k) {
 				*script_global(262145 + 24045).as<int*>() = 300000;
 				*script_global(262145 + 24041).as<int*>() = 300000;
-				STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLUB_POPULARITY"), 10000, true);
-				STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLUB_PAY_TIME_LEFT"), -1, true);
-				STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_CLUB_POPULARITY"), 100000, true);
-				STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLUB_POPULARITY"), 10000, true);
-				STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLUB_PAY_TIME_LEFT"), -1, true);
-				STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_CLUB_POPULARITY"), 100000, true);
+				Game->Stats->SetInt("MP0_CLUB_POPULARITY", 10000);
+				STATS::STAT_SET_INT(Game->HashKey("MP0_CLUB_PAY_TIME_LEFT"), -1, true);
+				STATS::STAT_SET_INT(Game->HashKey("MP0_CLUB_POPULARITY"), 100000, true);
+				STATS::STAT_SET_INT(Game->HashKey("MP1_CLUB_POPULARITY"), 10000, true);
+				STATS::STAT_SET_INT(Game->HashKey("MP1_CLUB_PAY_TIME_LEFT"), -1, true);
+				STATS::STAT_SET_INT(Game->HashKey("MP1_CLUB_POPULARITY"), 100000, true);
 			}
 			if (use_stunt_jump_camera) {
 				CAM::USE_VEHICLE_CAM_STUNT_SETTINGS_THIS_UPDATE();
@@ -839,12 +1000,12 @@ namespace Saint {
 				HUD::DISPLAY_RADAR(false);
 			}
 			if (reveal_all_players) {
-				*script_global(2657589).at(PLAYER::PLAYER_ID(), 466).at(213).as<std::int32_t*>() = 1;
+				*script_global(2657589).at(Game->Id(), 466).at(213).as<std::int32_t*>() = 1;
 				*script_global(2672505).at(58).as<std::int32_t*>() = NETWORK::GET_NETWORK_TIME() + 60;
 			}
 			if (wet) {
-				PED::SET_PED_WETNESS_ENABLED_THIS_FRAME(PLAYER::PLAYER_PED_ID());
-				PED::SET_PED_WETNESS_HEIGHT(PLAYER::PLAYER_PED_ID(), 10.0);
+				PED::SET_PED_WETNESS_ENABLED_THIS_FRAME(Game->Self());
+				PED::SET_PED_WETNESS_HEIGHT(Game->Self(), 10.0);
 			}
 			if (show_skidmarks) {
 				GRAPHICS::USE_SNOW_WHEEL_VFX_WHEN_UNSHELTERED(true);
@@ -854,7 +1015,7 @@ namespace Saint {
 				*script_global(1653913).at(1156).as<int*>() = -1;
 			}
 			if (disable_camber) {
-				VEHICLE::SET_CAN_USE_HYDRAULICS(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false);
+				VEHICLE::SET_CAN_USE_HYDRAULICS(Game->Vehicle(), false);
 			}
 			if (disable_wanted_stars) {
 				HUD::HIDE_HUD_COMPONENT_THIS_FRAME(1);
@@ -866,7 +1027,7 @@ namespace Saint {
 				g_Render->m_PosY = pos.y / 2370;
 			}
 			if (force_gun) {
-				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+				if (Game->Shooting())
 				{
 					Entity hitEntity;
 					if (raycast(hitEntity)) {
@@ -877,45 +1038,45 @@ namespace Saint {
 
 			}
 			if (slide_run) {
-				if (TASK::IS_PED_RUNNING(PLAYER::PLAYER_PED_ID()) || TASK::IS_PED_SPRINTING(PLAYER::PLAYER_PED_ID()) && !PED::IS_PED_RAGDOLL(PLAYER::PLAYER_PED_ID())) {
-					ENTITY::APPLY_FORCE_TO_ENTITY(PLAYER::PLAYER_PED_ID(), 1, 0.f, 1.5f, 0.f, 0.f, 0.f, 0.f, 1, true, true, true, false, true);
+				if (TASK::IS_PED_RUNNING(Game->Self()) || TASK::IS_PED_SPRINTING(Game->Self()) && !PED::IS_PED_RAGDOLL(Game->Self())) {
+					ENTITY::APPLY_FORCE_TO_ENTITY(Game->Self(), 1, 0.f, 1.5f, 0.f, 0.f, 0.f, 0.f, 1, true, true, true, false, true);
 				}
 			}
 			if (walk_underwater)
 			{
-				if (ENTITY::IS_ENTITY_IN_WATER(PLAYER::PLAYER_PED_ID()))
+				if (ENTITY::IS_ENTITY_IN_WATER(Game->Self()))
 				{
-					PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 65, false);
-					PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 66, false);
-					PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 168, false);
+					PED::SET_PED_CONFIG_FLAG(Game->Self(), 65, false);
+					PED::SET_PED_CONFIG_FLAG(Game->Self(), 66, false);
+					PED::SET_PED_CONFIG_FLAG(Game->Self(), 168, false);
 
-					NativeVector3 PlayerPos = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 0);
+					NativeVector3 PlayerPos = ENTITY::GET_ENTITY_COORDS(Game->Self(), 0);
 
 
-					if (PED::IS_PED_JUMPING(PLAYER::PLAYER_PED_ID()))
+					if (PED::IS_PED_JUMPING(Game->Self()))
 					{
-						ENTITY::APPLY_FORCE_TO_ENTITY(PLAYER::PLAYER_PED_ID(), true, 0, 0, 0.7f, 0, 0, 0, true, true, true, true, false, true);
+						ENTITY::APPLY_FORCE_TO_ENTITY(Game->Self(), true, 0, 0, 0.7f, 0, 0, 0, true, true, true, true, false, true);
 					}
 
-					if (ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(PLAYER::PLAYER_PED_ID()) > 1)
+					if (ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(Game->Self()) > 1)
 					{
-						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 60, false);
-						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 61, false);
-						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 104, false);
-						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 276, false);
-						PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 76, true);
-						ENTITY::APPLY_FORCE_TO_ENTITY(PLAYER::PLAYER_PED_ID(), true, 0, 0, -0.7f, 0, 0, 0, true, true, true, true, false, true);
+						PED::SET_PED_CONFIG_FLAG(Game->Self(), 60, false);
+						PED::SET_PED_CONFIG_FLAG(Game->Self(), 61, false);
+						PED::SET_PED_CONFIG_FLAG(Game->Self(), 104, false);
+						PED::SET_PED_CONFIG_FLAG(Game->Self(), 276, false);
+						PED::SET_PED_CONFIG_FLAG(Game->Self(), 76, true);
+						ENTITY::APPLY_FORCE_TO_ENTITY(Game->Self(), true, 0, 0, -0.7f, 0, 0, 0, true, true, true, true, false, true);
 					}
 
-					if (TASK::GET_IS_TASK_ACTIVE(PLAYER::PLAYER_PED_ID(), 281) || PED::IS_PED_SWIMMING(PLAYER::PLAYER_PED_ID()) || PED::IS_PED_SWIMMING_UNDER_WATER(PLAYER::PLAYER_PED_ID()))
+					if (TASK::GET_IS_TASK_ACTIVE(Game->Self(), 281) || PED::IS_PED_SWIMMING(Game->Self()) || PED::IS_PED_SWIMMING_UNDER_WATER(Game->Self()))
 					{
-						TASK::CLEAR_PED_TASKS_IMMEDIATELY(PLAYER::PLAYER_PED_ID());
+						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
 					}
 				}
 			}
 			if (push_water_away)
 			{
-				NativeVector3 Coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+				NativeVector3 Coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), true);
 				for (int i = -8; i <= 15; i++)
 				{
 					for (int j = -8; j <= 15; j++)
@@ -928,12 +1089,12 @@ namespace Saint {
 				Vector3 minV, maxV;
 				Hash weapHash;
 
-				Entity weap = WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(PLAYER::PLAYER_PED_ID(), 0);
-				WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weapHash, 1);
+				Entity weap = WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Game->Self(), 0);
+				WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weapHash, 1);
 				NativeVector3 pos = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(weap, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(weap, "gun_muzzle"));
 				NativeVector3 rot = ENTITY::GET_ENTITY_ROTATION(weap, 2);
 				Entity get_ent;
-				if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_PED_ID(), &get_ent)) {
+				if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(Game->Self(), &get_ent)) {
 					NativeVector3 hitCoords;
 					if (raycast(hitCoords)) {
 						GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, hitCoords.x, hitCoords.y, hitCoords.z, 255, 0, 0, 255);
@@ -952,20 +1113,20 @@ namespace Saint {
 
 			}
 			if (disable_lock_on) {
-				auto g_local_player = (*g_GameFunctions->m_pedFactory)->m_local_ped;
+				auto g_local_player = Game->CPed();
 				if (g_local_player && g_local_player->m_vehicle)
 					g_local_player->m_vehicle->m_is_targetable = false;
 			}
 			if (invisible_car) {
 				if (invisible_carlocal_visible) {
-					NETWORK::SET_ENTITY_LOCALLY_VISIBLE(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false));
+					NETWORK::SET_ENTITY_LOCALLY_VISIBLE(PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false));
 				}
-				ENTITY::SET_ENTITY_VISIBLE(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false, false);
+				ENTITY::SET_ENTITY_VISIBLE(PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false), false, false);
 			}
 			if (no_ragdoll) {
-				PED::SET_PED_RAGDOLL_ON_COLLISION(PLAYER::PLAYER_PED_ID(), false);
-				PED::SET_PED_CAN_RAGDOLL(PLAYER::PLAYER_PED_ID(), false);
-				PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(PLAYER::PLAYER_PED_ID(), false);
+				PED::SET_PED_RAGDOLL_ON_COLLISION(Game->Self(), false);
+				PED::SET_PED_CAN_RAGDOLL(Game->Self(), false);
+				PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(Game->Self(), false);
 			}
 			if (drugs) {
 				GRAPHICS::ENABLE_ALIEN_BLOOD_VFX(true);
@@ -974,30 +1135,30 @@ namespace Saint {
 				//GRAPHICS::ANIMPOSTFX_STOP("DrugsMichaelAliensFight");
 			}
 			if (infiniter) {
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-				if (VEHICLE::GET_HAS_ROCKET_BOOST(veh))
+				
+				if (VEHICLE::GET_HAS_ROCKET_BOOST(Game->Vehicle()))
 				{
 					//VEHICLE::SET_SCRIPT_ROCKET_BOOST_RECHARGE_TIME(veh, 0);
 
-					VEHICLE::SET_ROCKET_BOOST_FILL(veh, 100.0f);
+					VEHICLE::SET_ROCKET_BOOST_FILL(Game->Vehicle(), 100.0f);
 
 				}
 			}
 			if (burned) {
-				ENTITY::SET_ENTITY_RENDER_SCORCHED(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true);
+				ENTITY::SET_ENTITY_RENDER_SCORCHED(PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false), true);
 			}
 			if (stick_to_ground) {
-				Vehicle vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				Vehicle vehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 				NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle);
 				VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(vehicle, 0);
 			}
 			if (remove_def) {
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-				VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(veh);
+				
+				VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(Game->Vehicle());
 
 			}
 			if (bypass_c4_limit) {
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->fired_sticky_bombs = 0;
+				Game->CPed()->fired_sticky_bombs = 0;
 
 			}
 			if (match) {
@@ -1032,9 +1193,9 @@ namespace Saint {
 			if (auto_repair) {
 				if (get_repair_type == 0) {
 
-					if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+					if (Game->InVehicle())
 					{
-						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 						if (VEHICLE::GET_DOES_VEHICLE_HAVE_DAMAGE_DECALS(playerVehicle)) {
 							VEHICLE::SET_VEHICLE_FIXED(playerVehicle);
 							VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
@@ -1045,9 +1206,9 @@ namespace Saint {
 
 				}
 				if (get_repair_type == 1) {
-					if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+					if (Game->InVehicle())
 					{
-						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 						VEHICLE::SET_VEHICLE_FIXED(playerVehicle);
 						VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
 						VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, false);
@@ -1056,18 +1217,18 @@ namespace Saint {
 
 			}
 			if (keep_engine_on) {
-				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 				VEHICLE::SET_VEHICLE_ENGINE_ON(playerVehicle, true, true, true);
 			}
 			if (no_recoil) {
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_explosion_shake_amplitude = 0.0f;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_explosion_shake_amplitude = 0.0f;
 			}
 			if (ignored) {
 				const int ElementAmount = 10;
 				const int ArrSize = ElementAmount * 2 + 2;
 				Ped* peds = new Ped[ArrSize];
 				peds[0] = ElementAmount;
-				int PedFound = PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), peds, -1);
+				int PedFound = PED::GET_PED_NEARBY_PEDS(Game->Self(), peds, -1);
 				for (int i = 0; i < PedFound; i++)
 				{
 					int OffsetID = i * 2 + 2;
@@ -1077,48 +1238,48 @@ namespace Saint {
 					PED::SET_PED_FLEE_ATTRIBUTES(ped, 0, false);
 					PED::SET_PED_COMBAT_ATTRIBUTES(ped, 17, true);
 				}
-				PLAYER::SET_POLICE_IGNORE_PLAYER(PLAYER::PLAYER_ID(), true);
-				PLAYER::SET_EVERYONE_IGNORE_PLAYER(PLAYER::PLAYER_ID(), true);
-				PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(PLAYER::PLAYER_ID(), false);
-				PLAYER::SET_IGNORE_LOW_PRIORITY_SHOCKING_EVENTS(PLAYER::PLAYER_ID(), true);
+				PLAYER::SET_POLICE_IGNORE_PLAYER(Game->Id(), true);
+				PLAYER::SET_EVERYONE_IGNORE_PLAYER(Game->Id(), true);
+				PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(Game->Id(), false);
+				PLAYER::SET_IGNORE_LOW_PRIORITY_SHOCKING_EVENTS(Game->Id(), true);
 			}
 			if (bound_ankles) {
-				PED::SET_ENABLE_BOUND_ANKLES(PLAYER::PLAYER_PED_ID(), true);
+				PED::SET_ENABLE_BOUND_ANKLES(Game->Self(), true);
 			}
 			if (reduced) {
-				PED::SET_PED_CAPSULE(PLAYER::PLAYER_PED_ID(), 0.001);
+				PED::SET_PED_CAPSULE(Game->Self(), 0.001);
 			}
 			if (attack_friendly) {
-				PED::SET_CAN_ATTACK_FRIENDLY(PLAYER::PLAYER_PED_ID(), true, true);
+				PED::SET_CAN_ATTACK_FRIENDLY(Game->Self(), true, true);
 			}
 			if (unlim) {
-				PLAYER::SPECIAL_ABILITY_FILL_METER(PLAYER::PLAYER_ID(), true, 0);
+				PLAYER::SPECIAL_ABILITY_FILL_METER(Game->Id(), true, 0);
 			}
 			if (tiny_ped) {
-				PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 223, true);
+				PED::SET_PED_CONFIG_FLAG(Game->Self(), 223, true);
 			}
 			if (swim_anywhere) {
-				PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 65, true);
+				PED::SET_PED_CONFIG_FLAG(Game->Self(), 65, true);
 			}
 			if (autoclean) {
-				PED::CLEAR_PED_BLOOD_DAMAGE(PLAYER::PLAYER_PED_ID());
-				PED::RESET_PED_VISIBLE_DAMAGE(PLAYER::PLAYER_PED_ID());
+				PED::CLEAR_PED_BLOOD_DAMAGE(Game->Self());
+				PED::RESET_PED_VISIBLE_DAMAGE(Game->Self());
 			}
 			if (pickup_mode) {
 				static bool Locked = false;
 				HUD::DISPLAY_SNIPER_SCOPE_THIS_FRAME();
 
-				PED::SET_PED_RAGDOLL_ON_COLLISION(PLAYER::PLAYER_PED_ID(), false);
-				PED::SET_PED_CAN_RAGDOLL(PLAYER::PLAYER_PED_ID(), false);
-				PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(PLAYER::PLAYER_PED_ID(), false);
+				PED::SET_PED_RAGDOLL_ON_COLLISION(Game->Self(), false);
+				PED::SET_PED_CAN_RAGDOLL(Game->Self(), false);
+				PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(Game->Self(), false);
 
 
 
 				Entity target;
 
 				if (Locked) {
-					if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &target) && PAD::IS_CONTROL_PRESSED(0, 25)) {
-						PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_ID(), true);
+					if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(Game->Id(), &target) && PAD::IS_CONTROL_PRESSED(0, 25)) {
+						PLAYER::DISABLE_PLAYER_FIRING(Game->Id(), true);
 						if (ENTITY::IS_ENTITY_A_PED(target) && PED::IS_PED_IN_ANY_VEHICLE(target, true)) {
 							target = PED::GET_VEHICLE_PED_IS_IN(target, false);
 						}
@@ -1130,50 +1291,50 @@ namespace Saint {
 						NativeVector3 gameplayCam = CAM::GET_GAMEPLAY_CAM_COORD();
 						NativeVector3 gameplayCamRot = CAM::GET_GAMEPLAY_CAM_ROT(0);
 						NativeVector3 camera_direction = RotationToDirection(CAM::GET_GAMEPLAY_CAM_ROT(0));
-						NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+						NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), true);
 						NativeVector3 multiply2 = multiply(&camera_direction, (DistanceBetweenVector3(&gameplayCam, &self_coords) + 6));
 						NativeVector3 set_position = addn(&gameplayCam, &multiply2);
 
 						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(target, set_position.x, set_position.y, set_position.z, false, false, false);
 
-						if (PAD::IS_DISABLED_CONTROL_PRESSED(2, 24)) {
+						if (Game->DisabledControlPressed(24)) {
 
 
 
 							ENTITY::APPLY_FORCE_TO_ENTITY(target, 1, camera_direction.x * 10000.0f, camera_direction.y * 10000.0f, camera_direction.z * 10000.0f, 0.0f, 0.0f, 0.0f, 0, false, true, true, false, true);
 							Locked = false;
-							PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_ID(), false);
+							PLAYER::DISABLE_PLAYER_FIRING(Game->Id(), false);
 
 						}
 					}
 				}
 
-				if (!PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &target)) {
+				if (!PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(Game->Id(), &target)) {
 					Locked = true;
-					PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_ID(), false);
+					PLAYER::DISABLE_PLAYER_FIRING(Game->Id(), false);
 				}
 			}
 			if (spectate) {
-				NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(true, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
-				HUD::SET_MINIMAP_IN_SPECTATOR_MODE(true, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
+				NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(true, Game->PlayerIndex(g_SelectedPlayer));
+				HUD::SET_MINIMAP_IN_SPECTATOR_MODE(true, Game->PlayerIndex(g_SelectedPlayer));
 
-				ENTITY::FREEZE_ENTITY_POSITION(PLAYER::PLAYER_PED_ID(), true);
-				ENTITY::FREEZE_ENTITY_POSITION(PED::GET_VEHICLE_PED_IS_USING(PLAYER::PLAYER_PED_ID()), true);
+				ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), true);
+				ENTITY::FREEZE_ENTITY_POSITION(PED::GET_VEHICLE_PED_IS_USING(Game->Self()), true);
 
-				STREAMING::SET_FOCUS_ENTITY(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer));
+				STREAMING::SET_FOCUS_ENTITY(Game->PlayerIndex(g_SelectedPlayer));
 
-				if (PED::IS_PED_DEAD_OR_DYING(PLAYER::PLAYER_PED_ID(), 1))
+				if (PED::IS_PED_DEAD_OR_DYING(Game->Self(), 1))
 				{
-					NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, PLAYER::PLAYER_PED_ID());
+					NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, Game->Self());
 				}
 			}
 
 			if (infinite_ammo) {
-				WEAPON::SET_PED_INFINITE_AMMO_CLIP(PLAYER::PLAYER_PED_ID(), true);
+				WEAPON::SET_PED_INFINITE_AMMO_CLIP(Game->Self(), true);
 			}
 
 			if (delete_gun) {
-				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+				if (Game->Shooting())
 				{
 					Entity hitEntity;
 					if (raycast(hitEntity)) {
@@ -1182,36 +1343,36 @@ namespace Saint {
 				}
 			}
 			if (teleport_gun) {
-				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+				if (Game->Shooting())
 				{
 					NativeVector3 c;
 					if (raycast(c)) {
 						if (teleport_gun_int == 0) {
-							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(PLAYER::PLAYER_PED_ID(), c.x, c.y, c.z, true, true, true);
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), c.x, c.y, c.z, true, true, true);
 						}
 						if (teleport_gun_int == 1) {
-							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(PLAYER::PLAYER_PED_ID(), c.x, c.y, c.z, false, false, false);
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), c.x, c.y, c.z, false, false, false);
 						}
 					}
 				}
 			}
 
 			if (seatbelt) {
-				PED::SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(PLAYER::PLAYER_PED_ID(), true);
-				PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 32, false);
+				PED::SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(Game->Self(), true);
+				PED::SET_PED_CONFIG_FLAG(Game->Self(), 32, false);
 			}
 
 			if (auto_parachute) {
-				if (PED::GET_PED_PARACHUTE_STATE(PLAYER::PLAYER_PED_ID()) == 0)
+				if (PED::GET_PED_PARACHUTE_STATE(Game->Self()) == 0)
 				{
-					PED::FORCE_PED_TO_OPEN_PARACHUTE(PLAYER::PLAYER_PED_ID());
+					PED::FORCE_PED_TO_OPEN_PARACHUTE(Game->Self());
 
 				}
 			}
 			if (vehicle_godmode) {
-				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				if (Game->InVehicle())
 				{
-					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 					ENTITY::SET_ENTITY_INVINCIBLE(playerVehicle, true);
 					ENTITY::SET_ENTITY_PROOFS(playerVehicle, true, true, true, true, true, true, true, true);
 					VEHICLE::SET_VEHICLE_DAMAGE(playerVehicle, 0.0f, 0.0f, 0.0f, 0.0f, 200.0f, false);
@@ -1257,7 +1418,7 @@ namespace Saint {
 		}
 		void init() {
 			if (enabled) {
-				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+				if (Game->Shooting())
 				{
 					NativeVector3 c;
 					if (raycast(c)) {
@@ -1284,8 +1445,8 @@ namespace Saint {
 		void init() {
 			if (enabled)
 			{
-				if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), 1)) {
-					Player playerPed = PLAYER::PLAYER_PED_ID();
+				if (!PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), 1)) {
+					Player playerPed = Game->Self();
 					NativeVector3 gameplayCam = CAM::GET_GAMEPLAY_CAM_COORD();
 					NativeVector3 gameplayCamRot = CAM::GET_GAMEPLAY_CAM_ROT(0);
 					NativeVector3 gameplayCamDirection = RotationToDirection(gameplayCamRot);
@@ -1297,29 +1458,29 @@ namespace Saint {
 					WEAPON::GET_CURRENT_PED_WEAPON(playerPed, &weaponhash, 1);
 					static int delay2 = 0;
 					if (disable_shooting) {
-						PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), true);
+						PLAYER::DISABLE_PLAYER_FIRING(Game->Self(), true);
 					}
 					if (delay2 == 0 || (int)(GetTickCount64() - delay2) > delay)
 					{
 
 						if (disable_when_reloading && !only_when_aiming) {
-							if (PAD::IS_CONTROL_PRESSED(2, 208) || (GetKeyState(VK_LBUTTON) & 0x8000 && !PED::IS_PED_RELOADING(PLAYER::PLAYER_PED_ID()))) {
+							if (Game->ControlPressed(208) || (Game->KeyPress(VK_LBUTTON) && !PED::IS_PED_RELOADING(Game->Self()))) {
 								MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS2(startCoords, endCoords, 50, 1, weaponhash, playerPed, 1, 1, 0xbf800000);
 							}
 						}
 						else if (disable_when_reloading && only_when_aiming) {
-							if (PAD::IS_CONTROL_PRESSED(2, 208) || (GetKeyState(VK_LBUTTON) & 0x8000 && !PED::IS_PED_RELOADING(PLAYER::PLAYER_PED_ID()) && PAD::IS_CONTROL_PRESSED(2, 25))) {
+							if (Game->ControlPressed(208) || (Game->KeyPress(VK_LBUTTON) && !PED::IS_PED_RELOADING(Game->Self()) && PAD::IS_CONTROL_PRESSED(2, 25))) {
 								MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS2(startCoords, endCoords, 50, 1, weaponhash, playerPed, 1, 1, 0xbf800000);
 							}
 						}
 						else if (!disable_when_reloading && only_when_aiming) {
-							if (PAD::IS_CONTROL_PRESSED(2, 208) || (GetKeyState(VK_LBUTTON) & 0x8000 && PAD::IS_CONTROL_PRESSED(2, 25))) {
+							if (Game->ControlPressed(208) || (Game->KeyPress(VK_LBUTTON) && PAD::IS_CONTROL_PRESSED(2, 25))) {
 								MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS2(startCoords, endCoords, 50, 1, weaponhash, playerPed, 1, 1, 0xbf800000);
 							}
 						}
 						else
 						{
-							if (PAD::IS_CONTROL_PRESSED(2, 208) || (GetKeyState(VK_LBUTTON) & 0x8000)) {
+							if (Game->ControlPressed(208) || (Game->KeyPress(VK_LBUTTON))) {
 								MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS2(startCoords, endCoords, 50, 1, weaponhash, playerPed, 1, 1, 0xbf800000);
 							}
 						}
@@ -1337,8 +1498,8 @@ namespace Saint {
 		float multiplier = 1.0f;
 		void init() {
 			if (enabled) {
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-				VEHICLE::SET_VEHICLE_CHEAT_POWER_INCREASE(veh, 0.0 - multiplier);
+				
+				VEHICLE::SET_VEHICLE_CHEAT_POWER_INCREASE(Game->Vehicle(), 0.0 - multiplier);
 			}
 
 		}
@@ -1422,9 +1583,9 @@ namespace Saint {
 						float dz = rp_c.z;
 						rp_c.z = dz + height;
 
-						g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), [=] {
+						g_CallbackScript->AddCallback<ModelCallback>(Game->HashKey(rp_model_init[rp_model_data]), [=] {
 							*g_GameFunctions->should_sync_money_rewards = true;
-							OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, rp_c.x, rp_c.y, rp_c.z, 0, 10, MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), false, true);
+							OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, rp_c.x, rp_c.y, rp_c.z, 0, 10, Game->HashKey(rp_model_init[rp_model_data]), false, true);
 							*g_GameFunctions->should_sync_money_rewards = false;
 
 
@@ -1513,7 +1674,7 @@ namespace Saint {
 					timer = GetTickCount64();
 				}
 			}
-			Player p = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
+			Player p = Game->PlayerIndex(g_SelectedPlayer);
 			NativeVector3 rp_c;
 			NativeVector3 money_c;
 			if (data == 0) {
@@ -1537,9 +1698,9 @@ namespace Saint {
 					float dz = rp_c.z;
 					rp_c.z = dz + height;
 
-					g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), [=] {
+					g_CallbackScript->AddCallback<ModelCallback>(Game->HashKey(rp_model_init[rp_model_data]), [=] {
 						*g_GameFunctions->should_sync_money_rewards = true;
-						OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, rp_c.x, rp_c.y, rp_c.z, 0, 10, MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), false, true);
+						OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, rp_c.x, rp_c.y, rp_c.z, 0, 10, Game->HashKey(rp_model_init[rp_model_data]), false, true);
 						*g_GameFunctions->should_sync_money_rewards = false;
 
 
@@ -1577,7 +1738,7 @@ namespace Saint {
 		int height = 0;
 		int delay = 1100;
 		void init() {
-			Player p = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
+			Player p = Game->PlayerIndex(g_SelectedPlayer);
 			NativeVector3 c = ENTITY::GET_ENTITY_COORDS(p, false);
 			static int delayfr3 = 0;
 			if (delayfr3 == 0 || (int)(GetTickCount64() - delayfr3) > delay)
@@ -1585,10 +1746,10 @@ namespace Saint {
 				if (rp) {
 					float dz = c.z;
 					c.z = dz + height;
-					g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), [=] {
+					g_CallbackScript->AddCallback<ModelCallback>(Game->HashKey("vw_prop_vw_colle_alien"), [=] {
 
 						*g_GameFunctions->should_sync_money_rewards = true;
-						OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 0, MISC::GET_HASH_KEY("vw_prop_vw_colle_alien"), false, true);
+						OBJECT::CREATE_AMBIENT_PICKUP(1704231442, c.x, c.y, c.z, 1, 0, Game->HashKey("vw_prop_vw_colle_alien"), false, true);
 						*g_GameFunctions->should_sync_money_rewards = false;
 
 
@@ -1622,12 +1783,12 @@ namespace Saint {
 	{
 		if (index == -1)
 		{
-			VEHICLE::REMOVE_VEHICLE_MOD(PED::GET_VEHICLE_PED_IS_USING(PLAYER::PLAYER_PED_ID()), type);
+			VEHICLE::REMOVE_VEHICLE_MOD(PED::GET_VEHICLE_PED_IS_USING(Game->Self()), type);
 		}
 		else
 		{
-			VEHICLE::SET_VEHICLE_MOD_KIT(PED::GET_VEHICLE_PED_IS_USING(PLAYER::PLAYER_PED_ID()), 0);
-			VEHICLE::SET_VEHICLE_MOD(PED::GET_VEHICLE_PED_IS_USING(PLAYER::PLAYER_PED_ID()), type, index, false);
+			VEHICLE::SET_VEHICLE_MOD_KIT(PED::GET_VEHICLE_PED_IS_USING(Game->Self()), 0);
+			VEHICLE::SET_VEHICLE_MOD(PED::GET_VEHICLE_PED_IS_USING(Game->Self()), type, index, false);
 		}
 	}
 
@@ -1742,8 +1903,8 @@ namespace Saint {
 						int speedflags2 = 0;
 						bool invalidModel = false;
 						Hash playerModel = ENTITY::GET_ENTITY_MODEL(ped);
-						if (playerModel != MISC::GET_HASH_KEY("mp_m_freemode_01")) {
-							if (playerModel != MISC::GET_HASH_KEY("mp_f_freemode_01")) {
+						if (playerModel != Game->HashKey("mp_m_freemode_01")) {
+							if (playerModel != Game->HashKey("mp_f_freemode_01")) {
 								invalidModel = true;
 							}
 						}
@@ -1783,14 +1944,14 @@ namespace Saint {
 							}
 						}
 						Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(ped, false);
-						Hash cutter = MISC::GET_HASH_KEY("cutter");
-						Hash cutter2 = MISC::GET_HASH_KEY("mesa2");
-						Hash cutter3 = MISC::GET_HASH_KEY("policeold1");
-						Hash cutter4 = MISC::GET_HASH_KEY("policeold2");
-						Hash cutter5 = MISC::GET_HASH_KEY("speedo2");
-						Hash cutter6 = MISC::GET_HASH_KEY("stockade3");
-						Hash cutter7 = MISC::GET_HASH_KEY("asea2");
-						Hash cutter8 = MISC::GET_HASH_KEY("burrito5");
+						Hash cutter = Game->HashKey("cutter");
+						Hash cutter2 = Game->HashKey("mesa2");
+						Hash cutter3 = Game->HashKey("policeold1");
+						Hash cutter4 = Game->HashKey("policeold2");
+						Hash cutter5 = Game->HashKey("speedo2");
+						Hash cutter6 = Game->HashKey("stockade3");
+						Hash cutter7 = Game->HashKey("asea2");
+						Hash cutter8 = Game->HashKey("burrito5");
 
 						if (UnobtainableVehicle) {
 							if (PED::IS_PED_IN_ANY_VEHICLE(ped, false)) {
@@ -1824,8 +1985,8 @@ namespace Saint {
 						}
 						if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(veh, -1, 1) == ped) {
 							if (VEHICLE::GET_HAS_ROCKET_BOOST(veh)) {
-								Hash getveh = MISC::GET_HASH_KEY("scramjet");
-								Hash getveh2 = MISC::GET_HASH_KEY("oppressor2");
+								Hash getveh = Game->HashKey("scramjet");
+								Hash getveh2 = Game->HashKey("oppressor2");
 								if (ENTITY::GET_ENTITY_MODEL(veh) == getveh2) {
 									if (ENTITY::GET_ENTITY_SPEED(PED::GET_VEHICLE_PED_IS_IN(ped, false)) > 67 && speed) {
 
@@ -1942,10 +2103,10 @@ namespace Saint {
 		float swim_speed = 1.0f;
 		void init() {
 			if (run) {
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_run_speed = run_speed;
+				Game->CPed()->m_player_info->m_run_speed = run_speed;
 			}
 			if (swim_run) {
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_swim_speed = run_speed;
+				Game->CPed()->m_player_info->m_swim_speed = run_speed;
 			}
 		}
 	};
@@ -2013,25 +2174,25 @@ namespace Saint {
 			if (enabled) {
 				char buffer[32];
 				if (type_i == 0) {
-					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 					float vehicleSpeed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
 					snprintf(buffer, sizeof(buffer), "%.0f MPH", vehicleSpeed * 2.236936);
 					drawText(buffer, 0.01f + x_offset, 0.01f + y_offset, scale, 0, false, false);
 				}
 				if (type_i == 1) {
-					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 					float vehicleSpeed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
 					snprintf(buffer, sizeof(buffer), "%.0f KPH", vehicleSpeed * 3.6);
 					drawText(buffer, 0.01f + x_offset, 0.01f + y_offset, scale, 0, false, false);
 				}
 				if (type_i == 2) {
-					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 					float vehicleSpeed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
 					snprintf(buffer, sizeof(buffer), "%i GMPH", (int)vehicleSpeed);
 					drawText(buffer, 0.01f + x_offset, 0.01f + y_offset, scale, 0, false, false);
 				}
 				if (type_i == 3) {
-					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 					float vehicleSpeed = ENTITY::GET_ENTITY_SPEED(playerVehicle) * custom_times;
 					snprintf(buffer, sizeof(buffer), "%i %s", (int)vehicleSpeed, custom_name.c_str());
 					drawText(buffer, 0.01f + x_offset, 0.01f + y_offset, scale, 0, false, false);
@@ -2049,17 +2210,15 @@ namespace Saint {
 		void init() {
 			if (enabled) {
 
-				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+				if (Game->Shooting())
 				{
-					NativeVector3 hitCoords;
-					if (raycast(hitCoords)) {
-						Hash airStrike = MISC::GET_HASH_KEY("WEAPON_AIRSTRIKE_ROCKET");
+						Hash airStrike = Game->HashKey("WEAPON_AIRSTRIKE_ROCKET");
 						if (!WEAPON::HAS_WEAPON_ASSET_LOADED(airStrike))
 						{
 							WEAPON::REQUEST_WEAPON_ASSET(airStrike, 31, 0);
 						}
-						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(hitCoords.x, hitCoords.y, height, hitCoords.x, hitCoords.y, 0, damage, 1, airStrike, PLAYER::PLAYER_PED_ID(), 1, 0, -1.0);
-					}
+						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(Game->HitCoords().x, Game->HitCoords().y, height, Game->HitCoords().x, Game->HitCoords().y, 0, damage, 1, airStrike, Game->Self(), 1, 0, -1.0);
+					
 				}
 			}
 		}
@@ -2086,10 +2245,10 @@ namespace Saint {
 					static int delay2 = 0;
 					if (delay2 == 0 || (int)(GetTickCount64() - delay2) > delay) {
 						if (scoords_i == 0) {
-							PED::SET_PED_SHOOTS_AT_COORD(PLAYER::PLAYER_PED_ID(), hitCoords.x, hitCoords.y, hitCoords.z, true);
+							PED::SET_PED_SHOOTS_AT_COORD(Game->Self(), hitCoords.x, hitCoords.y, hitCoords.z, true);
 						}
 						if (scoords_i == 1) {
-							PED::SET_PED_SHOOTS_AT_COORD(PLAYER::PLAYER_PED_ID(), Mouth.x, Mouth.y, Mouth.z, true);
+							PED::SET_PED_SHOOTS_AT_COORD(Game->Self(), Mouth.x, Mouth.y, Mouth.z, true);
 						}
 						delay2 = GetTickCount64();
 					}
@@ -2100,14 +2259,14 @@ namespace Saint {
 		void init() {
 			if (enabled) {
 
-				if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &AimedAtEntity))
+				if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(Game->Id(), &AimedAtEntity))
 				{
-					if (PED::IS_PED_RELOADING(PLAYER::PLAYER_PED_ID())) {
+					if (PED::IS_PED_RELOADING(Game->Self())) {
 						if (d2) {
 							return;
 						}
 					}
-					if (PED::IS_PED_RAGDOLL(PLAYER::PLAYER_PED_ID())) {
+					if (PED::IS_PED_RAGDOLL(Game->Self())) {
 						if (d1) {
 							return;
 						}
@@ -2151,7 +2310,7 @@ namespace Saint {
 		void init() {
 			if (enabled) {
 				int handle[26];
-				NETWORK::NETWORK_HANDLE_FROM_PLAYER(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), &handle[0], 13);
+				NETWORK::NETWORK_HANDLE_FROM_PLAYER(Game->PlayerIndex(g_SelectedPlayer), &handle[0], 13);
 				if (NETWORK::NETWORK_IS_HANDLE_VALID(&handle[0], 13)) {
 					NETWORK::NETWORK_SEND_TEXT_MESSAGE(text.c_str(), &handle[0]);
 				}
@@ -2171,12 +2330,12 @@ namespace Saint {
 		int upgradedelay = 0;
 		void init() {
 			if (enabled) {
-				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				if (Game->InVehicle())
 				{
 
 					if (upgradedelay == 0 || (int)(GetTickCount64() - upgradedelay) > delay)
 					{
-						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 						VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
 						for (int i = 0; i < 50; i++)
 						{
@@ -2309,11 +2468,11 @@ namespace Saint {
 		void init() {
 			if (looped) {
 				if (blame) {
-					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), false);
 					add(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(blamed_person), c, data_i, damage_scale, sound, invisible, cameraShake);
 				}
 				else {
-					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), false);
 					FIRE::ADD_EXPLOSION(c.x, c.y, c.z, data_i, damage_scale, sound, invisible, cameraShake, false);
 				}
 			}
@@ -2375,13 +2534,13 @@ namespace Saint {
 		void add() {
 
 			if (mode_i == 1) {
-				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), false);
 
-				g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(cop_hashes[cop_int]), [=] {
+				g_CallbackScript->AddCallback<ModelCallback>(Game->HashKey(cop_hashes[cop_int]), [=] {
 
-					ped = PED::CREATE_PED(26, MISC::GET_HASH_KEY(cop_hashes[cop_int]), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
-					WEAPON::GIVE_DELAYED_WEAPON_TO_PED(ped, data2[data_i], 9998, true);
-					TASK::TASK_COMBAT_PED(ped, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
+					ped = PED::CREATE_PED(26, Game->HashKey(cop_hashes[cop_int]), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
+					Game->GiveWeapon(ped, data2[data_i], 9998);
+					TASK::TASK_COMBAT_PED(ped, Game->PlayerIndex(g_SelectedPlayer), 0, 16);
 					if (godmode)
 					{
 						ENTITY::SET_ENTITY_INVINCIBLE(ped, godmode);
@@ -2389,22 +2548,22 @@ namespace Saint {
 
 
 					});
-				g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY("police3"), [=] {
+				g_CallbackScript->AddCallback<ModelCallback>(Game->HashKey("police3"), [=] {
 					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-					Vehicle vehicle = VEHICLE::CREATE_VEHICLE(MISC::GET_HASH_KEY("police3"), c.x + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.y + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, false, false);
+					Vehicle vehicle = VEHICLE::CREATE_VEHICLE(Game->HashKey("police3"), c.x + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.y + MISC::GET_RANDOM_INT_IN_RANGE(20, 50), c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, false, false);
 					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 					DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
 					auto networkId = NETWORK::VEH_TO_NET(vehicle);
 					if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
 						NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
 					VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
-					TASK::TASK_COMBAT_PED(ped, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
+					TASK::TASK_COMBAT_PED(ped, Game->PlayerIndex(g_SelectedPlayer), 0, 16);
 					PED::SET_PED_INTO_VEHICLE(ped, vehicle, -1);
 
 					});
 			}
 			if (mode_i == 2) {
-				Entity playerEntity = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
+				Entity playerEntity = Game->PlayerIndex(g_SelectedPlayer);
 				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(playerEntity, true);
 				const char* modelName = "TITAN";
 				float spawnX = MISC::GET_RANDOM_FLOAT_IN_RANGE(playerCoords.x - 10.0f, playerCoords.x + 10.0f);
@@ -2414,8 +2573,8 @@ namespace Saint {
 				modelName = veh_hash[veh_int];
 
 
-				Hash modelHash = MISC::GET_HASH_KEY(modelName);
-				Hash pedModelHash = MISC::GET_HASH_KEY("A_F_Y_Golfer_01");
+				Hash modelHash = Game->HashKey(modelName);
+				Hash pedModelHash = Game->HashKey("A_F_Y_Golfer_01");
 				for (std::uint32_t i = 0; i < how_many_planes; ++i) {
 					g_CallbackScript->AddCallback<ModelCallback>(modelHash, [=] {
 						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
@@ -2438,7 +2597,7 @@ namespace Saint {
 							PED::SET_PED_INTO_VEHICLE(angryPlanesPed, angryPlanesPlane, -1);
 							PED::SET_DRIVER_ABILITY(angryPlanesPed, 0.99f);
 							ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPed, 1);
-							TASK::TASK_COMBAT_PED(angryPlanesPed, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0, 16);
+							TASK::TASK_COMBAT_PED(angryPlanesPed, Game->PlayerIndex(g_SelectedPlayer), 0, 16);
 						});
 
 				}
@@ -2498,7 +2657,7 @@ namespace Saint {
 			*script_global(4540726).as<bool*>() = true;
 			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
 				{
-					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 					float veh_speed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
 					if (dellast) {
 						Vehicle lastVehicle = PLAYER::GET_PLAYERS_LAST_VEHICLE();
@@ -2506,9 +2665,9 @@ namespace Saint {
 					}
 
 
-					NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::PLAYER_PED_ID(), { 0.f, dellast ? 0.f : 8.0f, (VEHICLE::IS_THIS_MODEL_A_PLANE(hash) && spawninair || VEHICLE::IS_THIS_MODEL_A_HELI(hash) && spawninair) ? 1.0f + heightmulti : 1.0f });
+					NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(Game->Self(), { 0.f, dellast ? 0.f : 8.0f, (VEHICLE::IS_THIS_MODEL_A_PLANE(hash) && spawninair || VEHICLE::IS_THIS_MODEL_A_HELI(hash) && spawninair) ? 1.0f + heightmulti : 1.0f });
 					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-					Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
+					Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(Game->Self()), true, false, false);
 					spawned_veh.spawned.push_back({ HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicle))), vehicle });
 					*buffer = vehicle;
 					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
@@ -2517,7 +2676,7 @@ namespace Saint {
 					if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
 						NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
 					VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
-					PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
+					PED::SET_PED_INTO_VEHICLE(Game->Self(), vehicle, -1);
 					VEHICLE::SET_VEHICLE_FORWARD_SPEED(vehicle, veh_speed);
 					if (max) {
 						VEHICLE::SET_VEHICLE_MOD_KIT(vehicle, 0);
@@ -2539,7 +2698,7 @@ namespace Saint {
 						}
 					}
 					if (spawn_in) {
-						PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
+						PED::SET_PED_INTO_VEHICLE(Game->Self(), vehicle, -1);
 					}
 					if (fade_in) {
 						if (fade_speed_i == 0) {
@@ -2564,9 +2723,9 @@ namespace Saint {
 
 
 
-					NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), { 0.f, dellast ? 0.f : 8.0f, 1.0f });
+					NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(Game->PlayerIndex(g_SelectedPlayer), { 0.f, dellast ? 0.f : 8.0f, 1.0f });
 					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-					Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer)), true, false, false);
+					Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(Game->PlayerIndex(g_SelectedPlayer)), true, false, false);
 					*buffer = vehicle;
 					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 					DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
@@ -2591,9 +2750,9 @@ namespace Saint {
 
 
 
-					NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), { 0.f, 0.f, 1.0f });
+					NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(Game->PlayerIndex(g_SelectedPlayer), { 0.f, 0.f, 1.0f });
 					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-					Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer)), true, false, false);
+					Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(Game->PlayerIndex(g_SelectedPlayer)), true, false, false);
 					*buffer = vehicle;
 					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 					DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
@@ -2643,7 +2802,7 @@ namespace Saint {
 		float value = 90.0f;
 		void init() {
 			if (enabled) {
-				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(Game->Self(), true);
 
 				if (!CAM::DOES_CAM_EXIST(freecamCamera)) {
 					freecamCamera = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", true);
@@ -2657,7 +2816,7 @@ namespace Saint {
 				CAM::SET_CAM_ROT(freecamCamera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
 				CAM::SET_CAM_COORD(freecamCamera, CAM::GET_GAMEPLAY_CAM_COORD());
 				CAM::SET_CAM_FOV(freecamCamera, value);
-				if (PAD::IS_CONTROL_PRESSED(2, 25)) {
+				if (Game->ControlPressed(25)) {
 					HUD::DISPLAY_SNIPER_SCOPE_THIS_FRAME();
 				}
 			}
@@ -2672,7 +2831,7 @@ namespace Saint {
 		bool enabled = false;
 		void init() {
 			if (enabled) {
-				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(Game->Self(), true);
 
 				if (!CAM::DOES_CAM_EXIST(freecamCamera)) {
 					freecamCamera = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", true);
@@ -2684,7 +2843,7 @@ namespace Saint {
 				CAM::SET_CAM_ACTIVE(freecamCamera, true);
 				CAM::SET_CAM_ROT(freecamCamera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
 
-				PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), true);
+				PLAYER::DISABLE_PLAYER_FIRING(Game->Self(), true);
 				//HUD::HIDE_HUD_AND_RADAR_THIS_FRAME();
 				PAD::DISABLE_CONTROL_ACTION(2, 8, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 32, true);
@@ -2743,19 +2902,19 @@ namespace Saint {
 			{
 				NativeVector3 target_coords = PED::GET_PED_BONE_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), BoneHashes[data], 0, 0, 0);
 				NativeVector3 ped_coords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), 1);
-				NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), TRUE);
+				NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), TRUE);
 
 				Ped PlayerPed = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i);
-				NativeVector3 PedCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+				NativeVector3 PedCoords = Game->SCoords();
 				NativeVector3 Coords = ENTITY::GET_ENTITY_COORDS(PlayerPed, false);
 				float distance = GetDistanceFloat(PedCoords, Coords);
 
-				if (PLAYER::IS_PLAYER_FREE_AIMING(PLAYER::PLAYER_ID()))
+				if (PLAYER::IS_PLAYER_FREE_AIMING(Game->Id()))
 				{
 					HUD::DISPLAY_SNIPER_SCOPE_THIS_FRAME();
 					if (ENTITY::DOES_ENTITY_EXIST(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i)))
 					{
-						if (i == PLAYER::PLAYER_ID())
+						if (i == Game->Id())
 							continue;
 
 
@@ -2763,10 +2922,10 @@ namespace Saint {
 						const int arrSize = numElements * 2 + 2;
 						int veh[arrSize];
 						veh[0] = numElements;
-						int count = PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), veh, -1);
+						int count = PED::GET_PED_NEARBY_PEDS(Game->Self(), veh, -1);
 						Ped closest = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i);
 						if (excludes.team) {
-							if (PLAYER::GET_PLAYER_TEAM(closest) != PLAYER::GET_PLAYER_TEAM(PLAYER::PLAYER_PED_ID())) {
+							if (PLAYER::GET_PLAYER_TEAM(closest) != PLAYER::GET_PLAYER_TEAM(Game->Self())) {
 								if (veh != NULL) {
 									for (int i = 0; i < count; i++)
 									{
@@ -2780,7 +2939,7 @@ namespace Saint {
 												if (closest == 0) closest = ped;
 												else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
 												Hash weaponhash;
-												WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+												WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
 												float screenX, screenY;
 												BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
 												if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
@@ -2808,7 +2967,7 @@ namespace Saint {
 												if (closest == 0) closest = ped;
 												else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
 												Hash weaponhash;
-												WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+												WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
 												float screenX, screenY;
 												BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
 												if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
@@ -2838,7 +2997,7 @@ namespace Saint {
 												if (closest == 0) closest = ped;
 												else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
 												Hash weaponhash;
-												WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+												WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
 												float screenX, screenY;
 												BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
 												if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
@@ -2866,7 +3025,7 @@ namespace Saint {
 												if (closest == 0) closest = ped;
 												else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
 												Hash weaponhash;
-												WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+												WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
 												float screenX, screenY;
 												BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
 												if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
@@ -2893,7 +3052,7 @@ namespace Saint {
 											if (closest == 0) closest = ped;
 											else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
 											Hash weaponhash;
-											WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+											WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
 											float screenX, screenY;
 											BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
 											if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
@@ -2909,19 +3068,19 @@ namespace Saint {
 					}
 				}
 			}
-			if (PLAYER::IS_PLAYER_FREE_AIMING(PLAYER::PLAYER_ID()))
+			if (PLAYER::IS_PLAYER_FREE_AIMING(Game->Id()))
 			{
 				const int numElements = 10;
 				const int arrSize = numElements * 2 + 2;
 				int veh[arrSize];
 				veh[0] = numElements;
-				int count = PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), veh, -1);
+				int count = PED::GET_PED_NEARBY_PEDS(Game->Self(), veh, -1);
 				Ped closest = 0;
 				NativeVector3 target_coords = PED::GET_PED_BONE_COORDS(closest, SKEL_Head, 0, 0, 0);
 				NativeVector3 ped_coords = ENTITY::GET_ENTITY_COORDS(closest, 1);
-				NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), TRUE);
+				NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), TRUE);
 				if (excludes.team) {
-					if (PLAYER::GET_PLAYER_TEAM(closest) != PLAYER::GET_PLAYER_TEAM(PLAYER::PLAYER_PED_ID())) {
+					if (PLAYER::GET_PLAYER_TEAM(closest) != PLAYER::GET_PLAYER_TEAM(Game->Self())) {
 						if (veh != NULL) {
 							for (int i = 0; i < count; i++)
 							{
@@ -2935,7 +3094,7 @@ namespace Saint {
 										if (closest == 0) closest = ped;
 										else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
 										Hash weaponhash;
-										WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+										WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
 										float screenX, screenY;
 										BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
 										if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
@@ -2963,7 +3122,7 @@ namespace Saint {
 										if (closest == 0) closest = ped;
 										else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
 										Hash weaponhash;
-										WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+										WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
 										float screenX, screenY;
 										BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
 										if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
@@ -2993,7 +3152,7 @@ namespace Saint {
 										if (closest == 0) closest = ped;
 										else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
 										Hash weaponhash;
-										WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+										WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
 										float screenX, screenY;
 										BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
 										if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
@@ -3021,7 +3180,7 @@ namespace Saint {
 										if (closest == 0) closest = ped;
 										else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
 										Hash weaponhash;
-										WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+										WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
 										float screenX, screenY;
 										BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
 										if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
@@ -3048,7 +3207,7 @@ namespace Saint {
 									if (closest == 0) closest = ped;
 									else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;
 									Hash weaponhash;
-									WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &weaponhash, 1);
+									WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
 									float screenX, screenY;
 									BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
 									if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
@@ -3077,67 +3236,67 @@ namespace Saint {
 
 			switch (size) {
 			case 0:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Unknown;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Unknown;
 				Lists::DamagePos = (std::size_t)eDamageType::Unknown;
 				break;
 			case 1:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::None;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::None;
 				Lists::DamagePos = (std::size_t)eDamageType::None;
 				break;
 			case 2:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Melee;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Melee;
 				Lists::DamagePos = (std::size_t)eDamageType::Melee;
 				break;
 			case 3:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Bullet;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Bullet;
 				Lists::DamagePos = (std::size_t)eDamageType::Bullet;
 				break;
 			case 4:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::BulletRubber;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::BulletRubber;
 				Lists::DamagePos = (std::size_t)eDamageType::BulletRubber;
 				break;
 			case 5:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Explosive;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Explosive;
 				Lists::DamagePos = (std::size_t)eDamageType::Explosive;
 				break;
 			case 6:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Fire;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Fire;
 				Lists::DamagePos = (std::size_t)eDamageType::Fire;
 				break;
 			case 7:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Collision;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Collision;
 				Lists::DamagePos = (std::size_t)eDamageType::Collision;
 				break;
 			case 8:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Fall;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Fall;
 				Lists::DamagePos = (std::size_t)eDamageType::Fall;
 				break;
 			case 9:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Drown;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Drown;
 				Lists::DamagePos = (std::size_t)eDamageType::Drown;
 				break;
 			case 10:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Electric;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Electric;
 				Lists::DamagePos = (std::size_t)eDamageType::Electric;
 				break;
 			case 11:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::BarbedWire;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::BarbedWire;
 				Lists::DamagePos = (std::size_t)eDamageType::BarbedWire;
 				break;
 			case 12:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::FireExtinguisher;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::FireExtinguisher;
 				Lists::DamagePos = (std::size_t)eDamageType::FireExtinguisher;
 				break;
 			case 13:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Smoke;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Smoke;
 				Lists::DamagePos = (std::size_t)eDamageType::Smoke;
 				break;
 			case 14:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::WaterCannon;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::WaterCannon;
 				Lists::DamagePos = (std::size_t)eDamageType::WaterCannon;
 				break;
 			case 15:
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Tranquilizer;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_damage_type = eDamageType::Tranquilizer;
 				Lists::DamagePos = (std::size_t)eDamageType::Tranquilizer;
 				break;
 			}
@@ -3242,7 +3401,7 @@ namespace Saint {
 				*script_global(1575017).as<int*>() = (int)session;
 
 			*script_global(1574589).as<int*>() = 1;
-			fbr::cur()->wait(200ms);
+			Game->Wait(200ms);
 			*script_global(1574589).as<int*>() = 0;
 		}
 	};
@@ -3340,12 +3499,12 @@ namespace Saint {
 				return;
 			}
 
-			PED::SET_PED_COORDS_KEEP_VEHICLE(PLAYER::PLAYER_PED_ID(), Location.x, Location.y, Location.z);
+			PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), Location.x, Location.y, Location.z);
 		}
 		void waypoint() {
 
 			NativeVector3 coords = GetBlipIcon();
-			Ped ped = PLAYER::PLAYER_PED_ID();
+			Ped ped = Game->Self();
 
 
 
@@ -3378,7 +3537,7 @@ namespace Saint {
 		}
 		void object() {
 			NativeVector3 coords = GetBlipIcon();
-			Ped ped = PLAYER::PLAYER_PED_ID();
+			Ped ped = Game->Self();
 
 			if (coords.x == 0 && coords.y == 0) { return; }
 
@@ -3489,18 +3648,18 @@ namespace Saint {
 						r++;
 						b--;
 					}
-					Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+					
 
-					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(veh, r, g, b);
+					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(Game->Vehicle(), r, g, b);
 					if (rainbow.change_secondary) {
-						VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(veh, r, g, b);
+						VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(Game->Vehicle(), r, g, b);
 					}
 					if (rainbow.underglow) {
-						VEHICLE::SET_VEHICLE_NEON_COLOUR(veh, r, g, b);
+						VEHICLE::SET_VEHICLE_NEON_COLOUR(Game->Vehicle(), r, g, b);
 					}
 					if (rainbow.tyre_smoke) {
-						VEHICLE::TOGGLE_VEHICLE_MOD(veh, 20, true);
-						VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(veh, r, g, b);
+						VEHICLE::TOGGLE_VEHICLE_MOD(Game->Vehicle(), 20, true);
+						VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(Game->Vehicle(), r, g, b);
 					}
 					
 					timer = GetTickCount64();
@@ -3520,9 +3679,9 @@ namespace Saint {
 		void add_message(const char* msg, const char* player_name, bool is_team)
 		{
 			if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
-				if (Hooks::send_chat_message(*g_GameFunctions->m_send_chat_ptr, g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_net_data(), msg, false)) {
-					g_GameFunctions->m_send_chat_message(*g_GameFunctions->m_send_chat_ptr, g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_net_data(), msg, false);
-					g_GameFunctions->m_send_chat_ptr, g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_net_data(), msg, false;
+				if (Hooks::send_chat_message(*g_GameFunctions->m_send_chat_ptr, g_GameVariables->m_net_game_player(Game->Id())->get_net_data(), msg, false)) {
+					g_GameFunctions->m_send_chat_message(*g_GameFunctions->m_send_chat_ptr, g_GameVariables->m_net_game_player(Game->Id())->get_net_data(), msg, false);
+					g_GameFunctions->m_send_chat_ptr, g_GameVariables->m_net_game_player(Game->Id())->get_net_data(), msg, false;
 					int scaleform = GRAPHICS::REQUEST_SCALEFORM_MOVIE("MULTIPLAYER_CHAT");
 					GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(scaleform, "ADD_MESSAGE");
 					GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING(player_name);
@@ -3549,7 +3708,7 @@ namespace Saint {
 				if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
 					static int timer;
 					if (timer == 0 || (int)(GetTickCount64() - timer) > delay) {
-						add_message(text.c_str(), g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_name(), false);
+						add_message(text.c_str(), g_GameVariables->m_net_game_player(Game->Id())->get_name(), false);
 						timer = GetTickCount64();
 					}
 				}
@@ -3560,7 +3719,7 @@ namespace Saint {
 		}
 		void send_once() {
 			if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
-				add_message(text.c_str(), g_GameVariables->m_net_game_player(PLAYER::PLAYER_ID())->get_name(), false);
+				add_message(text.c_str(), g_GameVariables->m_net_game_player(Game->Id())->get_name(), false);
 			}
 		}
 	};
@@ -3576,7 +3735,7 @@ namespace Saint {
 				NETWORK::USE_PLAYER_COLOUR_INSTEAD_OF_TEAM_COLOUR(true);
 			}
 			if (override_restrictions) {
-				NETWORK::NETWORK_OVERRIDE_TEAM_RESTRICTIONS(PLAYER::GET_PLAYER_TEAM(PLAYER::PLAYER_PED_ID()), true);
+				NETWORK::NETWORK_OVERRIDE_TEAM_RESTRICTIONS(PLAYER::GET_PLAYER_TEAM(Game->Self()), true);
 			}
 		}
 	};
@@ -3617,11 +3776,11 @@ namespace Saint {
 			g_CallbackScript->AddCallback<AnimationCallback>(anim, [=]
 				{
 					if (controllable) {
-						TASK::TASK_PLAY_ANIM(PLAYER::PLAYER_PED_ID(), (char*)anim, (char*)animid, 9.0f, 0.0f, -1, 120, 0, false, false, false);
+						TASK::TASK_PLAY_ANIM(Game->Self(), (char*)anim, (char*)animid, 9.0f, 0.0f, -1, 120, 0, false, false, false);
 					}
 					else
 					{
-						TASK::TASK_PLAY_ANIM(PLAYER::PLAYER_PED_ID(), (char*)anim, (char*)animid, 8.0f, 0.0f, -1, 9, 0, 0, 0, 0);
+						TASK::TASK_PLAY_ANIM(Game->Self(), (char*)anim, (char*)animid, 8.0f, 0.0f, -1, 9, 0, 0, 0, 0);
 					}
 				});
 		}
@@ -3647,12 +3806,11 @@ namespace Saint {
 			switch (data) {
 			case 0:
 				m_queue.add(10ms, "Adding Cage", [=] {
-					Player ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
-					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(ped, true);
-					Hash hash = MISC::GET_HASH_KEY("stt_prop_stunt_tube_l");
+					Player ped = Game->PlayerIndex(g_SelectedPlayer);
+					Hash hash = Game->HashKey("stt_prop_stunt_tube_l");
 
 
-					Object cage = OBJECT::CREATE_OBJECT_NO_OFFSET(hash, c.x, c.y, c.z, true, false, false);
+					Object cage = OBJECT::CREATE_OBJECT_NO_OFFSET(hash, Game->Coords(ped).x, Game->Coords(ped).y, Game->Coords(ped).z, true, false, false);
 					if (is_invisible) {
 						ENTITY::SET_ENTITY_VISIBLE(cage, false, 0);
 					}
@@ -3661,9 +3819,9 @@ namespace Saint {
 				break;
 			case 1:
 				m_queue.add(10ms, "Adding Cage", [=] {
-					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), false);
 
-					Object cage = OBJECT::CREATE_OBJECT(MISC::GET_HASH_KEY("prop_gold_cont_01"), c.x, c.y, c.z, true, false, false);
+					Object cage = OBJECT::CREATE_OBJECT(Game->HashKey("prop_gold_cont_01"), c.x, c.y, c.z, true, false, false);
 					if (is_invisible) {
 						ENTITY::SET_ENTITY_VISIBLE(cage, false, 0);
 					}
@@ -3725,10 +3883,10 @@ namespace Saint {
 				static Entity current_entity{ NULL };
 
 				if (locked) {
-					if (PAD::IS_CONTROL_PRESSED(2, 25))
+					if (Game->ControlPressed(25))
 					{
 						if (current_entity == NULL) {
-							PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &current_entity);
+							PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(Game->Id(), &current_entity);
 						}
 						else
 						{
@@ -3744,19 +3902,18 @@ namespace Saint {
 							NativeVector3 multiplyfr = multiply(&dir, zoom);
 							NativeVector3 spawnPosition = addn(&coord, &multiplyfr);
 
-							NativeVector3 getcoords = ENTITY::GET_ENTITY_COORDS(current_entity, 0);
-							float getaimcoordsX = GravityGunGoto(spawnPosition.x, getcoords.x);
-							float getaimcoordsY = GravityGunGoto(spawnPosition.y, getcoords.y);
-							float getaimcoordsZ = GravityGunGoto(spawnPosition.z, getcoords.z);
-							if (!PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID())) {
+							float getaimcoordsX = GravityGunGoto(spawnPosition.x, Game->Coords(current_entity).x);
+							float getaimcoordsY = GravityGunGoto(spawnPosition.y, Game->Coords(current_entity).y);
+							float getaimcoordsZ = GravityGunGoto(spawnPosition.z, Game->Coords(current_entity).z);
+							if (!PED::IS_PED_SHOOTING(Game->Self())) {
 								ENTITY::SET_ENTITY_VELOCITY(current_entity, getaimcoordsX * 2.0, getaimcoordsY * 2.0, getaimcoordsZ * 2.0);
 							}
 
-							if (PAD::IS_CONTROL_PRESSED(2, 24))
+							if (Game->ControlPressed(24))
 							{
 
 								ENTITY::APPLY_FORCE_TO_ENTITY(current_entity, 1, dir.x * m_force, dir.y * m_force, dir.z * m_force, 0.0f, 0.0f, 0.0f, false, false, true, true, false, true);
-								PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_ID(), false);
+								PLAYER::DISABLE_PLAYER_FIRING(Game->Id(), false);
 								current_entity = NULL;
 								locked = false;
 							}
@@ -3769,9 +3926,9 @@ namespace Saint {
 					}
 				}
 
-				if (!PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &current_entity)) {
+				if (!PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(Game->Id(), &current_entity)) {
 					locked = true;
-					PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_ID(), false);
+					PLAYER::DISABLE_PLAYER_FIRING(Game->Id(), false);
 				}
 			}
 		}
@@ -3922,51 +4079,51 @@ namespace Saint {
 			}
 		}
 		void m_add_ramp() {
-			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+			
 
-			Hash ramp = MISC::GET_HASH_KEY(m_ramp_data[m_ramp_type_data]);
+			Hash ramp = Game->HashKey(m_ramp_data[m_ramp_type_data]);
 
 			STREAMING::REQUEST_MODEL(ramp);
-			if (ENTITY::DOES_ENTITY_EXIST(veh))
+			if (ENTITY::DOES_ENTITY_EXIST(Game->Vehicle()))
 			{
 				//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(veh);
 
 				if (m_ramp_location.m_front)
 				{
-					m_ramp_location.front = OBJECT::CREATE_OBJECT(ramp, 0.f, 0.f, 0.f, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), 1, 0);
+					m_ramp_location.front = OBJECT::CREATE_OBJECT(ramp, 0.f, 0.f, 0.f, ENTITY::GET_ENTITY_HEADING(Game->Self()), 1, 0);
 					if (ENTITY::DOES_ENTITY_EXIST(m_ramp_location.front))
 					{
-						ENTITY::ATTACH_ENTITY_TO_ENTITY(m_ramp_location.front, veh, 0, 0, 5, 0.3f, 0, 0, 180, 0, 0, 0, 0, 2, 1, false);
+						ENTITY::ATTACH_ENTITY_TO_ENTITY(m_ramp_location.front, Game->Vehicle(), 0, 0, 5, 0.3f, 0, 0, 180, 0, 0, 0, 0, 2, 1, false);
 						ENTITY::SET_ENTITY_COLLISION(m_ramp_location.front, 1, 0);
 					}
 				}
 
 				if (m_ramp_location.m_back)
 				{
-					m_ramp_location.back = OBJECT::CREATE_OBJECT(ramp, 0.f, 0.f, 0.f, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), 1, 0);
+					m_ramp_location.back = OBJECT::CREATE_OBJECT(ramp, 0.f, 0.f, 0.f, ENTITY::GET_ENTITY_HEADING(Game->Self()), 1, 0);
 					if (ENTITY::DOES_ENTITY_EXIST(m_ramp_location.back))
 					{
-						ENTITY::ATTACH_ENTITY_TO_ENTITY(m_ramp_location.back, veh, 0, 0, -5, 0.3f, 0, 0, 360, 0, 0, 0, 0, 2, 1, false);
+						ENTITY::ATTACH_ENTITY_TO_ENTITY(m_ramp_location.back, Game->Vehicle(), 0, 0, -5, 0.3f, 0, 0, 360, 0, 0, 0, 0, 2, 1, false);
 						ENTITY::SET_ENTITY_COLLISION(m_ramp_location.back, 1, 0);
 					}
 				}
 
 				if (m_ramp_location.m_left)
 				{
-					m_ramp_location.left = OBJECT::CREATE_OBJECT(ramp, 0.f, 0.f, 0.f, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), 1, 0);
+					m_ramp_location.left = OBJECT::CREATE_OBJECT(ramp, 0.f, 0.f, 0.f, ENTITY::GET_ENTITY_HEADING(Game->Self()), 1, 0);
 					if (ENTITY::DOES_ENTITY_EXIST(m_ramp_location.left))
 					{
-						ENTITY::ATTACH_ENTITY_TO_ENTITY(m_ramp_location.left, veh, 0, -5, 0, 0.3f, 0, 0, -90, 0, 0, 0, 0, 2, 1, false);
+						ENTITY::ATTACH_ENTITY_TO_ENTITY(m_ramp_location.left, Game->Vehicle(), 0, -5, 0, 0.3f, 0, 0, -90, 0, 0, 0, 0, 2, 1, false);
 						ENTITY::SET_ENTITY_COLLISION(m_ramp_location.left, 1, 0);
 					}
 				}
 
 				if (m_ramp_location.m_right)
 				{
-					m_ramp_location.right = OBJECT::CREATE_OBJECT(ramp, 0.f, 0.f, 0.f, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), 1, 0);
+					m_ramp_location.right = OBJECT::CREATE_OBJECT(ramp, 0.f, 0.f, 0.f, ENTITY::GET_ENTITY_HEADING(Game->Self()), 1, 0);
 					if (ENTITY::DOES_ENTITY_EXIST(m_ramp_location.right))
 					{
-						ENTITY::ATTACH_ENTITY_TO_ENTITY(m_ramp_location.right, veh, 0, 5, 0, 0.3f, 0, 0, 90, 0, 0, 0, 0, 2, 1, false);
+						ENTITY::ATTACH_ENTITY_TO_ENTITY(m_ramp_location.right, Game->Vehicle(), 0, 5, 0, 0.3f, 0, 0, 90, 0, 0, 0, 0, 2, 1, false);
 						ENTITY::SET_ENTITY_COLLISION(m_ramp_location.right, 1, 0);
 					}
 				}
@@ -4071,7 +4228,7 @@ namespace Saint {
 			std::string AppDataPath = getenv("APPDATA");
 			std::string MenuFolderPath = AppDataPath + "\\Saint\\Vehicles\\";
 			Ini* ColorIni = new Ini(MenuFolderPath + "Saved.ini");
-			Hash hash = ENTITY::GET_ENTITY_MODEL(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false));
+			Hash hash = ENTITY::GET_ENTITY_MODEL(PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false));
 			ColorIni->WriteHash(hash, "Info", "hash");
 		}
 		void load() {
@@ -4096,7 +4253,7 @@ namespace Saint {
 
 		}
 		void save(std::string name) {
-			auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+			auto handling = Game->CPed()->m_vehicle->m_handling_data;
 			std::string MenuFolderPath = "C:\\Saint\\Themes\\";
 			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
 
@@ -4226,7 +4383,7 @@ namespace Saint {
 
 		}
 		void save(std::string name) {
-			auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+			auto handling = Game->CPed()->m_vehicle->m_handling_data;
 			std::string MenuFolderPath = "C:\\Saint\\Handling\\";
 			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
 			ColorIni->WriteFloat(handling->m_acceleration, "Handling", "m_acceleration");
@@ -4257,7 +4414,7 @@ namespace Saint {
 			std::string MenuFolderPath = "C:\\Saint\\Handling\\";
 			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
 				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
-				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+				auto handling = Game->CPed()->m_vehicle->m_handling_data;
 				handling->m_acceleration = ColorIni->GetFloat("Handling", "m_acceleration");
 				handling->m_mass = ColorIni->GetFloat("Handling", "m_mass");
 				handling->m_buoyancy = ColorIni->GetFloat("Handling", "m_buoyancy");
@@ -4304,29 +4461,29 @@ namespace Saint {
 
 			std::string MenuFolderPath = "C:\\Saint\\Vehicles\\";
 			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
-			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+			
 			int r, g, b;
-			VEHICLE::GET_VEHICLE_CUSTOM_SECONDARY_COLOUR(veh, &r, &g, &b);
+			VEHICLE::GET_VEHICLE_CUSTOM_SECONDARY_COLOUR(Game->Vehicle(), &r, &g, &b);
 			int r2, g2, b2;
-			VEHICLE::GET_VEHICLE_CUSTOM_PRIMARY_COLOUR(veh, &r2, &g2, &b2);
-			int hash = ENTITY::GET_ENTITY_MODEL(veh);
+			VEHICLE::GET_VEHICLE_CUSTOM_PRIMARY_COLOUR(Game->Vehicle(), &r2, &g2, &b2);
+			int hash = ENTITY::GET_ENTITY_MODEL(Game->Vehicle());
 			int primaryColor, secondaryColor;
-			VEHICLE::GET_VEHICLE_COLOURS(veh, &primaryColor, &secondaryColor);
+			VEHICLE::GET_VEHICLE_COLOURS(Game->Vehicle(), &primaryColor, &secondaryColor);
 			int pearl;
 			int wheel;
-			VEHICLE::GET_VEHICLE_EXTRA_COLOURS(get_veh(), &pearl, &wheel);
-			ColorIni->WriteString(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(veh)), "Info", "Name");
+			VEHICLE::GET_VEHICLE_EXTRA_COLOURS(Game->Vehicle(), &pearl, &wheel);
+			ColorIni->WriteString(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(Game->Vehicle())), "Info", "Name");
 			ColorIni->WriteInt(r, "Color", "R");
 			ColorIni->WriteInt(g, "Color", "G");
 			ColorIni->WriteInt(b, "Color", "B");
 			ColorIni->WriteInt(r2, "Color", "R2");
 			ColorIni->WriteInt(g2, "Color", "G2");
 			ColorIni->WriteInt(b2, "Color", "B2");
-			ColorIni->WriteInt(VEHICLE::GET_VEHICLE_WHEEL_TYPE(veh), "wheel", "type");
-			ColorIni->WriteInt(VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(veh), "plate", "index");
-			ColorIni->WriteString(VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(veh), "plate", "text");
-			ColorIni->WriteInt(VEHICLE::GET_VEHICLE_MOD(veh, MOD_LIVERY), "upgrades", "livery");
-			ColorIni->WriteInt(VEHICLE::GET_VEHICLE_MOD(veh, MOD_SPOILER), "upgrades", "spoiler");
+			ColorIni->WriteInt(VEHICLE::GET_VEHICLE_WHEEL_TYPE(Game->Vehicle()), "wheel", "type");
+			ColorIni->WriteInt(VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(Game->Vehicle()), "plate", "index");
+			ColorIni->WriteString(VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle()), "plate", "text");
+			ColorIni->WriteInt(VEHICLE::GET_VEHICLE_MOD(Game->Vehicle(), MOD_LIVERY), "upgrades", "livery");
+			ColorIni->WriteInt(VEHICLE::GET_VEHICLE_MOD(Game->Vehicle(), MOD_SPOILER), "upgrades", "spoiler");
 			ColorIni->WriteInt(primaryColor, "Color1", "index");
 			ColorIni->WriteInt(secondaryColor, "Color2", "index");
 			ColorIni->WriteInt(wheel, "Wheel", "index");
@@ -4336,7 +4493,7 @@ namespace Saint {
 			{
 				char input2[64];
 				sprintf(input2, "index_%i", i);
-				ColorIni->WriteInt(VEHICLE::GET_VEHICLE_MOD(veh, i), "upgrades", input2);
+				ColorIni->WriteInt(VEHICLE::GET_VEHICLE_MOD(Game->Vehicle(), i), "upgrades", input2);
 
 			}
 
@@ -4353,16 +4510,16 @@ namespace Saint {
 				}
 
 				*script_global(4540726).as<bool*>() = true;
-				Hash hash = MISC::GET_HASH_KEY(ColorIni->GetString("Info", "Name").c_str());
+				Hash hash = Game->HashKey(ColorIni->GetString("Info", "Name").c_str());
 				g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
 					{
 
 
 
 
-						NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(PLAYER::PLAYER_PED_ID(), { 0.f, 0.f, 1.0f });
+						NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(Game->Self(), { 0.f, 0.f, 1.0f });
 						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-						Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
+						Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(Game->Self()), true, false, false);
 						spawned_veh.spawned.push_back({ HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicle))), vehicle });
 						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 						DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
@@ -4370,7 +4527,7 @@ namespace Saint {
 						if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
 							NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
 						VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
-						PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), vehicle, -1);
+						PED::SET_PED_INTO_VEHICLE(Game->Self(), vehicle, -1);
 						VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(vehicle, ColorIni->GetInt("Color", "R"), ColorIni->GetInt("Color", "G"), ColorIni->GetInt("Color", "B"));
 						VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, ColorIni->GetInt("Color", "R2"), ColorIni->GetInt("Color", "G2"), ColorIni->GetInt("Color", "B2"));
 						VEHICLE::SET_VEHICLE_MOD_KIT(vehicle, 0);
@@ -4681,7 +4838,7 @@ namespace Saint {
 
 		}
 		void save(std::string name) {
-			auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+			auto handling = Game->CPed()->m_vehicle->m_handling_data;
 			std::string MenuFolderPath = "C:\\Saint\\Outfits\\";
 			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
 
@@ -4769,21 +4926,21 @@ namespace Saint {
 				testk = ColorIni->GetInt("Decals", "index");
 				facetexture11 = ColorIni->GetInt("Decals", "texture");
 
-				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 1, ColorIni->GetInt("Head", "index"), ColorIni->GetInt("Head", "texture"), 0);
-				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 3, ColorIni->GetInt("Torso", "index"), ColorIni->GetInt("Torso", "texture"), 0);
-				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 11, ColorIni->GetInt("Tops", "index"), ColorIni->GetInt("Tops", "texture"), 0);
-				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 4, ColorIni->GetInt("Legs", "index"), ColorIni->GetInt("Legs", "texture"), 0);
-				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 5, ColorIni->GetInt("Hands", "index"), ColorIni->GetInt("Hands", "texture"), 0);
-				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 6, ColorIni->GetInt("Feet", "index"), ColorIni->GetInt("Feet", "texture"), 0);
-				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 7, ColorIni->GetInt("Chains", "index"), ColorIni->GetInt("Chains", "texture"), 0);
-				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 8, ColorIni->GetInt("Accessories", "index"), ColorIni->GetInt("Accessories", "texture"), 0);
-				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 9, ColorIni->GetInt("Vests", "index"), ColorIni->GetInt("Vests", "texture"), 0);
-				PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), 10, ColorIni->GetInt("Decals", "index"), ColorIni->GetInt("Decals", "texture"), 0);
-				PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 0, ColorIni->GetInt("Hats", "index"), ColorIni->GetInt("Hats", "texture"), 0);
-				PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 1, ColorIni->GetInt("Glasses", "index"), ColorIni->GetInt("Glasses", "texture"), 0);
-				PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 2, ColorIni->GetInt("Ears", "index"), ColorIni->GetInt("Ears", "texture"), 0);
-				PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 6, ColorIni->GetInt("Watches", "index"), ColorIni->GetInt("Watches", "texture"), 0);
-				PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), 7, ColorIni->GetInt("Bracelets", "index"), ColorIni->GetInt("Bracelets", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 1, ColorIni->GetInt("Head", "index"), ColorIni->GetInt("Head", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 3, ColorIni->GetInt("Torso", "index"), ColorIni->GetInt("Torso", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 11, ColorIni->GetInt("Tops", "index"), ColorIni->GetInt("Tops", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 4, ColorIni->GetInt("Legs", "index"), ColorIni->GetInt("Legs", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 5, ColorIni->GetInt("Hands", "index"), ColorIni->GetInt("Hands", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 6, ColorIni->GetInt("Feet", "index"), ColorIni->GetInt("Feet", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 7, ColorIni->GetInt("Chains", "index"), ColorIni->GetInt("Chains", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 8, ColorIni->GetInt("Accessories", "index"), ColorIni->GetInt("Accessories", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 9, ColorIni->GetInt("Vests", "index"), ColorIni->GetInt("Vests", "texture"), 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 10, ColorIni->GetInt("Decals", "index"), ColorIni->GetInt("Decals", "texture"), 0);
+				PED::SET_PED_PROP_INDEX(Game->Self(), 0, ColorIni->GetInt("Hats", "index"), ColorIni->GetInt("Hats", "texture"), 0);
+				PED::SET_PED_PROP_INDEX(Game->Self(), 1, ColorIni->GetInt("Glasses", "index"), ColorIni->GetInt("Glasses", "texture"), 0);
+				PED::SET_PED_PROP_INDEX(Game->Self(), 2, ColorIni->GetInt("Ears", "index"), ColorIni->GetInt("Ears", "texture"), 0);
+				PED::SET_PED_PROP_INDEX(Game->Self(), 6, ColorIni->GetInt("Watches", "index"), ColorIni->GetInt("Watches", "texture"), 0);
+				PED::SET_PED_PROP_INDEX(Game->Self(), 7, ColorIni->GetInt("Bracelets", "index"), ColorIni->GetInt("Bracelets", "texture"), 0);
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Loaded '%s'", name });
 
 
@@ -4799,10 +4956,10 @@ namespace Saint {
 		bool m_explosive_melee = false;
 		void init() {
 			if (m_explosive_melee) {
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_frame_flags = 1 << 13;
+				Game->CPed()->m_player_info->m_frame_flags = 1 << 13;
 			}
 			if (m_fire) {
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_frame_flags = 1 << 12;
+				Game->CPed()->m_player_info->m_frame_flags = 1 << 12;
 			}
 		}
 	};
@@ -4816,21 +4973,21 @@ namespace Saint {
 		Vehicle entityGunVehicle;
 		void init() {
 			if (enabled) {
-				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+				if (Game->Shooting())
 				{
 					NativeVector3 cameraCoords = CAM::GET_GAMEPLAY_CAM_COORD();
 					NativeVector3 cameraDirection = RotationToDirection(CAM::GET_GAMEPLAY_CAM_ROT(0));
-					NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+					NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(Game->Self(), true);
 					NativeVector3 startMutliply = multiply(&cameraDirection, std::distance(&cameraCoords, &playerCoords) + 15.25f);
 					NativeVector3 start = addn(&cameraCoords, &startMutliply);
 					NativeVector3 rot = CAM::GET_GAMEPLAY_CAM_ROT(2);
 					float pitch = DegreeToRadian(rot.x);
 					float yaw = DegreeToRadian(rot.z + 90);
-					NativeVector3 location = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+					NativeVector3 location = ENTITY::GET_ENTITY_COORDS(Game->Self(), true);
 
 					g_CallbackScript->AddCallback<ModelCallback>(selected_hash, [=] {
 						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-						entityGunVehicle = VEHICLE::CREATE_VEHICLE(selected_hash, start.x, start.y, start.z, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false, false);
+						entityGunVehicle = VEHICLE::CREATE_VEHICLE(selected_hash, start.x, start.y, start.z, ENTITY::GET_ENTITY_HEADING(Game->Self()), true, false, false);
 						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 						DECORATOR::DECOR_SET_INT(entityGunVehicle, "MPBitset", 0);
 						auto networkId = NETWORK::VEH_TO_NET(entityGunVehicle);
@@ -4839,12 +4996,12 @@ namespace Saint {
 						VEHICLE::SET_VEHICLE_IS_STOLEN(entityGunVehicle, FALSE);
 						NativeVector3 velocity;
 						NativeVector3 other = ENTITY::GET_ENTITY_COORDS(entityGunVehicle, true);
-						velocity.x = location.x + (1000.0f * cos(pitch) * cos(yaw)) - other.x;
-						velocity.y = location.y + (1000.0f * sin(yaw) * cos(pitch)) - other.y;
-						velocity.z = location.z + (1000.0f * sin(pitch)) - other.z;
+						velocity.x = Game->SCoords().x + (1000.0f * cos(pitch) * cos(yaw)) - other.x;
+						velocity.y = Game->SCoords().y + (1000.0f * sin(yaw) * cos(pitch)) - other.y;
+						velocity.z = Game->SCoords().z + (1000.0f * sin(pitch)) - other.z;
 						ENTITY::SET_ENTITY_ROTATION(entityGunVehicle, rot.x, rot.y, rot.z, 2, false);
 						ENTITY::SET_ENTITY_VELOCITY2(entityGunVehicle, { velocity.x * (float)3.0, velocity.y * (float)3.0, velocity.z * (float)3.0 });
-						});
+					});
 
 				}
 			}
@@ -4932,11 +5089,10 @@ namespace Saint {
 			}
 			Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
 			vehicles[0] = 10;
-			for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), vehicles); i++)
+			for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(Game->Self(), vehicles); i++)
 			{
 				Vehicle vehicle = vehicles[(i * 2 + 2)];
-				if (vehicle != PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false)) {
-					NativeVector3 vehicleCoords = ENTITY::GET_ENTITY_COORDS(vehicle, true);
+				if (vehicle != Game->Vehicle()) {
 					if (horn) {
 						AUDIO::SET_HORN_PERMANENTLY_ON(vehicle);
 					}
@@ -4946,16 +5102,16 @@ namespace Saint {
 					}
 					if (max_loop) {
 
-						Vehicle playerVehicle = vehicle;
-						VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
+
+						VEHICLE::SET_VEHICLE_MOD_KIT(vehicle, 0);
 						for (int i = 0; i < 50; i++)
 						{
-							VEHICLE::SET_VEHICLE_MOD(playerVehicle, i, MISC::GET_RANDOM_INT_IN_RANGE(0, VEHICLE::GET_NUM_VEHICLE_MODS(playerVehicle, i) - 1), false);
+							VEHICLE::SET_VEHICLE_MOD(vehicle, i, MISC::GET_RANDOM_INT_IN_RANGE(0, VEHICLE::GET_NUM_VEHICLE_MODS(vehicle, i) - 1), false);
 
 						}
-						VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 2));
-						VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
-						VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+						VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(vehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 2));
+						VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+						VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(vehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
 					}
 
 				}
@@ -4982,7 +5138,7 @@ namespace Saint {
 			if (name_esp) {
 				Ped* peds = new Ped[(10 * 2 + 2)];
 				peds[0] = 10;
-				for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), peds, 0); i++)
+				for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(Game->Self(), peds, 0); i++)
 				{
 					Ped ped = peds[(i * 2 + 2)];
 					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(ped, false);
@@ -5008,7 +5164,7 @@ namespace Saint {
 			if (rectangle) {
 				Ped* peds = new Ped[(10 * 2 + 2)];
 				peds[0] = 10;
-				for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), peds, 0); i++)
+				for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(Game->Self(), peds, 0); i++)
 				{
 					Ped ped = peds[(i * 2 + 2)];
 					NativeVector3 v0, v1;
@@ -5055,7 +5211,7 @@ namespace Saint {
 
 			}
 			if (enabled) {
-				if (IsPedShooting(PLAYER::PLAYER_PED_ID()))
+				if (IsPedShooting(Game->Self()))
 				{
 					NativeVector3 hitCoords;
 					if (raycast(hitCoords)) {
@@ -5070,11 +5226,10 @@ namespace Saint {
 				{
 					Ped* peds = new Ped[(10 * 2 + 2)];
 					peds[0] = 10;
-					for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), peds, 0); i++)
+					for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(Game->Self(), peds, 0); i++)
 					{
 						Ped ped = peds[(i * 2 + 2)];
-						auto Coords = ENTITY::GET_ENTITY_COORDS(ped, true);
-						auto Distance = SYSTEM::VDIST(coords.x, coords.y, coords.z, Coords.x, Coords.y, Coords.z);
+						auto Distance = SYSTEM::VDIST(coords.x, coords.y, coords.z, Game->Coords(ped).x, Game->Coords(ped).y, Game->Coords(ped).z);
 						if (Distance < 3.0f)
 						{
 							TASK::CLEAR_PED_TASKS_IMMEDIATELY(ped);
@@ -5084,9 +5239,9 @@ namespace Saint {
 						else
 						{
 							NativeVector3 Velocity;
-							Velocity.x = (coords.x - Coords.x) * 3.0f;
-							Velocity.y = (coords.y - Coords.y) * 3.0f;
-							Velocity.z = (coords.z - Coords.z) * 3.0f;
+							Velocity.x = (coords.x - Game->Coords(ped).x) * 3.0f;
+							Velocity.y = (coords.y - Game->Coords(ped).y) * 3.0f;
+							Velocity.z = (coords.z - Game->Coords(ped).z) * 3.0f;
 							TASK::TASK_SKY_DIVE(ped, 0);
 							ENTITY::SET_ENTITY_VELOCITY(ped, Velocity.x, Velocity.y, Velocity.z);
 						}
@@ -5112,13 +5267,13 @@ namespace Saint {
 		bool teleport = false;
 		void init() {
 			if (teleport) {
-				if (PED::IS_PED_SHOOTING(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer)))
+				if (PED::IS_PED_SHOOTING(Game->PlayerIndex(g_SelectedPlayer)))
 				{
 					float c[6];
-					WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), (NativeVector3*)c);
+					WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(Game->PlayerIndex(g_SelectedPlayer), (NativeVector3*)c);
 					if (c[0] != 0 || c[2] != 0 || c[4] != 0) {
 
-						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(PLAYER::PLAYER_PED_ID(), c[0], c[2], c[4], true, true, true);
+						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), c[0], c[2], c[4], true, true, true);
 
 					}
 				}
@@ -5166,7 +5321,7 @@ namespace Saint {
 		std::size_t size = 0;
 		bool gas_cap = false;
 		void init() {
-			Vehicle vplayerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+			Vehicle vplayerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 			NativeVector3 wheelOne = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "wheel_lf"));
 			NativeVector3 wheelTwo = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "wheel_lr"));
 			NativeVector3 wheelThree = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "wheel_rf"));
@@ -5242,35 +5397,35 @@ namespace Saint {
 	inline VehicleFX m_fx;
 	inline void statSetBool(const char* stat, bool value, bool direct = false, int slot = 0) {
 		if (direct) {
-			STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY(stat), value, true);
+			STATS::STAT_SET_BOOL(Game->HashKey(stat), value, true);
 		}
 		else {
 			if (slot == 0) {
-				STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY((std::string("MP0_") + std::string(stat)).c_str()), value, true);
+				STATS::STAT_SET_BOOL(Game->HashKey((std::string("MP0_") + std::string(stat)).c_str()), value, true);
 			}
 			else if (slot == 1) {
-				STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY((std::string("MP1_") + std::string(stat)).c_str()), value, true);
+				STATS::STAT_SET_BOOL(Game->HashKey((std::string("MP1_") + std::string(stat)).c_str()), value, true);
 			}
 			else {
-				STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY((std::string("MP0_") + std::string(stat)).c_str()), value, true);
-				STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY((std::string("MP1_") + std::string(stat)).c_str()), value, true);
+				STATS::STAT_SET_BOOL(Game->HashKey((std::string("MP0_") + std::string(stat)).c_str()), value, true);
+				STATS::STAT_SET_BOOL(Game->HashKey((std::string("MP1_") + std::string(stat)).c_str()), value, true);
 			}
 		}
 	}
 	inline void statSetInt(const char* stat, int value, bool direct = false, int slot = 0) {
 		if (direct) {
-			STATS::STAT_SET_INT(MISC::GET_HASH_KEY(stat), value, true);
+			STATS::STAT_SET_INT(Game->HashKey(stat), value, true);
 		}
 		else {
 			if (slot == 0) {
-				STATS::STAT_SET_INT(MISC::GET_HASH_KEY((std::string("MP0_") + std::string(stat)).c_str()), value, true);
+				STATS::STAT_SET_INT(Game->HashKey((std::string("MP0_") + std::string(stat)).c_str()), value, true);
 			}
 			else if (slot == 1) {
-				STATS::STAT_SET_INT(MISC::GET_HASH_KEY((std::string("MP1_") + std::string(stat)).c_str()), value, true);
+				STATS::STAT_SET_INT(Game->HashKey((std::string("MP1_") + std::string(stat)).c_str()), value, true);
 			}
 			else {
-				STATS::STAT_SET_INT(MISC::GET_HASH_KEY((std::string("MP0_") + std::string(stat)).c_str()), value, true);
-				STATS::STAT_SET_INT(MISC::GET_HASH_KEY((std::string("MP1_") + std::string(stat)).c_str()), value, true);
+				STATS::STAT_SET_INT(Game->HashKey((std::string("MP0_") + std::string(stat)).c_str()), value, true);
+				STATS::STAT_SET_INT(Game->HashKey((std::string("MP1_") + std::string(stat)).c_str()), value, true);
 			}
 		}
 	}
@@ -5278,32 +5433,24 @@ namespace Saint {
 	public:
 		bool enabled = false;
 		void onDisable() {
-			(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_batch_spread = 0.1f;
-			(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_bullets_in_batch = 1;
-			(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_force = 200.0f;
-			(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_speed = 5000.0f;
+			Game->CPed()->m_weapon_manager->m_weapon_info->m_batch_spread = 0.1f;
+			Game->CPed()->m_weapon_manager->m_weapon_info->m_bullets_in_batch = 1;
+			Game->CPed()->m_weapon_manager->m_weapon_info->m_force = 200.0f;
+			Game->CPed()->m_weapon_manager->m_weapon_info->m_speed = 5000.0f;
 		}
 		void init() {
 			if (enabled) {
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_batch_spread = 0.5f;
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_bullets_in_batch = 30;
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_force = 200.0f;
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info->m_speed = 5000.0f;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_batch_spread = 0.5f;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_bullets_in_batch = 30;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_force = 200.0f;
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_speed = 5000.0f;
 			}
 		}
 	};
 	inline ShotGunMode m_shotgun;
 	class HandTrail {
 	public:
-		void ParticleOnBone(const char* dict, const char* particle, PedBones bone, float scale, bool color = false, float r = 1.f, float g = 1.f, float b = 1.f)
-		{
-			STREAMING::REQUEST_NAMED_PTFX_ASSET(dict);
-			GRAPHICS::USE_PARTICLE_FX_ASSET(dict);
-			GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE(particle, PLAYER::PLAYER_PED_ID(), 0.00f, 0.00f, 0.00f, 0.00f, 0.00f, 0.0f, bone, scale, TRUE, TRUE, TRUE);
-			if (color)
-				GRAPHICS::SET_PARTICLE_FX_NON_LOOPED_COLOUR(r, g, b);
-			STREAMING::REMOVE_PTFX_ASSET();
-		}
+		
 
 		const char* type[2] = { "Normal", "Sphere"};
 		std::size_t size = 0;
@@ -5333,16 +5480,16 @@ namespace Saint {
 				float b2 = b / 255.f;
 				if (size == 0) {
 					
-					ParticleOnBone("scr_powerplay", "sp_powerplay_beast_appear_trails", SKEL_L_Hand, 0.2f, true, r2, g2, b2);
-					ParticleOnBone("scr_powerplay", "sp_powerplay_beast_appear_trails", SKEL_R_Hand, 0.2f, true, r2, g2, b2);
+					Game->ParticleOnBone("scr_powerplay", "sp_powerplay_beast_appear_trails", SKEL_L_Hand, 0.2f, true, r2, g2, b2);
+					Game->ParticleOnBone("scr_powerplay", "sp_powerplay_beast_appear_trails", SKEL_R_Hand, 0.2f, true, r2, g2, b2);
 				}
 				if (size == 1) {
-					ParticleOnBone("scr_indep_fireworks", "scr_indep_firework_sparkle_spawn", SKEL_L_Hand, 0.5f, true, r2, g2, b2);
-					ParticleOnBone("scr_indep_fireworks", "scr_indep_firework_sparkle_spawn", SKEL_R_Hand, 0.5f, true, r2, g2, b2);
+					Game->ParticleOnBone("scr_indep_fireworks", "scr_indep_firework_sparkle_spawn", SKEL_L_Hand, 0.5f, true, r2, g2, b2);
+					Game->ParticleOnBone("scr_indep_fireworks", "scr_indep_firework_sparkle_spawn", SKEL_R_Hand, 0.5f, true, r2, g2, b2);
 				}
 				if (size == 2) {
-					ParticleOnBone("scr_minigametennis", "scr_tennis_ball_trail", SKEL_L_Hand, 0.5f, true, r2, g2, b2);
-					ParticleOnBone("scr_minigametennis", "scr_tennis_ball_trail", SKEL_R_Hand, 0.5f, true, r2, g2, b2);
+					Game->ParticleOnBone("scr_minigametennis", "scr_tennis_ball_trail", SKEL_L_Hand, 0.5f, true, r2, g2, b2);
+					Game->ParticleOnBone("scr_minigametennis", "scr_tennis_ball_trail", SKEL_R_Hand, 0.5f, true, r2, g2, b2);
 				}
 			}
 		}
@@ -5569,7 +5716,7 @@ namespace Saint {
 		void change(const char* name) {
 
 			g_CallbackScript->AddCallback<WalkStyleCallback>(name, [=] {
-				PED::SET_PED_MOVEMENT_CLIPSET(PLAYER::PLAYER_PED_ID(), name, 2.0f);
+				PED::SET_PED_MOVEMENT_CLIPSET(Game->Self(), name, 2.0f);
 				});
 		}
 
@@ -5596,7 +5743,7 @@ namespace Saint {
 		bool enabled = false;
 		void init() {
 			Memory::set_value<int>({ 0x8, 0xD10, 0x20, 0x58C }, static_cast<int>(true));
-			VEHICLE::VEHICLE_START_PARACHUTING(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true);
+			VEHICLE::VEHICLE_START_PARACHUTING(Game->Vehicle(), true);
 
 		}
 	};
@@ -5769,8 +5916,8 @@ namespace Saint {
 		bool frozen = false;
 		void init() {
 			if (enabled) {
-				ENTITY::FREEZE_ENTITY_POSITION(PLAYER::PLAYER_PED_ID(), true);
-				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+				ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), true);
+				
 
 				if (!CAM::DOES_CAM_EXIST(creator_cam)) {
 					creator_cam = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", true);
@@ -5787,7 +5934,7 @@ namespace Saint {
 				CAM::SET_CAM_ACTIVE(creator_cam, true);
 				CAM::SET_CAM_ROT(creator_cam, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
 
-				PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), true);
+				PLAYER::DISABLE_PLAYER_FIRING(Game->Self(), true);
 				HUD::HIDE_HUD_AND_RADAR_THIS_FRAME();
 				PAD::DISABLE_CONTROL_ACTION(2, 8, true);
 				PAD::DISABLE_CONTROL_ACTION(2, 32, true);
@@ -5815,7 +5962,7 @@ namespace Saint {
 						NativeVector3 get_coords55;
 						if (raycast_with_cam(creator_cam, get_coords55)) {
 							AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-							Hash hash = MISC::GET_HASH_KEY(m_selected.c_str());
+							Hash hash = Game->HashKey(m_selected.c_str());
 
 							Object cage = OBJECT::CREATE_OBJECT_NO_OFFSET(hash, get_coords55.x, get_coords55.y, get_coords55.z, true, false, false);
 							if (frozen) {
@@ -6137,8 +6284,8 @@ namespace Saint {
 				{
 					return false;
 				}
-				PLAYER::SET_PLAYER_MODEL(PLAYER::PLAYER_ID(), hash);
-				Ped ped = PLAYER::PLAYER_PED_ID();
+				PLAYER::SET_PLAYER_MODEL(Game->Id(), hash);
+				Ped ped = Game->Self();
 				fbr::cur()->wait();
 				STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
 				for (int i = 0; i < 12; i++)
@@ -6265,25 +6412,25 @@ namespace Saint {
 		}
 		void init() {
 			if (skeleton) {
-				NativeVector3 RightFoot = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_R_Foot, 0, 0, 0);
-				NativeVector3 RightKnee = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), MH_R_Knee, 0, 0, 0);
-				NativeVector3 RightThigh = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_R_Thigh, 0, 0, 0);
-				NativeVector3 LeftFoot = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_L_Foot, 0, 0, 0);
-				NativeVector3 LeftKnee = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), MH_L_Knee, 0, 0, 0);
-				NativeVector3 LeftThigh = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_L_Thigh, 0, 0, 0);
-				NativeVector3 Center = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_ROOT, 0, 0, 0);
-				NativeVector3 Neck = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_Neck_1, 0, 0, 0);
-				NativeVector3 Head = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_Head, 0, 0, 0);
-				NativeVector3 ForearmR = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_R_UpperArm, 0, 0, 0);
-				NativeVector3 Forearm2 = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_R_Forearm, 0, 0, 0);
-				NativeVector3 HandR = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_R_Hand, 0, 0, 0);
+				NativeVector3 RightFoot = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_R_Foot, 0, 0, 0);
+				NativeVector3 RightKnee = PED::GET_PED_BONE_COORDS(Game->Self(), MH_R_Knee, 0, 0, 0);
+				NativeVector3 RightThigh = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_R_Thigh, 0, 0, 0);
+				NativeVector3 LeftFoot = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_L_Foot, 0, 0, 0);
+				NativeVector3 LeftKnee = PED::GET_PED_BONE_COORDS(Game->Self(), MH_L_Knee, 0, 0, 0);
+				NativeVector3 LeftThigh = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_L_Thigh, 0, 0, 0);
+				NativeVector3 Center = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_ROOT, 0, 0, 0);
+				NativeVector3 Neck = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_Neck_1, 0, 0, 0);
+				NativeVector3 Head = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_Head, 0, 0, 0);
+				NativeVector3 ForearmR = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_R_UpperArm, 0, 0, 0);
+				NativeVector3 Forearm2 = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_R_Forearm, 0, 0, 0);
+				NativeVector3 HandR = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_R_Hand, 0, 0, 0);
 
-				NativeVector3 ForearmL = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_L_UpperArm, 0, 0, 0);
-				NativeVector3 Forearm2L = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_L_Forearm, 0, 0, 0);
-				NativeVector3 HandL = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_L_Hand, 0, 0, 0);
+				NativeVector3 ForearmL = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_L_UpperArm, 0, 0, 0);
+				NativeVector3 Forearm2L = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_L_Forearm, 0, 0, 0);
+				NativeVector3 HandL = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_L_Hand, 0, 0, 0);
 
-				NativeVector3 RightToe = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_R_Toe0, 0, 0, 0);
-				NativeVector3 LeftToe = PED::GET_PED_BONE_COORDS(PLAYER::PLAYER_PED_ID(), SKEL_L_Toe0, 0, 0, 0);
+				NativeVector3 RightToe = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_R_Toe0, 0, 0, 0);
+				NativeVector3 LeftToe = PED::GET_PED_BONE_COORDS(Game->Self(), SKEL_L_Toe0, 0, 0, 0);
 
 
 				GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(8);
@@ -6333,7 +6480,7 @@ namespace Saint {
 	}
 	inline bool force_host(rage::joaat_t hash)
 	{
-		uint32_t self = PLAYER::PLAYER_ID();
+		uint32_t self = Game->Id();
 		if (auto launcher = find_script_thread(hash); launcher && launcher->m_net_component)
 		{
 			for (int i = 0; !((CGameScriptHandlerNetComponent*)launcher->m_net_component)->is_local_player_host(); i++)
@@ -6363,36 +6510,36 @@ namespace Saint {
 
 			NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(roll));
 			HUD::SET_MINIMAP_IN_SPECTATOR_MODE(false, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(roll));
-			STREAMING::SET_FOCUS_ENTITY(PLAYER::PLAYER_PED_ID());
-			TASK::CLEAR_PED_TASKS_IMMEDIATELY(PLAYER::PLAYER_PED_ID());
+			STREAMING::SET_FOCUS_ENTITY(Game->Self());
+			TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
 
 		}
 		void random() {
 			features.spectate = false;
 			roll = MISC::GET_RANDOM_INT_IN_RANGE(0, 32);
-			if (roll == PLAYER::PLAYER_ID()) {
+			if (roll == Game->Id()) {
 				roll = MISC::GET_RANDOM_INT_IN_RANGE(0, 32);
 				if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(roll)) {
-					ENTITY::FREEZE_ENTITY_POSITION(PLAYER::PLAYER_PED_ID(), true);
+					ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), true);
 
 					NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(true, ped);
 					STREAMING::SET_FOCUS_ENTITY(ped);
 					HUD::SET_MINIMAP_IN_SPECTATOR_MODE(true, ped);
-					if (PED::IS_PED_DEAD_OR_DYING(PLAYER::PLAYER_PED_ID(), 1))
+					if (PED::IS_PED_DEAD_OR_DYING(Game->Self(), 1))
 					{
-						NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, PLAYER::PLAYER_PED_ID());
+						NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, Game->Self());
 					}
 				}
 			}
 			if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(roll)) {
-				ENTITY::FREEZE_ENTITY_POSITION(PLAYER::PLAYER_PED_ID(), true);
+				ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), true);
 
 				NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(true, ped);
 				STREAMING::SET_FOCUS_ENTITY(ped);
 				HUD::SET_MINIMAP_IN_SPECTATOR_MODE(true, ped);
-				if (PED::IS_PED_DEAD_OR_DYING(PLAYER::PLAYER_PED_ID(), 1))
+				if (PED::IS_PED_DEAD_OR_DYING(Game->Self(), 1))
 				{
-					NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, PLAYER::PLAYER_PED_ID());
+					NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(false, Game->Self());
 				}
 			}
 		}
@@ -6608,17 +6755,17 @@ namespace Saint {
 		int b;
 		void init() {
 			if (use_reservered) {
-				PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 363, true);
+				PED::SET_PED_CONFIG_FLAG(Game->Self(), 363, true);
 			}
 			if (give_when_in_plane) {
-				PLAYER::SET_AUTO_GIVE_PARACHUTE_WHEN_ENTER_PLANE(PLAYER::PLAYER_PED_ID(), true);
+				PLAYER::SET_AUTO_GIVE_PARACHUTE_WHEN_ENTER_PLANE(Game->Self(), true);
 			}
 		}
 		void set_color(int r, int g, int b) {
-			PLAYER::SET_PLAYER_PARACHUTE_SMOKE_TRAIL_COLOR(PLAYER::PLAYER_PED_ID(), r, g, b);
+			PLAYER::SET_PLAYER_PARACHUTE_SMOKE_TRAIL_COLOR(Game->Self(), r, g, b);
 		}
 		void set_tint(int id) {
-			PED::SET_PED_PARACHUTE_TINT_INDEX(PLAYER::PLAYER_PED_ID(), id);
+			PED::SET_PED_PARACHUTE_TINT_INDEX(Game->Self(), id);
 		}
 	};
 	inline ParachuteSelf parachutes;
@@ -6635,7 +6782,7 @@ namespace Saint {
 		NativeVector3 coords;
 		void init() {
 			if (enabled) {
-				if (IsPedShooting(PLAYER::PLAYER_PED_ID()))
+				if (IsPedShooting(Game->Self()))
 				{
 					NativeVector3 hitCoords;
 					if (raycast(hitCoords)) {
@@ -6648,12 +6795,12 @@ namespace Saint {
 
 				if (activated)
 				{
-					auto Coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+					auto Coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), true);
 					auto Distance = SYSTEM::VDIST(coords.x, coords.y, coords.z, Coords.x, Coords.y, Coords.z);
 					if (Distance < 3.0f)
 					{
-						TASK::CLEAR_PED_TASKS_IMMEDIATELY(PLAYER::PLAYER_PED_ID());
-						TASK::CLEAR_PED_SECONDARY_TASK(PLAYER::PLAYER_PED_ID());
+						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
+						TASK::CLEAR_PED_SECONDARY_TASK(Game->Self());
 						activated = false;
 					}
 					else
@@ -6662,8 +6809,8 @@ namespace Saint {
 						Velocity.x = (coords.x - Coords.x) * speed;
 						Velocity.y = (coords.y - Coords.y) * speed;
 						Velocity.z = (coords.z - Coords.z) * speed;
-						TASK::TASK_SKY_DIVE(PLAYER::PLAYER_PED_ID(), 0);
-						ENTITY::SET_ENTITY_VELOCITY(PLAYER::PLAYER_PED_ID(), Velocity.x, Velocity.y, Velocity.z);
+						TASK::TASK_SKY_DIVE(Game->Self(), 0);
+						ENTITY::SET_ENTITY_VELOCITY(Game->Self(), Velocity.x, Velocity.y, Velocity.z);
 					}
 				}
 			}
@@ -6725,7 +6872,7 @@ namespace Saint {
 	public:
 		void change_name(const char* name) {
 			script_global globalplayer_bd(2657589);
-			auto& stats3 = globalplayer_bd.as<GlobalPlayerBD*>()->Entries[PLAYER::PLAYER_ID()];
+			auto& stats3 = globalplayer_bd.as<GlobalPlayerBD*>()->Entries[Game->Id()];
 		}
 	};
 	inline void fade(int r, int g, int b)
@@ -6778,7 +6925,7 @@ namespace Saint {
 				}
 				static std::vector<NativeVector3> a;
 				NativeVector3 b2;
-				if (WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(PLAYER::PLAYER_PED_ID(), &b2));
+				if (WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(Game->Self(), &b2));
 				{
 					a.push_back(b2);
 				}
@@ -6801,8 +6948,8 @@ namespace Saint {
 	public:
 		int selected_class = 0;
 		void change(Hash hash) {
-			if ((*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_model_info->m_hash) {
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_model_info->m_hash = hash;
+			if (Game->CPed()->m_vehicle->m_model_info->m_hash) {
+				Game->CPed()->m_vehicle->m_model_info->m_hash = hash;
 			}
 		}
 	};
@@ -6862,13 +7009,13 @@ namespace Saint {
 		void init() {
 			if (enabled) {
 				NativeVector3 aim = get_coords_in_front_of_cam(500.0f);
-				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+				if (Game->Shooting())
 				{
-					float startDistance = distance(CAM::GET_GAMEPLAY_CAM_COORD(), ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true));
-					float endDistance = distance(CAM::GET_GAMEPLAY_CAM_COORD(), ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true));
+					float startDistance = distance(CAM::GET_GAMEPLAY_CAM_COORD(), ENTITY::GET_ENTITY_COORDS(Game->Self(), true));
+					float endDistance = distance(CAM::GET_GAMEPLAY_CAM_COORD(), ENTITY::GET_ENTITY_COORDS(Game->Self(), true));
 					startDistance += 0.25;
 					endDistance += 1000.0;
-					std::int32_t hash = all_weapons.hash[weapon_pos];
+					std::int32_t hash = Game->Weapon->Hash[weapon_pos];
 						WEAPON::REQUEST_WEAPON_ASSET(hash, 31, 0);
 						g_FiberPool.queue([=] {
 							while (!WEAPON::HAS_WEAPON_ASSET_LOADED(hash))
@@ -6882,7 +7029,7 @@ namespace Saint {
 							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).x,
 							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).y,
 							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).z,
-							250, 1, hash, PLAYER::PLAYER_PED_ID(), 1, 0, -1.0);
+							250, 1, hash, Game->Self(), 1, 0, -1.0);
 					
 				}
 			}
@@ -6900,8 +7047,8 @@ namespace Saint {
 		float refill_time;
 		void init() {
 			if (always_active) {
-				Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-				VEHICLE::SET_ROCKET_BOOST_ACTIVE(veh, true);
+				
+				VEHICLE::SET_ROCKET_BOOST_ACTIVE(Game->Vehicle(), true);
 			}
 		}
 	};
@@ -6919,9 +7066,9 @@ namespace Saint {
 		float eraidus;
 		float falloff;
 		void init() {
-			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+			
 			if (magnet) {
-				VEHICLE::SET_CARGOBOB_PICKUP_MAGNET_ACTIVE(veh, true);
+				VEHICLE::SET_CARGOBOB_PICKUP_MAGNET_ACTIVE(Game->Vehicle(), true);
 			}
 		}
 	};
@@ -6933,7 +7080,7 @@ namespace Saint {
 		std::size_t pos;
 		void init() {
 			if (increase) {
-				VEHICLE::SET_USE_HIGHER_CAR_JUMP(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true);
+				VEHICLE::SET_USE_HIGHER_CAR_JUMP(PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false), true);
 			}
 		}
 	};
@@ -6946,36 +7093,7 @@ namespace Saint {
 		}
 		bool vehicles;
 		bool peds2;
-		std::vector<int32_t> vehs() {
-			if (vehicles) {
-				const int get = 100;
-				int nearby[get * 2 + 2] = { get * 2 + 2 };
-				auto count = PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), (int*)&nearby);
-				std::vector<int32_t> total;
-
-				for (int i = 0; i < count; i++) {
-					auto v = nearby[i * 2 + 2];
-					total.push_back(v);
-				}
-
-				return total;
-			}
-		}
-		std::vector<int32_t> peds() {
-			if (peds2) {
-				const int get = 100;
-				int nearby[get * 2 + 2] = { get * 2 + 2 };
-				auto count = PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), (int*)&nearby, PLAYER::PLAYER_PED_ID());
-				std::vector<int32_t> total;
-
-				for (int i = 0; i < count; i++) {
-					auto p = nearby[i * 2 + 2];
-					total.push_back(p);
-				}
-
-				return total;
-			}
-		}
+		
 		int preview = 28;
 		NativeVector3 c;
 		float force = 1.f;
@@ -7002,9 +7120,8 @@ namespace Saint {
 					}
 				}
 				GRAPHICS::DRAW_MARKER(preview, c.x, c.y, c.z, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, size, size, size, r, g, b, a, false, false, 0, false, NULL, NULL, false);
-
-				auto get_nearby_vehs = vehs();
-				auto get_nearby_peds = peds();
+				auto get_nearby_vehs = Game->NearbyVehicles(&vehicles);
+				auto get_nearby_peds = Game->NearbyVehicles(&peds2);
 				get_nearby_vehs.insert(get_nearby_vehs.end(), get_nearby_peds.begin(), get_nearby_peds.end());
 				for (auto hole : get_nearby_vehs) {
 					if (hole && ENTITY::DOES_ENTITY_EXIST(hole)) {
@@ -7038,13 +7155,13 @@ namespace Saint {
 		std::size_t money_model_data = 0;
 		void init() {
 			if (rp) {
-				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+				if (Game->Shooting())
 				{
 					NativeVector3 c;
 					if (raycast(c)) {
-						g_CallbackScript->AddCallback<ModelCallback>(MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), [=] {
+						g_CallbackScript->AddCallback<ModelCallback>(Game->HashKey(rp_model_init[rp_model_data]), [=] {
 							*g_GameFunctions->should_sync_money_rewards = true;
-							OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, c.x, c.y, c.z, 0, 10, MISC::GET_HASH_KEY(rp_model_init[rp_model_data]), false, true);
+							OBJECT::CREATE_AMBIENT_PICKUP(0x2C014CA6, c.x, c.y, c.z, 0, 10, Game->HashKey(rp_model_init[rp_model_data]), false, true);
 							*g_GameFunctions->should_sync_money_rewards = false;
 
 
@@ -7055,7 +7172,7 @@ namespace Saint {
 				}
 			}
 			if (money) {
-				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
+				if (Game->Shooting())
 				{
 					NativeVector3 c;
 					if (raycast(c)) {
@@ -7095,9 +7212,9 @@ namespace Saint {
 		}
 		void init() {
 			if (enabled) {
-				if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &ENT))
+				if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(Game->Id(), &ENT))
 				{
-					myped = PLAYER::PLAYER_PED_ID();
+					myped = Game->Self();
 					if (WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(myped, &shootcoords))
 					{
 						if (ENT != 0)
@@ -7107,9 +7224,8 @@ namespace Saint {
 								bone = PED::GET_PED_BONE_INDEX(myped, 28422);
 								handcoords = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(myped, bone);
 
-								NativeVector3 coords1 = ENTITY::GET_ENTITY_COORDS(ENT, true);
 
-								ropes = PHYSICS::ADD_ROPE(handcoords.x, handcoords.y, handcoords.z, shootcoords.x, shootcoords.y, shootcoords.z, dist(handcoords, coords1) + 3.0f, 1, 300, 0.5f, 0.5f, false, true, true, 1.0f, false, 0);
+								ropes = PHYSICS::ADD_ROPE(handcoords.x, handcoords.y, handcoords.z, shootcoords.x, shootcoords.y, shootcoords.z, dist(handcoords, Game->Coords(ENT)) + 3.0f, 1, 300, 0.5f, 0.5f, false, true, true, 1.0f, false, 0);
 								ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&ropes);
 
 								PHYSICS::ACTIVATE_PHYSICS(ropes);
@@ -7124,8 +7240,8 @@ namespace Saint {
 							}
 							else
 							{
-								NativeVector3 coords1 = ENTITY::GET_ENTITY_COORDS(ENT, true);
-								NativeVector3 coords2 = ENTITY::GET_ENTITY_COORDS(ENT2, true);
+								NativeVector3 coords1 = Game->Coords(ENT);
+								NativeVector3 coords2 = Game->Coords(ENT2);
 								float speed = ENTITY::GET_ENTITY_SPEED(ENT2);
 
 								if (speed < 3.0f)
@@ -7162,7 +7278,7 @@ namespace Saint {
 					return false;
 				}
 				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+				NativeVector3 c = Game->SCoords();
 				PED::CREATE_PED(0, hash, c.x, c.y, c.z, 0, true, false);
 				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 				fbr::cur()->wait();
@@ -7197,53 +7313,53 @@ namespace Saint {
 		int wheel_type = 0;
 		
 		void set_wheel_type(int type) {
-			VEHICLE::SET_VEHICLE_WHEEL_TYPE(get_veh(), type);
+			VEHICLE::SET_VEHICLE_WHEEL_TYPE(Game->Vehicle(), type);
 		}
 		void set_wheel(int type) {
-			VEHICLE::SET_VEHICLE_MOD(get_veh(), 23, type, true);
+			VEHICLE::SET_VEHICLE_MOD(Game->Vehicle(), 23, type, true);
 		}
 		void init() {
 			if (neon.front) {
-				VEHICLE::SET_VEHICLE_NEON_ENABLED(get_veh(), 2, true);
+				VEHICLE::SET_VEHICLE_NEON_ENABLED(Game->Vehicle(), 2, true);
 			}
 			if (neon.back) {
-				VEHICLE::SET_VEHICLE_NEON_ENABLED(get_veh(), 3, true);
+				VEHICLE::SET_VEHICLE_NEON_ENABLED(Game->Vehicle(), 3, true);
 			}
 			if (neon.left) {
-				VEHICLE::SET_VEHICLE_NEON_ENABLED(get_veh(), 0, true);
+				VEHICLE::SET_VEHICLE_NEON_ENABLED(Game->Vehicle(), 0, true);
 			}
 			if (neon.right) {
-				VEHICLE::SET_VEHICLE_NEON_ENABLED(get_veh(), 1, true);
+				VEHICLE::SET_VEHICLE_NEON_ENABLED(Game->Vehicle(), 1, true);
 			}
 			if (xenon) {
-				VEHICLE::TOGGLE_VEHICLE_MOD(get_veh(), 22, true);
+				VEHICLE::TOGGLE_VEHICLE_MOD(Game->Vehicle(), 22, true);
 			}
 			if (turbo) {
-				VEHICLE::TOGGLE_VEHICLE_MOD(get_veh(), 18, true);
+				VEHICLE::TOGGLE_VEHICLE_MOD(Game->Vehicle(), 18, true);
 			}
 		}
 		void set_color(int type, int value) {
 			int pearl;
 			int wheel;
-			VEHICLE::GET_VEHICLE_EXTRA_COLOURS(get_veh(), &pearl, &wheel);
+			VEHICLE::GET_VEHICLE_EXTRA_COLOURS(Game->Vehicle(), &pearl, &wheel);
 			int p;
 			int s;
-			VEHICLE::GET_VEHICLE_COLOURS(get_veh(), &p, &s);
+			VEHICLE::GET_VEHICLE_COLOURS(Game->Vehicle(), &p, &s);
 			if (type == 0) {
-				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(get_veh(), pearl, value);
+				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(Game->Vehicle(), pearl, value);
 			}
 			if (type == 1) {
-				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(get_veh(), value, wheel);
+				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(Game->Vehicle(), value, wheel);
 			}
 			if (type == 2) {
-				VEHICLE::SET_VEHICLE_COLOURS(get_veh(), value, s);
+				VEHICLE::SET_VEHICLE_COLOURS(Game->Vehicle(), value, s);
 			}
 			if (type == 3) {
-				VEHICLE::SET_VEHICLE_COLOURS(get_veh(), p, value);
+				VEHICLE::SET_VEHICLE_COLOURS(Game->Vehicle(), p, value);
 			}
 			if (type == 4) {
-				VEHICLE::SET_VEHICLE_COLOURS(get_veh(), value, value);
-				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(get_veh(), value, value);
+				VEHICLE::SET_VEHICLE_COLOURS(Game->Vehicle(), value, value);
+				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(Game->Vehicle(), value, value);
 			}
 		}
 	};
@@ -7265,7 +7381,7 @@ namespace Saint {
 		void startc(int acrobatic_int) {
 			if (acrobatic_int == 0) {
 
-				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
 				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
 				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
@@ -7273,7 +7389,7 @@ namespace Saint {
 			}
 			if (acrobatic_int == 1) {
 
-				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
 				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
 				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
@@ -7281,13 +7397,13 @@ namespace Saint {
 			}
 			if (acrobatic_int == 2) {
 
-				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 10.0f, 20.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1);
 
 			}
 			if (acrobatic_int == 3) {
 
-				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+				Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 				ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 7.0f, 0, 0, 0, true, true, true, true, false, true);
 
 
@@ -7296,12 +7412,12 @@ namespace Saint {
 		}
 		void init() {
 			if (acrobatics) {
-				if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+				if (Game->InVehicle())
 				{
 					int upgradedelay = 0;
 					if (upgradedelay == 0 || (int)(GetTickCount64() - upgradedelay) > delay)
 					{
-						Vehicle veh = get_veh();
+						Vehicle veh = Game->Vehicle();
 						if (!ENTITY::IS_ENTITY_IN_AIR(veh)) {
 							if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(veh)) {
 								startc(random(0, 3));
@@ -7322,16 +7438,16 @@ namespace Saint {
 		int threshold = 500;
 		void init() {
 			if (on_collison) {
-				PED::SET_PED_RAGDOLL_ON_COLLISION(PLAYER::PLAYER_PED_ID(), true);
+				PED::SET_PED_RAGDOLL_ON_COLLISION(Game->Self(), true);
 			}
 			if (on_jump) {
 				g_FiberPool.queue([=] {
-					if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false)) {
+					if (!Game->InVehicle()) {
 						if (PAD::IS_CONTROL_JUST_PRESSED(0, 22))
 						{
 							fbr::cur()->wait(250ms);
-							NativeVector3 v = ENTITY::GET_ENTITY_FORWARD_VECTOR(PLAYER::PLAYER_PED_ID());
-							PED::SET_PED_TO_RAGDOLL_WITH_FALL(PLAYER::PLAYER_PED_ID(), 1500, 2000, 1, -v.x, -v.y, -v.z, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
+							NativeVector3 v = ENTITY::GET_ENTITY_FORWARD_VECTOR(Game->Self());
+							PED::SET_PED_TO_RAGDOLL_WITH_FALL(Game->Self(), 1500, 2000, 1, -v.x, -v.y, -v.z, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
 						}
 					}
 				});
@@ -7455,13 +7571,13 @@ namespace Saint {
 				}
 			}
 			if (loud) {
-				AUDIO::SET_VEHICLE_RADIO_LOUD(get_veh(), true);
+				AUDIO::SET_VEHICLE_RADIO_LOUD(Game->Vehicle(), true);
 			}
 			if (force_show) {
 				HUD::SHOW_HUD_COMPONENT_THIS_FRAME(16);
 			}
 			if (disable) {
-				AUDIO::SET_VEH_RADIO_STATION(get_veh(), "OFF");
+				AUDIO::SET_VEH_RADIO_STATION(Game->Vehicle(), "OFF");
 			}
 		}
 	};
@@ -7493,16 +7609,13 @@ namespace Saint {
 		get_model_info.init();
 
 		if (mark_as_Saint) {
-			PED::SET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 109, true);
+			PED::SET_PED_CONFIG_FLAG(Game->Self(), 109, true);
 
 		}
 
 		if (protections.Entities.cage) {
 			static int timer;
 			if ((GetTickCount() - timer) > 200) {
-
-				Ped playerPed = PLAYER::PLAYER_PED_ID();
-				NativeVector3 pos = ENTITY::GET_ENTITY_COORDS(playerPed, 0);
 				const char* cages[52] = { "bkr_prop_cashtrolley_01a", "p_cablecar_s_door_r", "p_cablecar_s_door_l", "p_cablecar_s_door_l" ,"p_cablecar_s", "prop_rub_cage01a", "prop_gold_cont_01", "prop_gold_cont_01b",
 					"prop_dog_cage_01", "prop_dog_cage_02", "stt_prop_stunt_tube_l", "stt_prop_stunt_tube_crn2", "stt_prop_stunt_tube_crn", "stt_prop_stunt_tube_crn2", "stt_prop_stunt_tube_crn_15d",
 					"stt_prop_stunt_tube_crn_30d", "stt_prop_stunt_tube_crn_5d", "stt_prop_stunt_tube_cross", "stt_prop_stunt_tube_end", "stt_prop_stunt_tube_xs", "stt_prop_stunt_tube_xxs", "stt_prop_stunt_tube_speeda",
@@ -7519,16 +7632,16 @@ namespace Saint {
 
 				for (int i = 0; i < 47; i++)
 				{
-					Object cage = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(pos.x, pos.y, pos.z, 15.0f, MISC::GET_HASH_KEY(cages[i]), 0, 0, 1);
+					Object cage = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, 15.0f, Game->HashKey(cages[i]), 0, 0, 1);
 					if (ENTITY::DOES_ENTITY_EXIST(cage))
 					{
-						if (!PED::IS_PED_IN_ANY_VEHICLE(playerPed, 0))
+						if (!PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), 0))
 						{
 							ENTITY::SET_ENTITY_COLLISION(cage, false, true);
 							ENTITY::SET_ENTITY_ALPHA(cage, 0, true);
 							ENTITY::SET_ENTITY_VISIBLE(cage, false, false);
 							NativeVector3 objcoords = ENTITY::GET_ENTITY_COORDS(cage, false);
-							STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(MISC::GET_HASH_KEY(cages[i]));
+							STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(Game->HashKey(cages[i]));
 							control(cage);
 							ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&cage);
 							ENTITY::DELETE_ENTITY(&cage);
@@ -7596,13 +7709,10 @@ namespace Saint {
 		gravity.init();
 		m_hotkeys.init();
 		if (NoPlaneTurbulance) {
-			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-
-			VEHICLE::SET_PLANE_TURBULENCE_MULTIPLIER(veh, 0.0f);
+			VEHICLE::SET_PLANE_TURBULENCE_MULTIPLIER(Game->Vehicle(), 0.0f);
 		}
 		if (!NoPlaneTurbulance) {
-			Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-			VEHICLE::SET_PLANE_TURBULENCE_MULTIPLIER(veh, 0.5f);
+			VEHICLE::SET_PLANE_TURBULENCE_MULTIPLIER(Game->Vehicle(), 0.5f);
 		}
 		if (godmode) {
 			uint32_t last_bits = 0;
@@ -7614,8 +7724,8 @@ namespace Saint {
 
 			if (changed_or_enabled_bits)
 			{
-				uint32_t unchanged_bits = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_damage_bits & ~changed_or_enabled_bits;
-				(*g_GameFunctions->m_pedFactory)->m_local_ped->m_damage_bits = unchanged_bits | bits;
+				uint32_t unchanged_bits = Game->CPed()->m_damage_bits & ~changed_or_enabled_bits;
+				Game->CPed()->m_damage_bits = unchanged_bits | bits;
 				last_bits = bits;
 
 			}
@@ -7624,8 +7734,8 @@ namespace Saint {
 		if (neverWantedBool)
 		{
 			PLAYER::SET_MAX_WANTED_LEVEL(0);
-			PLAYER::SET_PLAYER_WANTED_LEVEL(PLAYER::PLAYER_ID(), 0, true);
-			PLAYER::SET_PLAYER_WANTED_LEVEL_NOW(PLAYER::PLAYER_ID(), true);
+			PLAYER::SET_PLAYER_WANTED_LEVEL(Game->Id(), 0, true);
+			PLAYER::SET_PLAYER_WANTED_LEVEL_NOW(Game->Id(), true);
 		}
 	}
 

@@ -21,7 +21,7 @@ namespace Saint::Lists
 	inline const char* HeaderTypesFrontend[]
 	{
 		"Static",
-		"Gradient"
+		"YTD"
 	};
 
 	inline UserInterface::HeaderType HeaderTypesBackend[]
