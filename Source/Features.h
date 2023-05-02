@@ -6822,22 +6822,68 @@ namespace Saint {
 		float velocity = 100.f;
 		bool Audible = true;
 		bool Invisible = false;
+		float distance(NativeVector3 A, NativeVector3 B) {
+			return MISC::GET_DISTANCE_BETWEEN_COORDS(A.x, A.y, A.z, B.x, B.y, B.z, 1);
+		}
+		NativeVector3 rotDirection(NativeVector3 rot)
+		{
+			float radianz = rot.z * 0.0174532924f;
+			float radianx = rot.x * 0.0174532924f;
+			float num = std::abs((float)std::cos((double)radianx));
+
+			NativeVector3 dir;
+
+			dir.x = (float)((double)((float)(-(float)std::sin((double)radianz))) * (double)num);
+			dir.y = (float)((double)((float)std::cos((double)radianz)) * (double)num);
+			dir.z = (float)std::sin((double)radianx);
+
+			return dir;
+		}
+		inline NativeVector3 multiply2(NativeVector3 vector, float x) {
+			NativeVector3 result;
+			result.x = vector.x;
+			result.y = vector.y;
+			result.z = vector.z;
+			result.x *= x;
+			result.y *= x;
+			result.z *= x;
+			return result;
+		}
+		NativeVector3 add(NativeVector3 vectorA, NativeVector3 vectorB) {
+			NativeVector3 result;
+			result.x = vectorA.x;
+			result.y = vectorA.y;
+			result.z = vectorA.z;
+			result.x += vectorB.x;
+			result.y += vectorB.y;
+			result.z += vectorB.z;
+			return result;
+		}
 		void init() {
 			if (enabled) {
 				NativeVector3 aim = get_coords_in_front_of_cam(500.0f);
 				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID()))
 				{
-					NativeVector3 hitCoords;
-					if (raycast(hitCoords)) {
-						std::int32_t hash = all_weapons.hash[weapon_pos];
+					float startDistance = distance(CAM::GET_GAMEPLAY_CAM_COORD(), ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true));
+					float endDistance = distance(CAM::GET_GAMEPLAY_CAM_COORD(), ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true));
+					startDistance += 0.25;
+					endDistance += 1000.0;
+					std::int32_t hash = all_weapons.hash[weapon_pos];
 						WEAPON::REQUEST_WEAPON_ASSET(hash, 31, 0);
 						g_FiberPool.queue([=] {
 							while (!WEAPON::HAS_WEAPON_ASSET_LOADED(hash))
 								fbr::cur()->wait();
 							});
 
-						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(hitCoords.x, hitCoords.y, hitCoords.z, aim.x, aim.y, aim.z, 250, FALSE, hash, PLAYER::PLAYER_PED_ID(), Audible, Invisible, velocity);
-					}
+						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(
+							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), startDistance)).x,
+							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), startDistance)).y,
+							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), startDistance)).z,
+							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).x,
+							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).y,
+							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).z,
+							250, 1, hash, PLAYER::PLAYER_PED_ID(), 1, 0, -1.0);
+					
 				}
 			}
 		}

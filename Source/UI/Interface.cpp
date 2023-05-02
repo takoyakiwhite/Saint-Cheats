@@ -107,12 +107,14 @@ namespace Saint::UserInterface
 		"Kiddions VIP On Top",
 		"I've been on my KTM drip hopefully i dont fall off",
 		"stash doesn't like juice wrld ):",
-		"\"is this scooby?\""
+		"\"is this scooby?\"",
+		"grandrp is goat",
+		"\"play grand with me or im fucking the ui up\" - Kyro"
 		};
 
 		if (!g_HasSetToolTip)
 		{
-			g_ToolTip = random(0, 39);
+			g_ToolTip = random(0, 41);
 			g_HasSetToolTip = true;
 		}
 
@@ -250,7 +252,7 @@ namespace Saint::UserInterface
 				sub->Reset();
 				sub->Execute();
 				DrawSubmenuBar(sub);
-				g_Render->m_CurrentSubMenuName = submenu_enabled ? header_name.c_str() : sub->GetName();
+				g_Render->m_CurrentSubMenuName = dynamic_text ? sub->GetName() : header_name.c_str();
 				if (sub->GetNumOptions() != 0)
 				{
 					std::size_t startPoint = 0;
@@ -563,14 +565,26 @@ namespace Saint::UserInterface
 		}
 		if (m_HeaderNativeText)
 		{
-			DrawLeftText(
-				m_CurrentSubMenuName,
-				m_PosX - (m_Width / 2.1f) - header_x_offset,
-				m_DrawBaseY + (m_HeaderHeight / 2.f) - (GetTextHeight(m_HeaderFont, m_HeaderTextSize) / 2.f),
-				m_HeaderTextSize,
-				m_HeaderFont,
-				m_HeaderTextColor,
-				false, true);
+			if (center_head) {
+				DrawCenteredText(
+					m_CurrentSubMenuName,
+					m_PosX - (m_Width / 2.1f) - header_x_offset - 0.005f,
+					m_DrawBaseY + (m_HeaderHeight / 2.f) - (GetTextHeight(m_HeaderFont, m_HeaderTextSize) / 2.f),
+					m_HeaderTextSize,
+					m_HeaderFont,
+					m_HeaderTextColor,
+					false, true);
+			}
+			else {
+				DrawLeftText(
+					m_CurrentSubMenuName,
+					m_PosX - (m_Width / 2.1f) - header_x_offset,
+					m_DrawBaseY + (m_HeaderHeight / 2.f) - (GetTextHeight(m_HeaderFont, m_HeaderTextSize) / 2.f),
+					m_HeaderTextSize,
+					m_HeaderFont,
+					m_HeaderTextColor,
+					false, true);
+			}
 		}
 		draw_glare();
 		m_DrawBaseY += m_HeaderHeight;

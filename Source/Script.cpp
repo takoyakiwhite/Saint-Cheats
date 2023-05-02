@@ -5203,10 +5203,15 @@ namespace Saint
 			});
 
 
+			g_Render->draw_submenu<sub>("Single", rage::joaat("SingleUnlocks"), [](sub* sub)
+				{
+					sub->draw_option<RegularOption>("All", "", [] {
 
+					});
+				});
 		g_Render->draw_submenu<sub>("Unlocks", SubmenuUnlocks, [](sub* sub)
 			{
-
+				//sub->draw_option<submenu>("Single", nullptr, rage::joaat("SingleUnlocks"));
 
 				sub->draw_option<RegularOption>("All", "", [] {
 
@@ -9507,12 +9512,37 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Header"), CustomizationHeader, [](sub* sub)
 			{
+				sub->draw_option<toggle<bool>>("Center", nullptr, &g_Render->center_head, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>("Dynamic", nullptr, &g_Render->dynamic_text, BoolDisplay::OnOff);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Font", nullptr, &g_Render->HeaderFont, &g_Render->HeaderFontIterator, true, -1, []
+					{
+						if (g_Render->HeaderFontIterator == 0) {
+							g_Render->m_HeaderFont = Font::ChaletLondon;
+						}
+						if (g_Render->HeaderFontIterator == 1) {
+							g_Render->m_HeaderFont = Font::HouseScript;
+						}
+						if (g_Render->HeaderFontIterator == 2) {
+							g_Render->m_HeaderFont = Font::Monospace;
+						}
+						if (g_Render->HeaderFontIterator == 3) {
+							g_Render->m_HeaderFont = Font::Wingdings;
+						}
+						if (g_Render->HeaderFontIterator == 4) {
+							g_Render->m_HeaderFont = Font::ChaletComprimeCologne;
+						}
+						if (g_Render->HeaderFontIterator == 5) {
+							g_Render->m_HeaderFont = Font::Pricedown;
+						}
+					});
+				
 				sub->draw_option<KeyboardOption>(("Text"), nullptr, g_Render->header_name, []
 					{
 						showKeyboard("Enter Something", "", 25, &g_Render->header_name, [] {});
 					});
 				sub->draw_option<number<float>>("Height", nullptr, &g_Render->m_HeaderHeight, 0.01f, 0.2f, 0.001f, 3);
 				sub->draw_option<number<float>>("Text X Offset", nullptr, &g_Render->header_x_offset, -1000.f, 1000.f, 0.001f);
+				sub->draw_option<number<float>>("Text Size", nullptr, &g_Render->m_HeaderTextSize, 0.01f, 1.f, 0.01f, 2);
 
 
 			});

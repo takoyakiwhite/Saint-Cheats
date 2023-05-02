@@ -214,6 +214,7 @@ namespace Saint::UserInterface
 		};
 		std::size_t HeaderFontIterator = 3;
 		std::size_t HeaderFontIterator2 = 3;
+		bool center_head = false;
 		Outfits outfits = Outfits::Face;
 
 		Props props = Props::Hats;
@@ -232,6 +233,8 @@ namespace Saint::UserInterface
 
 		//submenubar
 		bool submenu_enabled = true;
+
+		bool dynamic_text = false;
 
 		Color m_SubheaderBackground{ 0, 0, 0, 255 };
 		Color m_SubheaderText{ 255,255,255, 255 };
