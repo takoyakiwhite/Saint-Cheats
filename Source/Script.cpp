@@ -33,6 +33,7 @@
 #include "hex_memory.h"
 #include "ScriptLocal.h"
 #include "Hotkeys.h"
+#include <GTAV-Classes/vehicle/CVehicleModelInfo.hpp>
 namespace Saint
 {
 
@@ -1042,7 +1043,19 @@ namespace Saint
 						ENTITY::SET_ENTITY_RENDER_SCORCHED(Game->Vehicle(), false);
 					}
 					});
-
+				sub->draw_option<toggle<bool>>(("Can Wheelie"), "", &features.can_wheelie, BoolDisplay::OnOff, false, [] {
+					if (!features.can_wheelie) {
+						for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
+						{
+							if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
+							{
+								auto const dc = reinterpret_cast<CCarHandlingData*>(d);
+								dc->m_advanced_flags = eAdvancedFlags::NONE;
+								break;
+							}
+						}
+					}
+					});
 				sub->draw_option<toggle<bool>>(("Bypass Max Speed"), "Allows you to exceed the maximum speed limit your current vehicle.", &m_vehicle.bypass_max_speed.enabled, BoolDisplay::OnOff, false, [] {
 					if (!m_vehicle.bypass_max_speed.enabled) {
 						m_vehicle.bypass_max_speed.disable(); //trying something new
@@ -3584,13 +3597,28 @@ namespace Saint
 					sub->draw_option<submenu>("Anti Rollbar", nullptr, RollCentreHeight);
 					sub->draw_option<submenu>("Damage", nullptr, HandlingDamage);
 					sub->draw_option<submenu>("Gas", nullptr, HandlingGas);
+					sub->draw_option<submenu>("Camber", nullptr, rage::joaat("Camber"));
 				}
 
 
 			});
+		g_Render->draw_submenu<sub>(("Camber"), rage::joaat("Camber"), [](sub* sub)
+			{
+				for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
+				{
+					if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
+					{
+						auto const dc = reinterpret_cast<CCarHandlingData*>(d);
+						sub->draw_option<number<float>>("Front", nullptr, &dc->m_camber_front, -1000.f, 1000.f, 0.1f, 1);
+						sub->draw_option<number<float>>("Rear", nullptr, &dc->m_camber_rear, -1000.f, 1000.f, 0.1f, 1);
+						break;
+					}
+				}
+				sub->draw_option<number<float>>("Stiffness", nullptr, &Game->CVehicle()->m_handling_data->m_camber_stiffness, 0.0f, 1000.f, 0.1f, 1);
+			});
 		g_Render->draw_submenu<sub>(("Miscellaneous"), HandlingMisc, [](sub* sub)
 			{
-				auto handling = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle->m_handling_data;
+				auto handling = Game->CVehicle()->m_handling_data;
 				sub->draw_option<number<float>>("Mass", nullptr, &handling->m_mass, 0.f, 10000.f, 50.0f, 1);
 				sub->draw_option<number<float>>("Initial Drag Coeff", nullptr, &handling->m_initial_drag_coeff, 0.f, 10000.f, 0.1f, 1);
 				sub->draw_option<number<float>>("Downforce Multiplier", nullptr, &handling->m_downforce_multiplier, 0.f, 10000.f, 0.1f, 1);
@@ -3611,7 +3639,11 @@ namespace Saint
 
 
 
-				sub->draw_option<number<float>>("Camber Stiffness", nullptr, &handling->m_camber_stiffness, 0.0f, 1000.f, 0.1f, 1);
+				
+				
+
+				
+				
 
 
 			});
@@ -6000,7 +6032,7 @@ namespace Saint
 					statSetInt("XMASLIVERIES20", -1);
 					});
 
-				sub->draw_option<RegularOption>("Speical T-Shirts", "", [] {
+				sub->draw_option<RegularOption>("Special T-Shirts", "", [] {
 					*script_global(262145 + 20904).as<int64_t*>() = 1; // "BLACK_AMMUNATION_TEE"
 					*script_global(262145 + 20906).as<int64_t*>() = 1; // "BLACK_COIL_TEE"
 					*script_global(262145 + 20908).as<int64_t*>() = 1; // "BLACK_HAWK_AND_LITTLE_LOGO_TEE"

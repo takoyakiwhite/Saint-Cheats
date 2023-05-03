@@ -24,6 +24,7 @@ namespace Saint
 	inline CNetGamePlayer* m_syncing_player = nullptr;
 	inline rage::rlSessionInfo g_Session_info;
 	inline bool BeastLanding = false;
+
 	struct Hooks
 	{
 		static void GetStatInt(rage::scrNativeCallContext* src);
@@ -83,6 +84,9 @@ namespace Saint
 		static uint64_t task_parachute_object_0x270(uint64_t _this, int a2, int a3);
 		static void serialize_take_off_ped_variation_task(ClonedTakeOffPedVariationInfo* info, rage::CSyncDataBase* serializer);
 		static std::uint64_t* FallTaskConstructor(std::uint64_t* _this, std::uint32_t flags);
+
+		
+
 		
 
 

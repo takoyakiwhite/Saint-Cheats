@@ -7,6 +7,9 @@ namespace Saint
 
 	namespace memory
 	{
+		uint64_t read_instruction(uint64_t address, int opcode_size, int opcode_length) {
+			return (uint64_t)(*(int*)(address + opcode_size) + address + opcode_length);
+		}
 		template<typename T>
 		concept SpanCompatibleType = requires(T a)
 		{

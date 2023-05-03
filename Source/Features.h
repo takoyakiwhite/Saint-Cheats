@@ -17,6 +17,7 @@
 #include "hex_memory.h"
 #include "ScriptLocal.h"
 #include "Timer.hpp"
+#include <GTAV-Classes/vehicle/CCarHandlingData.hpp>
 namespace Saint {
 	inline std::string handlingBuffer = "";
 	inline std::string VehNameBuffer = "";
@@ -248,6 +249,7 @@ namespace Saint {
 		}
 
 	};
+	
 	inline game* Game;
 	class m_all_weapons {
 	public:
@@ -295,6 +297,7 @@ namespace Saint {
 			if (Game->InVehicle()) {
 				if (DisableCollision) {
 					ENTITY::SET_ENTITY_COLLISION(Game->Vehicle(), true, true);
+					
 				}
 			}
 		}
@@ -942,7 +945,19 @@ namespace Saint {
 		bool crouched = false;
 		bool disable_wanted_music = false;
 		bool take_less_damage = false;
+		bool can_wheelie = false;
 		void init() {
+			if (can_wheelie) {
+				for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
+				{
+					if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
+					{
+						auto const dc = reinterpret_cast<CCarHandlingData*>(d);
+						dc->m_advanced_flags = eAdvancedFlags::CF_CAN_WHEELIE;
+						break;
+					}
+				}
+			}
 			if (take_less_damage) {
 				PED::SET_PED_SUFFERS_CRITICAL_HITS(Game->Self(), FALSE);
 			}
@@ -4409,11 +4424,29 @@ namespace Saint {
 			ColorIni->WriteFloat(handling->m_low_speed_traction_loss_mult, "Handling", "m_low_speed_traction_loss_mult");
 			ColorIni->WriteFloat(handling->m_traction_spring_delta_max, "Handling", "m_traction_spring_delta_max");
 			ColorIni->WriteFloat(handling->m_traction_spring_delta_max_ratio, "Handling", "m_traction_spring_delta_max_ratio");
+			ColorIni->WriteFloat(handling->m_suspension_raise, "Handling", "m_suspension_raise");
+			for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
+			{
+				if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
+				{
+					auto const dc = reinterpret_cast<CCarHandlingData*>(d);
+					ColorIni->WriteFloat(dc->m_camber_front, "Handling", "m_camber_front");
+					ColorIni->WriteFloat(dc->m_camber_rear, "Handling", "m_camber_rear");
+					break;
+				}
+			}
+			ColorIni->WriteString(MENU_VERSION, "Other", "Version");
 		}
 		void load(std::string name) {
 			std::string MenuFolderPath = "C:\\Saint\\Handling\\";
 			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
+
 				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+				std::string version = ColorIni->GetString("Other", "Version");
+				if (version != MENU_VERSION) {
+					Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  Outdated file!" });
+					return;
+				}
 				auto handling = Game->CPed()->m_vehicle->m_handling_data;
 				handling->m_acceleration = ColorIni->GetFloat("Handling", "m_acceleration");
 				handling->m_mass = ColorIni->GetFloat("Handling", "m_mass");
@@ -4438,6 +4471,17 @@ namespace Saint {
 				handling->m_low_speed_traction_loss_mult = ColorIni->GetFloat("Handling", "m_low_speed_traction_loss_mult");
 				handling->m_traction_spring_delta_max = ColorIni->GetFloat("Handling", "m_traction_spring_delta_max");
 				handling->m_traction_spring_delta_max_ratio = ColorIni->GetFloat("Handling", "m_traction_spring_delta_max_ratio");
+				handling->m_suspension_raise = ColorIni->GetFloat("Handling", "m_suspension_raise");
+				for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
+				{
+					if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
+					{
+						auto const dc = reinterpret_cast<CCarHandlingData*>(d);
+						dc->m_camber_front = ColorIni->GetFloat("Handling", "m_camber_front");
+						dc->m_camber_rear = ColorIni->GetFloat("Handling", "m_camber_rear");
+						break;
+					}
+				}
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Loaded '%s'", name });
 
 
@@ -4505,7 +4549,7 @@ namespace Saint {
 
 				std::string version = ColorIni->GetString("Other", "Version");
 				if (version != MENU_VERSION) {
-					Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  Outdated ini!" });
+					Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  Outdated file!" });
 					return;
 				}
 
