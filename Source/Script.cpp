@@ -3970,10 +3970,10 @@ namespace Saint
 					}
 					});
 				sub->draw_option<UnclickOption>("Settings", nullptr, [] {});
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Bone", nullptr, &aimbot.bone, &aimbot.data);
 				sub->draw_option<toggle<bool>>(("Shoot Through Walls"), nullptr, &aimbot.through_walls, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Only Players"), nullptr, &aimbot.only_players, BoolDisplay::OnOff);
 				sub->draw_option<toggle_number_option<float, bool>>("Distance", nullptr, &aimbot.distance_check, &aimbot.distance_to_check, 0.1f, 100000.f, 25.0f, 2);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Bone", nullptr, &aimbot.bone, &aimbot.data);
 			
 
 
