@@ -18,6 +18,7 @@ namespace Saint {
 		bool tracer = false;
 		bool box = false;
 		bool name = false;
+		bool distance = false;
 		void init() {
 			if (name) {
 				for (std::uint32_t i = 0; i < PLAYER::GET_NUMBER_OF_PLAYERS(); ++i) {
@@ -35,7 +36,11 @@ namespace Saint {
 					HUD::SET_TEXT_CENTRE(true);
 
 					std::string name = PLAYER::GET_PLAYER_NAME(i);
-
+					if (distance) {
+						NativeVector3 Coords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), false);
+						float distance = GetDistanceFloat(ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false), Coords);
+						name.append(std::format("\n{}", (int)distance));
+					}
 					HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(name.c_str());
 					HUD::END_TEXT_COMMAND_DISPLAY_TEXT(xPos, yPos, 0);
 				}

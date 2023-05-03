@@ -1045,13 +1045,15 @@ namespace Saint
 					});
 				sub->draw_option<toggle<bool>>(("Can Wheelie"), "", &features.can_wheelie, BoolDisplay::OnOff, false, [] {
 					if (!features.can_wheelie) {
-						for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
-						{
-							if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
+						if (VEHICLE::IS_THIS_MODEL_A_CAR(Game->GetHash(Game->Vehicle()))) {
+							for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
 							{
-								auto const dc = reinterpret_cast<CCarHandlingData*>(d);
-								dc->m_advanced_flags = eAdvancedFlags::NONE;
-								break;
+								if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
+								{
+									auto const dc = reinterpret_cast<CCarHandlingData*>(d);
+									dc->m_advanced_flags = eAdvancedFlags::NONE;
+									break;
+								}
 							}
 						}
 					}
@@ -3604,14 +3606,16 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Camber"), rage::joaat("Camber"), [](sub* sub)
 			{
-				for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
-				{
-					if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
+				if (VEHICLE::IS_THIS_MODEL_A_CAR(Game->GetHash(Game->Vehicle()))) {
+					for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
 					{
-						auto const dc = reinterpret_cast<CCarHandlingData*>(d);
-						sub->draw_option<number<float>>("Front", nullptr, &dc->m_camber_front, -1000.f, 1000.f, 0.1f, 1);
-						sub->draw_option<number<float>>("Rear", nullptr, &dc->m_camber_rear, -1000.f, 1000.f, 0.1f, 1);
-						break;
+						if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
+						{
+							auto const dc = reinterpret_cast<CCarHandlingData*>(d);
+							sub->draw_option<number<float>>("Front", nullptr, &dc->m_camber_front, -1000.f, 1000.f, 0.1f, 1);
+							sub->draw_option<number<float>>("Rear", nullptr, &dc->m_camber_rear, -1000.f, 1000.f, 0.1f, 1);
+							break;
+						}
 					}
 				}
 				sub->draw_option<number<float>>("Stiffness", nullptr, &Game->CVehicle()->m_handling_data->m_camber_stiffness, 0.0f, 1000.f, 0.1f, 1);
@@ -3958,9 +3962,6 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Aimbot"), SubmenuAimbot, [](sub* sub)
 			{
-				//sub->draw_option<submenu>("Excludes", nullptr, SubmenuAimbotExcludes);
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Bone", nullptr, &aimbot.bone, &aimbot.data);
-				//sub->draw_option<toggle<bool>>(("FOV Circle"), nullptr, &g_Render->fov_circle, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &aimbot.enabled, BoolDisplay::OnOff, false, [] {
 					if (!aimbot.enabled) {
 						CAM::RENDER_SCRIPT_CAMS(false, true, 700, true, true, true);
@@ -3968,6 +3969,12 @@ namespace Saint
 						CAM::DESTROY_CAM(aimbot.aimcam, true);
 					}
 					});
+				sub->draw_option<UnclickOption>("Settings", nullptr, [] {});
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Bone", nullptr, &aimbot.bone, &aimbot.data);
+				sub->draw_option<toggle<bool>>(("Shoot Through Walls"), nullptr, &aimbot.through_walls, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Only Players"), nullptr, &aimbot.only_players, BoolDisplay::OnOff);
+				sub->draw_option<toggle_number_option<float, bool>>("Distance", nullptr, &aimbot.distance_check, &aimbot.distance_to_check, 0.1f, 100000.f, 25.0f, 2);
+			
 
 
 
@@ -4210,7 +4217,7 @@ namespace Saint
 				int Maxammo = 0;
 
 				if (give_weapon.type_int != 0) {
-					WEAPON::GET_MAX_AMMO(Game->Self(), all_weapons.hash_all[give_weapon.type_int], &Maxammo);
+					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), all_weapons.hash_all[give_weapon.type_int], &Maxammo);
 				}
 				if (give_weapon.type_int == 0) {
 					Maxammo = 9999;
@@ -4221,11 +4228,11 @@ namespace Saint
 				sub->draw_option<RegularOption>(("Apply"), nullptr, []
 					{
 						if (give_weapon.type_int != 0) {
-							Game->GiveWeapon(Game->Self(), all_weapons.hash_all[give_weapon.type_int], 9999);
+							WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), all_weapons.hash_all[give_weapon.type_int], 9999, false);
 						}
 						if (give_weapon.type_int == 0) {
 							for (int x = 0; x < 106; x++) {
-								Game->GiveWeapon(Game->Self(), Game->Weapon->Hash[x], give_weapon.amount);
+								WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), all_weapons.hash[x], give_weapon.amount, false);
 							}
 						}
 					});
@@ -7508,7 +7515,7 @@ namespace Saint
 				int Maxammo = 0;
 
 				if (give_weapon.type_int != 0) {
-					WEAPON::GET_MAX_AMMO(Game->Self(), Game->Weapon->Hash[give_weapon.type_int], &Maxammo);
+					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), Game->Weapon->Hash[give_weapon.type_int], &Maxammo);
 				}
 				if (give_weapon.type_int == 0) {
 					Maxammo = 9999;
@@ -7518,12 +7525,12 @@ namespace Saint
 				sub->draw_option<RegularOption>(("Apply"), nullptr, []
 					{
 						if (give_weapon.type_int != 0) {
-							Game->GiveWeapon(Game->PlayerIndex(g_SelectedPlayer), all_weapons.hash_all[give_weapon.type_int], 9999);
+							WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), Game->Weapon->Hash[give_weapon.type_int], 9999, false);
 						}
 						if (give_weapon.type_int == 0) {
-
-							for (int x = 0; x < 106; x++) {
-								Game->GiveWeapon(Game->PlayerIndex(g_SelectedPlayer), Game->Weapon->Hash[give_weapon.type_int], give_weapon.amount);
+							
+							for (int x = 0; x < 105; x++) {
+								WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), Game->Weapon->Hash[x], give_weapon.amount, false);
 							}
 						}
 					});
@@ -7675,6 +7682,7 @@ namespace Saint
 			{
 				sub->draw_option<toggle<bool>>(("Tracers"), nullptr, &all_players.esp2.tracer, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Name"), nullptr, &all_players.esp2.name, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Distance"), nullptr, &all_players.esp2.distance, BoolDisplay::OnOff);
 				//sub->draw_option<toggle<bool>>(("Box"), nullptr, &all_players.esp2.box, BoolDisplay::OnOff);
 			});
 		g_Render->draw_submenu<sub>("Explode", SubmenuAllExplode, [](sub* sub)
@@ -8955,6 +8963,7 @@ namespace Saint
 			{
 				sub->draw_option<toggle<bool>>(("Name"), nullptr, &m_nearby.m_peds.name_esp, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Rectangle"), nullptr, &m_nearby.m_peds.rectangle, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Distance"), nullptr, &m_nearby.m_peds.distance, BoolDisplay::OnOff);
 			});
 		g_Render->draw_submenu<sub>(("Traffic"), NearbyVehicles, [](sub* sub)
 			{
