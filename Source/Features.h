@@ -1820,12 +1820,12 @@ namespace Saint {
 	{
 		if (index == -1)
 		{
-			VEHICLE::REMOVE_VEHICLE_MOD(PED::GET_VEHICLE_PED_IS_USING(Game->Self()), type);
+			VEHICLE::REMOVE_VEHICLE_MOD(Game->Vehicle(), type);
 		}
 		else
 		{
-			VEHICLE::SET_VEHICLE_MOD_KIT(PED::GET_VEHICLE_PED_IS_USING(Game->Self()), 0);
-			VEHICLE::SET_VEHICLE_MOD(PED::GET_VEHICLE_PED_IS_USING(Game->Self()), type, index, false);
+			VEHICLE::SET_VEHICLE_MOD_KIT(Game->Vehicle(), 0);
+			VEHICLE::SET_VEHICLE_MOD(Game->Vehicle(), type, index, false);
 		}
 	}
 
@@ -4876,7 +4876,7 @@ namespace Saint {
 							NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
 						VEHICLE::SET_VEHICLE_IS_STOLEN(entityGunVehicle, FALSE);
 						NativeVector3 velocity;
-						NativeVector3 other = ENTITY::GET_ENTITY_COORDS(entityGunVehicle, true);
+						NativeVector3 other = Game->Coords(entityGunVehicle);
 						velocity.x = Game->SCoords().x + (1000.0f * cos(pitch) * cos(yaw)) - other.x;
 						velocity.y = Game->SCoords().y + (1000.0f * sin(yaw) * cos(pitch)) - other.y;
 						velocity.z = Game->SCoords().z + (1000.0f * sin(pitch)) - other.z;
@@ -5023,7 +5023,7 @@ namespace Saint {
 				for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(Game->Self(), peds, 0); i++)
 				{
 					Ped ped = peds[(i * 2 + 2)];
-					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(ped, false);
+					NativeVector3 c = Game->Coords(ped);
 					float xPos;
 					float yPos;
 
@@ -5037,7 +5037,7 @@ namespace Saint {
 
 					std::string name = "Ped";
 					if (distance) {
-						float distance = GetDistanceFloat(ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false), c);
+						float distance = GetDistanceFloat(Game->SCoords(), c);
 						name.append(std::format("\n{}", (int)distance));
 					}
 
@@ -5207,7 +5207,7 @@ namespace Saint {
 		std::size_t size = 0;
 		bool gas_cap = false;
 		void init() {
-			Vehicle vplayerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
+			Vehicle vplayerVehicle = Game->Vehicle();
 			NativeVector3 wheelOne = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "wheel_lf"));
 			NativeVector3 wheelTwo = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "wheel_lr"));
 			NativeVector3 wheelThree = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "wheel_rf"));
@@ -5246,7 +5246,6 @@ namespace Saint {
 					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
 					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], wheelFour, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
 				}
-				//other
 				if (exaust2)
 				{
 					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
@@ -7468,6 +7467,7 @@ namespace Saint {
 		}
 	};
 	inline Radio radio;
+	inline std::string modelsearchresults = "";
 	inline void FeatureInitalize() {
 		radio.init();
 		ragdoll.init();

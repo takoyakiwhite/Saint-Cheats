@@ -6,6 +6,7 @@
 #include "Signatures.hpp"
 #include <GTAV-Classes/script/GtaThread.hpp>
 namespace rage {
+
 	struct vfx_wheel {
 		float m_slip_min; //0x0004
 		float m_slip_max; //0x0008
@@ -682,7 +683,7 @@ namespace Saint {
 		std::uint8_t m_0xAE;       // 0xAE
 		std::uint8_t m_0xAF;       // 0xAF
 	};
-
+	
 	class CGameScriptHandlerNetComponent
 	{
 	public:
@@ -920,5 +921,12 @@ namespace Saint {
 		{
 			return local_player_check & 1;
 		}
+	};
+
+	class CNetworkIncrementStatEvent : public rage::netGameEvent
+	{
+	public:
+		std::uint32_t m_stat;           // 0x30
+		std::uint32_t m_amount;// 0x34
 	};
 }

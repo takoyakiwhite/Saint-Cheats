@@ -46,7 +46,7 @@ namespace Saint
 		static void DISABLE_CONTROL_ACTION(rage::scrNativeCallContext* src);
 		static void HUD_FORCE_WEAPON_WHEEL(rage::scrNativeCallContext* src);
 		static void SET_CURRENT_PED_WEAPON(rage::scrNativeCallContext* src);
-		static int IncrementStatEvent(__int64 neteventclass, CNetGamePlayers* Source);
+		static bool IncrementStatEvent(CNetworkIncrementStatEvent* neteventclass, CNetGamePlayer* Source);
 
 		static void ChatMessage(void* thisptr, __int64 unk1, __int64 unk2, const char* message);
 		static bool write_player_game_state_data_node(rage::netObject* player, CPlayerGameStateDataNode* node);
@@ -84,6 +84,8 @@ namespace Saint
 		static uint64_t task_parachute_object_0x270(uint64_t _this, int a2, int a3);
 		static void serialize_take_off_ped_variation_task(ClonedTakeOffPedVariationInfo* info, rage::CSyncDataBase* serializer);
 		static std::uint64_t* FallTaskConstructor(std::uint64_t* _this, std::uint32_t flags);
+
+		static bool can_apply_data(rage::netSyncTree* tree, rage::netObject* object);
 
 		
 
@@ -152,6 +154,8 @@ namespace Saint
 		void* parachute{};
 		void* parachute2{};
 		void* m_OriginalFallTaskConstructor{};
+
+		void* crashover{};
 	
 
 

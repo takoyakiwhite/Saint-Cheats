@@ -157,7 +157,7 @@ enum class eNetworkEvents : uint16_t
 	CRequestDoorEvent,
 	CNetworkTrainReportEvent,
 	CNetworkTrainRequestEvent,
-	CNetworkIncrementStatEvent,
+	CNetworkIncrementStatEvent2,
 	CModifyVehicleLockWordStateData,
 	CModifyPtfxWordStateDataScriptedEvolveEvent,
 	CRequestPhoneExplosionEvent,

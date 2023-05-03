@@ -209,106 +209,32 @@ namespace Saint
 		return static_cast<decltype(&PlayerWildCardHandler)>(g_Hooking->m_OriginalRIDFunction)(friendIndex);
 	}
 
-	int Hooks::IncrementStatEvent(__int64 neteventclass, CNetGamePlayers* Source)
+	bool Hooks::IncrementStatEvent(CNetworkIncrementStatEvent* neteventclass, CNetGamePlayer* Source)
 	{
-		const auto StatHash = *reinterpret_cast<DWORD*>(neteventclass + 0x30);
 		if (protections.block_reports) {
-			switch (StatHash)
-			{
-			case 0xE7072CD: {
-				char name[64];
-				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for hate", Source->PlayerInfo->m_net_player_data.m_name);
-				g_NotificationManager->add(name, 2000, 1);
-				return true;
-				break;
-			}
-			case 0xB722D6C0: {
-				char name[64];
-				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for hate", Source->PlayerInfo->m_net_player_data.m_name);
-				g_NotificationManager->add(name, 2000, 1);
-				return true;
-				break;
-			}
-			case 0x762F9994: {
-				char name[64];
-				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for being annoying", Source->PlayerInfo->m_net_player_data.m_name);
-				g_NotificationManager->add(name, 2000, 1);
-				return true;
-				break;
-			}
-			case 0x9F79BA0B: {
-				char name[64];
-				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for exploits", Source->PlayerInfo->m_net_player_data.m_name);
-				g_NotificationManager->add(name, 2000, 1);
-				return true;
-				break;
-			}
-			case 0xCBFD04A4: {
-				char name[64];
-				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for exploits", Source->PlayerInfo->m_net_player_data.m_name);
-				g_NotificationManager->add(name, 2000, 1);
-				return true;
-				break;
-			}
-			case 0x9C6A0C42: {
-				char name[64];
-				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for griefing", Source->PlayerInfo->m_net_player_data.m_name);
-				g_NotificationManager->add(name, 2000, 1);
-				return true;
-				break;
-			}
-			case 0x3CDB43E2: {
-				char name[64];
-				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for offensive language", Source->PlayerInfo->m_net_player_data.m_name);
-				g_NotificationManager->add(name, 2000, 1);
-				return true;
-				break;
-			}
-			case 0xE8FB6DD5: {
-				char name[64];
-				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for offensive tag plate??", Source->PlayerInfo->m_net_player_data.m_name);
-				g_NotificationManager->add(name, 2000, 1);
-				return true;
-				break;
-			}
-			case 0xF3DE4879: {
-				char name[64];
-				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for ugc??", Source->PlayerInfo->m_net_player_data.m_name);
-				g_NotificationManager->add(name, 2000, 1);
-				return true;
-				break;
-			}
-			case 0xAA238FF0: {
-				char name[64];
-				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for bad crew name", Source->PlayerInfo->m_net_player_data.m_name);
-				g_NotificationManager->add(name, 2000, 1);
-				return true;
-				break;
-			}
-			case 0x03511A79: {
-				char name[64];
-				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for bad crew moto", Source->PlayerInfo->m_net_player_data.m_name);
-				g_NotificationManager->add(name, 2000, 1);
-				return true;
-				break;
-			}
-			case 0x3B566D5C: {
-				char name[64];
-				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for bad crew status", Source->PlayerInfo->m_net_player_data.m_name);
-				g_NotificationManager->add(name, 2000, 1);
-				return true;
-				break;
-			}
-			case 0x368F6FD9: {
-				char name[64];
-				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you for bad crew emblem", Source->PlayerInfo->m_net_player_data.m_name);
-				g_NotificationManager->add(name, 2000, 1);
-				return true;
-				break;
-			}
+				switch (neteventclass->m_stat)
+				{
+				
+				case rage::joaat("MPPLY_BAD_CREW_STATUS"):
+				case rage::joaat("MPPLY_BAD_CREW_MOTTO"):
+				case rage::joaat("MPPLY_BAD_CREW_NAME"):
+				case rage::joaat("MPPLY_BAD_CREW_EMBLEM"):
+				case rage::joaat("MPPLY_EXPLOITS"):
+				case rage::joaat("MPPLY_GAME_EXPLOITS"):
+				case rage::joaat("MPPLY_TC_ANNOYINGME"):
+				case rage::joaat("MPPLY_TC_HATE"):
+				case rage::joaat("MPPLY_VC_ANNOYINGME"):
+				case rage::joaat("MPPLY_VC_HATE"):
+					char name[128];
+					sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you!", Source->m_player_info->m_net_player_data.m_name);
+					g_NotificationManager->add(name, 2000);
+					return true;
+				}
+				return false;
+							  
 
 
-			}
+			
 		}
 
 		return static_cast<decltype(&IncrementStatEvent)>(g_Hooking->m_OriginalIncrementStatEvent)(neteventclass, Source);
@@ -537,7 +463,7 @@ namespace Saint
 				if (protections.GameEvents.request_control) {
 					if (source->m_player_id < 32) {
 						int NetworkID = buffer->Read<int>(13);
-						if (GetPed() && GetPed()->m_net_object && GetPed()->m_net_object->m_object_id == NetworkID)
+						if (Game->CPed() && Game->CVehicle() && Game->CVehicle()->m_net_object && Game->CVehicle()->m_net_object->m_object_id == NetworkID && Game->CVehicle()->m_driver == Game->CPed())
 						{
 							char name2324[64];
 							sprintf(name2324, "Request Control from %s blocked.", source->m_player_info->m_net_player_data.m_name);
@@ -661,6 +587,19 @@ namespace Saint
 				
 				break;
 			}
+			case eNetworkEvents::CNetworkIncrementStatEvent2:
+			{
+				const auto increment_stat_event = std::make_unique<CNetworkIncrementStatEvent>();
+				buffer->ReadDword(&increment_stat_event->m_stat, 0x20);
+				buffer->ReadDword(&increment_stat_event->m_amount, 0x20);
+				if (IncrementStatEvent(increment_stat_event.get(), source))
+				{
+					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+					return;
+				}
+				buffer->Seek(0);
+				break;
+			}
 			case eNetworkEvents::CExplosionEvent: {
 				if (protections.GameEvents.explosion) {
 					if (source->m_player_id < 32)
@@ -708,14 +647,49 @@ namespace Saint
 			}
 			case eNetworkEvents::CNetworkClearPedTasksEvent: {
 				if (protections.GameEvents.freeze) {
-					char g_Freeze[64];
-					sprintf(g_Freeze, "Freeze from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+					int net_id = buffer->Read<int>(13);
+					if (Game->CPed() && Game->CPed()->m_net_object && Game->CPed()->m_net_object->m_object_id == net_id) {
+						char g_Freeze[64];
+						sprintf(g_Freeze, "Freeze from %s blocked.", source->m_player_info->m_net_player_data.m_name);
 
-					g_NotificationManager->add(g_Freeze, 2000, 1);
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-					return;
-					buffer->Seek(0);
+						g_NotificationManager->add(g_Freeze, 2000, 1);
+						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+						return;
+						buffer->Seek(0);
+					}
 				}
+				break;
+			}
+			case eNetworkEvents::CGiveControlEvent:
+			{
+				uint32_t timestamp = buffer->Read<uint32_t>(32);
+				int count = buffer->Read<int>(2);
+				bool all_objects_migrate_together = buffer->Read<bool>(1);
+
+				if (count > 3)
+				{
+					count = 3;
+				}
+
+				for (int i = 0; i < count; i++)
+				{
+					int net_id = buffer->Read<int>(13);
+					eNetObjType object_type = buffer->Read<eNetObjType>(4);
+					int migration_type = buffer->Read<int>(3);
+
+					if (object_type < eNetObjType::NET_OBJ_TYPE_AUTOMOBILE || object_type > eNetObjType::NET_OBJ_TYPE_TRAIN)
+					{
+						char g_Freeze[64];
+						sprintf(g_Freeze, "Crash from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+						g_NotificationManager->add(g_Freeze, 2000);
+						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+						return;
+					}
+				}
+
+				buffer->Seek(0);
+				//g.m_syncing_player = source_player;
 				break;
 			}
 			case eNetworkEvents::CNetworkPtfxEvent: {
@@ -736,6 +710,7 @@ namespace Saint
 			}
 			case eNetworkEvents::CRemoveWeaponEvent: {
 				if (protections.GameEvents.remove_weapon) {
+					int net_id = buffer->Read<int>(13);
 					auto Hash = buffer->Read<std::uint32_t>(32);
 
 					if (Hash == rage::joaat("WEAPON_UNARMED"))
@@ -750,14 +725,15 @@ namespace Saint
 						}
 					}
 					else {
-						char g_RemoveWeapons[64];
-						sprintf(g_RemoveWeapons, "Remove weapon from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+						if (Game->CPed() && Game->CPed()->m_net_object && Game->CPed()->m_net_object->m_object_id == net_id) {
+							char g_RemoveWeapons[64];
+							sprintf(g_RemoveWeapons, "Remove weapon from %s blocked.", source->m_player_info->m_net_player_data.m_name);
 
-						g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
-						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-						return;
+							g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+							g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+							return;
+						}
 					}
-					return;
 					buffer->Seek(0);
 				}
 				break;
@@ -1112,6 +1088,8 @@ namespace Saint
 			SetBits<std::uint32_t>(&flags, 10, 11, 12, 16);
 		return static_cast<decltype(&FallTaskConstructor)>(g_Hooking->m_OriginalFallTaskConstructor)(_this, flags);
 	}
+	
+	
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
@@ -1121,7 +1099,6 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_WndProc, &Hooks::WndProc, &m_OriginalWndProc);
 		MH_CreateHook(g_GameFunctions->m_PlayerListMenuConstructor, &Hooks::CPlayerListMenuConstructor, &m_OriginalJoinSessionHook);
 		MH_CreateHook(g_GameFunctions->m_PlayerWildcard, &Hooks::PlayerWildCardHandler, &m_OriginalRIDFunction);
-		MH_CreateHook(g_GameFunctions->m_IncrementStatEvent, &Hooks::IncrementStatEvent, &m_OriginalIncrementStatEvent);
 		MH_CreateHook(g_GameFunctions->m_write_player_game_state_data_node, &Hooks::write_player_game_state_data_node, &m_Original_write_player_game_state_data_node);
 		MH_CreateHook(g_GameFunctions->m_write_player_gamer_data_node, &Hooks::write_player_gamer_data_node, &m_Original_write_player_gamer_data_node);
 		MH_CreateHook(g_GameFunctions->m_SendNetInfo, &Hooks::SendNetInfo, &m_OriginalSendNetInfo);
@@ -1160,7 +1137,6 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->m_PlayerListMenuConstructor);
 		MH_RemoveHook(g_GameFunctions->m_PlayerWildcard);
 		//MH_RemoveHook(g_GameFunctions->m_ChatMessage);
-		MH_RemoveHook(g_GameFunctions->m_IncrementStatEvent);
 		MH_RemoveHook(g_GameFunctions->m_write_player_game_state_data_node);
 		MH_RemoveHook(g_GameFunctions->m_write_player_gamer_data_node);
 		MH_RemoveHook(g_GameFunctions->m_SendNetInfo);

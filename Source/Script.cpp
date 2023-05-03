@@ -667,6 +667,8 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Model Changer"), SubmenuModelChanger, [](sub* sub)
 			{
+				sub->draw_option<submenu>("Search", nullptr, rage::joaat("AllModel"));
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 				for (std::int32_t i = 0; i < m_ModelChanger.size; i++) {
 					sub->draw_option<submenu>(m_ModelChanger.get_class_name[i], nullptr, SubmenuSelectedModelChanger, [=]
 						{
@@ -674,6 +676,25 @@ namespace Saint
 						});
 
 				}
+			});
+		g_Render->draw_submenu<sub>(("Search"), rage::joaat("AllModel"), [](sub* sub)
+			{
+				sub->draw_option<KeyboardOption>(("Value"), "Note: this is case sensitive.", modelsearchresults, []
+					{
+
+						showKeyboard("Enter Something", "", 8, &modelsearchresults, [=] {});
+					});
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				for (auto& model : m_ModelChanger.m_GetModels) {
+					if (has_string_attached(model.m_name, modelsearchresults)) {
+						sub->draw_option<RegularOption>(model.m_name.c_str(), nullptr, [=]
+							{
+
+								m_ModelChanger.change(rage::joaat(model.m_model.c_str()));
+
+							});
+					}
+				};
 			});
 		g_Render->draw_submenu<sub>((m_ModelChanger.get_class_name[m_ModelChanger.selected_class]), SubmenuSelectedModelChanger, [](sub* sub)
 			{
