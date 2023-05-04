@@ -1135,6 +1135,7 @@ namespace Saint
 							g_local_player->m_vehicle->m_is_targetable = true;
 					}
 					});
+				
 				sub->draw_option<toggle<bool>>(("Disable Camber"), nullptr, &features.disable_camber, BoolDisplay::OnOff, false, [] {
 					if (!features.disable_camber) {
 						VEHICLE::SET_CAN_USE_HYDRAULICS(Game->Vehicle(), true);
@@ -3955,7 +3956,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Incendiary"), nullptr, &m_frame_flags.m_fire, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Aim Tracer"), nullptr, &features.aim_tracer, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Rope"), nullptr, &rope_gun.enabled, BoolDisplay::OnOff);
-				sub->draw_option<toggle<bool>>(("Steal"), nullptr, &features.steal_gun, BoolDisplay::OnOff);
+				//sub->draw_option<toggle<bool>>(("Steal"), nullptr, &features.steal_gun, BoolDisplay::OnOff);
 				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Money", nullptr, &wdrop.money, &wdrop.money_model, &wdrop.money_model_data);
 				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("RP", nullptr, &wdrop.rp, &wdrop.rp_model, &wdrop.rp_model_data);
 				sub->draw_option<toggle<bool>>(("Shotgun"), nullptr, &m_shotgun.enabled, BoolDisplay::OnOff, false, [] {
@@ -3970,7 +3971,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Bullet Changer"), rage::joaat("BULLET_CHANGER"), [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &bullet_changer.enabled, BoolDisplay::OnOff);
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &Game->Weapon->Name, &bullet_changer.weapon_pos);
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &all_weapons.name, &bullet_changer.weapon_pos);
 				sub->draw_option<UnclickOption>("Attributes", nullptr, [] {});
 				sub->draw_option<toggle<bool>>(("Audible"), nullptr, &bullet_changer.Audible, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Invisible"), nullptr, &bullet_changer.Invisible, BoolDisplay::OnOff);

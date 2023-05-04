@@ -986,6 +986,7 @@ namespace Saint {
 		bool remove_stickys = false;
 		const char* name_buffer;
 		void init() {
+			
 			if (remove_stickys) {
 				NETWORK::REMOVE_ALL_STICKY_BOMBS_FROM_ENTITY(Game->Self(), Game->Self());
 			}
@@ -1154,7 +1155,6 @@ namespace Saint {
 				}
 			}
 			if (aim_tracer) {
-				Vector3 minV, maxV;
 				Hash weapHash;
 
 				Entity weap = WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Game->Self(), 0);
@@ -2314,12 +2314,15 @@ namespace Saint {
 
 				if (Game->Shooting())
 				{
-					Hash airStrike = Game->HashKey("WEAPON_AIRSTRIKE_ROCKET");
-					if (!WEAPON::HAS_WEAPON_ASSET_LOADED(airStrike))
-					{
-						WEAPON::REQUEST_WEAPON_ASSET(airStrike, 31, 0);
+					NativeVector3 hitCoords;
+					if (raycast(hitCoords)) {
+						Hash airStrike = Game->HashKey("WEAPON_AIRSTRIKE_ROCKET");
+						if (!WEAPON::HAS_WEAPON_ASSET_LOADED(airStrike))
+						{
+							WEAPON::REQUEST_WEAPON_ASSET(airStrike, 31, 0);
+						}
+						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(hitCoords.x, hitCoords.y, height, hitCoords.x, hitCoords.y, 0, damage, 1, airStrike, Game->Self(), 1, 0, -1.0);
 					}
-					MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(Game->HitCoords().x, Game->HitCoords().y, height, Game->HitCoords().x, Game->HitCoords().y, 0, damage, 1, airStrike, Game->Self(), 1, 0, -1.0);
 
 				}
 			}
@@ -6961,9 +6964,14 @@ namespace Saint {
 				{
 					float startDistance = distance(CAM::GET_GAMEPLAY_CAM_COORD(), ENTITY::GET_ENTITY_COORDS(Game->Self(), true));
 					float endDistance = distance(CAM::GET_GAMEPLAY_CAM_COORD(), ENTITY::GET_ENTITY_COORDS(Game->Self(), true));
+					Hash weapHash;
+
+					Entity weap = WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Game->Self(), 0);
+					WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weapHash, 1);
+					NativeVector3 pos = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(weap, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(weap, "gun_muzzle"));
 					startDistance += 0.25;
 					endDistance += 1000.0;
-					std::int32_t hash = Game->Weapon->Hash[weapon_pos];
+					std::int32_t hash = all_weapons.hash[weapon_pos];
 					WEAPON::REQUEST_WEAPON_ASSET(hash, 31, 0);
 					g_FiberPool.queue([=] {
 						while (!WEAPON::HAS_WEAPON_ASSET_LOADED(hash))
@@ -6971,9 +6979,9 @@ namespace Saint {
 						});
 
 					MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(
-						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), startDistance)).x,
-						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), startDistance)).y,
-						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), startDistance)).z,
+						pos.x,
+						pos.y,
+						pos.z,
 						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).x,
 						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).y,
 						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).z,
