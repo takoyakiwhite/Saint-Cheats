@@ -458,6 +458,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Pickup Entities"), "Allows you to pickup & throw entities and players.", &features.pickup_mode, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Auto Clean"), "Automaticly cleans you're ped from visual damage.", &features.autoclean, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Forcefield"), "Automaticly cleans you're ped from visual damage.", &features.force_field, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Infinite Stamina"), "", &features.infinite_stamina, BoolDisplay::OnOff);
 				//sub->draw_option<toggle<bool>>(("Beast Landing"), "", &BeastLanding, BoolDisplay::OnOff); not sure what it does, dont seem to do anything
 				sub->draw_option<toggle<bool>>(("Swim Anywhere"), nullptr, &features.swim_anywhere, BoolDisplay::OnOff, false, [] {
 					if (!features.swim_anywhere)
@@ -487,6 +488,12 @@ namespace Saint
 					if (!features.crouched)
 					{
 						PED::RESET_PED_MOVEMENT_CLIPSET(Game->Self(), 1.0f);
+					}
+					});
+				sub->draw_option<toggle<bool>>(("Walk On Air"), "", &features.no_grav_self, BoolDisplay::OnOff, false, [] {
+					if (!features.no_grav_self)
+					{
+						PED::SET_PED_GRAVITY(Game->Self(), true); //wtf?
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Unlimited Special Ability"), "Automaticly refills your special ability bar.", &features.unlim, BoolDisplay::OnOff);
@@ -1023,6 +1030,12 @@ namespace Saint
 						Memory::set_value<float>({ 0x08, 0x88 }, 1.0f);
 					}
 					});
+				sub->draw_option<number<float>>("Noise", nullptr, &multipliers.noise, 0.0f, 100.f, 0.1f, 2, true, "", "", [=] {
+					PLAYER::SET_PLAYER_NOISE_MULTIPLIER(Game->Self(), multipliers.noise);
+				});
+				sub->draw_option<number<float>>("Noise (Sneaking)", nullptr, &multipliers.sneaking_noise, 0.0f, 100.f, 0.1f, 2, true, "", "", [=] {
+					PLAYER::SET_PLAYER_SNEAKING_NOISE_MULTIPLIER(Game->Self(), multipliers.sneaking_noise);
+					});
 
 
 			});
@@ -1186,7 +1199,7 @@ namespace Saint
 					sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
 					sub->draw_option<toggle<bool>>(("Prediction"), "", &v_weapons.predict, BoolDisplay::OnOff);
 					sub->draw_option<ChooseOption<const char*, std::size_t>>("Weapon", nullptr, &all_weapons.name, &v_weapons.weapon);
-					sub->draw_option<number<std::int32_t>>("Delay", nullptr, &v_weapons.delay, 0, 5000, 50);
+					sub->draw_option<number<std::int32_t>>("Delay", nullptr, &v_weapons.delay, 0, 5000, 50, 3, true, "", "ms");
 					sub->draw_option<number<std::int32_t>>("Damage", nullptr, &v_weapons.damage, 0, 1000, 10);
 					sub->draw_option<UnclickOption>(("Location"), nullptr, [] {});
 					sub->draw_option<number<float>>("X Offset", nullptr, &v_weapons.x_offset, -10000.f, 10000.f, 0.1f, 2);
@@ -1392,6 +1405,12 @@ namespace Saint
 						if (doors.pos == 2) {
 							VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 0, true);
 						}
+						if (doors.pos == 3) {
+							VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 0, 2);
+						}
+						if (doors.pos == 4) {
+							VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 0, 1);
+						}
 
 					});
 				if (VEHICLE::GET_IS_DOOR_VALID(Game->Vehicle(), 1)) {
@@ -1405,6 +1424,12 @@ namespace Saint
 							}
 							if (doors.pos == 2) {
 								VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 1, true);
+							}
+							if (doors.pos == 3) {
+								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 1, 2);
+							}
+							if (doors.pos == 4) {
+								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 1, 1);
 							}
 
 						});
@@ -1421,6 +1446,12 @@ namespace Saint
 							if (doors.pos == 2) {
 								VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 2, true);
 							}
+							if (doors.pos == 3) {
+								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 2, 2);
+							}
+							if (doors.pos == 4) {
+								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 2, 1);
+							}
 
 						});
 				}
@@ -1435,6 +1466,12 @@ namespace Saint
 							}
 							if (doors.pos == 2) {
 								VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 3, true);
+							}
+							if (doors.pos == 3) {
+								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 3, 2);
+							}
+							if (doors.pos == 4) {
+								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 3, 1);
 							}
 
 						});
@@ -1451,6 +1488,7 @@ namespace Saint
 							if (doors.pos == 2) {
 								VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 4, true);
 							}
+							
 
 						});
 				}
@@ -2163,19 +2201,19 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Acrobatics"), rage::joaat("acrobaticsr"), [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &randomization.acrobatics, BoolDisplay::OnOff);
-				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &randomization.delay, 0, 5000, 50);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &randomization.delay, 0, 5000, 50, 3, true, "", "ms");
 			});
 		g_Render->draw_submenu<sub>(("Upgrades"), SubmenuUpgradeLoop, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Color", nullptr, Submenu::SubmenuSelectedVehicleColor);
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &max_loop.enabled, BoolDisplay::OnOff);
-				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &max_loop.delay, 0, 5000, 50);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &max_loop.delay, 0, 5000, 50, 3, true, "", "ms");
 			});
 		g_Render->draw_submenu<sub>(("Upgrades"), SubmenuUpgradeLoop, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Color", nullptr, Submenu::SubmenuSelectedVehicleColor);
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &max_loop.enabled, BoolDisplay::OnOff);
-				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &max_loop.delay, 0, 5000, 50);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &max_loop.delay, 0, 5000, 50, 3, true, "", "ms");
 			});
 		g_Render->draw_submenu<sub>(("Color"), SubmenuSelectedVehicleColor, [](sub* sub)
 			{
@@ -4000,12 +4038,28 @@ namespace Saint
 
 				sub->draw_option<submenu>("Entity", nullptr, EntityShooterVehicle);
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &m_entity_shooter.enabled, BoolDisplay::OnOff);
+				sub->draw_option<UnclickOption>("List", nullptr, [] {});
+				sub->draw_option<RegularOption>("Delete", nullptr, [=]
+					{
+						for (auto& v : m_entity_shooter.m_Shot) {
+							VEHICLE::DELETE_VEHICLE(&v.id);
+							m_entity_shooter.m_Shot.clear();
+						}
+
+					});
+				for (auto& v : m_entity_shooter.m_Shot) {
+					sub->draw_option<RegularOption>(Game->VehicleNameHash(Game->GetHash(v.id)), nullptr, [=]
+						{
+							
+
+						});
+				}
 
 
 			});
 		g_Render->draw_submenu<sub>(("Entity"), EntityShooterVehicle, [](sub* sub)
 			{
-				sub->draw_option<KeyboardOption>(("Selected"), nullptr, HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(m_entity_shooter.selected_hash)), []
+				sub->draw_option<KeyboardOption>(("Selected"), nullptr, Game->VehicleNameHash(m_entity_shooter.selected_hash), []
 					{
 
 
@@ -4095,7 +4149,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Exclude Friends"), nullptr, &triggerbot.exclude_friends, BoolDisplay::OnOff);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Filter", nullptr, &triggerbot.filter, &triggerbot.filter_i);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Redirect To Bone", nullptr, &triggerbot.shoot_coords, &triggerbot.scoords_i);
-				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &triggerbot.delay, 0, 5000, 50);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &triggerbot.delay, 0, 5000, 50, 3, true, "", "ms");
 
 
 			});
@@ -4309,6 +4363,10 @@ namespace Saint
 			{
 				sub->draw_option<submenu>("Ammo", nullptr, SubmenuGunLockerAmmo);
 				sub->draw_option<submenu>("Give", nullptr, SubmenuGunLockerGive);
+				sub->draw_option<RegularOption>(("Remove All"), nullptr, []
+					{
+						WEAPON::REMOVE_ALL_PED_WEAPONS(Game->Self(), 0);
+					});
 
 
 
@@ -4386,10 +4444,14 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Rapid Fire"), SubmenuRapidFire, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &rapid_fire.enabled, BoolDisplay::OnOff);
+				sub->draw_option<UnclickOption>(("Flags/Settings"), nullptr, [] {});
 				sub->draw_option<toggle<bool>>(("Disable When Reloading"), nullptr, &rapid_fire.disable_when_reloading, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Disable Shooting"), nullptr, &rapid_fire.disable_shooting, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Only When Aiming"), nullptr, &rapid_fire.only_when_aiming, BoolDisplay::OnOff);
-				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &rapid_fire.delay, 0, 5000, 50);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &rapid_fire.delay, 0, 5000, 50, 3, true, "", "ms");
+				sub->draw_option<UnclickOption>(("Attributes"), nullptr, [] {});
+				sub->draw_option<number<std::int32_t>>("Bullets", nullptr, &rapid_fire.bullets, 0, 25, 1, 3);
+				sub->draw_option<number<std::int32_t>>("Damage", nullptr, &rapid_fire.damage, 0, 5000, 30);
 
 			});
 		g_Render->draw_submenu<sub>(("Explosive Ammo"), SubmenuExplosiveAmmo, [](sub* sub)
@@ -6864,7 +6926,7 @@ namespace Saint
 			{
 				//sub->draw_option<submenu>("Spoof Sender", nullptr, SubmenuSpoofSpammer);
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &chat.spammer, BoolDisplay::OnOff);
-				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &chat.delay, 0, 5000, 50);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &chat.delay, 0, 5000, 50, 3, true, "", "ms");
 				sub->draw_option<KeyboardOption>(("Text"), nullptr, chat.text.c_str(), []
 					{
 						showKeyboard("Enter Something", "", 35, &chat.text, [] {});
@@ -8141,12 +8203,12 @@ namespace Saint
 			sub->draw_option<toggle<bool>>(("Money"), nullptr, &Fake_drops.money, BoolDisplay::OnOff);
 			sub->draw_option<toggle<bool>>(("RP"), nullptr, &Fake_drops.rp, BoolDisplay::OnOff);
 			sub->draw_option<number<std::int32_t>>("Height", nullptr, &Fake_drops.height, 0, 100);
-			sub->draw_option<number<std::int32_t>>("Delay", nullptr, &Fake_drops.delay, 0, 5000, 50);
+			sub->draw_option<number<std::int32_t>>("Delay", nullptr, &Fake_drops.delay, 0, 5000, 50, 3, true, "", "ms");
 			});
 		g_Render->draw_submenu<sub>("Text Spam", SubmenuSpamText, [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &text_spam.enabled, BoolDisplay::OnOff);
-				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &text_spam.delay, 0, 5000, 50);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &text_spam.delay, 0, 5000, 50, 3, true, "", "ms");
 
 				sub->draw_option<KeyboardOption>(("Text"), nullptr, text_spam.text.c_str(), []
 					{
@@ -8456,25 +8518,25 @@ namespace Saint
 			sub->draw_option<toggle<bool>>(("Money"), nullptr, &drops.money, BoolDisplay::OnOff);
 			sub->draw_option<toggle<bool>>(("RP"), nullptr, &drops.rp, BoolDisplay::OnOff);
 			sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
-			sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize RP Model", nullptr, &drops.random_rp_model, &drops.model_delay, 0, 5000, 50);
-			sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize Money Model", nullptr, &drops.random_money_model, &drops.model_delay2, 0, 5000, 50);
+			sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize RP Model", nullptr, &drops.random_rp_model, &drops.model_delay, 0, 5000, 50, 3, true, "", "ms");
+			sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize Money Model", nullptr, &drops.random_money_model, &drops.model_delay2, 0, 5000, 50, 3, true, "", "ms");
 			sub->draw_option<ChooseOption<const char*, std::size_t>>("Location", nullptr, &drops.location, &drops.data);
 			sub->draw_option<ChooseOption<const char*, std::size_t>>("RP Model", nullptr, &drops.rp_model, &drops.rp_model_data);
 			sub->draw_option<ChooseOption<const char*, std::size_t>>("Money Model", nullptr, &drops.money_model, &drops.money_model_data);
 			sub->draw_option<number<std::int32_t>>("Height", nullptr, &drops.height, 0, 100);
-			sub->draw_option<number<std::int32_t>>("Delay", nullptr, &drops.delay, 0, 5000, 50);
+			sub->draw_option<number<std::int32_t>>("Delay", nullptr, &drops.delay, 0, 5000, 50, 3, true, "", "ms");
 			});
 		g_Render->draw_submenu<sub>(("Custom Location"), rage::joaat("CLocation"), [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Money"), nullptr, &drops.custom.money, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("RP"), nullptr, &drops.custom.rp, BoolDisplay::OnOff);
-				sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize RP Model", nullptr, &drops.custom.random_rp_model, &drops.custom.model_delay, 0, 5000, 50);
-				sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize Money Model", nullptr, &drops.custom.random_money_model, &drops.custom.model_delay2, 0, 5000, 50);
+				sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize RP Model", nullptr, &drops.custom.random_rp_model, &drops.custom.model_delay, 0, 5000, 50, 3, true, "", "ms");
+				sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize Money Model", nullptr, &drops.custom.random_money_model, &drops.custom.model_delay2, 0, 5000, 50, 3, true, "", "ms");
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Location", nullptr, &drops.custom.location, &drops.custom.data);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("RP Model", nullptr, &drops.custom.rp_model, &drops.custom.rp_model_data);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Money Model", nullptr, &drops.custom.money_model, &drops.custom.money_model_data);
 				sub->draw_option<number<std::int32_t>>("Height", nullptr, &drops.custom.height, 0, 100);
-				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &drops.custom.delay, 0, 5000, 50);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &drops.custom.delay, 0, 5000, 50, 3, true, "", "ms");
 				sub->draw_option<RegularOption>(("Add"), nullptr, []
 					{
 						NativeVector3 b2 = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
@@ -9326,7 +9388,8 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Weather"), SubmeuWeather, [](sub* sub)
 			{
-				sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize", nullptr, &weather.randomize, &weather.randomize_delay, 0, 5000, 50);
+				sub->draw_option<submenu>("Editor", nullptr, rage::joaat("WEditor"));
+				sub->draw_option<toggle_number_option<std::int32_t, bool>>("Randomize", nullptr, &weather.randomize, &weather.randomize_delay, 0, 5000, 50, 3, true, "", "ms");
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &weather.data, &weather.init);
 				sub->draw_option<RegularOption>(("Apply"), nullptr, []
 					{
@@ -9374,6 +9437,18 @@ namespace Saint
 						}
 					});
 
+			});
+		g_Render->draw_submenu<sub>("Editor", rage::joaat("WEditor"), [](sub* sub)
+			{
+				sub->draw_option<number<float>>("Rain Intensity", nullptr, &weather_edior.rain_itensity, 0.0f, 1000.f, 0.1f, 2, true, "", "", [=] {
+					MISC::SET_RAIN(weather_edior.rain_itensity);
+				});
+				sub->draw_option<number<float>>("Wind Speed", nullptr, &weather_edior.wind_speed, 0.0f, 1000.f, 0.1f, 2, true, "", "", [=] {
+					MISC::SET_WIND_SPEED(weather_edior.wind_speed);
+					});
+				sub->draw_option<number<float>>("Wind Direction", nullptr, &weather_edior.wind_direction, 0.0f, 360.f, 5.f, 2, true, "", "", [=] {
+					MISC::SET_WIND_DIRECTION(weather_edior.wind_direction);
+					});
 			});
 		g_Render->draw_submenu<sub>("Misc", SubmenuMisc, [](sub* sub)
 			{

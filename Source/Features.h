@@ -161,6 +161,9 @@ namespace Saint {
 		bool InVehicle() {
 			return PED::IS_PED_IN_ANY_VEHICLE(Self(), 0);
 		}
+		bool Aiming() {
+			return PLAYER::IS_PLAYER_FREE_AIMING(Id());
+		}
 		bool ControlPressed(int control) {
 			return PAD::IS_CONTROL_PRESSED(2, control);
 		}
@@ -985,8 +988,15 @@ namespace Saint {
 		bool mute_sirens = false;
 		bool remove_stickys = false;
 		const char* name_buffer;
+		bool no_grav_self = false;
+		bool infinite_stamina = false;
 		void init() {
-			
+			if (infinite_stamina) {
+				Game->CPed()->m_player_info->m_stamina = 1.00f;
+			}
+			if (no_grav_self) {
+				PED::SET_PED_GRAVITY(Game->Self(), false);
+			}
 			if (remove_stickys) {
 				NETWORK::REMOVE_ALL_STICKY_BOMBS_FROM_ENTITY(Game->Self(), Game->Self());
 			}
@@ -1513,6 +1523,8 @@ namespace Saint {
 		bool only_when_aiming = false;
 		bool disable_shooting = false;
 		int delay = 0;
+		int bullets = 1;
+		int damage = 50;
 		void init() {
 			if (enabled)
 			{
@@ -1525,6 +1537,11 @@ namespace Saint {
 					NativeVector3 endMultiply = multiply(&gameplayCamDirection, 500.0f);
 					NativeVector3 startCoords = addn(&gameplayCam, &startMultiply);
 					NativeVector3 endCoords = addn(&startCoords, &endMultiply);
+					Hash weapHash;
+
+					Entity weap = WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Game->Self(), 0);
+					WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weapHash, 1);
+					NativeVector3 pos = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(weap, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(weap, "gun_muzzle"));
 					Hash weaponhash;
 					WEAPON::GET_CURRENT_PED_WEAPON(playerPed, &weaponhash, 1);
 					static int delay2 = 0;
@@ -1533,26 +1550,15 @@ namespace Saint {
 					}
 					if (delay2 == 0 || (int)(GetTickCount64() - delay2) > delay)
 					{
-
-						if (disable_when_reloading && !only_when_aiming) {
-							if (Game->ControlPressed(208) || (Game->KeyPress(VK_LBUTTON) && !PED::IS_PED_RELOADING(Game->Self()))) {
-								MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS2(startCoords, endCoords, 50, 1, weaponhash, playerPed, 1, 1, 0xbf800000);
-							}
+						if (disable_when_reloading && PED::IS_PED_RELOADING(Game->Self())) {
+							return;
 						}
-						else if (disable_when_reloading && only_when_aiming) {
-							if (Game->ControlPressed(208) || (Game->KeyPress(VK_LBUTTON) && !PED::IS_PED_RELOADING(Game->Self()) && PAD::IS_CONTROL_PRESSED(2, 25))) {
-								MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS2(startCoords, endCoords, 50, 1, weaponhash, playerPed, 1, 1, 0xbf800000);
-							}
+						if (only_when_aiming && !Game->Aiming()) {
+							return;
 						}
-						else if (!disable_when_reloading && only_when_aiming) {
-							if (Game->ControlPressed(208) || (Game->KeyPress(VK_LBUTTON) && PAD::IS_CONTROL_PRESSED(2, 25))) {
-								MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS2(startCoords, endCoords, 50, 1, weaponhash, playerPed, 1, 1, 0xbf800000);
-							}
-						}
-						else
-						{
-							if (Game->ControlPressed(208) || (Game->KeyPress(VK_LBUTTON))) {
-								MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS2(startCoords, endCoords, 50, 1, weaponhash, playerPed, 1, 1, 0xbf800000);
+						if (Game->DisabledControlPressed(24)) {
+							for (int i = 0; i < bullets; i++) {
+								MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS2(startCoords, endCoords, damage, 1, weaponhash, playerPed, 1, 1, 0xbf800000);
 							}
 						}
 						delay2 = GetTickCount64();
@@ -2172,6 +2178,8 @@ namespace Saint {
 		float run_speed = 1.0f;
 		bool swim_run = false;
 		float swim_speed = 1.0f;
+		float sneaking_noise = 1.0f;
+		float noise = 1.0f;
 		void init() {
 			if (run) {
 				Game->CPed()->m_player_info->m_run_speed = run_speed;
@@ -4909,6 +4917,16 @@ namespace Saint {
 		}
 	};
 	inline FrameFlags m_frame_flags;
+	class EntityShooterHandler {
+	public:
+		EntityShooterHandler(Vehicle m_id) {
+			id = m_id;
+
+		}
+	public:
+		Vehicle id;
+	};
+		
 	class EntityShooter2 {
 	public:
 		int selected_class;
@@ -4916,6 +4934,9 @@ namespace Saint {
 		Hash selected_hash = 0x6838FC1D;
 		bool enabled = false;
 		Vehicle entityGunVehicle;
+		std::vector<EntityShooterHandler> m_Shot = {
+			
+		};
 		void init() {
 			if (enabled) {
 				if (Game->Shooting())
@@ -4934,6 +4955,7 @@ namespace Saint {
 						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 						entityGunVehicle = VEHICLE::CREATE_VEHICLE(selected_hash, start.x, start.y, start.z, ENTITY::GET_ENTITY_HEADING(Game->Self()), true, false, false);
 						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+						m_Shot.push_back({ entityGunVehicle });
 						DECORATOR::DECOR_SET_INT(entityGunVehicle, "MPBitset", 0);
 						auto networkId = NETWORK::VEH_TO_NET(entityGunVehicle);
 						if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(entityGunVehicle))
@@ -7011,7 +7033,7 @@ namespace Saint {
 	inline RocketBoost rocket_boost;
 	class Doors {
 	public:
-		const char* action[3] = { "Open", "Close", "Delete" };
+		const char* action[5] = { "Open", "Close", "Delete", "Lock", "Unlock"};
 		std::size_t pos;
 	};
 	inline Doors doors;
@@ -7850,6 +7872,13 @@ namespace Saint {
 		Color color;
 	};
 	inline ColorSubmenuFr ColorSubmenu;
+	class WeatherEditor {
+	public:
+		float rain_itensity = 1.0f;
+		float wind_speed = 5.0f;
+		float wind_direction = 180.f;
+	};
+	inline WeatherEditor weather_edior;
 	inline void FeatureInitalize() {
 		v_weapons.init();
 		session_info.init();
