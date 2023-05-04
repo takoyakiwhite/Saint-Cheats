@@ -20,6 +20,8 @@ namespace Saint::UserInterface
 		virtual std::size_t GetSelectedOption() = 0;
 		virtual void SetSelectedOption(std::size_t) = 0;
 
+		virtual Color GetColor() = 0;
+
 		void ScrollForward()
 		{
 			if (GetSelectedOption() < GetNumOptions() - 1)

@@ -37,4 +37,38 @@ namespace Saint::UserInterface
 		KeyboardOption(KeyboardOption&&) = default;
 		KeyboardOption& operator=(KeyboardOption&&) = default;
 	};
+	class KeyboardOption2 : public BaseOption<KeyboardOption2>
+	{
+	public:
+		explicit KeyboardOption2() = default;
+		explicit KeyboardOption2(const char* text, const char* description = nullptr, const char* right = "", std::function<void()> action = [] {})
+		{
+			SetLeftText(text);
+			if (right == "") {
+				SetRightText("None");
+			}
+			else {
+				SetRightText(right);
+			}
+			if (description)
+				SetDescription(description);
+			SetAction(std::move(action));
+		}
+
+		bool GetFlag(OptionFlag flag) override
+		{
+			if (flag == OptionFlag::Keyboard)
+			{
+				return true;
+			}
+
+			return BaseOption::GetFlag(flag);
+		}
+
+		~KeyboardOption2() noexcept = default;
+		KeyboardOption2(KeyboardOption2 const&) = default;
+		KeyboardOption2& operator=(KeyboardOption2 const&) = default;
+		KeyboardOption2(KeyboardOption2&&) = default;
+		KeyboardOption2& operator=(KeyboardOption2&&) = default;
+	};
 }

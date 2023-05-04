@@ -65,8 +65,10 @@ namespace Saint::UserInterface
 		}
 		return min + rand() % ((max + 1) - min);
 	}
+	
 	void UIManager::RenderToolTip()
 	{
+
 		static const char* names[] = {
 		"put me in coach",
 		"i've made a severe and continuous lapse in my judgment",
@@ -119,14 +121,15 @@ namespace Saint::UserInterface
 		}
 
 		char text[200];
-
-		if (PAD::IS_USING_KEYBOARD_AND_MOUSE(2)) {
-			sprintf_s(text, "%s\n~u~%s", names[g_ToolTip], "~b~F4");
-			RenderText(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
-		}
-		else {
-			sprintf_s(text, "%s\n~b~RB + RIGHT", names[g_ToolTip]);
-			RenderText(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
+		if (tooltips_enabled) {
+			if (PAD::IS_USING_KEYBOARD_AND_MOUSE(2)) {
+				sprintf_s(text, "%s\n~u~%s", names[g_ToolTip], "~b~F4");
+				RenderText(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
+			}
+			else {
+				sprintf_s(text, "%s\n~b~RB + RIGHT", names[g_ToolTip]);
+				RenderText(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
+			}
 		}
 	}
 
@@ -936,6 +939,11 @@ namespace Saint::UserInterface
 				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.00355f, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f, m_OptionHeight, { m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, sub_alpha });
 			}
 		}
+		if (opt->GetFlag(OptionFlag::ColorSub))
+		{
+			DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.00355f, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f, m_OptionHeight, opt->GetColor());
+			
+		}
 		if (opt->GetFlag(OptionFlag::PlayerSub))
 		{
 			if (IndicatorIterator == 0)
@@ -1111,23 +1119,48 @@ namespace Saint::UserInterface
 		if (!description || !*description)
 			return;
 
-		m_DrawBaseY += m_DescriptionHeightPadding;
+		if (connect_description) {
+			m_DrawBaseY += m_DescriptionHeightPadding;
+		}
 
-
-		GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (m_DescriptionHeight / 2.f), m_Width, m_DescriptionHeight, m_OptionUnselectedBackgroundColor.r, m_OptionUnselectedBackgroundColor.g, m_OptionUnselectedBackgroundColor.b, m_OptionUnselectedBackgroundColor.a, 0);
-		GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (m_DescriptionHeight / 2.f) - 0.029, m_Width, 0.003f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
-		HUD::SET_TEXT_WRAP(m_PosX, m_PosX + m_Width / 2);
-		DrawLeftText(
-			description,
-			m_PosX - (m_Width / m_DescriptionPadding),
-			m_DrawBaseY + (m_DescriptionHeight / 2.f) - (GetTextHeight(m_DescriptionFont, m_DescriptionTextSize) / 1.5f) - 0.015,
-			m_DescriptionTextSize,
-			m_DescriptionFont,
-			m_DescriptionTextColor,
-			false, false, false
-		);
-
-		m_DrawBaseY += m_DescriptionHeight;
+		if (connect_description) {
+			GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (m_DescriptionHeight / 2.f), m_Width, m_DescriptionHeight, m_OptionUnselectedBackgroundColor.r, m_OptionUnselectedBackgroundColor.g, m_OptionUnselectedBackgroundColor.b, m_OptionUnselectedBackgroundColor.a, 0);
+			GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (m_DescriptionHeight / 2.f) - 0.029, m_Width, 0.003f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
+		}
+		else {
+			GRAPHICS::DRAW_RECT(m_PosX + description_x, m_PosY + description_y + (m_DescriptionHeight / 2.f), m_Width, m_DescriptionHeight, m_OptionUnselectedBackgroundColor.r, m_OptionUnselectedBackgroundColor.g, m_OptionUnselectedBackgroundColor.b, m_OptionUnselectedBackgroundColor.a, 0);
+			GRAPHICS::DRAW_RECT(m_PosX + description_x, m_PosY + description_y + (m_DescriptionHeight / 2.f) - 0.029, m_Width, 0.003f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
+		}
+		if (connect_description) {
+			HUD::SET_TEXT_WRAP(m_PosX, m_PosX + m_Width / 2);
+		}
+		else {
+			HUD::SET_TEXT_WRAP(m_PosX + description_x2, m_PosX + description_x2 + m_Width / 2);
+		}
+		if (connect_description) {
+			DrawLeftText(
+				description,
+				m_PosX - (m_Width / m_DescriptionPadding),
+				m_DrawBaseY + (m_DescriptionHeight / 2.f) - (GetTextHeight(m_DescriptionFont, m_DescriptionTextSize) / 1.5f) - 0.015,
+				m_DescriptionTextSize,
+				m_DescriptionFont,
+				m_DescriptionTextColor,
+				false, false, false);
+		}
+		else {
+			DrawLeftText(
+				description,
+				m_PosX + description_x2 - (m_Width / m_DescriptionPadding),
+				m_PosY + description_y2 + (m_DescriptionHeight / 2.f) - (GetTextHeight(m_DescriptionFont, m_DescriptionTextSize) / 1.5f) - 0.015,
+				m_DescriptionTextSize,
+				m_DescriptionFont,
+				m_DescriptionTextColor,
+				false, false, false);
+		}
+		
+		if (connect_description) {
+			m_DrawBaseY += m_DescriptionHeight;
+		}
 	}
 
 	void UIManager::DrawRect(float x, float y, float width, float height, Color color)

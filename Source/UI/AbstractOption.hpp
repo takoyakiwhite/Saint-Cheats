@@ -21,6 +21,7 @@ namespace Saint::UserInterface
 		Choose = (1 << 6),
 		Keyboard = (1 << 7),
 		PlayerSub = (1 << 8),
+		ColorSub = (1 << 9),
 	};
 
 	class AbstractOption
@@ -32,6 +33,7 @@ namespace Saint::UserInterface
 		virtual const char* GetRightText() = 0;
 		virtual const char* GetCenteredText() = 0;
 		virtual const char* GetDescription() = 0;
+		virtual Color GetColor() = 0;
 		virtual void HandleAction(OptionAction action) = 0;
 		virtual bool GetFlag(OptionFlag flag) = 0;
 	protected:

@@ -6,6 +6,14 @@
 
 namespace Saint::UserInterface
 {
+	class tooltipHandler {
+	public:
+		tooltipHandler(const char* m_name) {
+			name = m_name;
+		}
+	public:
+		const char* name;
+	};
 	enum class Font : std::int32_t
 	{
 		ChaletLondon = 0,
@@ -241,6 +249,7 @@ namespace Saint::UserInterface
 		Color m_OptionUnselectedTextColor{ 255,255,255, 255 };
 		Color m_OptionSelectedBackgroundColor{ 255, 255, 255, 255 };
 		Color m_OptionUnselectedBackgroundColor{ 0, 0, 0, 160 };
+		std::size_t option_font_it = 0;
 
 		//submenubar
 		bool submenu_enabled = true;
@@ -347,7 +356,19 @@ namespace Saint::UserInterface
 		Vector2 GetMousePos();
 		void SetMousePos(int x, int y);
 
+		const char* to_add = "";
+
+		bool tooltips_enabled = true;
+
+		bool connect_description = true;
+
+		float description_x = 0.0f;
+		float description_y = 0.0f;
+		float description_x2 = 0.0f;
+		float description_y2 = 0.0f;
+
 		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
+
 	private:
 		bool m_OpenKeyPressed = false;
 		bool m_OpenKeyPressed2 = false;

@@ -24,6 +24,7 @@
     <ClInclude Include="Chat Commands.h" />
     <ClInclude Include="Classes.h" />
     <ClInclude Include="ClassHelper.h" />
+    <ClInclude Include="ColorSubmenu.hpp" />
     <ClInclude Include="Common.hpp" />
     <ClInclude Include="CrossMap.hpp" />
     <ClInclude Include="CustomText.hpp" />

@@ -48,6 +48,13 @@ namespace Saint::UserInterface
 			return m_SelectedOption;
 		}
 
+		Color GetColor() override 
+		{
+			return m_color;
+		}
+
+
+
 		void SetSelectedOption(std::size_t n) override
 		{
 			m_SelectedOption = n;
@@ -111,5 +118,7 @@ namespace Saint::UserInterface
 
 		std::vector<std::unique_ptr<AbstractOption>> m_Options;
 		std::size_t m_SelectedOption{};
+
+		Color m_color{};
 	};
 }

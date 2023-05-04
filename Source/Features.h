@@ -28,7 +28,7 @@ namespace Saint {
 	inline std::string replaceTextBuffer2 = "";
 	inline bool replaced = false;
 	inline bool replaced2 = false;
-	
+
 	inline bool raycast_with_cam(Cam cam, NativeVector3& raycastHitCoords) {
 		bool raycastHit;
 		NativeVector3 surfaceNormal;
@@ -74,6 +74,7 @@ namespace Saint {
 			return CAM::GET_GAMEPLAY_CAM_ROT(0);
 		}
 	};
+	inline std::size_t acrobatic_int4 = 0;
 	class Weapon {
 	public:
 		const char* Name[106]
@@ -189,23 +190,23 @@ namespace Saint {
 		}
 		bool KeyPress(std::uint16_t keycode, bool only_once = false) {
 			if (GetForegroundWindow() == g_GameVariables->m_GameWindow)
-				{
-					if (only_once) {
-						if (GetAsyncKeyState(keycode) & 1)
-						{
-							return true;
-						}
-					}
-					else {
-						if (GetAsyncKeyState(keycode) & 0x8000)
-						{
-							return true;
-						}
+			{
+				if (only_once) {
+					if (GetAsyncKeyState(keycode) & 1)
+					{
+						return true;
 					}
 				}
+				else {
+					if (GetAsyncKeyState(keycode) & 0x8000)
+					{
+						return true;
+					}
+				}
+			}
 
-				return false;
-			
+			return false;
+
 		}
 		const char* VehicleName(const char* model) {
 			return HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(HashKey(model)));
@@ -249,12 +250,16 @@ namespace Saint {
 		}
 
 	};
-	
+
 	inline game* Game;
 	class m_all_weapons {
 	public:
-		
 
+		const char* explosion[84] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare",
+			"Dust", "Extinguisher", "Unknown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
+			"Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
+			"Bomb (Wide)", "Explosive Ammo (Shotgun)", "Oppressor MK II", "Kinetic Mortar", "Kinetic Vehicle Mine", "EMP Vehicle Mine", "Spike Vehicle Mine", "Slick Vehicle Mine", "Tar Vehicle Mine", "Script Drone", "Up-n-Atomizer", "Burried Mine", "Script Missle", "RC Tank Rocket",
+			"Bomb (Water)", "Bomb (Water 2)", "Steam 2", "Steam 3", "Flash Grenade", "Stun Grenade", "Stun Grenade 2", "Script Missle (Large)", "Submarine (Big)", "EMP Launcher" };
 		const char* name[106]
 		{ "Antique Cavalry Dagger", "Baseball Bat", "Broken Bottle", "Crowbar", "Unarmed", "Flashlight", "Golf Club", "Hammer", "Hatchet", "Brass Knucles", "Knife", "Machete", "Switchblade", "Nightstick", "Pipe Wrench",
 			"Battle Axe", "Pool Cue", "Stone Hatchet", "Pistol", "Pistol Mk II", "Combat Pistol", "AP Pistol", "Stun Gun", "Pistol .50", "SNS Pistol", "SNS Pistol Mk II", "Heavy Pistol", "Vintage Pistol", "Flare Gun", "Marksman Pistol",
@@ -313,11 +318,11 @@ namespace Saint {
 
 		std::size_t FlyInt = 0;
 		void onDisable() {
-			
+
 			if (Game->InVehicle()) {
 				if (DisableCollision) {
 					ENTITY::SET_ENTITY_COLLISION(Game->Vehicle(), true, true);
-					
+
 				}
 			}
 		}
@@ -484,7 +489,7 @@ namespace Saint {
 		float damagemultiplier = 1.0f;
 
 		std::vector<BodygaurdHandler> spawned = {
-			
+
 		};
 
 		Ped selected_gaurd;
@@ -537,9 +542,14 @@ namespace Saint {
 	public:
 		bool enabled = false;
 		float speed = 5.0f;
+		bool torque = false;
+		float value = 2.0f;
 		void init() {
+			if (torque) {
+				VEHICLE::SET_VEHICLE_CHEAT_POWER_INCREASE(Game->Vehicle(), value);
+			}
 			if (enabled) {
-				
+
 				if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(Game->Vehicle(), -1, 1) == Game->Self())
 				{
 
@@ -571,7 +581,7 @@ namespace Saint {
 				{
 					if (Boost_Int == 0)
 					{
-						
+
 						if (onlyOnGround && !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(Game->Vehicle())) {
 
 						}
@@ -604,7 +614,7 @@ namespace Saint {
 	public:
 		bool enabled = false;
 		bool add_force = false;
-		const char* Jump_Type[3] = { "Normal", "Beast", "Roll"};
+		const char* Jump_Type[3] = { "Normal", "Beast", "Roll" };
 		std::size_t Jump_Int = 0;
 		int speed = 25;
 		const char* flip_type[2] = { "Front", "Back" };
@@ -955,6 +965,7 @@ namespace Saint {
 		bool no_grav_veh = false;
 		bool clean_veh = false;
 		float forklight_height = 0.0f;
+		float speed_max = 50.0f;
 		bool can_be_used_by_peds = false;
 		bool ragdoll_on_q = false;
 		bool inf_c = false;
@@ -966,7 +977,16 @@ namespace Saint {
 		bool disable_wanted_music = false;
 		bool take_less_damage = false;
 		bool can_wheelie = false;
+		bool blackout = false;
+		float time_scale = 0.5f;
+		bool time_scale_edit = false;
 		void init() {
+			if (time_scale_edit) {
+				MISC::SET_TIME_SCALE(time_scale);
+			}
+			if (blackout) {
+				GRAPHICS::SET_ARTIFICIAL_LIGHTS_STATE(true);
+			}
 			if (can_wheelie) {
 				if (VEHICLE::IS_THIS_MODEL_A_CAR(Game->GetHash(Game->Vehicle()))) {
 					for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
@@ -990,9 +1010,9 @@ namespace Saint {
 			}
 			if (crouched) {
 				g_CallbackScript->AddCallback<WalkStyleCallback>("move_ped_crouched", [=] {
-							PED::SET_PED_MOVEMENT_CLIPSET(Game->Self(), "move_ped_crouched", 2.0f);
+					PED::SET_PED_MOVEMENT_CLIPSET(Game->Self(), "move_ped_crouched", 2.0f);
 					});
-				
+
 			}
 			if (force_field) {
 				Player p = Game->Self();
@@ -1172,7 +1192,7 @@ namespace Saint {
 				//GRAPHICS::ANIMPOSTFX_STOP("DrugsMichaelAliensFight");
 			}
 			if (infiniter) {
-				
+
 				if (VEHICLE::GET_HAS_ROCKET_BOOST(Game->Vehicle()))
 				{
 					//VEHICLE::SET_SCRIPT_ROCKET_BOOST_RECHARGE_TIME(veh, 0);
@@ -1190,7 +1210,7 @@ namespace Saint {
 				VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(vehicle, 0);
 			}
 			if (remove_def) {
-				
+
 				VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(Game->Vehicle());
 
 			}
@@ -1442,11 +1462,6 @@ namespace Saint {
 		float camera_shake = 0.0f;
 		int blamed_person = 0;
 		bool blame = false;
-		const char* explode_type[81] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare",
-			"Unknown", "Extinguisher", "Unknown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
-			"Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
-			"Bomb (Wide)", "Explosive Ammo (Shotgun)", "Oppressor MK II", "Kinetic Mortar", "Kinetic Vehicle Mine", "EMP Vehicle Mine", "Spike Vehicle Mine", "Slick Vehicle Mine", "Tar Vehicle Mine", "Script Drone", "Up-n-Atomizer", "Burried Mine", "Script Missle", "RC Tank Rocket",
-			"Bomb (Water)", "Bomb (Water 2)", "Flash Grenade", "Stun Grenade", "Script Missle (Large)", "Submarine (Big)", "EMP Launcher" };
 		std::size_t explode_int = 0;
 		void add(Ped ped, NativeVector3 vec, int explosionType, float damageScale, BOOL isAudible, BOOL isInvisible, float cameraShake) {
 			*(unsigned short*)g_GameFunctions->m_owned_explosion = 0xE990;
@@ -1535,7 +1550,7 @@ namespace Saint {
 		float multiplier = 1.0f;
 		void init() {
 			if (enabled) {
-				
+
 				VEHICLE::SET_VEHICLE_CHEAT_POWER_INCREASE(Game->Vehicle(), 0.0 - multiplier);
 			}
 
@@ -2179,6 +2194,24 @@ namespace Saint {
 		buffer = buffer;
 		g_CustomText->RemoveText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"));
 	}
+	inline void showKeyboard2(const char* title, const char* defaultText, int length, const char** buffer, std::function<void()> action) {
+		g_CustomText->AddText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"), title);
+		g_Render->controlsEnabled = false;
+		MISC::DISPLAY_ONSCREEN_KEYBOARD(0, "FMMC_KEY_TIP8", "", defaultText, "", "", "", length);
+		g_CallbackScript->AddCallback<KeyboardCallBack>(title, length, [=] {
+			if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT()) {
+				*buffer = "";
+			}
+			else {
+				*buffer = MISC::GET_ONSCREEN_KEYBOARD_RESULT();
+			}
+
+			std::invoke(std::move(action));
+			g_Render->controlsEnabled = true;
+			});
+		buffer = buffer;
+		g_CustomText->RemoveText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"));
+	}
 	class Speedo {
 	public:
 		bool enabled = false;
@@ -2249,13 +2282,13 @@ namespace Saint {
 
 				if (Game->Shooting())
 				{
-						Hash airStrike = Game->HashKey("WEAPON_AIRSTRIKE_ROCKET");
-						if (!WEAPON::HAS_WEAPON_ASSET_LOADED(airStrike))
-						{
-							WEAPON::REQUEST_WEAPON_ASSET(airStrike, 31, 0);
-						}
-						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(Game->HitCoords().x, Game->HitCoords().y, height, Game->HitCoords().x, Game->HitCoords().y, 0, damage, 1, airStrike, Game->Self(), 1, 0, -1.0);
-					
+					Hash airStrike = Game->HashKey("WEAPON_AIRSTRIKE_ROCKET");
+					if (!WEAPON::HAS_WEAPON_ASSET_LOADED(airStrike))
+					{
+						WEAPON::REQUEST_WEAPON_ASSET(airStrike, 31, 0);
+					}
+					MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(Game->HitCoords().x, Game->HitCoords().y, height, Game->HitCoords().x, Game->HitCoords().y, 0, damage, 1, airStrike, Game->Self(), 1, 0, -1.0);
+
 				}
 			}
 		}
@@ -2491,12 +2524,7 @@ namespace Saint {
 		bool invisible = false;
 		float cameraShake = 0.0f;
 		float damage_scale = 100.0f;
-		const char* data[81] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare",
-			"Unknown", "Extinguisher", "Unknown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
-			"Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
-			"Bomb (Wide)", "Explosive Ammo (Shotgun)", "Oppressor MK II", "Kinetic Mortar", "Kinetic Vehicle Mine", "EMP Vehicle Mine", "Spike Vehicle Mine", "Slick Vehicle Mine", "Tar Vehicle Mine", "Script Drone", "Up-n-Atomizer", "Burried Mine", "Script Missle", "RC Tank Rocket",
-			"Bomb (Water)", "Bomb (Water 2)", "Flash Grenade", "Stun Grenade", "Script Missle (Large)", "Submarine (Big)", "EMP Launcher" };
-		std::size_t data_i = 0;
+		std::size_t data_i;
 		void add(Ped ped, NativeVector3 vec, int explosionType, float damageScale, BOOL isAudible, BOOL isInvisible, float cameraShake) {
 			*(unsigned short*)g_GameFunctions->m_owned_explosion = 0xE990;
 			FIRE::ADD_OWNED_EXPLOSION(ped, vec.x, vec.y, vec.z, explosionType, damageScale, isAudible, isInvisible, cameraShake);
@@ -2950,87 +2978,30 @@ namespace Saint {
 			for (int i = 0; i < 32; i++)
 			{
 				NativeVector3 target_coords = PED::GET_PED_BONE_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), BoneHashes[data], 0, 0, 0);
-					NativeVector3 ped_coords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), 1);
-					NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), TRUE);
+				NativeVector3 ped_coords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i), 1);
+				NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), TRUE);
 
-					Ped PlayerPed = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i);
-					NativeVector3 PedCoords = Game->SCoords();
-					NativeVector3 Coords = ENTITY::GET_ENTITY_COORDS(PlayerPed, false);
-					float distance = GetDistanceFloat(PedCoords, Coords);
+				Ped PlayerPed = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i);
+				NativeVector3 PedCoords = Game->SCoords();
+				NativeVector3 Coords = ENTITY::GET_ENTITY_COORDS(PlayerPed, false);
+				float distance = GetDistanceFloat(PedCoords, Coords);
 
-					if (PLAYER::IS_PLAYER_FREE_AIMING(Game->Id()))
-					{
-						HUD::DISPLAY_SNIPER_SCOPE_THIS_FRAME();
-						if (auto ped = Game->PlayerIndex(i) && ENTITY::DOES_ENTITY_EXIST(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i)) && ent(i))
-						{
-							if (i == Game->Id())
-								continue;
-
-
-							const int numElements = 10;
-							const int arrSize = numElements * 2 + 2;
-							int veh[arrSize];
-							veh[0] = numElements;
-							int count = PED::GET_PED_NEARBY_PEDS(Game->Self(), veh, -1);
-							Ped closest = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i);
-							if (veh != NULL) {
-								for (int i = 0; i < count; i++)
-								{
-									int offsettedID = i * 2 + 2;
-									if (veh[offsettedID] != NULL && ENTITY::DOES_ENTITY_EXIST(veh[offsettedID]))
-									{
-										for (int j = -1; j <= 2; ++j)
-										{
-											Any ped = veh[offsettedID];
-
-											if (closest == 0) closest = ped;
-											else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
-											Hash weaponhash;
-											WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
-											float screenX, screenY;
-											BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
-											if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
-											{
-												if (distance_check) {
-													if (distance < distance_to_check) {
-														CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
-													}
-												}
-												if (!distance_check) {
-													CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
-												}
-												if (Game->Shooting() && through_walls) {
-													Hash weaponhash;
-													WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
-													NativeVector3 destination = PED::GET_PED_BONE_COORDS(closest, SKEL_ROOT, 0.0f, 0.0f, 0.0f);
-													NativeVector3 origin = PED::GET_PED_BONE_COORDS(closest, SKEL_R_Hand, 0.0f, 0.0f, 0.2f);
-													MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(origin.x, origin.y, origin.z, destination.x, destination.y, destination.z, WEAPON::GET_WEAPON_DAMAGE(weaponhash, 0), 0, weaponhash, Game->Self(), false, false, 100.f);
-												}
-											}
-										}
-									}
-								}
-							}
-
-
-						}
-					
-				}
-			}
-			if (!only_players) {
 				if (PLAYER::IS_PLAYER_FREE_AIMING(Game->Id()))
 				{
-					const int numElements = 10;
-					const int arrSize = numElements * 2 + 2;
-					int veh[arrSize];
-					veh[0] = numElements;
-					int count = PED::GET_PED_NEARBY_PEDS(Game->Self(), veh, -1);
-					Ped closest = 0;
-					NativeVector3 target_coords = PED::GET_PED_BONE_COORDS(closest, SKEL_Head, 0, 0, 0);
-					NativeVector3 ped_coords = ENTITY::GET_ENTITY_COORDS(closest, 1);
-					NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), TRUE);
-					
-					if (veh != NULL) {
+					HUD::DISPLAY_SNIPER_SCOPE_THIS_FRAME();
+					if (auto ped = Game->PlayerIndex(i) && ENTITY::DOES_ENTITY_EXIST(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i)) && ent(i))
+					{
+						if (i == Game->Id())
+							continue;
+
+
+						const int numElements = 10;
+						const int arrSize = numElements * 2 + 2;
+						int veh[arrSize];
+						veh[0] = numElements;
+						int count = PED::GET_PED_NEARBY_PEDS(Game->Self(), veh, -1);
+						Ped closest = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i);
+						if (veh != NULL) {
 							for (int i = 0; i < count; i++)
 							{
 								int offsettedID = i * 2 + 2;
@@ -3041,7 +3012,7 @@ namespace Saint {
 										Any ped = veh[offsettedID];
 
 										if (closest == 0) closest = ped;
-										else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;
+										else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;//                                                                                                                            
 										Hash weaponhash;
 										WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
 										float screenX, screenY;
@@ -3068,7 +3039,64 @@ namespace Saint {
 								}
 							}
 						}
-					
+
+
+					}
+
+				}
+			}
+			if (!only_players) {
+				if (PLAYER::IS_PLAYER_FREE_AIMING(Game->Id()))
+				{
+					const int numElements = 10;
+					const int arrSize = numElements * 2 + 2;
+					int veh[arrSize];
+					veh[0] = numElements;
+					int count = PED::GET_PED_NEARBY_PEDS(Game->Self(), veh, -1);
+					Ped closest = 0;
+					NativeVector3 target_coords = PED::GET_PED_BONE_COORDS(closest, SKEL_Head, 0, 0, 0);
+					NativeVector3 ped_coords = ENTITY::GET_ENTITY_COORDS(closest, 1);
+					NativeVector3 self_coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), TRUE);
+
+					if (veh != NULL) {
+						for (int i = 0; i < count; i++)
+						{
+							int offsettedID = i * 2 + 2;
+							if (veh[offsettedID] != NULL && ENTITY::DOES_ENTITY_EXIST(veh[offsettedID]))
+							{
+								for (int j = -1; j <= 2; ++j)
+								{
+									Any ped = veh[offsettedID];
+
+									if (closest == 0) closest = ped;
+									else if (MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ped_coords.x, ped_coords.y, ped_coords.z, TRUE) < MISC::GET_DISTANCE_BETWEEN_COORDS(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, TRUE).x, ENTITY::GET_ENTITY_COORDS(closest, TRUE).y, ENTITY::GET_ENTITY_COORDS(closest, TRUE).z, TRUE)) closest = ped;
+									Hash weaponhash;
+									WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
+									float screenX, screenY;
+									BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
+									if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
+									{
+										if (distance_check) {
+											if (distance < distance_to_check) {
+												CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
+											}
+										}
+										if (!distance_check) {
+											CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
+										}
+										if (Game->Shooting() && through_walls) {
+											Hash weaponhash;
+											WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
+											NativeVector3 destination = PED::GET_PED_BONE_COORDS(closest, SKEL_ROOT, 0.0f, 0.0f, 0.0f);
+											NativeVector3 origin = PED::GET_PED_BONE_COORDS(closest, SKEL_R_Hand, 0.0f, 0.0f, 0.2f);
+											MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(origin.x, origin.y, origin.z, destination.x, destination.y, destination.z, WEAPON::GET_WEAPON_DAMAGE(weaponhash, 0), 0, weaponhash, Game->Self(), false, false, 100.f);
+										}
+									}
+								}
+							}
+						}
+					}
+
 
 				}
 			}
@@ -3500,7 +3528,7 @@ namespace Saint {
 						r++;
 						b--;
 					}
-					
+
 
 					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(Game->Vehicle(), r, g, b);
 					if (rainbow.change_secondary) {
@@ -3513,7 +3541,7 @@ namespace Saint {
 						VEHICLE::TOGGLE_VEHICLE_MOD(Game->Vehicle(), 20, true);
 						VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(Game->Vehicle(), r, g, b);
 					}
-					
+
 					timer = GetTickCount64();
 				}
 			}
@@ -3931,7 +3959,7 @@ namespace Saint {
 			}
 		}
 		void m_add_ramp() {
-			
+
 
 			Hash ramp = Game->HashKey(m_ramp_data[m_ramp_type_data]);
 
@@ -4342,7 +4370,7 @@ namespace Saint {
 
 			std::string MenuFolderPath = "C:\\Saint\\Vehicles\\";
 			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
-			
+
 			int r, g, b;
 			VEHICLE::GET_VEHICLE_CUSTOM_SECONDARY_COLOUR(Game->Vehicle(), &r, &g, &b);
 			int r2, g2, b2;
@@ -4678,7 +4706,7 @@ namespace Saint {
 	class CRecovery {
 	public:
 		CLevel m_level;
-		const char* level_type[2] = { "Character", "Crew"};
+		const char* level_type[2] = { "Character", "Crew" };
 		std::size_t pos = 0;
 	};
 	inline CRecovery m_recovery;
@@ -4882,7 +4910,7 @@ namespace Saint {
 						velocity.z = Game->SCoords().z + (1000.0f * sin(pitch)) - other.z;
 						ENTITY::SET_ENTITY_ROTATION(entityGunVehicle, rot.x, rot.y, rot.z, 2, false);
 						ENTITY::SET_ENTITY_VELOCITY2(entityGunVehicle, { velocity.x * (float)3.0, velocity.y * (float)3.0, velocity.z * (float)3.0 });
-					});
+						});
 
 				}
 			}
@@ -5335,9 +5363,9 @@ namespace Saint {
 	inline ShotGunMode m_shotgun;
 	class HandTrail {
 	public:
-		
 
-		const char* type[2] = { "Normal", "Sphere"};
+
+		const char* type[2] = { "Normal", "Sphere" };
 		std::size_t size = 0;
 		bool enabled = false;
 		bool rainbow = false;
@@ -5364,7 +5392,7 @@ namespace Saint {
 				float g2 = g / 255.f;
 				float b2 = b / 255.f;
 				if (size == 0) {
-					
+
 					Game->ParticleOnBone("scr_powerplay", "sp_powerplay_beast_appear_trails", SKEL_L_Hand, 0.2f, true, r2, g2, b2);
 					Game->ParticleOnBone("scr_powerplay", "sp_powerplay_beast_appear_trails", SKEL_R_Hand, 0.2f, true, r2, g2, b2);
 				}
@@ -5501,6 +5529,7 @@ namespace Saint {
 	public:
 
 	};
+	inline float t_speed = 2.0f;
 	class WalkStyles {
 	public:
 
@@ -5598,15 +5627,16 @@ namespace Saint {
 				 "MOVE_F@TOUGH_GUY@"
 		};
 		std::size_t size;
+		
 		void change(const char* name) {
 
 			g_CallbackScript->AddCallback<WalkStyleCallback>(name, [=] {
-				PED::SET_PED_MOVEMENT_CLIPSET(Game->Self(), name, 2.0f);
+				PED::SET_PED_MOVEMENT_CLIPSET(Game->Self(), name, t_speed);
 				});
 		}
 
 	};
-	inline WalkStyles* walk_style;
+	inline WalkStyles walk_style;
 	class GetModelInfo {
 	public:
 		bool width = false;
@@ -5802,7 +5832,7 @@ namespace Saint {
 		void init() {
 			if (enabled) {
 				ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), true);
-				
+
 
 				if (!CAM::DOES_CAM_EXIST(creator_cam)) {
 					creator_cam = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", true);
@@ -6520,12 +6550,12 @@ namespace Saint {
 		Cloud cloud;
 		void change_effect() {
 			if (east.changed) {
-				
+
 				uintptr_t east_red = mem->Find(0x26CFAB0);
 				uintptr_t east_green = mem->Find(0x26CFAB4);
-				
+
 				uintptr_t east_blue = mem->Find(0x26CFAB8);
-				
+
 
 
 				*(float*)east_red = (east.r / 255.f) * east.brightness;
@@ -6901,21 +6931,21 @@ namespace Saint {
 					startDistance += 0.25;
 					endDistance += 1000.0;
 					std::int32_t hash = Game->Weapon->Hash[weapon_pos];
-						WEAPON::REQUEST_WEAPON_ASSET(hash, 31, 0);
-						g_FiberPool.queue([=] {
-							while (!WEAPON::HAS_WEAPON_ASSET_LOADED(hash))
-								fbr::cur()->wait();
-							});
+					WEAPON::REQUEST_WEAPON_ASSET(hash, 31, 0);
+					g_FiberPool.queue([=] {
+						while (!WEAPON::HAS_WEAPON_ASSET_LOADED(hash))
+							fbr::cur()->wait();
+						});
 
-						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(
-							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), startDistance)).x,
-							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), startDistance)).y,
-							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), startDistance)).z,
-							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).x,
-							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).y,
-							add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).z,
-							250, 1, hash, Game->Self(), 1, 0, -1.0);
-					
+					MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(
+						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), startDistance)).x,
+						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), startDistance)).y,
+						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), startDistance)).z,
+						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).x,
+						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).y,
+						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).z,
+						250, 1, hash, Game->Self(), 1, 0, -1.0);
+
 				}
 			}
 		}
@@ -6932,7 +6962,7 @@ namespace Saint {
 		float refill_time;
 		void init() {
 			if (always_active) {
-				
+
 				VEHICLE::SET_ROCKET_BOOST_ACTIVE(Game->Vehicle(), true);
 			}
 		}
@@ -6951,7 +6981,7 @@ namespace Saint {
 		float eraidus;
 		float falloff;
 		void init() {
-			
+
 			if (magnet) {
 				VEHICLE::SET_CARGOBOB_PICKUP_MAGNET_ACTIVE(Game->Vehicle(), true);
 			}
@@ -6978,7 +7008,7 @@ namespace Saint {
 		}
 		bool vehicles;
 		bool peds2;
-		
+
 		int preview = 28;
 		NativeVector3 c;
 		float force = 1.f;
@@ -7182,7 +7212,7 @@ namespace Saint {
 		bool front;
 		bool back;
 	};
-	inline const char* TypeName2[5] = { "Wheel", "Pearlescent", "Primary", "Secondary", "All"};
+	inline const char* TypeName2[5] = { "Wheel", "Pearlescent", "Primary", "Secondary", "All" };
 	inline std::size_t pos2 = 0;
 	inline const char* get_by[2] = { "List", "Index" };
 	inline std::size_t pos3 = 0;
@@ -7194,9 +7224,9 @@ namespace Saint {
 		bool turbo = false;
 		const char* TypeName[13] = { "Sport", "Muscle", "Lowrider", "SUV", "Off-Road", "Tuner", "Bike", "Hiend", "Benny's Original", "Benny's Bespoke", "Open Wheel", "Street", "Track" };
 		std::size_t pos = 0;
-		
+
 		int wheel_type = 0;
-		
+
 		void set_wheel_type(int type) {
 			VEHICLE::SET_VEHICLE_WHEEL_TYPE(Game->Vehicle(), type);
 		}
@@ -7335,7 +7365,7 @@ namespace Saint {
 							PED::SET_PED_TO_RAGDOLL_WITH_FALL(Game->Self(), 1500, 2000, 1, -v.x, -v.y, -v.z, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
 						}
 					}
-				});
+					});
 			}
 		}
 	};
@@ -7353,59 +7383,59 @@ namespace Saint {
 	class RadioBools {
 	public:
 		bool RADIO_11_TALK_02; // Blaine County Radio
-			bool RADIO_12_REGGAE; // The Blue Ark
-			bool RADIO_13_JAZZ; // Worldwide FM
-			bool RADIO_14_DANCE_02; // FlyLo FM
-			bool RADIO_15_MOTOWN; // The Lowdown 9.11
-			bool RADIO_20_THELAB; // The Lab
-			bool RADIO_16_SILVERLAKE; // Radio Mirror Park
-			bool RADIO_17_FUNK; // Space 103.2
-			bool RADIO_18_90S_ROCK; // Vinewood Boulevard Radio
-			bool RADIO_21_DLC_XM17; // Blonded Los Santos 97.8 FM
-			bool RADIO_22_DLC_BATTLE_MIX1_RADIO; // Los Santos Underground Radio
-			bool RADIO_23_DLC_XM19_RADIO; // iFruit Radio
-			bool RADIO_19_USER; // Self Radio
-			bool RADIO_01_CLASS_ROCK; // Los Santos Rock Radio
-			bool RADIO_02_POP; // Non-Stop-Pop FM
-			bool RADIO_03_HIPHOP_NEW; // Radio Los Santos
-			bool RADIO_04_PUNK; // Channel X
-			bool RADIO_05_TALK_01; // West Coast Talk Radio
-			bool RADIO_06_COUNTRY; // Rebel Radio
-			bool RADIO_07_DANCE_01; // Soulwax FM
-			bool RADIO_08_MEXICAN; // East Los FM
-			bool RADIO_09_HIPHOP_OLD; // West Coast Classics
-			bool RADIO_36_AUDIOPLAYER; // Media Player
-			bool RADIO_35_DLC_HEI4_MLR; // The Music Locker
-			bool RADIO_34_DLC_HEI4_KULT; // Kult FM
-			bool RADIO_27_DLC_PRHEI4; // Still Slipping Los Santos
-			bool HIDDEN_RADIO_01_CLASS_ROCK;
-			bool HIDDEN_RADIO_AMBIENT_TV_BRIGHT;
-			bool HIDDEN_RADIO_AMBIENT_TV;
-			bool HIDDEN_RADIO_ADVERTS;
-			bool HIDDEN_RADIO_02_POP;
-			bool HIDDEN_RADIO_03_HIPHOP_NEW;
-			bool HIDDEN_RADIO_04_PUNK;
-			bool HIDDEN_RADIO_06_COUNTRY;
-			bool HIDDEN_RADIO_07_DANCE_01;
-			bool HIDDEN_RADIO_09_HIPHOP_OLD;
-			bool HIDDEN_RADIO_12_REGGAE;
-			bool HIDDEN_RADIO_15_MOTOWN;
-			bool HIDDEN_RADIO_16_SILVERLAKE;
-			bool HIDDEN_RADIO_STRIP_CLUB;
-			bool RADIO_22_DLC_BATTLE_MIX1_CLUB;
-			bool DLC_BATTLE_MIX1_CLUB_PRIV;
-			bool HIDDEN_RADIO_BIKER_CLASSIC_ROCK;
-			bool DLC_BATTLE_MIX2_CLUB_PRIV;
-			bool RADIO_23_DLC_BATTLE_MIX2_CLUB;
-			bool HIDDEN_RADIO_BIKER_MODERN_ROCK;
-			bool RADIO_25_DLC_BATTLE_MIX4_CLUB;
-			bool RADIO_26_DLC_BATTLE_CLUB_WARMUP;
-			bool DLC_BATTLE_MIX4_CLUB_PRIV;
-			bool HIDDEN_RADIO_BIKER_PUNK;
-			bool RADIO_24_DLC_BATTLE_MIX3_CLUB;
-			bool DLC_BATTLE_MIX3_CLUB_PRIV;
-			bool HIDDEN_RADIO_BIKER_HIP_HOP;
-			bool OFF;
+		bool RADIO_12_REGGAE; // The Blue Ark
+		bool RADIO_13_JAZZ; // Worldwide FM
+		bool RADIO_14_DANCE_02; // FlyLo FM
+		bool RADIO_15_MOTOWN; // The Lowdown 9.11
+		bool RADIO_20_THELAB; // The Lab
+		bool RADIO_16_SILVERLAKE; // Radio Mirror Park
+		bool RADIO_17_FUNK; // Space 103.2
+		bool RADIO_18_90S_ROCK; // Vinewood Boulevard Radio
+		bool RADIO_21_DLC_XM17; // Blonded Los Santos 97.8 FM
+		bool RADIO_22_DLC_BATTLE_MIX1_RADIO; // Los Santos Underground Radio
+		bool RADIO_23_DLC_XM19_RADIO; // iFruit Radio
+		bool RADIO_19_USER; // Self Radio
+		bool RADIO_01_CLASS_ROCK; // Los Santos Rock Radio
+		bool RADIO_02_POP; // Non-Stop-Pop FM
+		bool RADIO_03_HIPHOP_NEW; // Radio Los Santos
+		bool RADIO_04_PUNK; // Channel X
+		bool RADIO_05_TALK_01; // West Coast Talk Radio
+		bool RADIO_06_COUNTRY; // Rebel Radio
+		bool RADIO_07_DANCE_01; // Soulwax FM
+		bool RADIO_08_MEXICAN; // East Los FM
+		bool RADIO_09_HIPHOP_OLD; // West Coast Classics
+		bool RADIO_36_AUDIOPLAYER; // Media Player
+		bool RADIO_35_DLC_HEI4_MLR; // The Music Locker
+		bool RADIO_34_DLC_HEI4_KULT; // Kult FM
+		bool RADIO_27_DLC_PRHEI4; // Still Slipping Los Santos
+		bool HIDDEN_RADIO_01_CLASS_ROCK;
+		bool HIDDEN_RADIO_AMBIENT_TV_BRIGHT;
+		bool HIDDEN_RADIO_AMBIENT_TV;
+		bool HIDDEN_RADIO_ADVERTS;
+		bool HIDDEN_RADIO_02_POP;
+		bool HIDDEN_RADIO_03_HIPHOP_NEW;
+		bool HIDDEN_RADIO_04_PUNK;
+		bool HIDDEN_RADIO_06_COUNTRY;
+		bool HIDDEN_RADIO_07_DANCE_01;
+		bool HIDDEN_RADIO_09_HIPHOP_OLD;
+		bool HIDDEN_RADIO_12_REGGAE;
+		bool HIDDEN_RADIO_15_MOTOWN;
+		bool HIDDEN_RADIO_16_SILVERLAKE;
+		bool HIDDEN_RADIO_STRIP_CLUB;
+		bool RADIO_22_DLC_BATTLE_MIX1_CLUB;
+		bool DLC_BATTLE_MIX1_CLUB_PRIV;
+		bool HIDDEN_RADIO_BIKER_CLASSIC_ROCK;
+		bool DLC_BATTLE_MIX2_CLUB_PRIV;
+		bool RADIO_23_DLC_BATTLE_MIX2_CLUB;
+		bool HIDDEN_RADIO_BIKER_MODERN_ROCK;
+		bool RADIO_25_DLC_BATTLE_MIX4_CLUB;
+		bool RADIO_26_DLC_BATTLE_CLUB_WARMUP;
+		bool DLC_BATTLE_MIX4_CLUB_PRIV;
+		bool HIDDEN_RADIO_BIKER_PUNK;
+		bool RADIO_24_DLC_BATTLE_MIX3_CLUB;
+		bool DLC_BATTLE_MIX3_CLUB_PRIV;
+		bool HIDDEN_RADIO_BIKER_HIP_HOP;
+		bool OFF;
 	};
 	class Radio {
 	public:
@@ -7435,7 +7465,7 @@ namespace Saint {
 			{ "RADIO_36_AUDIOPLAYER", radios.RADIO_36_AUDIOPLAYER},
 			{ "RADIO_35_DLC_HEI4_MLR", radios.RADIO_35_DLC_HEI4_MLR},
 			{ "RADIO_27_DLC_PRHEI4", radios.RADIO_27_DLC_PRHEI4},
-			
+
 		};
 		bool disable = false;
 		bool force_show = false;
@@ -7468,7 +7498,281 @@ namespace Saint {
 	};
 	inline Radio radio;
 	inline std::string modelsearchresults = "";
+	class HudColor {
+	public:
+		std::string search = "";
+		const char* HudIndexNames[171] = {
+		"Pure White",
+		"White",
+		"Black",
+		"Grey",
+		"Light Grey",
+		"Dark Grey",
+		"Red",
+		"Light Red",
+		"Dark Red",
+		"Blue",
+		"Light Blue",
+		"Dark Blue",
+		"Yellow",
+		"Light Yellow",
+		"Dark Yellow",
+		"Orange",
+		"Light Orange",
+		"Dark Orange",
+		"Green",
+		"Light Green",
+		"Dark Green",
+		"Purple",
+		"Light Purple",
+		"Dark Purple",
+		"Pink",
+		"Health",
+		"Armour",
+		"Damage",
+		"Net Player 1",
+		"Net Player 2",
+		"Net Player 3",
+		"Net Player 4",
+		"Net Player 5",
+		"Net Player 6",
+		"Net Player 7",
+		"Net Player 8",
+		"Net Player 9",
+		"Net Player 10",
+		"Net Player 11",
+		"Net Player 12",
+		"Net Player 13",
+		"Net Player 14",
+		"Net Player 15",
+		"Net Player 16",
+		"Net Player 17",
+		"Net Player 18",
+		"Net Player 19",
+		"Net Player 20",
+		"Net Player 21",
+		"Net Player 22",
+		"Net Player 23",
+		"Net Player 24",
+		"Net Player 25",
+		"Net Player 26",
+		"Net Player 27",
+		"Net Player 28",
+		"Net Player 29",
+		"Net Player 30",
+		"Net Player 31",
+		"Net Player 32",
+		"Simple Blimp Default",
+		"Menu Blue",
+		"Menu Light Gray",
+		"Menu Blue Extra Dark",
+		"Menu Yellow",
+		"Menu Dark Yellow",
+		"Menu Green",
+		"Menu Grey",
+		"Menu Dark Gray",
+		"Menu Highlight",
+		"Menu Standard",
+		"Menu Dimmed",
+		"Menu Extra Dimmed",
+		"Menu Brief Title",
+		"Menu Mid Gray MP",
+		"Net Player 1 Dark",
+		"Net Player 2 Dark",
+		"Net Player 3 Dark",
+		"Net Player 4 Dark",
+		"Net Player 5 Dark",
+		"Net Player 6 Dark",
+		"Net Player 7 Dark",
+		"Net Player 8 Dark",
+		"Net Player 9 Dark",
+		"Net Player 10 Dark",
+		"Net Player 11 Dark",
+		"Net Player 12 Dark",
+		"Net Player 13 Dark",
+		"Net Player 14 Dark",
+		"Net Player 15 Dark",
+		"Net Player 16 Dark",
+		"Net Player 17 Dark",
+		"Net Player 18 Dark",
+		"Net Player 19 Dark",
+		"Net Player 20 Dark",
+		"Net Player 21 Dark",
+		"Net Player 22 Dark",
+		"Net Player 23 Dark",
+		"Net Player 24 Dark",
+		"Net Player 25 Dark",
+		"Net Player 26 Dark",
+		"Net Player 27 Dark",
+		"Net Player 28 Dark",
+		"Net Player 29 Dark",
+		"Net Player 30 Dark",
+		"Net Player 31 Dark",
+		"Net Player 32 Dark",
+		"Bronze",
+		"Silver",
+		"Gold",
+		"Platinum",
+		"Gang 1",
+		"Gang 2",
+		"Gang 3",
+		"Gang 4",
+		"Same Crew",
+		"Freemode",
+		"Pause Background",
+		"Friendly",
+		"Enemy",
+		"Location",
+		"Pickup",
+		"Pause Singleplayer",
+		"Freemode Dark",
+		"Inactive Mission",
+		"Damage",
+		"Pinklight",
+		"Highlight",
+		"Script Variable",
+		"Yoga",
+		"Tennis",
+		"Golf",
+		"Shooting Range",
+		"Flight School",
+		"North Blue",
+		"Social Club",
+		"Platform Blue",
+		"Platform Green",
+		"Platform Grey",
+		"Facebook Blue",
+		"Ingame Background",
+		"Darts",
+		"Waypoint",
+		"Michael",
+		"Franklin",
+		"Trevor",
+		"Golf Part 1",
+		"Golf Part 2",
+		"Golf Part 3",
+		"Golf Part 4",
+		"Waypoint Light",
+		"Waypoint Dark",
+		"Panel Light",
+		"Michael Dark",
+		"Franklin Dark",
+		"Trevor Dark",
+		"Objective Route",
+		"Pausemap Tint",
+		"Pause Deselect",
+		"Weapons Purchasable",
+		"Weapons Locked",
+		"End Screen Background",
+		"Chop",
+		"Pausemap Tint Half",
+		"North Blue Official",
+		"Script Variables 2",
+		"H",
+		"H Dark",
+		"T",
+		"T Dark",
+		"H Shard"
+		};
+		int r[171];
+		int g[171];
+		int b[171];
+		int a[171];
+		int r2[171];
+		int g2[171];
+		int b2[171];
+		int a2[171];
+		int selected = 0;
+	};
+	inline HudColor hud_color;
+	class SessionInfo {
+	public:
+		bool enabled = false;
+		int session_host = 0;
+		float x = 0.16;
+		float y = 0.81;
+		float scale = 0.25f;
+		bool outline = false;
+		void init() {
+			if (enabled) {
+				HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT((char*)"STRING");
+				HUD::SET_TEXT_COLOUR(255, 255, 255, 255);
+				HUD::SET_TEXT_FONT(0);
+				HUD::SET_TEXT_SCALE(scale, scale);
+				if (outline) {
+					HUD::SET_TEXT_OUTLINE();
+				}
+				//------------------//
+				const char* host = PLAYER::GET_PLAYER_NAME(NETWORK::NETWORK_GET_HOST_OF_SCRIPT("freemode", -1, 0));
+				const char* shost = PLAYER::GET_PLAYER_NAME(NETWORK::NETWORK_GET_HOST_OF_SCRIPT("fmmc_launcher", -1, 0));
+				int max = 32 - NETWORK::NETWORK_GET_NUM_CONNECTED_PLAYERS();
+				HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(std::format("Connected Players: {}\nSession Host: {}\nScript Host: {}\nFree Slots: {}", NETWORK::NETWORK_GET_NUM_CONNECTED_PLAYERS(), host, shost, max).c_str());
+				HUD::END_TEXT_COMMAND_DISPLAY_TEXT(x, y, 0);
+			}
+		}
+	};
+	inline SessionInfo session_info;
+	class VehicleWeapons {
+	public:
+		int shoot_delay = 0;
+		std::size_t weapon;
+		int delay = 150;
+		bool enabled = false;
+		int damage = 250;
+		bool predict = false;
+		float x_offset = 0.80f;
+		float y_offset = 1.90f;
+		float z_offset = -0.10f;
+		void init() {
+			if (enabled) {
+				Player player = Game->Id();
+				Ped playerPed = Game->Self();
+				NativeVector3 v0, v1;
+				MISC::GET_MODEL_DIMENSIONS(ENTITY::GET_ENTITY_MODEL(Game->Vehicle()), &v0, &v1);
+				NativeVector3 coords0from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(Game->Vehicle(), -(v1.x + 0.25f - x_offset), v1.y + 1.25f - y_offset, 0.1 - z_offset);
+				NativeVector3 coords1from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(Game->Vehicle(), (v1.x + 0.25f - x_offset), v1.y + 1.25f - y_offset, 0.1 - z_offset);
+				NativeVector3 coords0to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(Game->Vehicle(), -v1.x, v1.y + 100.0f, 0.1f);
+				NativeVector3 coords1to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(Game->Vehicle(), v1.x, v1.y + 100.0f, 0.1f);
+				if (predict) {
+					GRAPHICS::DRAW_LINE(coords0from.x, coords0from.y, coords0from.z, coords0to.x, coords0to.y, coords0to.z, 255, 255, 255, 255);
+					GRAPHICS::DRAW_LINE(coords1from.x, coords1from.y, coords1from.z, coords1to.x, coords1to.y, coords1to.z, 255, 255, 255, 255);
+				}
+				if (shoot_delay == 0 || (int)(GetTickCount64() - shoot_delay) > delay) {
+
+
+					if (PLAYER::IS_PLAYER_PRESSING_HORN(Game->Id()))
+					{
+
+						
+
+						Hash hash = all_weapons.hash[weapon];
+						if (!WEAPON::HAS_WEAPON_ASSET_LOADED(hash))
+						{
+							WEAPON::REQUEST_WEAPON_ASSET(hash, 31, 0);
+						}
+
+						
+
+						
+						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(coords0from.x, coords0from.y, coords0from.z, coords0to.x, coords0to.y, coords0to.z, damage, 1, hash, playerPed, 1, 0, -1.0);
+						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(coords1from.x, coords1from.y, coords1from.z, coords1to.x, coords1to.y, coords1to.z, damage, 1, hash, playerPed, 1, 0, -1.0);
+
+						shoot_delay = GetTickCount64();
+					}
+				}
+			}
+		}
+	};
+	inline VehicleWeapons v_weapons;
+	class ColorSubmenuFr {
+	public:
+		const char* name;
+		Color color;
+	};
+	inline ColorSubmenuFr ColorSubmenu;
 	inline void FeatureInitalize() {
+		v_weapons.init();
+		session_info.init();
 		radio.init();
 		ragdoll.init();
 		randomization.init();
@@ -7493,7 +7797,7 @@ namespace Saint {
 		esp.init();
 		rainbow_ui.init();
 		get_model_info.init();
-
+		
 		if (mark_as_Saint) {
 			PED::SET_PED_CONFIG_FLAG(Game->Self(), 109, true);
 
@@ -7594,6 +7898,7 @@ namespace Saint {
 		all_players.init();
 		gravity.init();
 		m_hotkeys.init();
+		
 		if (NoPlaneTurbulance) {
 			VEHICLE::SET_PLANE_TURBULENCE_MULTIPLIER(Game->Vehicle(), 0.0f);
 		}

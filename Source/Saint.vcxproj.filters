@@ -262,6 +262,9 @@
     <ClInclude Include="font_awesome.h">
       <Filter>Core\Notifications</Filter>
     </ClInclude>
+    <ClInclude Include="ColorSubmenu.hpp">
+      <Filter>Interface\Option</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">

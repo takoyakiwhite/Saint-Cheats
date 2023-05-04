@@ -18,6 +18,11 @@ namespace Saint::UserInterface
 			return &m_RightText[0];
 		}
 
+		Color GetColor() override
+		{
+			return m_Color;
+		}
+
 		const char* GetCenteredText() override
 		{
 			return &m_CenteredText[0];
@@ -47,6 +52,12 @@ namespace Saint::UserInterface
 		T& SetLeftText(const char* text)
 		{
 			std::strncpy(&m_LeftText[0], text, sizeof(m_LeftText) - 1);
+			return static_cast<T&>(*this);
+		}
+
+		T& SetColor(Color color)
+		{
+			m_Color = color;
 			return static_cast<T&>(*this);
 		}
 
@@ -88,5 +99,6 @@ namespace Saint::UserInterface
 		char m_CenteredText[64] = {};
 		char m_Description[64] = {};
 		std::function<void()> m_Action;
+		Color m_Color = {};
 	};
 }

@@ -56,6 +56,15 @@ namespace Saint {
     };
 	class GetSelected {
 	public:
+       const char* PlaySounds[3][4] = {
+        { "Orbital Cannon", "Beep", "Yacht Horn", "Garage Door"},
+        { "DLC_XM_Explosions_Orbital_Cannon", "Hack_Success", "Horn", "Garage_Door"},
+        { 0, "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS", "DLC_Apt_Yacht_Ambient_Soundset", "DLC_HEISTS_GENERIC_SOUNDS"},
+        };
+        void PlaySound(int i) {
+            NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
+            AUDIO::PLAY_SOUND_FROM_COORD(AUDIO::GET_SOUND_ID(), PlaySounds[1][i], coords.x, coords.y, coords.z, PlaySounds[2][i], true, 0, true);
+        }
         ExplosiveAmmo2 explosiveAmmo;
 		FlashBlip flash_blip;
 		OTR otr;

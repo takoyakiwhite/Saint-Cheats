@@ -31,6 +31,34 @@ namespace Saint
 	protected:
 		AbstractCallback() = default;
 	};
+	class WeaponModelCallback : public AbstractCallback
+	{
+	public:
+		explicit WeaponModelCallback(std::uint32_t model, std::function<void()> action) :
+			m_Model(model),
+			m_Action(std::move(action))
+		{
+		}
+
+		bool IsDone() override
+		{
+			return WEAPON::HAS_WEAPON_ASSET_LOADED(m_Model);
+		}
+
+		void OnSuccess() override
+		{
+			if (m_Action)
+				std::invoke(m_Action);
+		}
+
+		void OnFailure() override
+		{
+			WEAPON::REQUEST_WEAPON_ASSET(m_Model, 31, 0);
+		}
+	private:
+		std::uint32_t m_Model;
+		std::function<void()> m_Action;
+	};
 	class PTFXCallback : public AbstractCallback
 	{
 	public:
