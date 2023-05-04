@@ -8809,8 +8809,11 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Black Hole"), rage::joaat("BlackHole"), [](sub* sub)
 			{
-				sub->draw_option<submenu>("Color", nullptr, rage::joaat("BHoleColor"));
-				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &black_hole.enabled, BoolDisplay::OnOff);
+				sub->draw_option<submenu>("Attach To Player", nullptr, rage::joaat("AttachToPlayer"));
+				Color color22 = { black_hole.r, black_hole.g, black_hole.b, black_hole.a };
+				sub->draw_option<color_submenu>("Color", nullptr, color22, rage::joaat("BHoleColor"));
+				sub->draw_option<toggle<bool>>(("Enabled"),nullptr, &black_hole.enabled, BoolDisplay::OnOff);
+				sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
 				sub->draw_option<toggle<bool>>(("Peds"), nullptr, &black_hole.peds2, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Vehicles"), nullptr, &black_hole.vehicles, BoolDisplay::OnOff);
 				sub->draw_option<number<std::int32_t>>("Preview", nullptr, &black_hole.preview, 0, 43, 1, 3);
@@ -9302,6 +9305,18 @@ namespace Saint
 							VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 2));
 							VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
 							VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+
+						}
+						delete vehicles;
+					});
+				sub->draw_option<RegularOption>(("Boost"), nullptr, []
+					{
+						Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
+						vehicles[0] = 10;
+						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(Game->Self(), vehicles); i++)
+						{
+							Vehicle playerVehicle = vehicles[(i * 2 + 2)];
+							VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVehicle, 300);
 
 						}
 						delete vehicles;

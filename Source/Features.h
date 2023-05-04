@@ -7054,6 +7054,37 @@ namespace Saint {
 		bool selected = false;
 		int selected_player = 0;
 		float size = 1.0f;
+		Color color = { r, g, b, a };
+		std::vector<int32_t> vehs() {
+			if (vehicles) {
+				const int get = 100;
+				int nearby[get * 2 + 2] = { get * 2 + 2 };
+				auto count = PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), (int*)&nearby);
+				std::vector<int32_t> total;
+
+				for (int i = 0; i < count; i++) {
+					auto v = nearby[i * 2 + 2];
+					total.push_back(v);
+				}
+
+				return total;
+			}
+		}
+		std::vector<int32_t> peds() {
+			if (peds2) {
+				const int get = 100;
+				int nearby[get * 2 + 2] = { get * 2 + 2 };
+				auto count = PED::GET_PED_NEARBY_PEDS(PLAYER::PLAYER_PED_ID(), (int*)&nearby, PLAYER::PLAYER_PED_ID());
+				std::vector<int32_t> total;
+
+				for (int i = 0; i < count; i++) {
+					auto p = nearby[i * 2 + 2];
+					total.push_back(p);
+				}
+
+				return total;
+			}
+		}
 		void init() {
 			if (attach_to_player && selected) {
 				c = Game->Coords(Game->PlayerIndex(selected_player));
@@ -7075,8 +7106,8 @@ namespace Saint {
 					}
 				}
 				GRAPHICS::DRAW_MARKER(preview, c.x, c.y, c.z, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, size, size, size, r, g, b, a, false, false, 0, false, NULL, NULL, false);
-				auto get_nearby_vehs = Game->NearbyVehicles(&vehicles);
-				auto get_nearby_peds = Game->NearbyVehicles(&peds2);
+				auto get_nearby_vehs = vehs();
+				auto get_nearby_peds = peds();
 				get_nearby_vehs.insert(get_nearby_vehs.end(), get_nearby_peds.begin(), get_nearby_peds.end());
 				for (auto hole : get_nearby_vehs) {
 					if (hole && ENTITY::DOES_ENTITY_EXIST(hole)) {
