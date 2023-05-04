@@ -30,18 +30,18 @@ const char* meower = "";
 void load_dir() {
 	using namespace Saint;
 	fs::create_directories("C:\\Saint\\");
-	fs::create_directories("C:\\Saint\\Fonts");
+	//fs::create_directories("C:\\Saint\\Fonts");
 
-	int yes18 = _wmkdir((const wchar_t*)"C:\\Saint\\Fonts\\Chinese-Rocks.ttf");
+	//int yes18 = _wmkdir((const wchar_t*)"C:\\Saint\\Fonts\\Chinese-Rocks.ttf");
 	int yes19 = _wmkdir((const wchar_t*)"C:\\Saint\\Textures.ytd");
 
 	std::string path;
 	std::ofstream file;
-	std::string DownloadPP = std::string("C:\\Saint\\Fonts\\Chinese-Rocks.ttf");
+	//std::string DownloadPP = std::string("C:\\Saint\\Fonts\\Chinese-Rocks.ttf");
 	std::string DownloadPP2 = std::string("C:\\Saint\\Textures.ytd");
 
 
-	URLDownloadToFileA(0, "https://saintcheats.xyz/Chinese-Rocks.ttf", DownloadPP.c_str(), 0, 0);
+	//URLDownloadToFileA(0, "https://saintcheats.xyz/Chinese-Rocks.ttf", DownloadPP.c_str(), 0, 0);
 	URLDownloadToFileA(0, "https://saintcheats.xyz/Textures.ytd", DownloadPP2.c_str(), 0, 0);
 }
 std::string wideToString(std::wstring strw) {

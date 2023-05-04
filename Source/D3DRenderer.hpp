@@ -39,7 +39,7 @@ namespace Saint
 		void WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	public: 
 		ImFont* m_QuantumFont;
-		ImFont* m_HeaderFont;
+		ImFont* m_HeaderFontData;
 		ImFont* m_DefaultFont;
 		ImColor* m_Color;
 	private:

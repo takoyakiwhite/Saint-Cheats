@@ -100,7 +100,7 @@ namespace Saint
 		colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
 		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 
-		m_HeaderFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Saint\\Fonts\\Chinese-Rocks.ttf", 70.f);
+		m_HeaderFontData = ImGui::GetIO().Fonts->AddFontFromMemoryTTF((void*)g_HeaderFontData, sizeof(g_HeaderFontData), 70.f);
 		ImGui::GetIO().Fonts->AddFontDefault();
 		ImFontConfig font_cfg;
 		m_DefaultFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Arial.ttf", 19.f, &font_cfg);

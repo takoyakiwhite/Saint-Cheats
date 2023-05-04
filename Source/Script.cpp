@@ -368,6 +368,27 @@ namespace Saint
 		m_Initialized = true;
 		using namespace UserInterface;
 		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_JOINING"), "Loading GTA Online with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_QUITTING"), "Leaving with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_QUIT_MP"), "Exiting GTA Online with " BIGBASE_NAME);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_ENTER_MP"), "Play GTA Online with " BIGBASE_NAME);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_EXIT_GAME"), "Quit GTA with" BIGBASE_NAME);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_GO"), "Online with " BIGBASE_NAME);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_MPREENTER"), "Joining a new session with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_FRIEND_FM"), "Closed Friend Session with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_GOTO_STORE"), "Purchase Shark Cards with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INF_EXIT"), "Quit to desktop with " BIGBASE_NAME "?");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_CRESES"), "Joining A Crew Only Session with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INF_PGOB"), "Cut to the chase and	 head straight into the world of GTA Online with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INF_PGOT"), "Online w/ " BIGBASE_NAME "!");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INVO_FM"), "Join A Invite Only Session with " BIGBASE_NAME ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("LOADING_SPLAYER_L"), "Loading Story Mode with " BIGBASE_NAME "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_NCREW_FM"), "Join A Crew Session with " BIGBASE_NAME ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_CREW_FM"), "Join A Closed Crew Session with " BIGBASE_NAME ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_SOLO_FM"), "Join A Solo Session with " BIGBASE_NAME ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_FRESES"), "Join A Friends Only Session with " BIGBASE_NAME ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_MAINTIT"), BIGBASE_NAME);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("MP_CHAT_ALL"), BIGBASE_NAME);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_TRANSP"), "Isn't " BIGBASE_NAME " the fucking best?");
 		if (!std::filesystem::exists("C:\\Saint\\Translations"))
 			std::filesystem::create_directory("C:\\Saint\\Translations");
 
@@ -417,7 +438,6 @@ namespace Saint
 					if (!godmode)
 					{
 						Game->CPed()->m_damage_bits = 0;
-
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Never Wanted"), "Disables the wanted level system.", &neverWantedBool, BoolDisplay::OnOff, false, [] {
@@ -452,7 +472,8 @@ namespace Saint
 					}
 					});
 				sub->draw_option<toggle_number_option<float, bool>>("Slow Motion", nullptr, &features.time_scale_edit, &features.time_scale, 0.0f, 1.f, 0.05f, 2, true, "", "", [] {
-					if (!features.time_scale_edit) {
+					if (!features.time_scale_edit) 
+					{
 						MISC::SET_TIME_SCALE(1.0f);
 					}
 					});
@@ -502,8 +523,6 @@ namespace Saint
 					{
 						GRAPHICS::ENABLE_ALIEN_BLOOD_VFX(false);
 						GRAPHICS::ANIMPOSTFX_STOP("DrugsMichaelAliensFight");
-
-
 					}
 					});
 
@@ -518,23 +537,23 @@ namespace Saint
 						CAM::SET_CAM_ACTIVE(blink.freecamCamera, false);
 						CAM::DESTROY_CAM(blink.freecamCamera, true);
 						PLAYER::DISABLE_PLAYER_FIRING(Game->Self(), true);
-
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Wet"), "", &features.wet, BoolDisplay::OnOff, false, [] {
 					if (!features.wet)
 					{
 						PED::SET_PED_WETNESS_HEIGHT(Game->Self(), 0);
-
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Walk Underwater"), "Disables the swimming animation.", &features.walk_underwater, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Push Water Away"), "Pushes water away from you.", &features.push_water_away, BoolDisplay::OnOff);
 
-				sub->draw_option<number<std::int32_t>>("Wanted Level", nullptr, &i_hate_niggers, 0, 5, 1, 3, true, "", "", [] {
+				sub->draw_option<number<std::int32_t>>("Wanted Level", nullptr, &i_hate_niggers, 0, 5, 1, 3, true, "", "", [] 
+					{
 					(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_wanted_level = i_hate_niggers;
 					});
-				sub->draw_option<number<float>>("Move Rate", nullptr, &move_rate, 0, 10.0, 1.0, 3, true, "", "", [] {
+				sub->draw_option<number<float>>("Move Rate", nullptr, &move_rate, 0, 10.0, 1.0, 3, true, "", "", [] 
+					{
 					PED::SET_PED_MOVE_RATE_OVERRIDE(Game->Self(), move_rate);
 					});
 
@@ -604,10 +623,7 @@ namespace Saint
 				for (std::uint32_t i = 0; i < 14; ++i) {
 					sub->draw_option<RegularOption>((parachutes.types[i]), nullptr, [=]
 						{
-
 							parachutes.set_tint(i + 1 - 2);
-
-
 						});
 				}
 			});
@@ -622,27 +638,19 @@ namespace Saint
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 				sub->draw_option<RegularOption>("Sexy", nullptr, [=]
 					{
-
 						walk_style.change("move_f@sexy@a");
-
 					});
 				sub->draw_option<RegularOption>("Injured", nullptr, [=]
 					{
-
 						walk_style.change("move_injured_generic");
-
 					});
 				sub->draw_option<RegularOption>("Gangster", nullptr, [=]
 					{
-
 						walk_style.change("move_m@gangster@var_e");
-
 					});
 				sub->draw_option<RegularOption>("Gangster 2", nullptr, [=]
 					{
-
 						walk_style.change("move_m@gangster@var_f");
-
 					});
 				sub->draw_option<RegularOption>("Gangster 3", nullptr, [=]
 					{
@@ -704,11 +712,6 @@ namespace Saint
 						walk_style.change("move_heist_lester");
 
 					});
-
-
-
-
-
 			});
 		g_Render->draw_submenu<sub>(("Model Changer"), SubmenuModelChanger, [](sub* sub)
 			{
@@ -716,17 +719,15 @@ namespace Saint
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 				for (std::int32_t i = 0; i < m_ModelChanger.size; i++) {
 					sub->draw_option<submenu>(m_ModelChanger.get_class_name[i], nullptr, SubmenuSelectedModelChanger, [=]
-						{
-							m_ModelChanger.selected_class = i;
-						});
-
+					{
+						m_ModelChanger.selected_class = i;
+					});
 				}
 			});
 		g_Render->draw_submenu<sub>(("Search"), rage::joaat("AllModel"), [](sub* sub)
 			{
 				sub->draw_option<KeyboardOption>(("Value"), "Note: this is case sensitive.", modelsearchresults, []
 					{
-
 						showKeyboard("Enter Something", "", 8, &modelsearchresults, [=] {});
 					});
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
@@ -734,9 +735,7 @@ namespace Saint
 					if (has_string_attached(model.m_name, modelsearchresults)) {
 						sub->draw_option<RegularOption>(model.m_name.c_str(), nullptr, [=]
 							{
-
 								m_ModelChanger.change(rage::joaat(model.m_model.c_str()));
-
 							});
 					}
 				};
@@ -747,9 +746,7 @@ namespace Saint
 					if (m_ModelChanger.selected_class == model.m_class) {
 						sub->draw_option<RegularOption>(model.m_name.c_str(), nullptr, [=]
 							{
-
 								m_ModelChanger.change(rage::joaat(model.m_model.c_str()));
-
 							});
 					}
 				}
@@ -763,13 +760,10 @@ namespace Saint
 				sub->draw_option<UnclickOption>(("Color"), nullptr, [] {});
 				sub->draw_option<toggle<bool>>(("Rainbow"), nullptr, &g_HandTrails.rainbow, BoolDisplay::OnOff);
 				sub->draw_option<number<std::int32_t>>("Red", nullptr, &g_HandTrails.r, 0, 255, 1, 3, true, "", "", [] {
-
 					});
 				sub->draw_option<number<std::int32_t>>("Green", nullptr, &g_HandTrails.g, 0, 255, 1, 3, true, "", "", [] {
-
 					});
 				sub->draw_option<number<std::int32_t>>("Blue", nullptr, &g_HandTrails.b, 0, 255, 1, 3, true, "", "", [] {
-
 					});
 			});
 		g_Render->draw_submenu<sub>(("Outfit Editor"), SubmenuOutfitEditor, [](sub* sub)
@@ -864,7 +858,6 @@ namespace Saint
 				sub->draw_option<RegularOption>(("Sit Ups"), nullptr, [=]
 					{
 						animation.start("amb@world_human_sit_ups@male@base", "base");
-
 					});
 				sub->draw_option<RegularOption>(("Push Ups"), nullptr, [=]
 					{
@@ -9844,10 +9837,6 @@ namespace Saint
 				sub->draw_option<toggle<bool>>("Sounds", nullptr, &g_Render->m_Sounds, BoolDisplay::OnOff);
 				sub->draw_option<number<float>>("Width", nullptr, &g_Render->m_Width, 0.01f, 1.f, 0.01f, 2);
 				sub->draw_option<number<float>>("Smooth Scroll Speed", nullptr, &g_Render->smooth_scroll_speed, 0.01f, 1.00f, 0.01f, 2);
-
-
-
-
 			});
 		g_Render->draw_submenu<sub>(("Header"), CustomizationHeader, [](sub* sub)
 			{
@@ -9860,7 +9849,7 @@ namespace Saint
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Font", nullptr, &g_Render->HeaderFont2, &g_Render->HeaderFontIterator, true, -1, []
 					{
 						if (g_Render->HeaderFontIterator == 0) {
-							g_Render->m_HeaderText = false;
+							g_Render->m_HeaderTextData = false;
 							g_Render->m_HeaderNativeText = true;
 							g_Render->m_HeaderFont = Font::ChaletLondon;
 						}
@@ -9877,12 +9866,12 @@ namespace Saint
 							g_Render->m_HeaderFont = Font::ChaletComprimeCologne;
 						}
 						if (g_Render->HeaderFontIterator == 5) {
-							g_Render->m_HeaderText = false;
+							g_Render->m_HeaderTextData = false;
 							g_Render->m_HeaderNativeText = true;
 							g_Render->m_HeaderFont = Font::Pricedown;
 						}
 						if (g_Render->HeaderFontIterator == 6) {
-							g_Render->m_HeaderText = true;
+							g_Render->m_HeaderTextData = true;
 							g_Render->m_HeaderNativeText = false;
 						}
 					});
@@ -9894,8 +9883,6 @@ namespace Saint
 				sub->draw_option<number<float>>("Height", nullptr, &g_Render->m_HeaderHeight, 0.01f, 0.2f, 0.001f, 3);
 				sub->draw_option<number<float>>("Text X Offset", nullptr, &g_Render->header_x_offset, -1000.f, 1000.f, 0.001f);
 				sub->draw_option<number<float>>("Text Size", nullptr, &g_Render->m_HeaderTextSize, 0.01f, 1.f, 0.01f, 2);
-
-
 			});
 		g_Render->draw_submenu<sub>(("Colors"), SubmenuColors, [](sub* sub)
 			{
@@ -10275,7 +10262,7 @@ namespace Saint
 
 						g_Render->header_name = "Saint";
 
-						g_Render->m_HeaderText = false;
+						g_Render->m_HeaderTextData = false;
 						g_Render->m_HeaderNativeText = true;
 
 						g_Render->submenu_enabled = true;
@@ -10392,7 +10379,7 @@ namespace Saint
 
 		g_Render->draw_submenu<sub>("Header Text", SubmenuSettingsHeaderText, [](sub* sub)
 			{
-				sub->draw_option<toggle<bool>>("DX Header Text", "Disable native text if going to use dx", &g_Render->m_HeaderText, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>("DX Header Text", "Disable native text if going to use dx", &g_Render->m_HeaderTextData, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>("Native Header Text", "Disable dx text if going to use native ", &g_Render->m_HeaderNativeText, BoolDisplay::OnOff);
 				if (g_Render->m_HeaderNativeText) {
 					sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &g_Render->HeaderFont, &g_Render->HeaderFontIterator, true, -1, []

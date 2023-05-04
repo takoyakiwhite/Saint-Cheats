@@ -161,7 +161,7 @@ namespace Saint::UserInterface
 		std::size_t reso = 1920;
 		// Header
 		float m_HeaderHeight = { 0.083f };
-		bool m_HeaderText = false;
+		bool m_HeaderTextData = false;
 		bool m_HeaderNativeText = true;
 		float m_HeaderTextSize = 1.f;
 		Font m_HeaderFont = Font::HouseScript;
@@ -268,13 +268,13 @@ namespace Saint::UserInterface
 		std::string header_name = "Saint";
 
 		// Footer
-		bool m_dynamic_footer = { true };
+		bool m_dynamic_footer = { false };
 		int m_option_count;
 		int m_current_option;
 		int m_previous_option;
 
-		float m_FooterHeight = 0.025000f;
-		float m_FooterSpriteSize = 0.032000f;
+		float m_FooterHeight = 0.029000f;
+		float m_FooterSpriteSize = 0.029000f;
 		Color m_FooterBackgroundColor{ 0, 0, 0, 255 };
 		Color m_FooterSpriteColor{ 255,255,255, 255 };
 
@@ -302,7 +302,7 @@ namespace Saint::UserInterface
 			"Checkmarks",
 			"Custom",
 		};
-		std::size_t ToggleIterator = 3;
+		std::size_t ToggleIterator = 0;
 		std::string custom_toggle_dict_on = "commonmenu";
 		std::string custom_toggle_asset_on = "shop_tick_icon";
 		std::string custom_toggle_dict_off = "commonmenu";
@@ -319,7 +319,7 @@ namespace Saint::UserInterface
 		//Header
 		float header_x_offset = -0.068;
 		//smooth scroll
-		float smooth_scroll_speed = 1.00f;
+		float smooth_scroll_speed = 0.15f;
 
 		//break
 		bool break_italic = true;
@@ -348,6 +348,7 @@ namespace Saint::UserInterface
 
 		bool m_MenuOpeningAnimation = false;
 		int g_MenuAlpha = 255;
+		int g_MenuOpacity = m_OptionUnselectedBackgroundColor.a;
 		const char* m_CurrentSubMenuName = "Hello";
 		bool m_AnimationCheck = false;
 		void DrawRect(float x, float y, float width, float height, Color color);
