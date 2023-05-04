@@ -912,6 +912,7 @@ namespace Saint {
 		const char* veh_density[2] = { "None", "Normal" };
 		std::size_t vden_pos = 0;
 		bool delete_gun = false;
+		bool steal_gun = false;
 		bool infinite_ammo = false;
 		bool spectate = false;
 		bool pickup_mode = false;
@@ -947,6 +948,7 @@ namespace Saint {
 			return PED::GET_PED_CONFIG_FLAG(Game->Self(), 78, true);
 		}
 		bool slide_run = false;
+		float slide_run_speed = 1.5f;
 		bool force_gun = false;
 		int force_gun_mult = 150;
 		bool move_with_mouse = false;
@@ -980,7 +982,16 @@ namespace Saint {
 		bool blackout = false;
 		float time_scale = 0.5f;
 		bool time_scale_edit = false;
+		bool mute_sirens = false;
+		bool remove_stickys = false;
+		const char* name_buffer;
 		void init() {
+			if (remove_stickys) {
+				NETWORK::REMOVE_ALL_STICKY_BOMBS_FROM_ENTITY(Game->Self(), Game->Self());
+			}
+			if (mute_sirens) {
+				VEHICLE::SET_VEHICLE_HAS_MUTED_SIRENS(Game->Vehicle(), true);
+			}
 			if (time_scale_edit) {
 				MISC::SET_TIME_SCALE(time_scale);
 			}
@@ -1096,7 +1107,7 @@ namespace Saint {
 			}
 			if (slide_run) {
 				if (TASK::IS_PED_RUNNING(Game->Self()) || TASK::IS_PED_SPRINTING(Game->Self()) && !PED::IS_PED_RAGDOLL(Game->Self())) {
-					ENTITY::APPLY_FORCE_TO_ENTITY(Game->Self(), 1, 0.f, 1.5f, 0.f, 0.f, 0.f, 0.f, 1, true, true, true, false, true);
+					ENTITY::APPLY_FORCE_TO_ENTITY(Game->Self(), 1, 0.f, slide_run_speed, 0.0f, 0.0f, 0.0f, 0.0f, FALSE, TRUE, TRUE, TRUE, FALSE, TRUE);
 				}
 			}
 			if (walk_underwater)
@@ -1389,7 +1400,15 @@ namespace Saint {
 			if (infinite_ammo) {
 				WEAPON::SET_PED_INFINITE_AMMO_CLIP(Game->Self(), true);
 			}
-
+			if (steal_gun) {
+				if (Game->Shooting())
+				{
+					Entity hitEntity;
+					if (raycast(hitEntity)) {
+						PED::SET_PED_INTO_VEHICLE(Game->Self(), Game->Vehicle(), -1);
+					}
+				}
+			}
 			if (delete_gun) {
 				if (Game->Shooting())
 				{
@@ -2227,6 +2246,7 @@ namespace Saint {
 		int a = 255;
 		float custom_times = 5.0;
 		std::string custom_name;
+		bool plate = false;
 		void drawText(const char* text, float x, float y, float size, int font, bool center, bool right) {
 			HUD::SET_TEXT_SCALE(size, size);
 			HUD::SET_TEXT_FONT(font2);
@@ -2248,24 +2268,36 @@ namespace Saint {
 					float vehicleSpeed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
 					snprintf(buffer, sizeof(buffer), "%.0f MPH", vehicleSpeed * 2.236936);
 					drawText(buffer, 0.01f + x_offset, 0.01f + y_offset, scale, 0, false, false);
+					if (plate) {
+						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle(), buffer);
+					}
 				}
 				if (type_i == 1) {
 					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 					float vehicleSpeed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
 					snprintf(buffer, sizeof(buffer), "%.0f KPH", vehicleSpeed * 3.6);
 					drawText(buffer, 0.01f + x_offset, 0.01f + y_offset, scale, 0, false, false);
+					if (plate) {
+						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle(), buffer);
+					}
 				}
 				if (type_i == 2) {
 					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 					float vehicleSpeed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
 					snprintf(buffer, sizeof(buffer), "%i GMPH", (int)vehicleSpeed);
 					drawText(buffer, 0.01f + x_offset, 0.01f + y_offset, scale, 0, false, false);
+					if (plate) {
+						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle(), buffer);
+					}
 				}
 				if (type_i == 3) {
 					Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
 					float vehicleSpeed = ENTITY::GET_ENTITY_SPEED(playerVehicle) * custom_times;
 					snprintf(buffer, sizeof(buffer), "%i %s", (int)vehicleSpeed, custom_name.c_str());
 					drawText(buffer, 0.01f + x_offset, 0.01f + y_offset, scale, 0, false, false);
+					if (plate) {
+						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle(), buffer);
+					}
 				}
 			}
 		}
@@ -3721,6 +3753,7 @@ namespace Saint {
 		}
 	};
 	inline Incr incr;
+	inline float cloud_opacity = 1.00f;
 	class GravityG {
 	public:
 		bool enabled = false;
@@ -7017,8 +7050,15 @@ namespace Saint {
 		int b;
 		int a = 255;
 		bool rainbow = false;
+		bool attach_to_player = false;
+		bool selected = false;
+		int selected_player = 0;
 		float size = 1.0f;
 		void init() {
+			if (attach_to_player && selected) {
+				c = Game->Coords(Game->PlayerIndex(selected_player));
+				 
+			}
 			if (enabled) {
 				if (rainbow) {
 					if (r > 0 && b == 0) {
@@ -7498,6 +7538,7 @@ namespace Saint {
 	};
 	inline Radio radio;
 	inline std::string modelsearchresults = "";
+	inline std::string modelsearchresults2 = "";
 	class HudColor {
 	public:
 		std::string search = "";

@@ -445,8 +445,8 @@ namespace Saint
 						PLAYER::SET_MAX_WANTED_LEVEL(5);
 					}
 					});
-				sub->draw_option<toggle<bool>>(("Slide Run"), "Slides you around the map.", &features.slide_run, BoolDisplay::OnOff);
-
+				
+				sub->draw_option<toggle_number_option<float, bool>>("Slide Run", nullptr, &features.slide_run, &features.slide_run_speed, 0.1f, 100.f, 0.1f, 2);
 				sub->draw_option<toggle<bool>>(("Seatbelt"), "Click you're seatbelt so you don't fly out of the vehicle.", &features.seatbelt, BoolDisplay::OnOff, false, [] {
 					if (!features.seatbelt) {
 						PED::SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(Game->Self(), false);
@@ -555,6 +555,10 @@ namespace Saint
 				sub->draw_option<number<float>>("Move Rate", nullptr, &move_rate, 0, 10.0, 1.0, 3, true, "", "", [] 
 					{
 					PED::SET_PED_MOVE_RATE_OVERRIDE(Game->Self(), move_rate);
+					});
+				sub->draw_option<RegularOption>(("Clear Tasks"), nullptr, []
+					{
+						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
 					});
 
 			});
@@ -1146,6 +1150,11 @@ namespace Saint
 						VEHICLE::SET_VEHICLE_GRAVITY(Game->Vehicle(), true);
 					}
 					});
+				sub->draw_option<toggle<bool>>(("Mute Sirens"), "", &features.mute_sirens, BoolDisplay::OnOff, false, [] {
+					if (!features.mute_sirens) {
+						VEHICLE::SET_VEHICLE_HAS_MUTED_SIRENS(Game->Vehicle(), false);
+					}
+					});
 				sub->draw_option<toggle<bool>>(("Auto Clean"), "", &features.clean_veh, BoolDisplay::OnOff);
 				if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false)) {
 					sub->draw_option<KeyboardOption>(("Liscene Plate"), nullptr, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle()), []
@@ -1162,6 +1171,11 @@ namespace Saint
 					});
 				sub->draw_option<number<float>>("Forklift Height", nullptr, &features.forklight_height, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
 					VEHICLE::SET_FORKLIFT_FORK_HEIGHT(Game->Vehicle(), features.forklight_height);
+					});
+				sub->draw_option<RegularOption>("Delete", nullptr, [] 
+					{ 
+						Vehicle veh = Game->Vehicle();
+						VEHICLE::DELETE_VEHICLE(&veh);
 					});
 
 			});
@@ -2077,49 +2091,45 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Search"), SubmenuVehicleSearch, [](sub* sub)
 			{
-				sub->draw_option<RegularOption>(("Click Here"), nullptr, []
+				sub->draw_option<KeyboardOption>(("Value"), "Note: this is case sensitive.", modelsearchresults2, []
 					{
-
-						showKeyboard("Enter Something", "", 25, &ModelInput, [] {
-							search_completed = true;
-							});
+						showKeyboard("Enter Something", "", 8, &modelsearchresults2, [=] {});
 					});
-				if (search_completed) {
-					Hash vehicleHash2 = Game->HashKey(ModelInput.c_str());
-					if (STREAMING::IS_MODEL_VALID(vehicleHash2)) {
-						sub->draw_option<UnclickOption>(("Found ~r~1 ~w~Result."), nullptr, [] {});
-					}
-					else {
-						sub->draw_option<UnclickOption>(("Found ~r~0 ~w~Results."), nullptr, [] {});
-					}
+				sub->draw_option<UnclickOption>(("Results"), nullptr, [] {});
+				if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {
+					for (std::int32_t i = 0; i < g_GameFunctions->m_vehicle_hash_pool->capacity; i++) {
+						std::uint64_t info = g_GameFunctions->m_vehicle_hash_pool->get(i);
+						if (info != NULL) {
+							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
+								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
+								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
+								std::stringstream ss;
+								std::string make(make_ptr);
+								std::string model(model_ptr);
+								if (make[0] || model[0]) {
+									make = Game->Label(make.c_str());
+									model = Game->Label(model.c_str());
+									if (make != "NULL" && model != "NULL") {
+										ss << make << " " << model;
+									}
+									else if (model != "NULL") {
+										ss << model;
+									}
+									else {
+										ss << "Unknown";
+									}
+								}
+								Hash hash = *(std::uint32_t*)(info + 0x18);
+								if (has_string_attached(Game->VehicleNameHash(hash), modelsearchresults2)) {
+									sub->draw_option<RegularOption>(Game->VehicleNameHash(hash), nullptr, [=]
+										{
+											Vehicle veh;
+											veh_spawner.spawn(hash, &veh);
 
-					if (STREAMING::IS_MODEL_VALID(vehicleHash2)) {
+										});
+								}
 
-						STREAMING::REQUEST_MODEL(vehicleHash2);
-						if (!STREAMING::HAS_MODEL_LOADED(vehicleHash2)) {
-
-
-						}
-						else {
-
-
-
-							sub->draw_option<RegularOption>(Game->VehicleNameHash(vehicleHash2), nullptr, [=]
-								{
-									NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
-									*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-									Vehicle vehicle = VEHICLE::CREATE_VEHICLE(vehicleHash2, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, false, false);
-									*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-									DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
-									auto networkId = NETWORK::VEH_TO_NET(vehicle);
-									if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
-										NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
-									VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
-									PED::SET_PED_INTO_VEHICLE(Game->Self(), vehicle, -1);
-
-								});
-
-
+							}
 						}
 					}
 				}
@@ -2502,6 +2512,8 @@ namespace Saint
 			{
 				sub->draw_option<submenu>("Custom", "", rage::joaat("CustomSpeedo"));
 				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Enabled", nullptr, &speedo.enabled, &speedo.type, &speedo.type_i);
+				sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
+				sub->draw_option<toggle<bool>>(("License Plate"), nullptr, &speedo.plate, BoolDisplay::OnOff);
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Font", nullptr, &g_Render->HeaderFont, &speedo.font2);
 				sub->draw_option<number<float>>("X Offset", nullptr, &speedo.x_offset, -100.f, 100.f, 0.01f, 2);
 				sub->draw_option<number<float>>("Y Offset", nullptr, &speedo.y_offset, -100.f, 100.f, 0.01f, 2);
@@ -3943,6 +3955,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Incendiary"), nullptr, &m_frame_flags.m_fire, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Aim Tracer"), nullptr, &features.aim_tracer, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Rope"), nullptr, &rope_gun.enabled, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Steal"), nullptr, &features.steal_gun, BoolDisplay::OnOff);
 				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Money", nullptr, &wdrop.money, &wdrop.money_model, &wdrop.money_model_data);
 				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("RP", nullptr, &wdrop.rp, &wdrop.rp_model, &wdrop.rp_model_data);
 				sub->draw_option<toggle<bool>>(("Shotgun"), nullptr, &m_shotgun.enabled, BoolDisplay::OnOff, false, [] {
@@ -4678,33 +4691,51 @@ namespace Saint
 
 
 			});
-		g_Render->draw_submenu<sub>("Recovery", SubmenuRecovery, [](sub* sub)
-			{
+			g_Render->draw_submenu<sub>("Recovery", SubmenuRecovery, [](sub* sub)
+				{
 
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Character", nullptr, &g_RecoveryManager.get_char_name, &g_RecoveryManager.selected, false, -1, [] {});
-				sub->draw_option<submenu>("Level", nullptr, SubmenuRP);
-				sub->draw_option<submenu>("Unlocks", nullptr, SubmenuUnlocks);
-
-
-				sub->draw_option<submenu>("Stats", nullptr, SubmenuCstats);
-
-				sub->draw_option<submenu>("DLC", nullptr, SubmenuDLC);
+					sub->draw_option<ChooseOption<const char*, std::size_t>>("Character", nullptr, &g_RecoveryManager.get_char_name, &g_RecoveryManager.selected, false, -1, [] {});
+					sub->draw_option<submenu>("Level", nullptr, SubmenuRP);
+					sub->draw_option<submenu>("Unlocks", nullptr, SubmenuUnlocks);
 
 
+					sub->draw_option<submenu>("Stats", nullptr, SubmenuCstats);
 
-				sub->draw_option<submenu>("Misc", nullptr, SubmenuRMisc);
-
-
-				//sub->draw_option<submenu>("Money", nullptr, SubmenuMoney); not finished
+					sub->draw_option<submenu>("DLC", nullptr, SubmenuDLC);
 
 
-				//sub->draw_option<submenu>("Arena War", nullptr, SubmenuAWar);
 
-				sub->draw_option<submenu>("Nightclub", nullptr, rage::joaat("Nightclub"));
-				sub->draw_option<submenu>("ATM", nullptr, rage::joaat("ATM"));
+					sub->draw_option<submenu>("Misc", nullptr, SubmenuRMisc);
 
 
-				sub->draw_option<submenu>("Detected Methods", nullptr, SubmenuDEmeth);
+					//sub->draw_option<submenu>("Money", nullptr, SubmenuMoney); not finished
+
+
+					//sub->draw_option<submenu>("Arena War", nullptr, SubmenuAWar);
+
+					sub->draw_option<submenu>("Nightclub", nullptr, rage::joaat("Nightclub"));
+					sub->draw_option<submenu>("ATM", nullptr, rage::joaat("ATM"));
+
+
+					sub->draw_option<submenu>("Detected Methods", nullptr, SubmenuDEmeth);
+					if (g_RecoveryManager.selected == 0) {
+						sub->draw_option<KeyboardOption>(("Change Name"), nullptr, STATS::STAT_GET_STRING(0x4A211FC8, -1), []
+							{
+
+								showKeyboard2("Enter Something", "", 8, &features.name_buffer, [=] {
+									STATS::STAT_SET_STRING(0x4A211FC8, features.name_buffer, true);
+								});
+							});
+					}
+					if (g_RecoveryManager.selected == 1) {
+						sub->draw_option<KeyboardOption>(("Change Name"), nullptr, STATS::STAT_GET_STRING(0xD2AB0EC6, -1), []
+							{
+
+								showKeyboard2("Enter Something", "", 8, &features.name_buffer, [=] {
+									STATS::STAT_SET_STRING(0xD2AB0EC6, features.name_buffer, true);
+									});
+							});
+					}
 
 
 
@@ -8795,6 +8826,35 @@ namespace Saint
 						black_hole.c = ENTITY::GET_ENTITY_COORDS(Game->Self(), 1);
 					});
 			});
+		g_Render->draw_submenu<sub>("Attach To Player", rage::joaat("AttachToPlayer"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &black_hole.attach_to_player, BoolDisplay::OnOff);
+				sub->draw_option<UnclickOption>(("Player List"), nullptr, [] {});
+
+				if (!black_hole.attach_to_player) {
+					return;
+				}
+				for (std::uint32_t i = 0; i < 32; ++i)
+				{
+					if (auto ped = Game->PlayerIndex(i))
+					{
+
+						std::string name = PLAYER::GET_PLAYER_NAME(i);
+						if (i == PLAYER::PLAYER_ID())
+							name.append(" ~p~[Self]");
+
+						if (i == black_hole.selected_player)
+							name.append(" ~b~[Selected]");
+						if (INTERIOR::GET_INTERIOR_FROM_ENTITY(ped) == 0) {
+							sub->draw_option<RegularOption>((name.c_str()), nullptr, [=]
+								{
+									black_hole.selected_player = i;
+									black_hole.selected = true;
+								});
+						}
+					}
+				}
+			});
 		g_Render->draw_submenu<sub>(("Color"), rage::joaat("BHoleColor"), [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Rainbow"), nullptr, &black_hole.rainbow, BoolDisplay::OnOff);
@@ -8855,6 +8915,10 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Clouds"), rage::joaat("Clouds"), [](sub* sub)
 			{
 				sub->draw_option<submenu>("Color", nullptr, rage::joaat("ColorClouds"));
+				sub->draw_option<number<float>>("Opacity", nullptr, &cloud_opacity, 0, 10.0, 1.0, 3, true, "", "", []
+					{
+						MISC::SET_CLOUDS_ALPHA(cloud_opacity);
+					});
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 				sub->draw_option<RegularOption>("None", nullptr, [] { MISC::UNLOAD_ALL_CLOUD_HATS(); });
 				sub->draw_option<RegularOption>("Cloudy", nullptr, [] { MISC::LOAD_CLOUD_HAT("Cloudy 01", 0.5f); });

@@ -153,7 +153,7 @@ namespace Saint::UserInterface
 		Font m_ToolTipFont = Font::ChaletLondon;
 		float m_ToolTipTextSize = 0.4f;
 		//resolution
-		const char* Resolution[2] = 
+		const char* Resolution[2] =
 		{
 			"1920x1080",
 			"2560x1440"
@@ -165,7 +165,7 @@ namespace Saint::UserInterface
 		bool m_HeaderNativeText = true;
 		float m_HeaderTextSize = 1.f;
 		Font m_HeaderFont = Font::HouseScript;
-		Color m_HeaderBackgroundColor{ 0, 131, 255, 255 };
+		Color m_HeaderBackgroundColor{ 255, 150, 184, 255 };
 		Color m_HeaderTextColor{ 255, 255, 255, 255 };
 		HeaderType m_HeaderType = HeaderType::Static;
 		HeaderType m_HeaderType2 = HeaderType::Static;
@@ -187,7 +187,7 @@ namespace Saint::UserInterface
 
 		//enables
 		bool footer_enabled = true;
-		bool lines_enabled = false;
+		bool lines_enabled = true;
 
 		// Smooth Scrolling
 		float lerp(float a, float b, float t)
@@ -273,8 +273,8 @@ namespace Saint::UserInterface
 		int m_current_option;
 		int m_previous_option;
 
-		float m_FooterHeight = 0.029000f;
-		float m_FooterSpriteSize = 0.029000f;
+		float m_FooterHeight = 0.026000f;
+		float m_FooterSpriteSize = 0.027000f;
 		Color m_FooterBackgroundColor{ 0, 0, 0, 255 };
 		Color m_FooterSpriteColor{ 255,255,255, 255 };
 
@@ -302,7 +302,7 @@ namespace Saint::UserInterface
 			"Checkmarks",
 			"Custom",
 		};
-		std::size_t ToggleIterator = 0;
+		std::size_t ToggleIterator = 3;
 		std::string custom_toggle_dict_on = "commonmenu";
 		std::string custom_toggle_asset_on = "shop_tick_icon";
 		std::string custom_toggle_dict_off = "commonmenu";
@@ -319,7 +319,7 @@ namespace Saint::UserInterface
 		//Header
 		float header_x_offset = -0.068;
 		//smooth scroll
-		float smooth_scroll_speed = 0.15f;
+		float smooth_scroll_speed = 0.170000f;
 
 		//break
 		bool break_italic = true;
@@ -348,7 +348,6 @@ namespace Saint::UserInterface
 
 		bool m_MenuOpeningAnimation = false;
 		int g_MenuAlpha = 255;
-		int g_MenuOpacity = m_OptionUnselectedBackgroundColor.a;
 		const char* m_CurrentSubMenuName = "Hello";
 		bool m_AnimationCheck = false;
 		void DrawRect(float x, float y, float width, float height, Color color);
@@ -361,11 +360,11 @@ namespace Saint::UserInterface
 
 		bool tooltips_enabled = true;
 
-		bool connect_description = true;
+		bool connect_description = false;
 
-		float description_x = 0.0f;
+		float description_x = 0.22f;
 		float description_y = 0.0f;
-		float description_x2 = 0.0f;
+		float description_x2 = 0.22f;
 		float description_y2 = 0.0f;
 
 		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
