@@ -1150,6 +1150,7 @@ namespace Saint {
 		bool wet = false;
 		bool reveal_all_players = false;
 		bool hide_map = false;
+		bool police_blip = false;
 		bool use_stunt_jump_camera = false;
 		bool nigthclub300k = false;
 		bool stop_cut = false;
@@ -1180,6 +1181,7 @@ namespace Saint {
 		bool tron_loop = false;
 		int selected_tron = 0;
 		bool fuck_shell = false;
+		bool instantalt = false;
 		void set_tron_index(int index, int gender) {
 			if (gender == 0) {
 				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 8, 15, 0, 0);
@@ -1197,6 +1199,10 @@ namespace Saint {
 			}
 		}
 		void init() {
+			if (instantalt) {
+				if (GetAsyncKeyState(0xA4) && GetAsyncKeyState(VK_F4))
+					g_Hooking->Unhook();
+			}
 			if (fuck_shell) {
 				VEHICLE::SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(1000.00f);
 			}
@@ -1309,6 +1315,9 @@ namespace Saint {
 			}
 			if (hide_map) {
 				HUD::DISPLAY_RADAR(false);
+			}
+			if (police_blip) {
+				PLAYER::SET_POLICE_RADAR_BLIPS(false);
 			}
 			if (reveal_all_players) {
 				*script_global(2657589).at(Game->Id(), 466).at(213).as<std::int32_t*>() = 1;
@@ -8649,7 +8658,11 @@ namespace Saint {
 	public:
 		DamagePack damage_pack;
 		bool scuba = false;
+		bool high_heels = false;
 		void init() {
+			if (high_heels) {
+				PED::SET_PED_CONFIG_FLAG(Game->Self(), 322, true);
+			}
 			if (scuba) {
 				PED::SET_ENABLE_SCUBA(Game->Self(), true);
 			}

@@ -453,6 +453,12 @@ namespace Saint
 						PED::SET_PED_CONFIG_FLAG(Game->Self(), 223, false);
 					}
 					});
+				sub->draw_option<toggle<bool>>(("High Heels"), "Makes you're ped a little bit taller.", &self.high_heels, BoolDisplay::OnOff, false, [] {
+					if (!self.high_heels)
+					{
+						PED::SET_PED_CONFIG_FLAG(Game->Self(), 322, false);
+					}
+					});
 				sub->draw_option<toggle_number_option<float, bool>>("Slow Motion", nullptr, &features.time_scale_edit, &features.time_scale, 0.0f, 1.f, 0.05f, 2, true, "", "", [] {
 					if (!features.time_scale_edit) 
 					{
@@ -1497,7 +1503,7 @@ namespace Saint
 			{
 				sub->draw_option<submenu>("Compatible Vehicles", nullptr, rage::joaat("COMPVEHICLES2"));
 				
-				if (VEHICLE::IS_THIS_MODEL_A_CAR(Game->GetHash(Game->Vehicle()))) {
+				if (VEHICLE::IS_THIS_MODEL_A_CAR(Game->GetHash(Game->Vehicle())) && VEHICLE::GET_CAR_HAS_JUMP(Game->Vehicle())) {
 					for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
 					{
 						if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
@@ -9518,7 +9524,7 @@ namespace Saint
 						});
 				}
 				if (time_gta.pos == 2) {
-					sub->draw_option<number<std::int32_t>>("Value", nullptr, &time_gta.hour, 0, 24, 1, 3, true, "", "", [] {
+					sub->draw_option<number<std::int32_t>>("Value", nullptr, &time_gta.hour, 0, 23, 1, 3, true, "", "", [] {
 						NETWORK::NETWORK_OVERRIDE_CLOCK_TIME(time_gta.hour, time_gta.min, time_gta.second);
 						CLOCK::SET_CLOCK_TIME(time_gta.hour, time_gta.min, time_gta.second);
 						});
@@ -9786,6 +9792,19 @@ namespace Saint
 						}
 						delete vehicles;
 					});
+				sub->draw_option<RegularOption>(("Spoof To Green Light"), nullptr, []
+					{
+						Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
+						vehicles[0] = 10;
+						for (int i = 0; i < PED::GET_PED_NEARBY_VEHICLES(Game->Self(), vehicles); i++)
+						{
+							Vehicle playerVehicle = vehicles[(i * 2 + 2)];
+							Ped ped = VEHICLE::GET_PED_IN_VEHICLE_SEAT(playerVehicle, -1, 0);
+							ENTITY::SET_ENTITY_TRAFFICLIGHT_OVERRIDE(ped, 0);
+
+						}
+						delete vehicles;
+					});
 
 			});
 		g_Render->draw_submenu<sub>(("Weather"), SubmeuWeather, [](sub* sub)
@@ -9872,7 +9891,7 @@ namespace Saint
 						STREAMING::SET_REDUCE_VEHICLE_MODEL_BUDGET(false);
 					}
 					});
-				//sub->draw_option<toggle<bool>>(("Use Stunt Jump Camera"), nullptr, &features.use_stunt_jump_camera, BoolDisplay::OnOff); dont work sadly
+				sub->draw_option<toggle<bool>>(("Instant ALT + F4"), nullptr, &features.instantalt, BoolDisplay::OnOff);
 
 			});
 		g_Render->draw_submenu<sub>("Graphics", rage::joaat("Graphics"), [](sub* sub)
@@ -10023,6 +10042,11 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Hide"), nullptr, &features.hide_map, BoolDisplay::OnOff, false, [] {
 					if (!features.hide_map) {
 						HUD::DISPLAY_RADAR(true);
+					}
+					});
+				sub->draw_option<toggle<bool>>(("Disable Police Blips"), nullptr, &features.police_blip, BoolDisplay::OnOff, false, [] {
+					if (!features.police_blip) {
+						PLAYER::SET_POLICE_RADAR_BLIPS(true);
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Reveal"), nullptr, &minimap.hide_fow, BoolDisplay::OnOff);
