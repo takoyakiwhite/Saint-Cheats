@@ -18,6 +18,7 @@
 #include "ScriptLocal.h"
 #include "Timer.hpp"
 #include <GTAV-Classes/vehicle/CCarHandlingData.hpp>
+#include <GTAV-Classes/weapon/CAmmoProjectileInfo.hpp>
 namespace Saint {
 	inline std::string handlingBuffer = "";
 	inline std::string VehNameBuffer = "";
@@ -86,7 +87,7 @@ namespace Saint {
 			"Assault Rifle", "Assault Rifle Mk II", "Carbine Rifle", "Carbine Rifle Mk II", "Advanced Rifle", "Special Carbine", "Special Carbine Mk II", "Bullpup Rifle", "Bullpup Rifle Mk II", "Compact Rifle", "Military Rifle", "Heavy Rifle", "Service Carbine",
 			"MG", "Combat MG", "Combat MG Mk II", "Gusenberg Sweeper",
 			"Sniper Rifle", "Heavy Sniper", "Heavy Sniper Mk II", "Marksman Rifle", "Marksman Rifle Mk II", "Precision Rifle",
-			"RPG", "Grenade Launcher", "Grenade Launcher Smoke", "Minigun", "Firework Launcher", "Railgun", "Homing Launcher", "Compact Grenade Launcher","Widowmaker","Compact EMP Launcher", "Grenade", "BZ Gas", "Molotov Cocktail", "Molotov Cocktail", "Proximity Mines",
+			"RPG", "Grenade Launcher", "Grenade Launcher Smoke", "Minigun", "Firework Launcher", "Railgun", "Homing Launcher", "Compact Grenade Launcher","Widowmaker","Compact EMP Launcher", "Grenade", "BZ Gas", "Molotov Cocktail", "Sticky Bomb", "Proximity Mines",
 			"Snowballs", "Pipe Bombs", "Baseball", "Tear Gas", "Flare", "Jerry Can", "Parachute", "Fire Extinguisher", "Hazardous Jerry Can", "Fertilizer Can", "Candy Cane", "Acid Package" };
 		std::uint32_t Hash[106]
 		{ 0x92A27487, 0x958A4A8F, 0xF9E6AA4B, 0x84BD7BFD, 0xA2719263, 0x8BB05FD7, 0x440E4788, 0x4E875F73, 0xF9DCBF2D, 0xD8DF3C3C, 0x99B507EA, 0xDD5DF8D9, 0xDFE37640, 0x678B81B1, 0x19044EE0, 0xCD274149, 0x94117305, 0x3813FC08,
@@ -255,9 +256,143 @@ namespace Saint {
 	};
 
 	inline game* Game;
+	class AllWeaponsHandler {
+	public:
+		AllWeaponsHandler(const char* m_name, Hash m_hash, const char* m_category) {
+			name = m_name;
+			hash = m_hash;
+			category = m_category;
+
+		}
+	public:
+		const char* category;
+		const char* name;
+		Hash hash;
+
+	};
+	
+		
 	class m_all_weapons {
 	public:
+		std::vector<AllWeaponsHandler> m_Weapons = {
+			{"Antique Cavalry Dagger", rage::joaat("weapon_dagger"), "Melee"},
+			{"Baseball Bat", rage::joaat("weapon_bat"), "Melee"},
+			{"Broken Bottle", rage::joaat("weapon_bottle"), "Melee"},
+			{"Crowbar", rage::joaat("weapon_crowbar"), "Melee"},
+			{"Fist", rage::joaat("weapon_unarmed"), "Melee"},
+			{"Flashlight", rage::joaat("weapon_flashlight"), "Melee"},
+			{"Golf Club", rage::joaat("weapon_golfclub"), "Melee"},
+			{"Hammer", rage::joaat("weapon_hammer"), "Melee"},
+			{"Hatchet", rage::joaat("weapon_hatchet"), "Melee"},
+			{"Brass Knuckles", rage::joaat("weapon_knuckle"), "Melee"},
+			{"Knife", rage::joaat("weapon_knife"), "Melee"},
+			{"Machete", rage::joaat("weapon_machete"), "Melee"},
+			{"Switchblade", rage::joaat("weapon_switchblade"), "Melee"},
+			{"Nightstick", rage::joaat("weapon_nightstick"), "Melee"},
+			{"Pipe Wrench", rage::joaat("weapon_wrench"), "Melee"},
+			{"Battle Axe", rage::joaat("weapon_battleaxe"), "Melee"},
+			{"Pool Cue", rage::joaat("weapon_poolcue"), "Melee"},
+			{"Stone Hatchet", rage::joaat("weapon_stone_hatchet"), "Melee"},
+			{"Candy Cane", 0x6589186A, "Melee"},
 
+			{"Pistol", rage::joaat("weapon_pistol"), "Handguns"},
+			{"Pistol Mk II", rage::joaat("weapon_pistol_mk2"), "Handguns"},
+			{"Combat Pistol", rage::joaat("weapon_combatpistol"), "Handguns"},
+			{"AP Pistol", rage::joaat("weapon_appistol"), "Handguns"},
+			{"Stun Gun", rage::joaat("weapon_stungun"), "Handguns"},
+			{"Pistol .50", rage::joaat("weapon_pistol50"), "Handguns"},
+			{"SNS Pistol", rage::joaat("weapon_snspistol"), "Handguns"},
+			{"SNS Pistol Mk II", rage::joaat("weapon_snspistol_mk2"), "Handguns"},
+			{"Heavy Pistol", rage::joaat("weapon_heavypistol"), "Handguns"},
+			{"Vintage Pistol", rage::joaat("weapon_vintagepistol"), "Handguns"},
+			{"Flare Gun", rage::joaat("weapon_flaregun"), "Handguns"},
+			{"Marksman Pistol", rage::joaat("weapon_marksmanpistol"), "Handguns"},
+			{"Heavy Revolver", rage::joaat("weapon_revolver"), "Handguns"},
+			{"Heavy Revolver Mk II", rage::joaat("weapon_revolver_mk2"), "Handguns"},
+			{"Double Action Revolver", rage::joaat("weapon_doubleaction"), "Handguns"},
+			{"Up-n-Atomizer", rage::joaat("weapon_raypistol"), "Handguns"},
+			{"Ceramic Pistol", rage::joaat("weapon_ceramicpistol"), "Handguns"},
+			{"Navy Revolver", rage::joaat("weapon_navyrevolver"), "Handguns"},
+			{"Perico Pistol", rage::joaat("weapon_gadgetpistol"), "Handguns"},
+			{"Stun Gun MP", rage::joaat("weapon_stungun_mp"), "Handguns"},
+
+			{"Micro SMG", rage::joaat("weapon_microsmg"), "Submachine Guns"},
+			{"SMG", rage::joaat("weapon_smg"), "Submachine Guns"},
+			{"SMG Mk II", rage::joaat("weapon_smg_mk2"), "Submachine Guns"},
+			{"Assault SMG", rage::joaat("weapon_assaultsmg"), "Submachine Guns"},
+			{"Combat PDW", rage::joaat("weapon_combatpdw"), "Submachine Guns"},
+			{"Machine Pistol", rage::joaat("weapon_machinepistol"), "Submachine Guns"},
+			{"Mini SMG", rage::joaat("weapon_minismg"), "Submachine Guns"},
+			{"Unholy Hellbringer", rage::joaat("weapon_raycarbine"), "Submachine Guns"},
+
+			{"Pump Shotgun", rage::joaat("weapon_pumpshotgun"), "Shotguns"},
+			{"Pump Shotgun Mk II", rage::joaat("weapon_pumpshotgun_mk2"), "Shotguns"},
+			{"Sawed-Off Shotgun", rage::joaat("weapon_sawnoffshotgun"), "Shotguns"},
+			{"Assault Shotgun", rage::joaat("weapon_assaultshotgun"), "Shotguns"},
+			{"Bullpup Shotgun", rage::joaat("weapon_bullpupshotgun"), "Shotguns"},
+			{"Musket", rage::joaat("weapon_musket"), "Shotguns"},
+			{"Heavy Shotgun", rage::joaat("weapon_heavyshotgun"), "Shotguns"},
+			{"Double Barrel Shotgun", rage::joaat("weapon_dbshotgun"), "Shotguns"},
+			{"Sweeper Shotgun", rage::joaat("weapon_autoshotgun"), "Shotguns"},
+			{"Combat Shotgun", rage::joaat("weapon_combatshotgun"), "Shotguns"},
+
+			{"Assault Rifle", rage::joaat("weapon_assaultrifle"), "Assault Rifles"},
+			{"Assault Rifle Mk II", rage::joaat("weapon_assaultrifle_mk2"), "Assault Rifles"},
+			{"Carbine Rifle", rage::joaat("weapon_carbinerifle"), "Assault Rifles"},
+			{"Carbine Rifle Mk II", rage::joaat("weapon_carbinerifle_mk2"), "Assault Rifles"},
+			{"Advanced Rifle", rage::joaat("weapon_advancedrifle"), "Assault Rifles"},
+			{"Special Carbine", rage::joaat("weapon_specialcarbine"), "Assault Rifles"},
+			{"Special Carbine Mk II", rage::joaat("weapon_specialcarbine_mk2"), "Assault Rifles"},
+			{"Bullpup Rifle", rage::joaat("weapon_bullpuprifle"), "Assault Rifles"},
+			{"Bullpup Rifle Mk II", rage::joaat("weapon_bullpuprifle_mk2"), "Assault Rifles"},
+			{"Compact Rifle", rage::joaat("weapon_compactrifle"), "Assault Rifles"},
+			{"Military Rifle", rage::joaat("weapon_militaryrifle"), "Assault Rifles"},
+			{"Heavy Rifle", rage::joaat("weapon_heavyrifle"), "Assault Rifles"},
+			{"Tactical Rifle", rage::joaat("weapon_tacticalrifle"), "Assault Rifles"},
+
+			{"MG", rage::joaat("weapon_mg"), "Light Machine Guns"},
+			{"Combat MG", rage::joaat("weapon_combatmg"), "Light Machine Guns"},
+			{"Combat MG Mk II", rage::joaat("weapon_combatmg_mk2"), "Light Machine Guns"},
+			{"Gusenberg Sweeper", rage::joaat("weapon_gusenberg"), "Light Machine Guns"},
+
+			{"Sniper Rifle", rage::joaat("weapon_sniperrifle"), "Sniper Rifles"},
+			{"Heavy Sniper", rage::joaat("weapon_heavysniper"), "Sniper Rifles"},
+			{"Heavy Sniper Mk II", rage::joaat("weapon_heavysniper_mk2"), "Sniper Rifles"},
+			{"Marksman Rifle", rage::joaat("weapon_marksmanrifle"), "Sniper Rifles"},
+			{"Marksman Rifle Mk II", rage::joaat("weapon_marksmanrifle_mk2"), "Sniper Rifles"},
+			{"Precision Rifle", rage::joaat("weapon_precisionrifle"), "Sniper Rifles"},
+
+			{"RPG", rage::joaat("weapon_rpg"), "Heavy Weapons"},
+			{"Grenade Launcher", rage::joaat("weapon_grenadelauncher"), "Heavy Weapons"},
+			{"Smoke Launcher", rage::joaat("weapon_grenadelauncher_smoke"), "Heavy Weapons"},
+			{"Minigun", rage::joaat("weapon_minigun"), "Heavy Weapons"},
+			{"Firework Launcher", rage::joaat("weapon_firework"), "Heavy Weapons"},
+			{"Railgun", rage::joaat("weapon_railgun"), "Heavy Weapons"},
+			{"Homing Launcher", rage::joaat("weapon_hominglauncher"), "Heavy Weapons"},
+			{"Compact Grenade Launcher", rage::joaat("weapon_compactlauncher"), "Heavy Weapons"},
+			{"Widowmaker", rage::joaat("weapon_rayminigun"), "Heavy Weapons"},
+			{"Compact EMP Launcher", rage::joaat("weapon_emplauncher"), "Heavy Weapons"},
+
+			{"Grenade", rage::joaat("weapon_grenade"), "Throwables"},
+			{"BZ Gas", rage::joaat("weapon_bzgas"), "Throwables"},
+			{"Molotov Cocktail", rage::joaat("weapon_molotov"), "Throwables" },
+			{ "Sticky Bomb", rage::joaat("weapon_stickybomb"), "Throwables" },
+			{ "Proximity Mines", rage::joaat("weapon_proxmine"), "Throwables" },
+			{ "Snowball", rage::joaat("weapon_snowball"), "Throwables" },
+			{ "Pipe Bomb", rage::joaat("weapon_pipebomb"), "Throwables" },
+			{ "Baseball", rage::joaat("weapon_ball"), "Throwables" },
+			{ "Tear Gas", rage::joaat("weapon_smokegrenade"), "Throwables" },
+			{ "Flare", rage::joaat("weapon_flare"), "Throwables" },
+			{ "Acid Package", 0xF7F1E25E, "Throwables" },
+
+			{ "Jerry Can", rage::joaat("weapon_petrolcan"), "Miscellaneous" },
+			{ "Parachute", rage::joaat("gadget_parachute"), "Miscellaneous" },
+			{ "Fire Extinguisher", rage::joaat("weapon_fireextinguisher"), "Miscellaneous" },
+			{ "Hazardous Jerry Can", rage::joaat("weapon_hazardcan"), "Miscellaneous" },
+			{ "Fertilizer Can", rage::joaat("weapon_fertilizercan"), "Miscellaneous" },
+		};
+		const char* weapon_class_names[11] = { "Melee", "Handguns", "Submachine Guns", "Shotguns", "Assault Rifles", "Light Machine Guns", "Sniper Rifles", "Heavy Weapons", "Throwables", "Miscellaneous"};
+		
 		const char* explosion[84] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare",
 			"Dust", "Extinguisher", "Unknown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
 			"Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
@@ -314,11 +449,11 @@ namespace Saint {
 		float speed = 2.5f;
 		bool transparent = false;
 		bool spin = false;
-		const char* FlyType[2]
+		const char* FlyType[3] =
 		{
-			"None", "T-Pose"
+			"None", "T-Pose", "Freecam",
 		};
-
+		Cam camera;
 		std::size_t FlyInt = 0;
 		void onDisable() {
 
@@ -333,6 +468,34 @@ namespace Saint {
 			if (enabled) {
 				if (!Game->InVehicle())
 				{
+					if (!CAM::DOES_CAM_EXIST(camera) && FlyInt == 2) {
+						camera = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", true);
+						CAM::SET_CAM_ROT(camera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+						CAM::SET_CAM_COORD(camera, CAM::GET_GAMEPLAY_CAM_COORD());
+					}
+					if (FlyInt == 2) {
+						CAM::RENDER_SCRIPT_CAMS(true, true, 700, true, true, true);
+						CAM::SET_CAM_ACTIVE(camera, true);
+						CAM::SET_CAM_ROT(camera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+					}
+					NativeVector3 freecamCoords = CAM::GET_CAM_COORD(camera);
+					if (FlyInt == 2) {
+
+						NativeVector3 cameraDirection = RotationToDirection(CAM::GET_GAMEPLAY_CAM_ROT(0));
+						NativeVector3 accelerateCoords = multiply(&cameraDirection, 0.2f);
+						if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 8)) {
+
+							NativeVector3 newCoords = addn(&freecamCoords, &accelerateCoords);
+							CAM::SET_CAM_COORD(camera, newCoords);
+						}
+						if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 32)) {
+							NativeVector3 newCoords = addn(&freecamCoords, &accelerateCoords);
+							CAM::SET_CAM_COORD(camera, newCoords);
+						}
+						if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 34)) {
+							CAM::SET_CAM_ROT(camera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+						}
+					}
 					static bool turnoff = true;
 					if (!transparent)
 					{
@@ -383,6 +546,9 @@ namespace Saint {
 						}
 						if (FlyInt == 0) {
 							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), pos.x, pos.y, pos.z, true, true, true);
+						}
+						if (FlyInt == 2) {
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), freecamCoords.x, freecamCoords.y, freecamCoords.z, true, true, true);
 						}
 					}
 					if (SetRotation) {
@@ -574,7 +740,7 @@ namespace Saint {
 		bool enabled = false;
 		bool smooth = false;
 		bool onlyOnGround = false;
-		const char* Boost_Type[2] = { "Forward", "Jump" };
+		const char* Boost_Type[3] = { "Forward", "Backward", "Jump" };
 		std::size_t Boost_Int = 0;
 		int speed = 0;
 		float boost_power = 1.0f;
@@ -601,7 +767,26 @@ namespace Saint {
 
 
 					}
-					if (Boost_Int == 1)
+					if (Boost_Int == 2)
+					{
+
+						if (onlyOnGround && !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(Game->Vehicle())) {
+
+						}
+						else {
+							if (smooth) {
+								if (ENTITY::GET_ENTITY_SPEED(Game->Vehicle()) < speed) {
+									VEHICLE::SET_VEHICLE_FORWARD_SPEED(Game->Vehicle(), -ENTITY::GET_ENTITY_SPEED(Game->Vehicle()) + boost_power);
+								}
+							}
+							else {
+								VEHICLE::SET_VEHICLE_FORWARD_SPEED(Game->Vehicle(), -speed);
+							}
+						}
+
+
+					}
+					if (Boost_Int == 2)
 					{
 						ENTITY::APPLY_FORCE_TO_ENTITY(Game->Vehicle(), 1, 0 + ENTITY::GET_ENTITY_FORWARD_X(Game->Vehicle()), 0 + ENTITY::GET_ENTITY_FORWARD_Y(Game->Vehicle()), 0.5f, 0, 0, 0, 1, 0, 1, 1, 1, 1);
 
@@ -841,6 +1026,7 @@ namespace Saint {
 	inline Autopilot autopilot;
 	class Give_weapon {
 	public:
+		const char* selected_class = "";
 		const char* type[90]
 		{ "All", "Antique Cavalry Dagger", "Baseball Bat", "Broken Bottle", "Crowbar", "Unarmed", "Flashlight", "Golf Club", "Hammer", "Hatchet", "Brass Knucles", "Knife", "Machete", "Switchblade", "Nightstick", "Pipe Wrench",
 			"Battle Axe", "Pool Cue", "Stone Hatchet", "Pistol", "Pistol Mk II", "Combat Pistol", "AP Pistol", "Stun Gun", "Pistol .50", "SNS Pistol", "SNS Pistol Mk II", "Heavy Pistol", "Vintage Pistol", "Flare Gun", "Marksman Pistol",
@@ -970,6 +1156,7 @@ namespace Saint {
 		bool no_grav_veh = false;
 		bool clean_veh = false;
 		float forklight_height = 0.0f;
+		float speedbumpsev = 0.0f;
 		float speed_max = 50.0f;
 		bool can_be_used_by_peds = false;
 		bool ragdoll_on_q = false;
@@ -990,7 +1177,52 @@ namespace Saint {
 		const char* name_buffer;
 		bool no_grav_self = false;
 		bool infinite_stamina = false;
+		bool tron_loop = false;
+		int selected_tron = 0;
+		bool fuck_shell = false;
+		void set_tron_index(int index, int gender) {
+			if (gender == 0) {
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 8, 15, 0, 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 11, 178, index, 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 6, 55, index, 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 4, 77, index, 0);
+				PED::SET_PED_PROP_INDEX(Game->Self(), 0, 91, index, 0);
+			}
+			if (gender == 1) {
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 8, 6, 0, 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 11, 180, index, 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 6, 58, index, 0);
+				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 4, 79, index, 0);
+				PED::SET_PED_PROP_INDEX(Game->Self(), 0, 90, index, 0);
+			}
+		}
 		void init() {
+			if (fuck_shell) {
+				VEHICLE::SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(1000.00f);
+			}
+			if (tron_loop) {
+				
+				static int delay2 = 0;
+				if (delay2 == 0 || (int)(GetTickCount64() - delay2) > 1000)
+				{
+					if (selected_tron > 6) {
+						selected_tron = 0;
+					}
+
+					if (Game->GetHash(Game->Self()) == rage::joaat("mp_m_freemode_01")) {
+							
+							set_tron_index(selected_tron, 0);
+						}
+					if (Game->GetHash(Game->Self()) == rage::joaat("mp_f_freemode_01")) {
+						selected_tron += 1;
+						set_tron_index(selected_tron, 1);
+					}
+
+					
+					delay2 = GetTickCount64();
+					selected_tron++;
+				}
+			}
 			if (infinite_stamina) {
 				Game->CPed()->m_player_info->m_stamina = 1.00f;
 			}
@@ -1273,11 +1505,10 @@ namespace Saint {
 
 					if (Game->InVehicle())
 					{
-						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
-						if (VEHICLE::GET_DOES_VEHICLE_HAVE_DAMAGE_DECALS(playerVehicle)) {
-							VEHICLE::SET_VEHICLE_FIXED(playerVehicle);
-							VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
-							VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, false);
+						if (VEHICLE::GET_DOES_VEHICLE_HAVE_DAMAGE_DECALS(Game->Vehicle())) {
+							VEHICLE::SET_VEHICLE_FIXED(Game->Vehicle());
+							VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(Game->Vehicle());
+							VEHICLE::SET_VEHICLE_DIRT_LEVEL(Game->Vehicle(), false);
 						}
 
 					}
@@ -1286,10 +1517,9 @@ namespace Saint {
 				if (get_repair_type == 1) {
 					if (Game->InVehicle())
 					{
-						Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false);
-						VEHICLE::SET_VEHICLE_FIXED(playerVehicle);
-						VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
-						VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, false);
+						VEHICLE::SET_VEHICLE_FIXED(Game->Vehicle());
+						VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(Game->Vehicle());
+						VEHICLE::SET_VEHICLE_DIRT_LEVEL(Game->Vehicle(), false);
 					}
 				}
 
@@ -3694,17 +3924,512 @@ namespace Saint {
 		Scenarios scenarios;
 		bool contort = false;
 		bool controllable = false;
+		const char* idk1[247] = { "Standing",
+		  "Coffee",
+		  "Smoke",
+		  "Binoculars",
+		  "Freeway",
+		  "Slumped",
+		  "Bum Standing",
+		  "Wash",
+		  "Car Park",
+		  "Cheering",
+		  "Clipboard",
+		  "Clipboard (Facility)",
+		  "Drill",
+		  "Cop Idle",
+		  "Drinking",
+		  "Drinking (Facility)",
+		  "Drinking (Casino)",
+		  "Drug Dealer",
+		  "Drug Dealer Hard",
+		  "Drug Field Rake",
+		  "Drug Field Weeding",
+		  "Coke",
+		  "Weed",
+		  "Mobile Film Shocking",
+		  "Leaf Blower",
+		  "Plant",
+		  "Golf Player",
+		  "Guard Patrol",
+		  "Guard Stand",
+		  "Guard Stand (Casino)",
+		  "Guard Stand (Clubhouse)",
+		  "Guard Stand (Facility)",
+		  "Guard Stand (Army)",
+		  "Hammering",
+		  "Hang Out Street",
+		  "Hang Out Street (Clubhouse)",
+		  "Hiker",
+		  "Hiker (Standing)",
+		  "Human Statue",
+		  "Inspect Crouch",
+		  "Inspect Stand",
+		  "Janitor",
+		  "Jog",
+		  "Jog (Standing)",
+		  "Leaning",
+		  "Leaning (Casino)",
+		  "Maid",
+		  "Muscle Flex",
+		  "Muscle Flex Weights",
+		  "Muscian",
+		  "Paparazzi",
+		  "Partying",
+		  "Picnic",
+		  "Power Walker",
+		  "Prostitue (High Class)",
+		  "Prostitue (Low Class)",
+		  "Push Ups",
+		  "Seat Ledge",
+		  "Seat Ledge (Eating)",
+		  "Seat Steps",
+		  "Seat Wall",
+		  "Seat Wall (Eating)",
+		  "Seat Wall (Tablet)",
+		  "Secruity Shine Torch",
+		  "Sit Ups",
+		  "Smoking",
+		  "Smoking (Clubhouse)",
+		  "Smoking Pot",
+		  "Smoking Pot (Clubhouse)",
+		  "Stand (Fire)",
+		  "Stand (Fishing)",
+		  "Stand (Impatient)",
+		  "Stand (Impatient Clubhouse)",
+		  "Stand (Impatient Facility)",
+		  "Stand (Impatient Upright)",
+		  "Stand (Impatient Upright Facility)",
+		  "Stand (Mobile)",
+		  "Stand (Mobile Clubhouse)",
+		  "Stand (Mobile Facility)",
+		  "Stand (Mobile Upright)",
+		  "Stand (Mobile Clubhouse)",
+		  "Strip Watch Stand",
+		  "Stupor",
+		  "Stupor (Clubhouse)",
+		  "Showroom",
+		  "Sunbathe",
+		  "Sunbathe (Back)",
+		  "Superhero",
+		  "Swimming",
+		  "Tennis Player",
+		  "Tourist Map",
+		  "Tourist Mobile",
+		  "Valet",
+		  "Vehicle Mechanic",
+		  "Welding",
+		  "Shop Browse",
+		  "Yoga",
+		  "Walk",
+		  "Walk (Facility)",
+		  "Boar",
+		  "Cat Sleeping (Ground)",
+		  "Cat Sleeping (Ledge)",
+		  "Cow",
+		  "Coyote (Growl)",
+		  "Coyote (Rest)",
+		  "Coyote (Wander)",
+		  "Coyote (Walk)",
+		  "Chickenhawk (Feeding)",
+		  "Chickenhawk (Standing)",
+		  "Cormorant (Standing)",
+		  "Crow (Feeding)",
+		  "Crow (Standing)",
+		  "Deer",
+		  "Dog Barking (Rottweiler)",
+		  "Dog Barking (Retriever)",
+		  "Dog Barking (Sheperd)",
+		  "Dog Sitting (Rottweiler)",
+		  "Dog Sitting (Retriever)",
+		  "Dog Sitting (Sheperd)",
+		  "Dog Barking (Small)",
+		  "Dog Sitting (Small)",
+		  "Dolphin",
+		  "Fish (Flee)",
+		  "Fish (Idle)",
+		  "Gull (Feeding)",
+		  "Gull (Standing)",
+		  "Hen (Flee)",
+		  "Hen (Pecking)",
+		  "Hen (Standing)",
+		  "Mountain Lion (Rest)",
+		  "Mountain Lion (Wonder)",
+		  "Orca",
+		  "Pig",
+		  "Pigeon (Feeding)",
+		  "Pigeon (Standing)",
+		  "Rabbit (Eating)",
+		  "Rabbit (Flee)",
+		  "Rat (Eating)",
+		  "Rat (Flee)",
+		  "Shark",
+		  "Hammerhead Shark",
+		  "Stingray",
+		  "Whale",
+		  "Drive",
+		  "Vehicle Attractor",
+		  "Park",
+		  "Ambulance",
+		  "BMX",
+		  "BMX (Ballas)",
+		  "BMX (Family)",
+		  "BMX (Harmony)",
+		  "BMX (Vagos)",
+		  "BMX (Mountain)",
+		  "BMX (Road)",
+		  "BMX (Off Road Race)",
+		  "Biker",
+		  "Boat (Idle)",
+		  "Boat (Idle Alamo)",
+		  "Boat (Idle Marquis)",
+		  "Broken Down",
+		  "Vehucke Business Men",
+		  "Heli Lifeguard",
+		  "Cluckin Bell Trailer",
+		  "Vehicle Construction Solo",
+		  "Vehicle Construction Passengers",
+		  "Drive Passengers",
+		  "Drive Passengers Limited",
+		  "Drive Solo",
+		  "Vehicle Farm Worker",
+		  "Fire Truck",
+		  "Vehicle Empty",
+		  "Vehicle Mariachi",
+		  "Vehicle Mechanic",
+		  "Miltary Plane Big",
+		  "Miltary Plane Small",
+		  "Parallel Parking",
+		  "Park Nose In",
+		  "Passenger Exit",
+		  "Police Bike",
+		  "Police Car",
+		  "Police Next To Car",
+		  "Quarry",
+		  "Salton",
+		  "Salton (Dirt Bike)",
+		  "Secruity Car",
+		  "Streetrace",
+		  "Tourbus",
+		  "Vehicle Tourist",
+		  "Tandl",
+		  "Tractor",
+		  "Tractor (Beach)",
+		  "Truck Logs",
+		  "Truck Trailers",
+		  "Bird In Tree",
+		  "Empty Ground",
+		  "Telegraph Pole",
+		  "ATM",
+		  "BBQ",
+		  "Bum Bin",
+		  "Bum Shopping Cart",
+		  "Muscle Chin Ups",
+		  "Muscle Chin Ups (Army)",
+		  "Muscle Chin Ups (Prison)",
+		  "Parking Meter",
+		  "Chair (Army)",
+		  "Seat (Bar)",
+		  "Seat (Bench)",
+		  "Seat (Bench Facility)",
+		  "Seat (Bench Drink)",
+		  "Seat (Bench Drink Facility)",
+		  "Seat (Bench Drink Beer)",
+		  "Seat (Bench Food)",
+		  "Seat (Bench Food Facility)",
+		  "Bus Stop Wait",
+		  "Seat (Chair)",
+		  "Seat (Chair Drink)",
+		  "Seat (Chair Drink Beer)",
+		  "Seat (Chair Food)",
+		  "Seat (Chair Upright)",
+		  "Seat (Chair Upright Showroom)",
+		  "Seat (Chair MP Player)",
+		  "Seat (Chair Computer)",
+		  "Seat (Chair Computer Low)",
+		  "Seat (Deckchair)",
+		  "Seat (Deckchair Drink)",
+		  "Bench Press",
+		  "Bench Press (Prison)",
+		  "Sewing",
+		  "Strip Watch",
+		  "Sunlounger",
+		  "Impatient",
+		  "Cower",
+		  "Cross Road Wait",
+		  "Park Car",
+		  "Movie Bulb",
+		  "Studio Light",
+		  "Medic (Kneel)",
+		  "Medic (Tend To Dead)",
+		  "Medic (Time Of Death)",
+		  "Police (Crowd Control)",
+		  "Police (Investigate)",
+		  "Chaining (Entry)",
+		  "Chaining (Exit)",
+		  "Stand Cower",
+		  "Ear To Text",
+		  "Ear To Text (Fat)",
+		  "Lookat Point"
+		};
+		const char* idk[247] = { "Standing",
+		  "WORLD_HUMAN_AA_COFFEE",
+		  "WORLD_HUMAN_AA_SMOKE",
+		  "WORLD_HUMAN_BINOCULARS",
+		  "WORLD_HUMAN_BUM_FREEWAY",
+		  "WORLD_HUMAN_BUM_SLUMPED",
+		  "WORLD_HUMAN_BUM_STANDING",
+		  "WORLD_HUMAN_BUM_WASH",
+		  "WORLD_HUMAN_CAR_PARK_ATTENDANT",
+		  "WORLD_HUMAN_CHEERING",
+		  "WORLD_HUMAN_CLIPBOARD",
+		  "WORLD_HUMAN_CLIPBOARD_FACILITY",
+		  "WORLD_HUMAN_CONST_DRILL",
+		  "WORLD_HUMAN_COP_IDLES",
+		  "WORLD_HUMAN_DRINKING",
+		  "WORLD_HUMAN_DRINKING_FACILITY",
+		  "WORLD_HUMAN_DRINKING_CASINO_TERRACE",
+		  "WORLD_HUMAN_DRUG_DEALER",
+		  "WORLD_HUMAN_DRUG_DEALER_HARD",
+		  "WORLD_HUMAN_DRUG_FIELD_WORKERS_RAKE",
+		  "WORLD_HUMAN_DRUG_FIELD_WORKERS_WEEDING",
+		  "WORLD_HUMAN_DRUG_PROCESSORS_COKE",
+		  "WORLD_HUMAN_DRUG_PROCESSORS_WEED",
+		  "WORLD_HUMAN_MOBILE_FILM_SHOCKING",
+		  "WORLD_HUMAN_GARDENER_LEAF_BLOWER",
+		  "WORLD_HUMAN_GARDENER_PLANT",
+		  "WORLD_HUMAN_GOLF_PLAYER",
+		  "WORLD_HUMAN_GUARD_PATROL",
+		  "WORLD_HUMAN_GUARD_STAND",
+		  "WORLD_HUMAN_GUARD_STAND_CASINO",
+		  "WORLD_HUMAN_GUARD_STAND_CLUBHOUSE",
+		  "WORLD_HUMAN_GUARD_STAND_FACILITY",
+		  "WORLD_HUMAN_GUARD_STAND_ARMY",
+		  "WORLD_HUMAN_HAMMERING",
+		  "WORLD_HUMAN_HANG_OUT_STREET",
+		  "WORLD_HUMAN_HANG_OUT_STREET_CLUBHOUSE",
+		  "WORLD_HUMAN_HIKER",
+		  "WORLD_HUMAN_HIKER_STANDING",
+		  "WORLD_HUMAN_HUMAN_STATUE",
+		  "WORLD_HUMAN_INSPECT_CROUCH",
+		  "WORLD_HUMAN_INSPECT_STAND",
+		  "WORLD_HUMAN_JANITOR",
+		  "WORLD_HUMAN_JOG",
+		  "WORLD_HUMAN_JOG_STANDING",
+		  "WORLD_HUMAN_LEANING",
+		  "WORLD_HUMAN_LEANING_CASINO_TERRACE",
+		  "WORLD_HUMAN_MAID_CLEAN",
+		  "WORLD_HUMAN_MUSCLE_FLEX",
+		  "WORLD_HUMAN_MUSCLE_FREE_WEIGHTS",
+		  "WORLD_HUMAN_MUSICIAN",
+		  "WORLD_HUMAN_PAPARAZZI",
+		  "WORLD_HUMAN_PARTYING",
+		  "WORLD_HUMAN_PICNIC",
+		  "WORLD_HUMAN_POWER_WALKER",
+		  "WORLD_HUMAN_PROSTITUTE_HIGH_CLASS",
+		  "WORLD_HUMAN_PROSTITUTE_LOW_CLASS",
+		  "WORLD_HUMAN_PUSH_UPS",
+		  "WORLD_HUMAN_SEAT_LEDGE",
+		  "WORLD_HUMAN_SEAT_LEDGE_EATING",
+		  "WORLD_HUMAN_SEAT_STEPS",
+		  "WORLD_HUMAN_SEAT_WALL",
+		  "WORLD_HUMAN_SEAT_WALL_EATING",
+		  "WORLD_HUMAN_SEAT_WALL_TABLET",
+		  "WORLD_HUMAN_SECURITY_SHINE_TORCH",
+		  "WORLD_HUMAN_SIT_UPS",
+		  "WORLD_HUMAN_SMOKING",
+		  "WORLD_HUMAN_SMOKING_CLUBHOUSE",
+		  "WORLD_HUMAN_SMOKING_POT",
+		  "WORLD_HUMAN_SMOKING_POT_CLUBHOUSE",
+		  "WORLD_HUMAN_STAND_FIRE",
+		  "WORLD_HUMAN_STAND_FISHING",
+		  "WORLD_HUMAN_STAND_IMPATIENT",
+		  "WORLD_HUMAN_STAND_IMPATIENT_CLUBHOUSE",
+		  "WORLD_HUMAN_STAND_IMPATIENT_FACILITY",
+		  "WORLD_HUMAN_STAND_IMPATIENT_UPRIGHT",
+		  "WORLD_HUMAN_STAND_IMPATIENT_UPRIGHT_FACILITY",
+		  "WORLD_HUMAN_STAND_MOBILE",
+		  "WORLD_HUMAN_STAND_MOBILE_CLUBHOUSE",
+		  "WORLD_HUMAN_STAND_MOBILE_FACILITY",
+		  "WORLD_HUMAN_STAND_MOBILE_UPRIGHT",
+		  "WORLD_HUMAN_STAND_MOBILE_UPRIGHT_CLUBHOUSE",
+		  "WORLD_HUMAN_STRIP_WATCH_STAND",
+		  "WORLD_HUMAN_STUPOR",
+		  "WORLD_HUMAN_STUPOR_CLUBHOUSE",
+		  "WORLD_HUMAN_WINDOW_SHOP_BROWSE_SHOWROOM",
+		  "WORLD_HUMAN_SUNBATHE",
+		  "WORLD_HUMAN_SUNBATHE_BACK",
+		  "WORLD_HUMAN_SUPERHERO",
+		  "WORLD_HUMAN_SWIMMING",
+		  "WORLD_HUMAN_TENNIS_PLAYER",
+		  "WORLD_HUMAN_TOURIST_MAP",
+		  "WORLD_HUMAN_TOURIST_MOBILE",
+		  "WORLD_HUMAN_VALET",
+		  "WORLD_HUMAN_VEHICLE_MECHANIC",
+		  "WORLD_HUMAN_WELDING",
+		  "WORLD_HUMAN_WINDOW_SHOP_BROWSE",
+		  "WORLD_HUMAN_YOGA",
+		  "Walk",
+		  "Walk_Facility",
+		  "WORLD_BOAR_GRAZING",
+		  "WORLD_CAT_SLEEPING_GROUND",
+		  "WORLD_CAT_SLEEPING_LEDGE",
+		  "WORLD_COW_GRAZING",
+		  "WORLD_COYOTE_HOWL",
+		  "WORLD_COYOTE_REST",
+		  "WORLD_COYOTE_WANDER",
+		  "WORLD_COYOTE_WALK",
+		  "WORLD_CHICKENHAWK_FEEDING",
+		  "WORLD_CHICKENHAWK_STANDING",
+		  "WORLD_CORMORANT_STANDING",
+		  "WORLD_CROW_FEEDING",
+		  "WORLD_CROW_STANDING",
+		  "WORLD_DEER_GRAZING",
+		  "WORLD_DOG_BARKING_ROTTWEILER",
+		  "WORLD_DOG_BARKING_RETRIEVER",
+		  "WORLD_DOG_BARKING_SHEPHERD",
+		  "WORLD_DOG_SITTING_ROTTWEILER",
+		  "WORLD_DOG_SITTING_RETRIEVER",
+		  "WORLD_DOG_SITTING_SHEPHERD",
+		  "WORLD_DOG_BARKING_SMALL",
+		  "WORLD_DOG_SITTING_SMALL",
+		  "WORLD_DOLPHIN_SWIM",
+		  "WORLD_FISH_FLEE",
+		  "WORLD_FISH_IDLE",
+		  "WORLD_GULL_FEEDING",
+		  "WORLD_GULL_STANDING",
+		  "WORLD_HEN_FLEE",
+		  "WORLD_HEN_PECKING",
+		  "WORLD_HEN_STANDING",
+		  "WORLD_MOUNTAIN_LION_REST",
+		  "WORLD_MOUNTAIN_LION_WANDER",
+		  "WORLD_ORCA_SWIM",
+		  "WORLD_PIG_GRAZING",
+		  "WORLD_PIGEON_FEEDING",
+		  "WORLD_PIGEON_STANDING",
+		  "WORLD_RABBIT_EATING",
+		  "WORLD_RABBIT_FLEE",
+		  "WORLD_RATS_EATING",
+		  "WORLD_RATS_FLEEING",
+		  "WORLD_SHARK_SWIM",
+		  "WORLD_SHARK_HAMMERHEAD_SWIM",
+		  "WORLD_STINGRAY_SWIM",
+		  "WORLD_WHALE_SWIM",
+		  "DRIVE",
+		  "WORLD_VEHICLE_ATTRACTOR",
+		  "PARK_VEHICLE",
+		  "WORLD_VEHICLE_AMBULANCE",
+		  "WORLD_VEHICLE_BICYCLE_BMX",
+		  "WORLD_VEHICLE_BICYCLE_BMX_BALLAS",
+		  "WORLD_VEHICLE_BICYCLE_BMX_FAMILY",
+		  "WORLD_VEHICLE_BICYCLE_BMX_HARMONY",
+		  "WORLD_VEHICLE_BICYCLE_BMX_VAGOS",
+		  "WORLD_VEHICLE_BICYCLE_MOUNTAIN",
+		  "WORLD_VEHICLE_BICYCLE_ROAD",
+		  "WORLD_VEHICLE_BIKE_OFF_ROAD_RACE",
+		  "WORLD_VEHICLE_BIKER",
+		  "WORLD_VEHICLE_BOAT_IDLE",
+		  "WORLD_VEHICLE_BOAT_IDLE_ALAMO",
+		  "WORLD_VEHICLE_BOAT_IDLE_MARQUIS",
+		  "WORLD_VEHICLE_BROKEN_DOWN",
+		  "WORLD_VEHICLE_BUSINESSMEN",
+		  "WORLD_VEHICLE_HELI_LIFEGUARD",
+		  "WORLD_VEHICLE_CLUCKIN_BELL_TRAILER",
+		  "WORLD_VEHICLE_CONSTRUCTION_SOLO",
+		  "WORLD_VEHICLE_CONSTRUCTION_PASSENGERS",
+		  "WORLD_VEHICLE_DRIVE_PASSENGERS",
+		  "WORLD_VEHICLE_DRIVE_PASSENGERS_LIMITED",
+		  "WORLD_VEHICLE_DRIVE_SOLO",
+		  "WORLD_VEHICLE_FARM_WORKER",
+		  "WORLD_VEHICLE_FIRE_TRUCK",
+		  "WORLD_VEHICLE_EMPTY",
+		  "WORLD_VEHICLE_MARIACHI",
+		  "WORLD_VEHICLE_MECHANIC",
+		  "WORLD_VEHICLE_MILITARY_PLANES_BIG",
+		  "WORLD_VEHICLE_MILITARY_PLANES_SMALL",
+		  "WORLD_VEHICLE_PARK_PARALLEL",
+		  "WORLD_VEHICLE_PARK_PERPENDICULAR_NOSE_IN",
+		  "WORLD_VEHICLE_PASSENGER_EXIT",
+		  "WORLD_VEHICLE_POLICE_BIKE",
+		  "WORLD_VEHICLE_POLICE_CAR",
+		  "WORLD_VEHICLE_POLICE_NEXT_TO_CAR",
+		  "WORLD_VEHICLE_QUARRY",
+		  "WORLD_VEHICLE_SALTON",
+		  "WORLD_VEHICLE_SALTON_DIRT_BIKE",
+		  "WORLD_VEHICLE_SECURITY_CAR",
+		  "WORLD_VEHICLE_STREETRACE",
+		  "WORLD_VEHICLE_TOURBUS",
+		  "WORLD_VEHICLE_TOURIST",
+		  "WORLD_VEHICLE_TANDL",
+		  "WORLD_VEHICLE_TRACTOR",
+		  "WORLD_VEHICLE_TRACTOR_BEACH",
+		  "WORLD_VEHICLE_TRUCK_LOGS",
+		  "WORLD_VEHICLE_TRUCKS_TRAILERS",
+		  "PROP_BIRD_IN_TREE",
+		  "WORLD_VEHICLE_DISTANT_EMPTY_GROUND",
+		  "PROP_BIRD_TELEGRAPH_POLE",
+		  "PROP_HUMAN_ATM",
+		  "PROP_HUMAN_BBQ",
+		  "PROP_HUMAN_BUM_BIN",
+		  "PROP_HUMAN_BUM_SHOPPING_CART",
+		  "PROP_HUMAN_MUSCLE_CHIN_UPS",
+		  "PROP_HUMAN_MUSCLE_CHIN_UPS_ARMY",
+		  "PROP_HUMAN_MUSCLE_CHIN_UPS_PRISON",
+		  "PROP_HUMAN_PARKING_METER",
+		  "PROP_HUMAN_SEAT_ARMCHAIR",
+		  "PROP_HUMAN_SEAT_BAR",
+		  "PROP_HUMAN_SEAT_BENCH",
+		  "PROP_HUMAN_SEAT_BENCH_FACILITY",
+		  "PROP_HUMAN_SEAT_BENCH_DRINK",
+		  "PROP_HUMAN_SEAT_BENCH_DRINK_FACILITY",
+		  "PROP_HUMAN_SEAT_BENCH_DRINK_BEER",
+		  "PROP_HUMAN_SEAT_BENCH_FOOD",
+		  "PROP_HUMAN_SEAT_BENCH_FOOD_FACILITY",
+		  "PROP_HUMAN_SEAT_BUS_STOP_WAIT",
+		  "PROP_HUMAN_SEAT_CHAIR",
+		  "PROP_HUMAN_SEAT_CHAIR_DRINK",
+		  "PROP_HUMAN_SEAT_CHAIR_DRINK_BEER",
+		  "PROP_HUMAN_SEAT_CHAIR_FOOD",
+		  "PROP_HUMAN_SEAT_CHAIR_UPRIGHT",
+		  "PROP_HUMAN_SEAT_CHAIR_UPRIGHT_SHOWROOM",
+		  "PROP_HUMAN_SEAT_CHAIR_MP_PLAYER",
+		  "PROP_HUMAN_SEAT_COMPUTER",
+		  "PROP_HUMAN_SEAT_COMPUTER_LOW",
+		  "PROP_HUMAN_SEAT_DECKCHAIR",
+		  "PROP_HUMAN_SEAT_DECKCHAIR_DRINK",
+		  "PROP_HUMAN_SEAT_MUSCLE_BENCH_PRESS",
+		  "PROP_HUMAN_SEAT_MUSCLE_BENCH_PRESS_PRISON",
+		  "PROP_HUMAN_SEAT_SEWING",
+		  "PROP_HUMAN_SEAT_STRIP_WATCH",
+		  "PROP_HUMAN_SEAT_SUNLOUNGER",
+		  "PROP_HUMAN_STAND_IMPATIENT",
+		  "CODE_HUMAN_COWER",
+		  "CODE_HUMAN_CROSS_ROAD_WAIT",
+		  "CODE_HUMAN_PARK_CAR",
+		  "PROP_HUMAN_MOVIE_BULB",
+		  "PROP_HUMAN_MOVIE_STUDIO_LIGHT",
+		  "CODE_HUMAN_MEDIC_KNEEL",
+		  "CODE_HUMAN_MEDIC_TEND_TO_DEAD",
+		  "CODE_HUMAN_MEDIC_TIME_OF_DEATH",
+		  "CODE_HUMAN_POLICE_CROWD_CONTROL",
+		  "CODE_HUMAN_POLICE_INVESTIGATE",
+		  "CHAINING_ENTRY",
+		  "CHAINING_EXIT",
+		  "CODE_HUMAN_STAND_COWER",
+		  "EAR_TO_TEXT",
+		  "EAR_TO_TEXT_FAT",
+		  "WORLD_LOOKAT_POINT"
+		};
+		std::string results = "";
+		const char* flags[7] = { "Normal", "Repeat", "Stop Last Frame", "Upperbody", "Controllable", "Cancelable", "Player Control" };
+		int flags_int[7] = { 0, 1, 2, 16, 120, 120,32 };
+		std::size_t pos;
 		void start(const char* anim, const char* animid)
 		{
 			g_CallbackScript->AddCallback<AnimationCallback>(anim, [=]
 				{
-					if (controllable) {
-						TASK::TASK_PLAY_ANIM(Game->Self(), (char*)anim, (char*)animid, 9.0f, 0.0f, -1, 120, 0, false, false, false);
-					}
-					else
-					{
-						TASK::TASK_PLAY_ANIM(Game->Self(), (char*)anim, (char*)animid, 8.0f, 0.0f, -1, 9, 0, 0, 0, 0);
-					}
+					TASK::TASK_PLAY_ANIM(Game->Self(), (char*)anim, (char*)animid, 8.0f, 0.0f, -1, flags_int[pos], 0, 0, 0, 0);
+
 				});
 		}
 	};
@@ -4926,7 +5651,7 @@ namespace Saint {
 	public:
 		Vehicle id;
 	};
-		
+
 	class EntityShooter2 {
 	public:
 		int selected_class;
@@ -4935,7 +5660,7 @@ namespace Saint {
 		bool enabled = false;
 		Vehicle entityGunVehicle;
 		std::vector<EntityShooterHandler> m_Shot = {
-			
+
 		};
 		void init() {
 			if (enabled) {
@@ -5423,7 +6148,7 @@ namespace Saint {
 	public:
 
 
-		const char* type[2] = { "Normal", "Sphere" };
+		const char* type[3] = { "Normal", "Sphere", "Sphere (Less Fuzzy)"};
 		std::size_t size = 0;
 		bool enabled = false;
 		bool rainbow = false;
@@ -5459,8 +6184,8 @@ namespace Saint {
 					Game->ParticleOnBone("scr_indep_fireworks", "scr_indep_firework_sparkle_spawn", SKEL_R_Hand, 0.5f, true, r2, g2, b2);
 				}
 				if (size == 2) {
-					Game->ParticleOnBone("scr_minigametennis", "scr_tennis_ball_trail", SKEL_L_Hand, 0.5f, true, r2, g2, b2);
-					Game->ParticleOnBone("scr_minigametennis", "scr_tennis_ball_trail", SKEL_R_Hand, 0.5f, true, r2, g2, b2);
+					Game->ParticleOnBone("scr_rcpaparazzo1", "scr_mich4_firework_sparkle_spawn", SKEL_L_Hand, 0.5f, true, r2, g2, b2);
+					Game->ParticleOnBone("scr_rcpaparazzo1", "scr_mich4_firework_sparkle_spawn", SKEL_R_Hand, 0.5f, true, r2, g2, b2);
 				}
 			}
 		}
@@ -5685,7 +6410,7 @@ namespace Saint {
 				 "MOVE_F@TOUGH_GUY@"
 		};
 		std::size_t size;
-		
+
 		void change(const char* name) {
 
 			g_CallbackScript->AddCallback<WalkStyleCallback>(name, [=] {
@@ -7033,7 +7758,7 @@ namespace Saint {
 	inline RocketBoost rocket_boost;
 	class Doors {
 	public:
-		const char* action[5] = { "Open", "Close", "Delete", "Lock", "Unlock"};
+		const char* action[5] = { "Open", "Close", "Delete", "Lock", "Unlock" };
 		std::size_t pos;
 	};
 	inline Doors doors;
@@ -7085,6 +7810,7 @@ namespace Saint {
 		int selected_player = 0;
 		float size = 1.0f;
 		Color color = { r, g, b, a };
+		bool consume_entites = false;
 		std::vector<int32_t> vehs() {
 			if (vehicles) {
 				const int get = 100;
@@ -7115,10 +7841,12 @@ namespace Saint {
 				return total;
 			}
 		}
+		const char* consume_notify[2] = { "None", "Notification" };
+		std::size_t pos;
 		void init() {
 			if (attach_to_player && selected) {
 				c = Game->Coords(Game->PlayerIndex(selected_player));
-				 
+
 			}
 			if (enabled) {
 				if (rainbow) {
@@ -7136,6 +7864,16 @@ namespace Saint {
 					}
 				}
 				GRAPHICS::DRAW_MARKER(preview, c.x, c.y, c.z, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, size, size, size, r, g, b, a, false, false, 0, false, NULL, NULL, false);
+				if (consume_entites) {
+					if (vehicles) {
+						MISC::CLEAR_AREA_OF_VEHICLES(c.x, c.y, c.z, size, false, false, false, false, false, false, false);
+						
+					}
+					if (peds2) {
+						MISC::CLEAR_AREA_OF_PEDS(c.x, c.y, c.z, size, 0);
+						
+					}
+				}
 				auto get_nearby_vehs = vehs();
 				auto get_nearby_peds = peds();
 				get_nearby_vehs.insert(get_nearby_vehs.end(), get_nearby_peds.begin(), get_nearby_peds.end());
@@ -7452,6 +8190,8 @@ namespace Saint {
 		bool on_collison = false;
 		bool on_jump = false;
 		int threshold = 500;
+		const char* TypeName[4] = { "Normal", "Stiff Legs/Body", "Narrow Leg Stumble", "Wide Leg Stumble"};
+		std::size_t pos = 0;
 		void init() {
 			if (on_collison) {
 				PED::SET_PED_RAGDOLL_ON_COLLISION(Game->Self(), true);
@@ -7845,7 +8585,7 @@ namespace Saint {
 					if (PLAYER::IS_PLAYER_PRESSING_HORN(Game->Id()))
 					{
 
-						
+
 
 						Hash hash = all_weapons.hash[weapon];
 						if (!WEAPON::HAS_WEAPON_ASSET_LOADED(hash))
@@ -7853,9 +8593,9 @@ namespace Saint {
 							WEAPON::REQUEST_WEAPON_ASSET(hash, 31, 0);
 						}
 
-						
 
-						
+
+
 						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(coords0from.x, coords0from.y, coords0from.z, coords0to.x, coords0to.y, coords0to.z, damage, 1, hash, playerPed, 1, 0, -1.0);
 						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(coords1from.x, coords1from.y, coords1from.z, coords1to.x, coords1to.y, coords1to.z, damage, 1, hash, playerPed, 1, 0, -1.0);
 
@@ -7879,7 +8619,155 @@ namespace Saint {
 		float wind_direction = 180.f;
 	};
 	inline WeatherEditor weather_edior;
+	class Graphics {
+	public:
+		bool hd_only = false;
+	};
+	class Misc {
+	public:
+		Graphics graphics;
+		bool reduce_ped_budget = false;
+		bool reduce_vehicle_budget = false;
+		void init() {
+			if (graphics.hd_only) {
+				STREAMING::SET_RENDER_HD_ONLY(true);
+			}
+			if (reduce_ped_budget) {
+				STREAMING::SET_REDUCE_PED_MODEL_BUDGET(true);
+			}
+			if (reduce_vehicle_budget) {
+				STREAMING::SET_REDUCE_VEHICLE_MODEL_BUDGET(true);
+			}
+		}
+	};
+	inline Misc misc;
+	class DamagePack {
+	public:
+		float value = 50.0f;
+	};
+	class Self {
+	public:
+		DamagePack damage_pack;
+		bool scuba = false;
+		void init() {
+			if (scuba) {
+				PED::SET_ENABLE_SCUBA(Game->Self(), true);
+			}
+		}
+	};
+	inline Self self;
+	class ClearArea {
+	public:
+		bool always_show_radius = false;
+		float radius = 150.f;
+	};
+	class World {
+	public:
+		ClearArea clear_area;
+		bool disable_random_trains = false;
+		bool ambient_sirens = false;
+		void init() {
+			if (ambient_sirens) {
+				AUDIO::DISTANT_COP_CAR_SIRENS(true);
+			}
+			if (disable_random_trains) {
+				VEHICLE::SET_DISABLE_RANDOM_TRAINS_THIS_FRAME(true);
+			}
+		}
+	};
+	inline World world;
+	class SpeechHandler {
+	public:
+		SpeechHandler(const char* m_actual_name, const char* m_name, const char* m_voice) {
+			actual_name = m_actual_name;
+			name = m_name;
+			voice = m_voice;
+		}
+	public:
+		const char* actual_name;
+		const char* name;
+		const char* voice;
+	};
+	class Speech {
+	public:
+		const char* voices[5] = { "Ambient", "Ballas", "Cop", "Franklin", "Lester"};
+		std::size_t pos;
+		const char* params[2] = { "Normal", "Megaphone" };
+		const char* paramnames[2] = { "SPEECH_PARAMS_STANDARD", "SPEECH_PARAMS_MEGAPHONE" };
+		std::size_t pos2;
+		std::vector<SpeechHandler> Ballas = {
+			{ "Hi", "GENERIC_HI", "G_M_Y_BALLASOUT_01_BLACK_FULL_01"},
+			{ "Bye", "GENERIC_BYE", "G_M_Y_BALLASOUT_01_BLACK_FULL_01"},
+			{ "Reloading", "RELOADING", "G_M_Y_BALLASOUT_01_BLACK_FULL_01"},
+			{ "Nice Car", "NICE_CAR", "G_M_Y_BALLASOUT_01_BLACK_FULL_01"},
+			{ "Cheer", "GENERIC_CHEER", "G_M_Y_BALLASOUT_01_BLACK_FULL_01"},
+			{ "Crash", "CRASH_GENERIC", "G_M_Y_BALLASOUT_01_BLACK_FULL_01"},
+		};
+		std::vector<SpeechHandler> Cop = {
+			{ "Arrest", "ARREST_PLAYER", "s_m_y_sheriff_01_white_full_01"},
+			{ "Hi", "GENERIC_HI", "s_m_y_sheriff_01_white_full_01"},
+			{ "Bye", "GENERIC_BYE", "s_m_y_sheriff_01_white_full_01"},
+			{ "Reloading", "RELOADING", "s_m_y_sheriff_01_white_full_01"},
+			{ "Cover Me", "COVER_ME", "s_m_y_sheriff_01_white_full_01"},
+		};
+		std::vector<SpeechHandler> Franklin = {
+			{ "Hi", "GENERIC_HI", "FRANKLIN_NORMAL"},
+			{ "Bye", "GENERIC_BYE", "FRANKLIN_NORMAL"},
+			{ "Reloading", "RELOADING", "FRANKLIN_NORMAL"},
+			{ "Crash", "CRASH_GENERIC", "FRANKLIN_NORMAL"},
+			{ "Curse (High)", "GENERIC_CURSE_HIGH", "FRANKLIN_NORMAL"},
+			{ "Whatever", "GENERIC_WHATEVER", "FRANKLIN_NORMAL"},
+			{ "Thanks", "GENERIC_THANKS", "FRANKLIN_NORMAL"},
+		};
+		std::vector<SpeechHandler> Lester = {
+			{ "Hi", "GENERIC_HI", "LESTER"},
+			{ "Interrupt", "GENERIC_INTERRUPT_ANNOYED", "LESTER"},
+			{ "Wait For Me", "WAIT_FOR_ME", "LESTER"},
+			
+		};
+	};
+	inline Speech speech;
+	class Weapon22 {
+	public:
+		const char* mk2[6] = { "Armor Piercing", "Explosive", "FMJ", "Hollow Point", "Incendiary", "Tracer" };
+		std::size_t pos;
+		bool mk2_ammo = false;
+		void set_mk2(int what) {
+			auto const dc = reinterpret_cast<CAmmoProjectileInfo*>(Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info);
+			switch (what) {
+			case 0:
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info->m_ammo_special_type = eAmmoSpecialType::ArmorPiercing;
+				break;
+			case 1:
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info->m_ammo_special_type = eAmmoSpecialType::Explosive;
+				break;
+			case 2:
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info->m_ammo_special_type = eAmmoSpecialType::FMJ;
+				break;
+			case 3:
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info->m_ammo_special_type = eAmmoSpecialType::HollowPoint;
+				break;
+			case 4:
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info->m_ammo_special_type = eAmmoSpecialType::Incendiary;
+				break;
+			case 5:
+				Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info->m_ammo_special_type = eAmmoSpecialType::Tracer;
+				break;
+			}
+			
+		}
+		void init() {
+			if (mk2_ammo) {
+				set_mk2(pos);
+			}
+		}
+	};
+	inline Weapon22 weapon;
 	inline void FeatureInitalize() {
+		weapon.init();
+		world.init();
+		self.init();
+		misc.init();
 		v_weapons.init();
 		session_info.init();
 		radio.init();
@@ -7906,7 +8794,7 @@ namespace Saint {
 		esp.init();
 		rainbow_ui.init();
 		get_model_info.init();
-		
+
 		if (mark_as_Saint) {
 			PED::SET_PED_CONFIG_FLAG(Game->Self(), 109, true);
 
@@ -8007,7 +8895,7 @@ namespace Saint {
 		all_players.init();
 		gravity.init();
 		m_hotkeys.init();
-		
+
 		if (NoPlaneTurbulance) {
 			VEHICLE::SET_PLANE_TURBULENCE_MULTIPLIER(Game->Vehicle(), 0.0f);
 		}

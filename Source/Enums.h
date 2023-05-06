@@ -58,7 +58,7 @@ enum class eRemoteEvent
 	SMS = 53975141,
 	SendTextLabelSMS = 1075676399,
 
-	Crash1 = -992162568, // SET_NO_LOADING_SCREEN, xref it
+	Crash = -992162568, // SET_NO_LOADING_SCREEN, xref it
 	Crash2 = 1131623211,
 	Crash3 = 1556360603,
 

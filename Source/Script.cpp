@@ -367,28 +367,7 @@ namespace Saint
 	{
 		m_Initialized = true;
 		using namespace UserInterface;
-		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_JOINING"), "Loading GTA Online with " BIGBASE_NAME "...");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_QUITTING"), "Leaving with " BIGBASE_NAME "...");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_QUIT_MP"), "Exiting GTA Online with " BIGBASE_NAME);
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_ENTER_MP"), "Play GTA Online with " BIGBASE_NAME);
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_EXIT_GAME"), "Quit GTA with" BIGBASE_NAME);
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_GO"), "Online with " BIGBASE_NAME);
-		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_MPREENTER"), "Joining a new session with " BIGBASE_NAME "...");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_FRIEND_FM"), "Closed Friend Session with " BIGBASE_NAME "...");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_GOTO_STORE"), "Purchase Shark Cards with " BIGBASE_NAME "...");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INF_EXIT"), "Quit to desktop with " BIGBASE_NAME "?");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_CRESES"), "Joining A Crew Only Session with " BIGBASE_NAME "...");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INF_PGOB"), "Cut to the chase and	 head straight into the world of GTA Online with " BIGBASE_NAME "...");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INF_PGOT"), "Online w/ " BIGBASE_NAME "!");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INVO_FM"), "Join A Invite Only Session with " BIGBASE_NAME ".");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("LOADING_SPLAYER_L"), "Loading Story Mode with " BIGBASE_NAME "...");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_NCREW_FM"), "Join A Crew Session with " BIGBASE_NAME ".");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_CREW_FM"), "Join A Closed Crew Session with " BIGBASE_NAME ".");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_SOLO_FM"), "Join A Solo Session with " BIGBASE_NAME ".");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_FRESES"), "Join A Friends Only Session with " BIGBASE_NAME ".");
-		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_MAINTIT"), BIGBASE_NAME);
-		g_CustomText->AddText(CONSTEXPR_JOAAT("MP_CHAT_ALL"), BIGBASE_NAME);
-		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_TRANSP"), "Isn't " BIGBASE_NAME " the fucking best?");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_JOINING"), "Loading GTA Online with " BRANDING "...");
 		if (!std::filesystem::exists("C:\\Saint\\Translations"))
 			std::filesystem::create_directory("C:\\Saint\\Translations");
 
@@ -434,6 +413,8 @@ namespace Saint
 				sub->draw_option<submenu>("Walk Styles", nullptr, SubmenuWalkStyles);
 				sub->draw_option<submenu>("Parachute", nullptr, rage::joaat("ParachuteSelf"));
 				sub->draw_option<submenu>("Ragdoll", nullptr, rage::joaat("RagdollFort"));
+				sub->draw_option<submenu>("Speech", nullptr, rage::joaat("Speech"));
+				sub->draw_option<submenu>("Damage Packs", nullptr, rage::joaat("DamagePacks"));
 				sub->draw_option<toggle<bool>>(("Godmode"), nullptr, &godmode, BoolDisplay::OnOff, false, [] {
 					if (!godmode)
 					{
@@ -515,6 +496,12 @@ namespace Saint
 						PED::SET_ENABLE_BOUND_ANKLES(Game->Self(), false);
 					}
 					});
+				sub->draw_option<toggle<bool>>(("Scuba"), "Enables diving motion when underwater.", &self.scuba, BoolDisplay::OnOff, false, [] {
+					if (!self.scuba)
+					{
+						PED::SET_ENABLE_SCUBA(Game->Self(), false);
+					}
+					});
 				sub->draw_option<toggle<bool>>(("Ignored By Peds"), "Makes pedestrains around you ignore your actions.", &features.ignored, BoolDisplay::OnOff, false, [] {
 					if (!features.ignored)
 					{
@@ -567,8 +554,208 @@ namespace Saint
 					{
 						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
 					});
+				sub->draw_option<RegularOption>(("Clone"), nullptr, []
+					{
+						PED::CLONE_PED(Game->Self(), true, false, true);
+					});
 
 			});
+			g_Render->draw_submenu<sub>(("Damage Packs"), rage::joaat("DamagePacks"), [](sub* sub)
+				{
+					sub->draw_option<number<float>>("Value", nullptr, &self.damage_pack.value, 0, 1000.0, 1.0, 3, true, "", "", []
+						{
+							PED::SET_PED_MOVE_RATE_OVERRIDE(Game->Self(), move_rate);
+						});
+					sub->draw_option<RegularOption>(("Clear"), nullptr, []
+						{
+							PED::CLEAR_PED_BLOOD_DAMAGE(Game->Self());
+						});
+					sub->draw_option<UnclickOption>(("Packs"), nullptr, [] {});
+					sub->draw_option<RegularOption>(("Trevor Tree Bang"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "SCR_TrevorTreeBang", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Hosptial 1"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "HOSPITAL_0", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Hosptial 2"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "HOSPITAL_1", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Hosptial 3"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "HOSPITAL_2", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Hosptial 4"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "HOSPITAL_3", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Hosptial 5"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "HOSPITAL_4", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Hosptial 6"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "HOSPITAL_5", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Hosptial 7"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "HOSPITAL_6", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Hosptial 8"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "HOSPITAL_7", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Hosptial 9"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "HOSPITAL_8", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Hosptial 10"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "HOSPITAL_9", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Dumpster"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "SCR_Dumpster", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Hit By Vehicle"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "BigHitByVehicle", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Finale Michael (Race)"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "SCR_Finale_Michael_Face", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Finale Michael Race"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "SCR_Finale_Michael", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Franklin Final"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "SCR_Franklin_finb", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Franklin Final 2"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "SCR_Franklin_finb2", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Explosion (Med)"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "Explosion_Large", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Explosion (Large)"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "Explosion_Med", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Torture"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "SCR_Torture", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Tracy Splash"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "SCR_TracySplash", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Skin Melee"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "Skin_Melee_0", self.damage_pack.value, 1.0f);
+						});
+					sub->draw_option<RegularOption>(("Shark"), nullptr, []
+						{
+							PED::APPLY_PED_DAMAGE_PACK(Game->Self(), "SCR_Shark", self.damage_pack.value, 1.0f);
+						});
+				});
+			g_Render->draw_submenu<sub>(("Speech"), rage::joaat("Speech"), [](sub* sub)
+				{
+					sub->draw_option<ChooseOption<const char*, std::size_t>>("Voice Actor", nullptr, &speech.voices, &speech.pos);
+					sub->draw_option<ChooseOption<const char*, std::size_t>>("Flags", nullptr, &speech.params, &speech.pos2);
+					sub->draw_option<UnclickOption>(("Lines"), nullptr, [] {});
+					if (speech.pos == 0) {
+						sub->draw_option<RegularOption>(("Hi"), nullptr, []
+							{
+								AUDIO::PLAY_PED_AMBIENT_SPEECH_NATIVE(Game->Self(), "GENERIC_HI", speech.paramnames[speech.pos2], 0);
+							});
+						sub->draw_option<RegularOption>(("No"), nullptr, []
+							{
+								AUDIO::PLAY_PED_AMBIENT_SPEECH_NATIVE(Game->Self(), "GENERIC_NO", speech.paramnames[speech.pos2], 0);
+							});
+						sub->draw_option<RegularOption>(("Yes"), nullptr, []
+							{
+								AUDIO::PLAY_PED_AMBIENT_SPEECH_NATIVE(Game->Self(), "GENERIC_YES", speech.paramnames[speech.pos2], 0);
+							});
+						sub->draw_option<RegularOption>(("How's It Going"), nullptr, []
+							{
+								AUDIO::PLAY_PED_AMBIENT_SPEECH_NATIVE(Game->Self(), "GENERIC_HOWS_IT_GOING", speech.paramnames[speech.pos2], 0);
+							});
+						sub->draw_option<RegularOption>(("Insult (High)"), nullptr, []
+							{
+								AUDIO::PLAY_PED_AMBIENT_SPEECH_NATIVE(Game->Self(), "GENERIC_INSULT_HIGH", speech.paramnames[speech.pos2], 0);
+							});
+						sub->draw_option<RegularOption>(("Bye"), nullptr, []
+							{
+								AUDIO::PLAY_PED_AMBIENT_SPEECH_NATIVE(Game->Self(), "GENERIC_BYE", speech.paramnames[speech.pos2], 0);
+							});
+						sub->draw_option<RegularOption>(("Thanks"), nullptr, []
+							{
+								AUDIO::PLAY_PED_AMBIENT_SPEECH_NATIVE(Game->Self(), "GENERIC_THANKS", speech.paramnames[speech.pos2], 0);
+							});
+						sub->draw_option<RegularOption>(("Whatever"), nullptr, []
+							{
+								AUDIO::PLAY_PED_AMBIENT_SPEECH_NATIVE(Game->Self(), "GENERIC_WHATEVER", speech.paramnames[speech.pos2], 0);
+							});
+						sub->draw_option<RegularOption>(("Car Crash"), nullptr, []
+							{
+								AUDIO::PLAY_PED_AMBIENT_SPEECH_NATIVE(Game->Self(), "CRASH_CAR", speech.paramnames[speech.pos2], 0);
+							});
+						sub->draw_option<RegularOption>(("Kifflom"), nullptr, []
+							{
+								AUDIO::PLAY_PED_AMBIENT_SPEECH_NATIVE(Game->Self(), "KIFFLOM_GREET", speech.paramnames[speech.pos2], 0);
+							});
+						sub->draw_option<RegularOption>(("Nice Car"), nullptr, []
+							{
+								AUDIO::PLAY_PED_AMBIENT_SPEECH_NATIVE(Game->Self(), "NICE_CAR", speech.paramnames[speech.pos2], 0);
+							});
+						sub->draw_option<RegularOption>(("Reloading"), nullptr, []
+							{
+								AUDIO::PLAY_PED_AMBIENT_SPEECH_NATIVE(Game->Self(), "RELOADING", speech.paramnames[speech.pos2], 0);
+							});
+					}
+					if (speech.pos == 1) {
+						for (auto& voice : speech.Ballas) {
+							sub->draw_option<RegularOption>(voice.actual_name, nullptr, [=]
+									{
+										AUDIO::PLAY_PED_AMBIENT_SPEECH_WITH_VOICE_NATIVE(Game->Self(), voice.name, voice.voice, speech.paramnames[speech.pos2], 0);
+									});
+							
+						};
+					}
+					if (speech.pos == 2) {
+						for (auto& voice : speech.Cop) {
+							sub->draw_option<RegularOption>(voice.actual_name, nullptr, [=]
+								{
+									AUDIO::PLAY_PED_AMBIENT_SPEECH_WITH_VOICE_NATIVE(Game->Self(), voice.name, voice.voice, speech.paramnames[speech.pos2], 0);
+								});
+
+						};
+					}
+					if (speech.pos == 3) {
+						for (auto& voice : speech.Franklin) {
+							sub->draw_option<RegularOption>(voice.actual_name, nullptr, [=]
+								{
+									AUDIO::PLAY_PED_AMBIENT_SPEECH_WITH_VOICE_NATIVE(Game->Self(), voice.name, voice.voice, speech.paramnames[speech.pos2], 0);
+								});
+
+						};
+					}
+					if (speech.pos == 4) {
+						for (auto& voice : speech.Lester) {
+							sub->draw_option<RegularOption>(voice.actual_name, nullptr, [=]
+								{
+									AUDIO::PLAY_PED_AMBIENT_SPEECH_WITH_VOICE_NATIVE(Game->Self(), voice.name, voice.voice, speech.paramnames[speech.pos2], 0);
+								});
+
+						};
+					}
+				});
 		g_Render->draw_submenu<sub>(("Ragdoll"), rage::joaat("RagdollFort"), [](sub* sub)
 			{
 				sub->draw_option<toggle<bool>>(("Disable"), "", &features.no_ragdoll, BoolDisplay::OnOff, false, [] {
@@ -591,10 +778,12 @@ namespace Saint
 							PED::SET_PED_RAGDOLL_ON_COLLISION(Game->Self(), false);
 						}
 						});
+					sub->draw_option<UnclickOption>(("Custom"), nullptr, [] {});
+					sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &ragdoll.TypeName, &ragdoll.pos);
 					sub->draw_option<RegularOption>(("Start"), nullptr, []
 						{
 							NativeVector3 v = ENTITY::GET_ENTITY_FORWARD_VECTOR(Game->Self());
-							PED::SET_PED_TO_RAGDOLL_WITH_FALL(Game->Self(), 1500, 2000, 1, -v.x, -v.y, -v.z, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
+							PED::SET_PED_TO_RAGDOLL_WITH_FALL(Game->Self(), 1500, 2000, ragdoll.pos, -v.x, -v.y, -v.z, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
 						});
 				}
 			});
@@ -780,6 +969,11 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Outfit Editor"), SubmenuOutfitEditor, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Load", nullptr, SubmenuOutfitLoader);
+				sub->draw_option<toggle<bool>>(("Tron"), "", &features.tron_loop, BoolDisplay::OnOff, false, [] {
+					if (!features.tron_loop) {
+						
+					}
+				});
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Component", nullptr, &Lists::HeaderTypesFrontend2, &Lists::HeaderTypesPosition2, true, -1, [] {
 					g_Render->outfits = Lists::HeaderTypesBackend2[Lists::HeaderTypesPosition2];
 					});
@@ -849,17 +1043,28 @@ namespace Saint
 					sub->draw_option<number<std::int32_t>>("Texture", "", &braceTexture, 0, PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(Game->Self(), 7, braceDrawable), 1, 3, true, "", "", [] { PED::SET_PED_PROP_INDEX(Game->Self(), 7, braceDrawable, braceTexture, 0); }); break;
 					break;
 				}
+				sub->draw_option<UnclickOption>(("Other"), nullptr, [] {});
+				sub->draw_option<RegularOption>(("Clear Props"), nullptr, [=]
+					{
+						PED::CLEAR_ALL_PED_PROPS(Game->Self());
+
+					});
+				sub->draw_option<RegularOption>(("Random Props"), nullptr, [=]
+					{
+						PED::SET_PED_RANDOM_PROPS(Game->Self());
+
+					});
 
 			});
 		g_Render->draw_submenu<sub>(("Animations"), SubmenuAnimations, [](sub* sub)
 			{
-				//sub->draw_option<submenu>("Scenarions", "", Submenu::SubmenuScenarios);
-				sub->draw_option<toggle<bool>>(("Controllable"), nullptr, &animation.controllable, BoolDisplay::OnOff);
+				sub->draw_option<submenu>("Scenarios", "", Submenu::SubmenuScenarios);
 				sub->draw_option<RegularOption>(("Stop"), nullptr, [=]
 					{
 						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
 
 					});
+				sub->draw_option<ChooseOption<const char*, std::size_t>>("Flags", nullptr, &animation.flags, &animation.pos);
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 				sub->draw_option<RegularOption>(("Pole Dance"), nullptr, [=]
 					{
@@ -917,6 +1122,43 @@ namespace Saint
 
 				}
 
+			});
+		g_Render->draw_submenu<sub>(("Scenarios"), SubmenuScenarios, [](sub* sub)
+			{
+				if (TASK::IS_PED_ACTIVE_IN_SCENARIO(Game->Self())) {
+					sub->draw_option<RegularOption>(("Stop"), nullptr, [=]
+						{
+							TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
+
+						});
+				}
+				
+				sub->draw_option<KeyboardOption>("Search", nullptr, animation.results, []
+					{
+						showKeyboard("Enter Something", "", 25, &animation.results, [] {
+
+						});
+					});
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				for (std::int32_t i = 0; i < 246; i++) {
+					if (animation.results != "") {
+						if (has_string_attached(animation.idk1[i], animation.results)) {
+							sub->draw_option<RegularOption>((animation.idk1[i]), nullptr, [=]
+								{
+									TASK::TASK_START_SCENARIO_IN_PLACE(Game->Self(), animation.idk[i], -1, true);
+
+								});
+						}
+					}
+					if (animation.results == "") {
+						sub->draw_option<RegularOption>((animation.idk1[i]), nullptr, [=]
+							{
+								TASK::TASK_START_SCENARIO_IN_PLACE(Game->Self(), animation.idk[i], -1, true);
+
+							});
+					}
+
+				}
 			});
 		g_Render->draw_submenu<sub>(("Load"), SubmenuOutfitLoader, [](sub* sub)
 			{
@@ -979,6 +1221,11 @@ namespace Saint
 					if (!no_clip.enabled) {
 						no_clip.onDisable();
 						ENTITY::SET_ENTITY_ALPHA(Game->Self(), 255, false);
+						if (CAM::DOES_CAM_EXIST(no_clip.camera)) {
+							CAM::RENDER_SCRIPT_CAMS(false, true, 700, true, true, true);
+							CAM::SET_CAM_ACTIVE(no_clip.camera, false);
+							CAM::DESTROY_CAM(no_clip.camera, true);
+						}
 					}
 					});
 				sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
@@ -1010,21 +1257,21 @@ namespace Saint
 					if (!multipliers.run) {
 						(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_run_speed = 1.0f;
 					}
-					});
+				});
 				sub->draw_option<toggle_number_option<float, bool>>("Swim Speed", nullptr, &multipliers.swim_run, &multipliers.swim_speed, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
 
 					if (!multipliers.run) {
 						(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_swim_speed = 1.0f;
 					}
 					});
-				sub->draw_option<toggle_number_option<float, bool>>("Width", nullptr, &get_model_info.width, &get_model_info.widthm, 0.1f, 10.f, 0.01f, 2, true, "", "", [] {
+				sub->draw_option<toggle_number_option<float, bool>>("Width", nullptr, &get_model_info.width, &get_model_info.widthm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
 
 
 					if (!get_model_info.width) {
 						Memory::set_value<float>({ 0x08, 0x0064 }, 1.0f);
 					}
 					});
-				sub->draw_option<toggle_number_option<float, bool>>("Height", nullptr, &get_model_info.height, &get_model_info.heightm, 0.1f, 10.f, 0.01f, 2, true, "", "", [] {
+				sub->draw_option<toggle_number_option<float, bool>>("Height", nullptr, &get_model_info.height, &get_model_info.heightm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
 
 					if (!get_model_info.height) {
 						Memory::set_value<float>({ 0x08, 0x88 }, 1.0f);
@@ -1116,12 +1363,17 @@ namespace Saint
 					});
 				sub->draw_option<toggle<bool>>(("Remove Deformation"), "Removes deformation from you're vehicle.", &features.remove_def, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Stick To Ground"), "Creates a weird wheel effect, and makes it so you're vehicle stays on the ground.", &features.stick_to_ground, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Shaky Shell"), "", &features.fuck_shell, BoolDisplay::OnOff, false, [] {
+					if (!features.fuck_shell) {
+						VEHICLE::SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(1.0f);
+					}
+					});
 				sub->draw_option<toggle<bool>>(("Burned"), "Displays you're vehicle as destroyed like you blew it up.", &features.burned, BoolDisplay::OnOff, false, [] {
 					if (!features.burned) {
 						ENTITY::SET_ENTITY_RENDER_SCORCHED(Game->Vehicle(), false);
 					}
 					});
-				sub->draw_option<toggle<bool>>(("Can Wheelie"), "", &features.can_wheelie, BoolDisplay::OnOff, false, [] {
+				sub->draw_option<toggle<bool>>(("Can Wheelie"), "Works better with vehicles that have higher suspension", &features.can_wheelie, BoolDisplay::OnOff, false, [] {
 					if (!features.can_wheelie) {
 						if (VEHICLE::IS_THIS_MODEL_A_CAR(Game->GetHash(Game->Vehicle()))) {
 							for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
@@ -1186,6 +1438,9 @@ namespace Saint
 				sub->draw_option<number<float>>("Forklift Height", nullptr, &features.forklight_height, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
 					VEHICLE::SET_FORKLIFT_FORK_HEIGHT(Game->Vehicle(), features.forklight_height);
 					});
+				sub->draw_option<number<float>>("Shell Shakiness", nullptr, &features.speedbumpsev, 0.0f, 1000.f, .1f, 2, true, "", "", [=] {
+					VEHICLE::SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(features.speedbumpsev);
+					});
 				sub->draw_option<RegularOption>("Delete", nullptr, [] 
 					{ 
 						Vehicle veh = Game->Vehicle();
@@ -1241,11 +1496,19 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Jump Force"), rage::joaat("JUNPFORCE"), [](sub* sub)
 			{
 				sub->draw_option<submenu>("Compatible Vehicles", nullptr, rage::joaat("COMPVEHICLES2"));
-				sub->draw_option<toggle<bool>>(("Increase"), "", &jump_force.increase, BoolDisplay::OnOff, false, [] {
-					if (!jump_force.increase) {
-						VEHICLE::SET_USE_HIGHER_CAR_JUMP(Game->Vehicle(), false);
+				
+				if (VEHICLE::IS_THIS_MODEL_A_CAR(Game->GetHash(Game->Vehicle()))) {
+					for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
+					{
+						if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
+						{
+							auto const dc = reinterpret_cast<CCarHandlingData*>(d);
+							sub->draw_option<number<float>>("Scale", nullptr, &dc->m_jumpforce_scale, -1000.f, 1000.f, 0.1f, 1);
+							break;
+						}
 					}
-					});
+				}
+				
 			});
 		g_Render->draw_submenu<sub>(("Compatible Vehicles"), rage::joaat("COMPVEHICLES2"), [](sub* sub)
 			{
@@ -1911,7 +2174,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Secondary"), nullptr, &changeVehicleColor.rainbow.change_secondary, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Underglow"), nullptr, &changeVehicleColor.rainbow.underglow, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Tyre Smoke"), nullptr, &changeVehicleColor.rainbow.tyre_smoke, BoolDisplay::OnOff);
-				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &changeVehicleColor.rainbow.delay, rainbow_delay.min, rainbow_delay.max, rainbow_delay.step);
+				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &changeVehicleColor.rainbow.delay, rainbow_delay.min, rainbow_delay.max, rainbow_delay.step, 3, true, "", "ms");
 
 
 
@@ -1925,6 +2188,7 @@ namespace Saint
 				sub->draw_option<submenu>("Spawned", nullptr, rage::joaat("Spawned"));
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 				sub->draw_option<submenu>("All", nullptr, SubmenuVehicleAll);
+				
 				for (std::int32_t i = 0; i < 23; i++) {
 					sub->draw_option<submenu>(get_vehicle_class_name(i), nullptr, SubmenuGetClass, [=]
 						{
@@ -1950,6 +2214,12 @@ namespace Saint
 			{
 				for (auto& model : spawned_veh.spawned) {
 					if (spawned_veh.selectedveh == model.m_id) {
+						sub->draw_option<RegularOption>("Set Into", nullptr, [=]
+							{
+
+								PED::SET_PED_INTO_VEHICLE(Game->Self(), model.m_id, -1);
+
+							});
 						sub->draw_option<RegularOption>("Teleport To You", nullptr, [=]
 							{
 
@@ -2542,6 +2812,7 @@ namespace Saint
 
 
 						}
+						
 					});
 
 
@@ -3991,7 +4262,11 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Delete"), nullptr, &features.delete_gun, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Bypass C4 Limit"), nullptr, &features.bypass_c4_limit, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Gravity"), nullptr, &gravity.enabled, BoolDisplay::OnOff);
-				sub->draw_option<toggle<bool>>(("Incendiary"), nullptr, &m_frame_flags.m_fire, BoolDisplay::OnOff);
+				sub->draw_option<BoolChoose<const char*, std::size_t, bool>>("Mark II", "", &weapon.mk2_ammo, &weapon.mk2, &weapon.pos, false, [] {
+					if (!weapon.mk2_ammo) {
+						Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info->m_ammo_special_type = eAmmoSpecialType::None;
+					}
+					});
 				sub->draw_option<toggle<bool>>(("Aim Tracer"), nullptr, &features.aim_tracer, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Rope"), nullptr, &rope_gun.enabled, BoolDisplay::OnOff);
 				//sub->draw_option<toggle<bool>>(("Steal"), nullptr, &features.steal_gun, BoolDisplay::OnOff);
@@ -4382,19 +4657,44 @@ namespace Saint
 					Maxammo = 9999;
 				}
 
-				sub->draw_option<ChooseOption<const char*, std::size_t>>("Type", nullptr, &all_weapons.name_all, &give_weapon.type_int);
+				
 				sub->draw_option<number<std::int32_t>>("Ammo", nullptr, &give_weapon.amount, 1, Maxammo);
-				sub->draw_option<RegularOption>(("Apply"), nullptr, []
+				sub->draw_option<RegularOption>(("All"), nullptr, []
 					{
-						if (give_weapon.type_int != 0) {
-							WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), all_weapons.hash_all[give_weapon.type_int], 9999, false);
-						}
-						if (give_weapon.type_int == 0) {
-							for (int x = 0; x < 106; x++) {
+						for (int x = 0; x < 106; x++) {
 								WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), all_weapons.hash[x], give_weapon.amount, false);
-							}
 						}
+						
 					});
+				sub->draw_option<UnclickOption>(("Category"), nullptr, [] {});
+				for (std::int32_t i = 0; i < 10; i++) {
+					
+					sub->draw_option<submenu>(all_weapons.weapon_class_names[i], nullptr, rage::joaat("GunLockerGive"), [=]
+						{
+							give_weapon.selected_class = all_weapons.weapon_class_names[i];
+						});
+
+				}
+
+			});
+		g_Render->draw_submenu<sub>("Selected", rage::joaat("GunLockerGive"), [](sub* sub)
+			{
+				for (auto& weapon : all_weapons.m_Weapons) {
+					if (give_weapon.selected_class == weapon.category) {
+						if (sub->GetSelectedOption() == sub->GetNumOptions()) {
+							g_players.draw_weapon_info(weapon.hash);
+
+
+						}
+						sub->draw_option<RegularOption>(weapon.name, nullptr, [=]
+							{
+								
+								WEAPON::GIVE_DELAYED_WEAPON_TO_PED(Game->Self(), weapon.hash, give_weapon.amount, false);
+
+							});
+					}
+				}
+
 
 			});
 		g_Render->draw_submenu<sub>(("Ammo"), SubmenuGunLockerAmmo, [](sub* sub)
@@ -4841,13 +5141,13 @@ namespace Saint
 
 
 				sub->draw_option<UnclickOption>(("Single"), nullptr, [] {});
-				sub->draw_option<RegularOption>("Max Stamina", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STAM"), 100, 0); });
-				sub->draw_option<RegularOption>("Max Strength", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STRN"), 100, 0); });
-				sub->draw_option<RegularOption>("Max Loungh", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_LUNG"), 100, 0); });
-				sub->draw_option<RegularOption>("Max Driving", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_DRIV"), 100, 0); });
-				sub->draw_option<RegularOption>("Max Flying", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_FLY"), 100, 0); });
-				sub->draw_option<RegularOption>("Max Shooting", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_SHO"), 100, 0); });
-				sub->draw_option<RegularOption>("Max Stealth", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STL"), 100, 0); });
+				sub->draw_option<RegularOption>("Stamina", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STAM"), 100, 0); });
+				sub->draw_option<RegularOption>("Strength", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STRN"), 100, 0); });
+				sub->draw_option<RegularOption>("Lung Capacity", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_LUNG"), 100, 0); });
+				sub->draw_option<RegularOption>("Driving", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_DRIV"), 100, 0); });
+				sub->draw_option<RegularOption>("Flying", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_FLY"), 100, 0); });
+				sub->draw_option<RegularOption>("Shooting", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_SHO"), 100, 0); });
+				sub->draw_option<RegularOption>("Stealth", nullptr, [] { STATS::STAT_SET_INT(Game->HashKey("MP0_SCRIPT_INCREASE_STL"), 100, 0); });
 
 			});
 
@@ -5068,27 +5368,27 @@ namespace Saint
 
 
 				// turn to masked
-				sub->draw_option<RegularOption>("Stone Hatchet & Double", "", [] {
-					statSetInt("MP0_GANGOPSPSTAT_INT102", 24, 8, 3);
-					statSetInt("MP1_GANGOPSPSTAT_INT102", 24, 8, 3);
+				sub->draw_option<RegularOption>("Stone Hatchet & Double Revolver", "", [] {
+					STATS::STAT_SET_MASKED_INT(Game->HashKey("MP0_GANGOPSPSTAT_INT102"), 24, 8, 3, true);
+					STATS::STAT_SET_MASKED_INT(Game->HashKey("MP1_GANGOPSPSTAT_INT102"), 24, 8, 3, true);
 
-					statSetInt("MP1_GANGOPSPSTAT_INT102", 24, 8, 3);
-					statSetInt("MP0_GANGOPSPSTAT_INT102", 24, 8, 3);
+					STATS::STAT_SET_MASKED_INT(Game->HashKey("MP1_GANGOPSPSTAT_INT102"), 24, 8, 3, true);
+					STATS::STAT_SET_MASKED_INT(Game->HashKey("MP0_GANGOPSPSTAT_INT102"), 24, 8, 3, true);
 
 
-					statSetInt("MP0_GANGOPSPSTAT_INT102", 24, 8, 3);
-					statSetInt("MP1_GANGOPSPSTAT_INT102", 0, 24, 8);
+					STATS::STAT_SET_MASKED_INT(Game->HashKey("MP0_GANGOPSPSTAT_INT102"), 24, 8, 3, true);
+					STATS::STAT_SET_MASKED_INT(Game->HashKey("MP1_GANGOPSPSTAT_INT102"), 0, 24, 8, true);
 
-					statSetInt("MP1_GANGOPSPSTAT_INT102", 24, 8, 3);
-					statSetInt("MP0_GANGOPSPSTAT_INT102", 0, 24, 8);
+					STATS::STAT_SET_MASKED_INT(Game->HashKey("MP1_GANGOPSPSTAT_INT102"), 24, 8, 3, true);
+					STATS::STAT_SET_MASKED_INT(Game->HashKey("MP0_GANGOPSPSTAT_INT102"), 0, 24, 8, true);
 
 					// ----------------------
 
-					statSetInt("MP0_MP_NGDLCPSTAT_INT0", 16, 8, 5);
-					statSetInt("MP1_MP_NGDLCPSTAT_INT0", 16, 8, 5);
+					STATS::STAT_SET_MASKED_INT(Game->HashKey("MP0_MP_NGDLCPSTAT_INT0"), 16, 8, 5, true);
+					STATS::STAT_SET_MASKED_INT(Game->HashKey("MP1_MP_NGDLCPSTAT_INT0"), 16, 8, 5, true);
 
-					statSetInt("MP0_MP_NGDLCPSTAT_INT0", 5, 16, 8);
-					statSetInt("MP1_MP_NGDLCPSTAT_INT0", 5, 16, 8);
+					STATS::STAT_SET_MASKED_INT(Game->HashKey("MP0_MP_NGDLCPSTAT_INT0"), 5, 16, 8, true);
+					STATS::STAT_SET_MASKED_INT(Game->HashKey("MP1_MP_NGDLCPSTAT_INT0"), 5, 16, 8, true);
 
 
 					});
@@ -7447,6 +7747,23 @@ namespace Saint
 						}
 
 					});
+				sub->draw_option<RegularOption>("Upgrade", nullptr, [=]
+					{
+						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false))) {
+
+							Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false);
+							VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
+							for (int i = 0; i < 50; i++)
+							{
+								VEHICLE::SET_VEHICLE_MOD(playerVehicle, i, MISC::GET_RANDOM_INT_IN_RANGE(0, VEHICLE::GET_NUM_VEHICLE_MODS(playerVehicle, i) - 1), false);
+
+							}
+							VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 2));
+							//	VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+							VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+						}
+
+					});
 				sub->draw_option<RegularOption>("Gift Current", "", [] {
 					Vehicle vehicle = Game->Vehicle();
 					ENTITY::SET_ENTITY_AS_MISSION_ENTITY(vehicle, TRUE, TRUE);
@@ -7556,8 +7873,39 @@ namespace Saint
 
 							}
 						}
+						
+						
 
 					});
+					sub->draw_option<RegularOption>("Kill Engine", nullptr, [=]
+						{
+							if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false))) {
+
+								VEHICLE::SET_VEHICLE_ENGINE_HEALTH(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false), -4000);
+							}
+
+						});
+					sub->draw_option<RegularOption>("Repair", nullptr, [=]
+						{
+							if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false))) {
+								Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false);
+								if (VEHICLE::GET_DOES_VEHICLE_HAVE_DAMAGE_DECALS(playerVehicle)) {
+									VEHICLE::SET_VEHICLE_FIXED(playerVehicle);
+									VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
+									VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, false);
+								}
+							}
+						});
+					sub->draw_option<RegularOption>("Pop Tyres", nullptr, [=]
+						{
+							if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false))) {
+								Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false);
+								for (int tireID = 0; tireID < 8; tireID++) {
+									VEHICLE::SET_VEHICLE_TYRE_BURST(veh, tireID, true, 1000.0);
+								}
+							}
+
+						});
 
 
 
@@ -8820,12 +9168,23 @@ namespace Saint
 				sub->draw_option<submenu>("Ocean", nullptr, rage::joaat("Ocean"));
 				sub->draw_option<submenu>("Black Hole", nullptr, rage::joaat("BlackHole"));
 				sub->draw_option<submenu>("Spawner", nullptr, rage::joaat("SpawnerW"));
+				sub->draw_option<submenu>("Clear Area", nullptr, rage::joaat("ClearArea"));
 				sub->draw_option<toggle<bool>>(("Disable Lights"), "", &features.blackout, BoolDisplay::OnOff, false, [] {
 					if (!features.blackout)
 					{
 						GRAPHICS::SET_ARTIFICIAL_LIGHTS_STATE(false);
-
-
+					}
+					});
+				sub->draw_option<toggle<bool>>(("Disable Random Trains"), "", &world.disable_random_trains, BoolDisplay::OnOff, false, [] {
+					if (!world.disable_random_trains)
+					{
+						VEHICLE::SET_DISABLE_RANDOM_TRAINS_THIS_FRAME(false);
+					}
+					});
+				sub->draw_option<toggle<bool>>(("Distant Sirens"), "", &world.ambient_sirens, BoolDisplay::OnOff, false, [] {
+					if (!world.ambient_sirens)
+					{
+						AUDIO::DISTANT_COP_CAR_SIRENS(false);
 					}
 					});
 				sub->draw_option<ChooseOption<const char*, std::size_t>>("Vehicle Density", nullptr, &features.veh_density, &features.vden_pos, true, -1, [] {
@@ -8840,6 +9199,48 @@ namespace Saint
 					});
 
 
+
+			});
+		g_Render->draw_submenu<sub>(("Clear Area"), rage::joaat("ClearArea"), [](sub* sub)
+			{
+				if (sub->GetSelectedOption() == 0 || world.clear_area.always_show_radius) {
+					GRAPHICS::DRAW_MARKER(28, Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, 0, 0, 0, 0, 0, 0, world.clear_area.radius, world.clear_area.radius, world.clear_area.radius, 255, 0, 0, 160, false, false, 0, false, NULL, NULL, false);
+				}
+				sub->draw_option<number<float>>("Radius", nullptr, &world.clear_area.radius, 0, 1000.0, 1.0, 0, true, "", "m", [] {
+					
+					});
+				sub->draw_option<toggle<bool>>(("Always Show Radius"), "", &world.clear_area.always_show_radius, BoolDisplay::OnOff);
+				sub->draw_option<UnclickOption>(("Entities"), nullptr, [] {});
+				sub->draw_option<RegularOption>("All", nullptr, [=]
+					{
+						MISC::CLEAR_AREA(Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, world.clear_area.radius, 0, false, false, 0);
+
+					});
+				sub->draw_option<RegularOption>("Peds", nullptr, [=]
+					{
+						MISC::CLEAR_AREA_OF_PEDS(Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, world.clear_area.radius, 1);
+
+					});
+				sub->draw_option<RegularOption>("Cops", nullptr, [=]
+					{
+						MISC::CLEAR_AREA_OF_COPS(Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, world.clear_area.radius, 1);
+
+					});
+				sub->draw_option<RegularOption>("Vehicles", nullptr, [=]
+					{
+						MISC::CLEAR_AREA_OF_VEHICLES(Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, world.clear_area.radius, false, false, false, false, false, false, false);
+
+					});
+				sub->draw_option<RegularOption>("Objects", nullptr, [=]
+					{
+						MISC::CLEAR_AREA_OF_OBJECTS(Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, world.clear_area.radius, 16);
+
+					});
+				sub->draw_option<RegularOption>("Projectiles", nullptr, [=]
+					{
+						MISC::CLEAR_AREA_OF_PROJECTILES(Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, world.clear_area.radius, 1);
+
+					});
 
 			});
 		g_Render->draw_submenu<sub>(("Spawner"), rage::joaat("SpawnerW"), [](sub* sub)
@@ -8877,6 +9278,7 @@ namespace Saint
 				sub->draw_option<color_submenu>("Color", nullptr, color22, rage::joaat("BHoleColor"));
 				sub->draw_option<toggle<bool>>(("Enabled"),nullptr, &black_hole.enabled, BoolDisplay::OnOff);
 				sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
+				sub->draw_option<toggle<bool>>(("Consume Entities"), nullptr, &black_hole.consume_entites, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Peds"), nullptr, &black_hole.peds2, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Vehicles"), nullptr, &black_hole.vehicles, BoolDisplay::OnOff);
 				sub->draw_option<number<std::int32_t>>("Preview", nullptr, &black_hole.preview, 0, 43, 1, 3);
@@ -9459,8 +9861,27 @@ namespace Saint
 				sub->draw_option<submenu>("HUD", nullptr, rage::joaat("HUDFORT"));
 				sub->draw_option<submenu>("Phone", nullptr, rage::joaat("Phone"));
 				sub->draw_option<submenu>("Cutscene", nullptr, rage::joaat("Cutscene"));
+				sub->draw_option<submenu>("Graphics", nullptr, rage::joaat("Graphics"));
+				sub->draw_option<toggle<bool>>(("Reduce Ped Budget"), nullptr, &misc.reduce_ped_budget, BoolDisplay::OnOff, false, [] {
+					if (!misc.reduce_ped_budget) {
+						STREAMING::SET_REDUCE_PED_MODEL_BUDGET(false);
+					}
+					});
+				sub->draw_option<toggle<bool>>(("Reduce Vehicle Budget"), nullptr, &misc.reduce_vehicle_budget, BoolDisplay::OnOff, false, [] {
+					if (!misc.reduce_vehicle_budget) {
+						STREAMING::SET_REDUCE_VEHICLE_MODEL_BUDGET(false);
+					}
+					});
 				//sub->draw_option<toggle<bool>>(("Use Stunt Jump Camera"), nullptr, &features.use_stunt_jump_camera, BoolDisplay::OnOff); dont work sadly
 
+			});
+		g_Render->draw_submenu<sub>("Graphics", rage::joaat("Graphics"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("HD Only"), nullptr, &misc.graphics.hd_only, BoolDisplay::OnOff, false, [] {
+					if (!misc.graphics.hd_only){
+						STREAMING::SET_RENDER_HD_ONLY(false);
+					}
+					});
 			});
 		g_Render->draw_submenu<sub>("Cutscene", rage::joaat("Cutscene"), [](sub* sub)
 			{
@@ -9743,6 +10164,10 @@ namespace Saint
 						g_Running = false;
 					});
 				#endif	
+				sub->draw_option<RegularOption>("Restart Game", nullptr, []
+					{
+						MISC::RESTART_GAME();
+					});
 				
 			});
 		g_Render->draw_submenu<sub>(("Hotkeys"), rage::joaat("Hotkeys"), [](sub* sub)

@@ -609,24 +609,16 @@ namespace Saint
 						"Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
 						"Bomb (Wide)", "Explosive Ammo (Shotgun)", "Oppressor MK II", "Kinetic Mortar", "Kinetic Vehicle Mine", "EMP Vehicle Mine", "Spike Vehicle Mine", "Slick Vehicle Mine", "Tar Vehicle Mine", "Script Drone", "Up-n-Atomizer", "Burried Mine", "Script Missle", "RC Tank Rocket",
 						"Bomb (Water)", "Bomb (Water 2)", "Flash Grenade", "Stun Grenade", "Script Missle (Large)", "Submarine (Big)", "EMP Launcher" };
-						int NetworkID = buffer->Read<int>(13);
-						int32_t explosion_type{};
-						buffer->ReadInt32(&explosion_type, 8);
-						buffer->Seek(149);
-						if (GetPed() && GetPed()->m_net_object && GetPed()->m_net_object->m_object_id == NetworkID)
-						{
-							char name2324[64];
-							if (target->m_player_info->m_net_player_data.m_name == (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_net_player_data.m_name) {
-								sprintf(name2324, "Explosion from %s going to you blocked. Type: %s", source->m_player_info->m_net_player_data.m_name, explode_type[explosion_type]);
+						char name2324[64];
+						if (target->m_player_info->m_net_player_data.m_name == (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_net_player_data.m_name) {
+								sprintf(name2324, "Explosion from %s going to you blocked", source->m_player_info->m_net_player_data.m_name);
 							}
-							else {
-								sprintf(name2324, "Explosion from %s going to %s blocked. Type: %s", source->m_player_info->m_net_player_data.m_name, target->m_player_info->m_net_player_data.m_name, explode_type[explosion_type]);
-							}
-
-							g_NotificationManager->add(name2324, 2000, 1);
-							g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-							return;
+						else {
+								sprintf(name2324, "Explosion from %s going to %s blocked", source->m_player_info->m_net_player_data.m_name);
 						}
+
+						g_NotificationManager->add(name2324, 2000, 1);
+						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
 					}
 					buffer->Seek(0);
 				}

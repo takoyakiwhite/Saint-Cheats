@@ -8,7 +8,7 @@ namespace Saint
 
 		if (!AttachConsole(GetCurrentProcessId()))
 			AllocConsole();
-		SetConsoleTitleW(BIGBASE_WIDE(BIGBASE_NAME));
+		SetConsoleTitleW(BIGBASE_WIDE(BRANDING));
 		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 		SetLayeredWindowAttributes(GetConsoleWindow(), NULL, 235, LWA_ALPHA);
 		SetConsoleCP(CP_UTF8);

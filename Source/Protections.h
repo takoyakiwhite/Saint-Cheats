@@ -105,7 +105,7 @@ namespace Saint {
 				crash_blocked = true;
 			}
 		}
-		bool send_to_location = false;
+		bool send_to_location = true;
 		bool mc_teleport = true;
 		bool sound_spam = true;
 		bool block_reports = false;

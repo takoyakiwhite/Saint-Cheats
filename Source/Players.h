@@ -231,6 +231,24 @@ namespace Saint {
 			GRAPHICS::DRAW_RECT(x - 0.510, y + -0.000, 0.183, -0.002, g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255, false);
 			GRAPHICS::DRAW_RECT(xfr, y + -0.000, 0.183f, -0.002, g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255, false);
 		}
+		void draw_weapon_info(Hash weapon) {
+			info_part_1();
+			char timesince[128];
+			char max_speed[128];
+			char seats[64];
+			char price[128];
+			char make[128];
+			char make2[128];
+			sprintf(timesince, "%i", WEAPON::GET_WEAPON_CLIP_SIZE(weapon));
+			sprintf(max_speed, "%.f", WEAPON::GET_WEAPON_DAMAGE(weapon, 0));
+			sprintf(seats, "%i", WEAPON::GET_WEAPON_TINT_COUNT(weapon));
+			sprintf(price, "%.fs", WEAPON::GET_WEAPON_TIME_BETWEEN_SHOTS(weapon));
+			//drawSprite(preview.dict, preview.texture, x + 0.3545595, y + -0.139, 0.1493f, 0.10f, { 255, 255, 255, 255 }, 0.0f);
+			draw_info_text("Clip Size", timesince, 1, 0, true);
+			draw_info_text("Damage", max_speed, 1, 0);
+			draw_info_text("Tint Count", seats, 2, 0);
+			draw_info_text("Time Inbetween Shots", price, 3, 0);
+		}
 		void draw_info4(Ped gaurd) {
 
 			float x = g_Render->m_PosX;

@@ -102,6 +102,10 @@ namespace Saint {
 				m_jobs.push(std::move(Func));
 			}
 		}
+		void clear() {
+			m_jobs.pop();
+			
+		}
 		void tick() {
 			std::unique_lock lck(m_mutex);
 			if (!m_jobs.empty()) {

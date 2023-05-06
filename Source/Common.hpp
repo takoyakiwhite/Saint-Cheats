@@ -55,7 +55,7 @@
 #define BIGBASE_STRINGIZE_IMPL(x) #x
 #define BIGBASE_STRINGIZE(x) BIGBASE_STRINGIZE_IMPL(x)
 
-#define BIGBASE_NAME "Saint"
+#define BRANDING "Saint"
 
 namespace Saint
 {
