@@ -22,9 +22,13 @@
 #include <Windows.h>
 #include <ShellAPI.h>
 #include <urlmon.h>
+#include <iostream>
+#include <windows.h>
+#include <mmsystem.h>
 
 
 #pragma comment (lib, "urlmon.lib") 
+#pragma comment(lib, "winmm.lib")
 
 const char* meower = "";
 bool fileExists(const std::string& filePath) {
@@ -44,16 +48,17 @@ bool does_exist(const char* path, const char* file) {
 void load_dir() {
 	using namespace Saint;
 	fs::create_directories("C:\\Saint\\");
-	//fs::create_directories("C:\\Saint\\Fonts");
+	fs::create_directories("C:\\Saint\\Sounds");
 
 	//int yes18 = _wmkdir((const wchar_t*)"C:\\Saint\\Fonts\\Chinese-Rocks.ttf");
 	if (!does_exist("C:\\Saint\\", "Textures.ytd")) {
 		int yes19 = _wmkdir((const wchar_t*)"C:\\Saint\\Textures.ytd");
 	}
+	int yes18 = _wmkdir((const wchar_t*)"C:\\Saint\\Sounds\\Intro.wav");
 
 	std::string path;
 	std::ofstream file;
-	//std::string DownloadPP = std::string("C:\\Saint\\Fonts\\Chinese-Rocks.ttf");
+	std::string DownloadPP = std::string("C:\\Saint\\Sounds\\Intro.wav");
 	std::string DownloadPP2 = std::string("C:\\Saint\\Textures.ytd");
 
 
@@ -61,6 +66,7 @@ void load_dir() {
 	if (!does_exist("C:\\Saint\\", "Textures.ytd")) {
 		URLDownloadToFileA(0, "https://saintcheats.xyz/Textures.ytd", DownloadPP2.c_str(), 0, 0);
 	}
+	URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1104892686386876427/1104892755781632010/Intro.wav", DownloadPP.c_str(), 0, 0);
 }
 std::string wideToString(std::wstring strw) {
 	if (strw.empty()) return std::string();
@@ -95,7 +101,6 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 	using namespace Saint;
 	if (reason == DLL_PROCESS_ATTACH)
 	{
-
 		g_Module = hInstance;
 		CreateThread(nullptr, 0, [](LPVOID) -> DWORD
 			{
@@ -150,7 +155,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				g_Logger = std::make_unique<Logger>();
 				g_Logger->Info("Saint Version %s", MENU_VERSION);
 				g_Logger->Info("This build was compiled at " __DATE__ ", " __TIME__ ".");
-
+				PlaySound(TEXT("C:\\Saint\\Sounds\\Intro.wav"), NULL, SND_FILENAME | SND_ASYNC);
 				g_FiberPool.registerFbrPool();
 
 				g_GameFunctions = std::make_unique<GameFunctions>();
@@ -224,7 +229,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				}
 
 				std::this_thread::sleep_for(500ms);
-
+				PlaySound(NULL, NULL, 0);
 				g_Discord->Shutdown();
 
 				g_NativeHook.reset();

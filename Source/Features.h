@@ -8644,13 +8644,18 @@ namespace Saint {
 	inline HudColor hud_color;
 	class SessionInfo {
 	public:
-		bool enabled = false;
+		bool enabled = true;
+		bool overlay = true;
 		int session_host = 0;
 		float x = 0.16;
 		float y = 0.81;
 		float scale = 0.25f;
 		bool outline = false;
 		void init() {
+			if (overlay)
+			{
+
+			}
 			if (enabled) {
 				HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT((char*)"STRING");
 				HUD::SET_TEXT_COLOUR(255, 255, 255, 255);
