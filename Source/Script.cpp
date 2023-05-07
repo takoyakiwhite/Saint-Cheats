@@ -1536,6 +1536,7 @@ namespace Saint
 						GRAPHICS::USE_SNOW_WHEEL_VFX_WHEN_UNSHELTERED(false);
 					}
 					});
+				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Drift", "", &features.drift_on_shift, &features.drift_mode, &features.drift_pos);
 				sub->draw_option<toggle<bool>>(("No Gravity"), nullptr, &features.no_grav_veh, BoolDisplay::OnOff, false, [] {
 					if (!features.no_grav_veh) {
 						VEHICLE::SET_VEHICLE_GRAVITY(Game->Vehicle(), true);
@@ -1556,10 +1557,7 @@ namespace Saint
 								});
 						});
 				}
-				sub->draw_option<Scroll<const char*, std::size_t>>("Upgrades", nullptr, &m_upgrades.types, &m_upgrades.data, false, SubmenuMaxThatFucker, [] {
-
-					m_upgrades.apply(m_upgrades.data);
-					});
+				
 				sub->draw_option<number<float>>("Forklift Height", nullptr, &features.forklight_height, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
 					VEHICLE::SET_FORKLIFT_FORK_HEIGHT(Game->Vehicle(), features.forklight_height);
 					});
@@ -3000,6 +2998,10 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("LSC"), SubmenuCustomize, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Settings", "", rage::joaat("SetitngsForLsc"));
+				sub->draw_option<Scroll<const char*, std::size_t>>("Upgrades", nullptr, &m_upgrades.types, &m_upgrades.data, false, SubmenuMaxThatFucker, [] {
+
+					m_upgrades.apply(m_upgrades.data);
+					});
 				sub->draw_option<UnclickOption>(("Modifications"), nullptr, [] {});
 				if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false))
 				{
@@ -8547,13 +8549,9 @@ namespace Saint
 
 
 					});
-				sub->draw_option<Button>(("Kick From Vehicle"), nullptr, [=]
-					{
-
-						g_players.get_selected.kick_from_vehicle();
-
-
-
+				sub->draw_option<Scroll<const char*, std::size_t>>("Kick From Vehicle", nullptr, &g_players.get_selected.kick_type, &g_players.get_selected.pos, false, -1, [] {
+					g_players.get_selected.kick_from_vehicle(g_players.get_selected.pos);
+						
 					});
 				sub->draw_option<Button>(("Blame"), nullptr, [=]
 					{
@@ -9221,6 +9219,10 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Tutorial"), nullptr, &protections.ScriptEvents.tutorial, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Sound Spam"), nullptr, &protections.sound_spam, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Bounty"), nullptr, &protections.ScriptEvents.bounty, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Activity"), nullptr, &protections.activity, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Kick"), nullptr, &protections.kick, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Transaction Error"), nullptr, &protections.ScriptEvents.transaction_error, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Globals"), nullptr, &protections.ScriptEvents.globals, BoolDisplay::OnOff);
 
 			});
 		g_Render->draw_submenu<sub>(("Notifications"), rage::joaat("ProtectionsNOTI"), [](sub* sub)

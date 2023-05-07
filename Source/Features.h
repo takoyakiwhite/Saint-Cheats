@@ -1198,6 +1198,8 @@ namespace Saint {
 		bool fake_lag = false;
 		bool drift_on_shift = false;
 		bool block_rid_joins = false;
+		const char* drift_mode[3] = { "Shift", "Space", "RB"};
+		std::size_t drift_pos;
 		void set_tron_index(int index, int gender) {
 			if (gender == 0) {
 				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 8, 15, 0, 0);
@@ -1220,11 +1222,31 @@ namespace Saint {
 				NETWORK::NETWORK_SESSION_CANCEL_INVITE();
 			}
 			if (drift_on_shift) {
-				if (Game->KeyPress(VK_SHIFT)) {
-					VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), 1);
+				if (drift_pos == 0) {
+					if (Game->KeyPress(VK_SHIFT)) {
+						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), 1);
+					}
+					else {
+						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), 0);
+					}
 				}
-				else {
-					VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), 0);
+				if (drift_pos == 1) {
+					if (Game->KeyPress(VK_SPACE)) {
+						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), 1);
+					}
+					else {
+						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), 0);
+					}
+				}
+				if (drift_pos == 2) {
+					if (!PAD::IS_USING_KEYBOARD_AND_MOUSE(2)) {
+						if (Game->ControlPressed(INPUT_VEH_HANDBRAKE)) {
+							VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), 1);
+						}
+						else {
+							VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), 0);
+						}
+					}
 				}
 			}
 			if (fake_lag) {

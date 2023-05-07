@@ -12,11 +12,7 @@ namespace Saint {
         bool sound = true;
         float damage = 1.0f;
         float camera_shake = 0.0f;
-        const char* explode_type[81] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare",
-            "Unkown", "Extinguisher", "Unkown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
-            "Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
-            "Bomb (Wide)", "Explosive Ammo (Shotgun)", "Oppressor MK II", "Kinetic Mortar", "Kinetic Vehicle Mine", "EMP Vehicle Mine", "Spike Vehicle Mine", "Slick Vehicle Mine", "Tar Vehicle Mine", "Script Drone", "Up-n-Atomizer", "Burried Mine", "Script Missle", "RC Tank Rocket",
-            "Bomb (Water)", "Bomb (Water 2)", "Flash Grenade", "Stun Grenade", "Script Missle (Large)", "Submarine (Big)", "EMP Launcher" };
+        
         std::size_t explode_int = 0;
         void add(Ped ped, float x, float y, float z, int explosionType, float damageScale, BOOL isAudible, BOOL isInvisible, float cameraShake) {
             *(unsigned short*)g_GameFunctions->m_owned_explosion = 0xE990;
@@ -151,14 +147,52 @@ namespace Saint {
         void send_to_tutorial(int scriptId) {
            
         }
-        void kick_from_vehicle() {
-            const size_t arg_count = 9;
-            int64_t args[arg_count] = {
-                (int64_t)-1603050746,
-                PLAYER::PLAYER_ID(), 0, 0, 0, 0, 0, 0, 0
-            };
+        const char* kick_type[2] = { "Smooth", "Rough" };
+        std::size_t pos;
+        inline bool ChangeNetworkObjectOwner(std::int32_t script_index, CNetGamePlayer* owner)
+        {
+            if (*g_GameVariables->m_is_session_started && !ENTITY::IS_ENTITY_A_PED(script_index))
+            {
+                std::uint64_t NetworkObjectMgrInterface = *(std::uint64_t*)(g_GameFunctions->m_NetworkObjectMgrInterface);
+                if (NetworkObjectMgrInterface == NULL)
+                    return false;
 
-            g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << get_id());
+                if (!ENTITY::DOES_ENTITY_EXIST(script_index))
+                    return false;
+
+                std::uint64_t Entity = g_GameFunctions->m_GetEntityFromScript(script_index);
+                if (Entity == NULL)
+                    return false;
+
+                std::uint64_t NetObject = *(std::uint64_t*)(Entity + 0xD0);
+                if (NetObject == NULL)
+                    return false;
+
+                if (*(std::uint16_t*)(NetObject + 0x8) == 11)
+                    return false;
+
+                int NetworkHandle = NETWORK::NETWORK_GET_NETWORK_ID_FROM_ENTITY(script_index);
+                g_GameFunctions->m_ChangeNetworkObjectOwner(NetworkObjectMgrInterface, NetObject, owner, 0ui64);
+                NETWORK::SET_NETWORK_ID_CAN_MIGRATE(NetworkHandle, TRUE);
+
+                return true;
+            }
+
+        }
+        void kick_from_vehicle(int pos) {
+            if (pos == 0) {
+                const size_t arg_count = 9;
+                int64_t args[arg_count] = {
+                    (int64_t)-1603050746,
+                    PLAYER::PLAYER_ID(), 0, 0, 0, 0, 0, 0, 0
+                };
+
+                g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << get_id());
+            }
+            if (pos == 1) {
+                auto Vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), FALSE);
+                ChangeNetworkObjectOwner(Vehicle, g_GameFunctions->m_GetNetPlayer(PLAYER::PLAYER_ID()));
+            }
         }
         bool network_has_control_of_entity(rage::netObject* net_object)
         {
