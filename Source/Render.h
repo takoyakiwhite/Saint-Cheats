@@ -29,7 +29,11 @@ inline int NOTIFY_PADDING_Y = 1330.f;		// Bottom-left Y padding
 typedef int ImGuiToastType;
 typedef int ImGuiToastPhase;
 typedef int ImGuiToastPos;
-
+#pragma comment(lib, "winmm.lib")
+#include <urlmon.h>
+#include <iostream>
+#include <windows.h>
+#include <mmsystem.h>
 
 
 enum ImGuiToastType_
@@ -240,7 +244,7 @@ namespace Saint {
 		NOTIFY_INLINE VOID InsertNotification(const ImGuiToast& toast)
 		{
 
-
+			PlaySound(TEXT("C:\\Saint\\Sounds\\Notification.wav"), NULL, SND_FILENAME | SND_ASYNC);
 			update();
 			if (notifications.size() < 10) {
 

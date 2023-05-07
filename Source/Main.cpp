@@ -55,10 +55,12 @@ void load_dir() {
 		int yes19 = _wmkdir((const wchar_t*)"C:\\Saint\\Textures.ytd");
 	}
 	int yes18 = _wmkdir((const wchar_t*)"C:\\Saint\\Sounds\\Intro.wav");
+	int yes20 = _wmkdir((const wchar_t*)"C:\\Saint\\Sounds\\Notification.wav");
 
 	std::string path;
 	std::ofstream file;
 	std::string DownloadPP = std::string("C:\\Saint\\Sounds\\Intro.wav");
+	std::string DownloadPP3 = std::string("C:\\Saint\\Sounds\\Notification.wav");
 	std::string DownloadPP2 = std::string("C:\\Saint\\Textures.ytd");
 
 
@@ -66,7 +68,8 @@ void load_dir() {
 	if (!does_exist("C:\\Saint\\", "Textures.ytd")) {
 		URLDownloadToFileA(0, "https://saintcheats.xyz/Textures.ytd", DownloadPP2.c_str(), 0, 0);
 	}
-	URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1104892686386876427/1104892755781632010/Intro.wav", DownloadPP.c_str(), 0, 0);
+	URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1104892686386876427/1104915044472475759/Intro.wav", DownloadPP.c_str(), 0, 0);
+	URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1104892686386876427/1104911641499418675/Notifications.wav", DownloadPP3.c_str(), 0, 0);
 }
 std::string wideToString(std::wstring strw) {
 	if (strw.empty()) return std::string();
@@ -155,7 +158,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				g_Logger = std::make_unique<Logger>();
 				g_Logger->Info("Saint Version %s", MENU_VERSION);
 				g_Logger->Info("This build was compiled at " __DATE__ ", " __TIME__ ".");
-				PlaySound(TEXT("C:\\Saint\\Sounds\\Intro.wav"), NULL, SND_FILENAME | SND_ASYNC);
+			//	PlaySound(TEXT("C:\\Saint\\Sounds\\Intro.wav"), NULL, SND_FILENAME | SND_ASYNC);
 				g_FiberPool.registerFbrPool();
 
 				g_GameFunctions = std::make_unique<GameFunctions>();
@@ -213,8 +216,8 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				//registering
 				load_dir();
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome, if your looking to disable phone its in misc",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
-				
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome, thanks for buying Saint!",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
+				PlaySound(TEXT("C:\\Saint\\Sounds\\Intro.wav"), NULL, SND_FILENAME | SND_ASYNC);
 
 				
 				while (g_Running)
