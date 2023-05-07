@@ -254,6 +254,16 @@ namespace Saint
 		PVOID m_FallTaskConstructor;
 
 		bool* m_send_clone_sync;
+
+		std::uintptr_t m_NetworkObjectMgrInterface;
+
+		using GetEntityFromScript = std::uint64_t(std::int32_t script_index);
+		using ChangeNetworkObjectOwner = std::uint64_t(std::uint64_t obj_mgr, std::uint64_t net_obj, CNetGamePlayer* player, std::uint64_t unk);
+		GetEntityFromScript* m_GetEntityFromScript;
+		ChangeNetworkObjectOwner* m_ChangeNetworkObjectOwner;
+
+		using GetNetPlayer = CNetGamePlayer * (std::uint32_t id);
+		GetNetPlayer* m_GetNetPlayer;
 		
 
 		

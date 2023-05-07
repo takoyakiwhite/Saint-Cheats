@@ -20,6 +20,7 @@
 #include <GTAV-Classes/vehicle/CCarHandlingData.hpp>
 #include <GTAV-Classes/weapon/CAmmoProjectileInfo.hpp>
 namespace Saint {
+
 	inline std::string handlingBuffer = "";
 	inline std::string VehNameBuffer = "";
 	inline std::string ridBuffer = "";
@@ -628,6 +629,17 @@ namespace Saint {
 		Ped m_id = 0;
 		std::string m_name;
 		std::uint32_t m_owner;
+	};
+	class pedHandler {
+	public:
+		pedHandler(Ped id, std::string name) {
+			m_id = id;
+			m_name = name;
+
+		}
+	public:
+		Ped m_id = 0;
+		std::string m_name;
 	};
 	class Bodygaurd {
 	public:
@@ -8019,6 +8031,8 @@ namespace Saint {
 	inline ShootDrops wdrop;
 	class RopeGun {
 	public:
+		const char* type[6] = { "Normal", "Thick 1", "Thick 2", "Thick 3", "Metal Wire", "Metal Wire 2"};
+		std::size_t pos = 0;
 		bool enabled = false;
 		Entity rope_ent0;
 		Object first_rope;
@@ -8052,7 +8066,7 @@ namespace Saint {
 								handcoords = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(myped, bone);
 
 
-								ropes = PHYSICS::ADD_ROPE(handcoords.x, handcoords.y, handcoords.z, shootcoords.x, shootcoords.y, shootcoords.z, dist(handcoords, Game->Coords(ENT)) + 3.0f, 1, 300, 0.5f, 0.5f, false, true, true, 1.0f, false, 0);
+								ropes = PHYSICS::ADD_ROPE(handcoords.x, handcoords.y, handcoords.z, shootcoords.x, shootcoords.y, shootcoords.z, dist(handcoords, Game->Coords(ENT)) + 3.0f, pos + 1, 300, 0.5f, 0.5f, false, true, true, 1.0f, false, 0);
 								ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&ropes);
 
 								PHYSICS::ACTIVATE_PHYSICS(ropes);
@@ -8092,6 +8106,11 @@ namespace Saint {
 	class PedSpawner {
 	public:
 		int selected;
+		std::string selected_model = "";
+		Ped selected_ped;
+		std::vector<pedHandler> spawned = {
+
+		};
 		bool change(const Hash hash)
 		{
 			g_FiberPool.queue([=] {
@@ -8106,7 +8125,8 @@ namespace Saint {
 				}
 				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 				NativeVector3 c = Game->SCoords();
-				PED::CREATE_PED(0, hash, c.x, c.y, c.z, 0, true, false);
+				Ped ped = PED::CREATE_PED(0, hash, c.x, c.y, c.z, 0, true, false);
+				spawned.push_back({ped, selected_model});
 				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 				fbr::cur()->wait();
 				STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
@@ -8743,7 +8763,16 @@ namespace Saint {
 		ClearArea clear_area;
 		bool disable_random_trains = false;
 		bool ambient_sirens = false;
+		bool dra = false;
 		void init() {
+			if (dra) {
+				MISC::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("am_armybase");
+				MISC::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("restrictedareas");
+				MISC::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("re_armybase");
+				MISC::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("re_lossantosintl");
+				MISC::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("re_prison");
+				MISC::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("re_prisonvanbreak");
+			}
 			if (ambient_sirens) {
 				AUDIO::DISTANT_COP_CAR_SIRENS(true);
 			}
@@ -8965,6 +8994,7 @@ namespace Saint {
 
 		}
 		bool is_finished() {
+			return true;
 			std::string MenuFolderPath = "C:\\Saint\\";
 			if (DoesIniExists((MenuFolderPath + "tutorial" + ".ini").c_str())) {
 				Ini* ColorIni = new Ini(MenuFolderPath + "tutorial" + ".ini");
@@ -10899,13 +10929,64 @@ namespace Saint {
 		int m_flag;
 	};
 	inline CMenuData m_menu_data;
+	class Proofs {
+	public:
+		bool bulletProof;
+		bool meleeProof;
+		bool explosionProof;
+		bool fireProof;
+		bool collisionProof;
+		bool steamProof;
+		bool waterProof;
+		void init() {
+			if (bulletProof || meleeProof || explosionProof || fireProof || collisionProof || steamProof || waterProof) {
+				ENTITY::SET_ENTITY_PROOFS(Game->Self(), bulletProof, fireProof, explosionProof, collisionProof, meleeProof, steamProof, 1, waterProof);
+			}
+			else {
+				ENTITY::SET_ENTITY_PROOFS(Game->Self(), false, false, false, false, false, false, 1, false);
+			}
+		}
+	};
+	inline Proofs proofs;
+	inline bool ChangeNetworkObjectOwner(std::int32_t script_index, CNetGamePlayer* owner)
+	{
+		if (*g_GameVariables->m_is_session_started && !ENTITY::IS_ENTITY_A_PED(script_index))
+		{
+			std::uint64_t NetworkObjectMgrInterface = *(std::uint64_t*)(g_GameFunctions->m_NetworkObjectMgrInterface);
+			if (NetworkObjectMgrInterface == NULL)
+				return false;
+
+			if (!ENTITY::DOES_ENTITY_EXIST(script_index))
+				return false;
+
+			std::uint64_t Entity = g_GameFunctions->m_GetEntityFromScript(script_index);
+			if (Entity == NULL)
+				return false;
+
+			std::uint64_t NetObject = *(std::uint64_t*)(Entity + 0xD0);
+			if (NetObject == NULL)
+				return false;
+
+			if (*(std::uint16_t*)(NetObject + 0x8) == 11)
+				return false;
+
+			int NetworkHandle = NETWORK::NETWORK_GET_NETWORK_ID_FROM_ENTITY(script_index);
+			g_GameFunctions->m_ChangeNetworkObjectOwner(NetworkObjectMgrInterface, NetObject, owner, 0ui64);
+			NETWORK::SET_NETWORK_ID_CAN_MIGRATE(NetworkHandle, TRUE);
+
+			return true;
+		}
+		
+	}
+	
 	inline void FeatureInitalize() {
-	#ifndef DEV
-		m_menu_data.m_flag = eMenuFlags::REGULAR_USER;
-	#else
-		m_menu_data.m_flag = eMenuFlags::IS_DEV;
-	#endif	
+		#ifndef DEV
+			m_menu_data.m_flag = eMenuFlags::REGULAR_USER;
+		#else
+			m_menu_data.m_flag = eMenuFlags::IS_DEV;
+		#endif	
 		rockstarAdminDetector.init();
+		proofs.init();
 		weapon.init();
 		world.init();
 		self.init();

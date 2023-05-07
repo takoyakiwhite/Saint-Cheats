@@ -27,13 +27,29 @@
 #pragma comment (lib, "urlmon.lib") 
 
 const char* meower = "";
+bool fileExists(const std::string& filePath) {
+	std::ifstream file(filePath);
+	return file.good();
+}
+bool does_exist(const char* path, const char* file) {
+	std::string MenuFolderPath = path;
+	if (fileExists(MenuFolderPath + file)) {
+		return true;
+	}
+	else {
+		return false;
+	}
+	return false;
+}
 void load_dir() {
 	using namespace Saint;
 	fs::create_directories("C:\\Saint\\");
 	//fs::create_directories("C:\\Saint\\Fonts");
 
 	//int yes18 = _wmkdir((const wchar_t*)"C:\\Saint\\Fonts\\Chinese-Rocks.ttf");
-	int yes19 = _wmkdir((const wchar_t*)"C:\\Saint\\Textures.ytd");
+	if (!does_exist("C:\\Saint\\", "Textures.ytd")) {
+		int yes19 = _wmkdir((const wchar_t*)"C:\\Saint\\Textures.ytd");
+	}
 
 	std::string path;
 	std::ofstream file;
@@ -42,7 +58,9 @@ void load_dir() {
 
 
 	//URLDownloadToFileA(0, "https://saintcheats.xyz/Chinese-Rocks.ttf", DownloadPP.c_str(), 0, 0);
-	URLDownloadToFileA(0, "https://saintcheats.xyz/Textures.ytd", DownloadPP2.c_str(), 0, 0);
+	if (!does_exist("C:\\Saint\\", "Textures.ytd")) {
+		URLDownloadToFileA(0, "https://saintcheats.xyz/Textures.ytd", DownloadPP2.c_str(), 0, 0);
+	}
 }
 std::string wideToString(std::wstring strw) {
 	if (strw.empty()) return std::string();
