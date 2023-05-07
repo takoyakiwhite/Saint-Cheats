@@ -24,7 +24,17 @@ namespace Saint
 	inline CNetGamePlayer* m_syncing_player = nullptr;
 	inline rage::rlSessionInfo g_Session_info;
 	inline bool BeastLanding = false;
-
+	class MenuFlag {
+	public:
+		bool isDev() {
+			#ifndef DEV
+				return false;
+			#else
+				return true;
+			#endif	
+		}
+	};
+	inline MenuFlag* Flags;
 	struct Hooks
 	{
 		static void GetStatInt(rage::scrNativeCallContext* src);

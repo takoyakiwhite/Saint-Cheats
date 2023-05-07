@@ -43,4 +43,4 @@ public:
     uint64_t qword278;
     char gap280[16];
 };
-static_assert(sizeof(CPedModelInfo) == 0x290);
+

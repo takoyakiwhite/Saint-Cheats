@@ -253,7 +253,7 @@ namespace Saint
 
 		PVOID m_FallTaskConstructor;
 
-		
+		bool* m_send_clone_sync;
 		
 
 		

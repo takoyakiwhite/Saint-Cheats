@@ -4,13 +4,13 @@
 
 namespace Saint::UserInterface {
 	template <typename DataType, typename PositionType, typename BoolType>
-	class BoolChoose : public BaseOption<BoolChoose<DataType, PositionType, BoolType>>
+	class ToggleWithScroller : public BaseOption<ToggleWithScroller<DataType, PositionType, BoolType>>
 	{
 	public:
-		explicit BoolChoose() = default;
+		explicit ToggleWithScroller() = default;
 
 		template <PositionType N>
-		explicit BoolChoose(const char* text, const char* description, BoolType* b00l, DataType(*array)[N], PositionType* position, bool actionOnHorizontal = false, std::function<void()> action = [] {}) :
+		explicit ToggleWithScroller(const char* text, const char* description, BoolType* b00l, DataType(*array)[N], PositionType* position, bool actionOnHorizontal = false, std::function<void()> action = [] {}) :
 			m_Bool(b00l),
 			m_Data(&(*array)[0]),
 			m_DataSize(N),
@@ -24,7 +24,7 @@ namespace Saint::UserInterface {
 		}
 
 		template <typename VectorType>
-		explicit BoolChoose(const char* text, const char* description, BoolType* b00l, const VectorType* v, PositionType* position, bool actionOnHorizontal = true, std::function<void()> action = [] {}) :
+		explicit ToggleWithScroller(const char* text, const char* description, BoolType* b00l, const VectorType* v, PositionType* position, bool actionOnHorizontal = true, std::function<void()> action = [] {}) :
 			m_Bool(b00l),
 			m_Data(v->data()),
 			m_DataSize(v->size()),
@@ -43,7 +43,7 @@ namespace Saint::UserInterface {
 			YesNo
 		};
 		template <typename BoolType = bool>
-		explicit BoolChoose(const char* text, const char* description, BoolType* b00l, PositionType* position, BoolDisplay displayType, bool displayInverted = true, std::function<void()> action = [] {}) :
+		explicit ToggleWithScroller(const char* text, const char* description, BoolType* b00l, PositionType* position, BoolDisplay displayType, bool displayInverted = true, std::function<void()> action = [] {}) :
 			m_Bool(b00l),
 			m_DisplayInverted(displayInverted),
 			m_DisplayType(displayType)
@@ -119,11 +119,11 @@ namespace Saint::UserInterface {
 				Base::HandleAction(action);
 		}
 
-		~BoolChoose() noexcept = default;
-		BoolChoose(BoolChoose const&) = default;
-		BoolChoose& operator=(BoolChoose const&) = default;
-		BoolChoose(BoolChoose&&) = default;
-		BoolChoose& operator=(BoolChoose&&) = default;
+		~ToggleWithScroller() noexcept = default;
+		ToggleWithScroller(ToggleWithScroller const&) = default;
+		ToggleWithScroller& operator=(ToggleWithScroller const&) = default;
+		ToggleWithScroller(ToggleWithScroller&&) = default;
+		ToggleWithScroller& operator=(ToggleWithScroller&&) = default;
 	private:
 		const DataType* m_Data{};
 		PositionType m_DataSize{};
@@ -134,6 +134,6 @@ namespace Saint::UserInterface {
 		BoolDisplay m_DisplayType;
 		BoolType m_DisplayInverted = false;
 
-		using Base = BaseOption<BoolChoose<DataType, PositionType, BoolType>>;
+		using Base = BaseOption<ToggleWithScroller<DataType, PositionType, BoolType>>;
 	};
 }

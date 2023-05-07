@@ -4,13 +4,13 @@
 namespace Saint::UserInterface
 {
 	template <typename DataType, typename PositionType>
-	class ChooseOption : public BaseOption<ChooseOption<DataType, PositionType>>
+	class Scroll : public BaseOption<Scroll<DataType, PositionType>>
 	{
 	public:
-		explicit ChooseOption() = default;
+		explicit Scroll() = default;
 
 		template <PositionType N>
-		explicit ChooseOption(const char* text, const char* description, DataType(*array)[N], PositionType* position, bool actionOnHorizontal = false, std::uint32_t subId2 = -1, std::function<void()> action = [] {}):
+		explicit Scroll(const char* text, const char* description, DataType(*array)[N], PositionType* position, bool actionOnHorizontal = false, std::uint32_t subId2 = -1, std::function<void()> action = [] {}):
 			m_Data(&(*array)[0]),
 			m_DataSize(N),
 			m_Position(position),
@@ -24,7 +24,7 @@ namespace Saint::UserInterface
 		}
 
 		template <typename VectorType>
-		explicit ChooseOption(const char* text, const char* description, const VectorType* v, PositionType* position, bool actionOnHorizontal = false, std::uint32_t subId2 = -1, std::function<void()> action = [] {}) :
+		explicit Scroll(const char* text, const char* description, const VectorType* v, PositionType* position, bool actionOnHorizontal = false, std::uint32_t subId2 = -1, std::function<void()> action = [] {}) :
 			m_Data(v->data()),
 			m_DataSize(v->size()),
 			m_Position(position),
@@ -103,11 +103,11 @@ namespace Saint::UserInterface
 				Base::HandleAction(action);
 		}
 
-		~ChooseOption() noexcept = default;
-		ChooseOption(ChooseOption const&) = default;
-		ChooseOption& operator=(ChooseOption const&) = default;
-		ChooseOption(ChooseOption&&) = default;
-		ChooseOption& operator=(ChooseOption&&) = default;
+		~Scroll() noexcept = default;
+		Scroll(Scroll const&) = default;
+		Scroll& operator=(Scroll const&) = default;
+		Scroll(Scroll&&) = default;
+		Scroll& operator=(Scroll&&) = default;
 	private:
 		const DataType* m_Data{};
 		PositionType m_DataSize{};
@@ -115,6 +115,6 @@ namespace Saint::UserInterface
 		bool m_ActionOnHorizontal{};
 		std::uint32_t m_SubId2{};
 
-		using Base = BaseOption<ChooseOption<DataType, PositionType>>;
+		using Base = BaseOption<Scroll<DataType, PositionType>>;
 	};
 }

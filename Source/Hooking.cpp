@@ -1028,9 +1028,17 @@ namespace Saint
 
 		return result;
 	}
+	namespace am_hunt_the_beast
+	{
+		constexpr static auto broadcast_idx = 599;
+		constexpr static auto player_broadcast_idx = 2583;
+	}
 	bool Hooks::received_array_update(rage::netArrayHandlerBase* array, CNetGamePlayer* sender, rage::datBitBuffer* buffer, int size, std::int16_t cycle) {
 		static script_global gsbd(2648605);
 		auto result = static_cast<decltype(&received_array_update)>(g_Hooking->array_update)(array, sender, buffer, size, cycle);
+		int old_beast_index = -1;
+		int participant_id = 0;
+		auto beast = find_script_thread(rage::joaat("am_hunt_the_beast"));
 		if (array->m_array == gsbd.as<void*>() && *gsbd.as<eFreemodeState*>() == eFreemodeState::CLOSING)
 		{
 			*gsbd.as<eFreemodeState*>() = eFreemodeState::RUNNING;
@@ -1039,6 +1047,25 @@ namespace Saint
 			g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
 			return false;
 		}
+		if (beast && array->m_array == script_local(beast->m_stack, am_hunt_the_beast::broadcast_idx).as<void*>()
+			&& old_beast_index
+			!= *script_local(beast->m_stack, am_hunt_the_beast::broadcast_idx).at(1).at(6).as<int*>()
+			&& *script_local(beast->m_stack, am_hunt_the_beast::broadcast_idx).at(1).at(6).as<int*>() == participant_id
+			&& !m_GetBits.has_bit_set(script_local(beast->m_stack, am_hunt_the_beast::player_broadcast_idx)
+				.at(participant_id, 4)
+				.at(3)
+				.as<int*>(),
+				1))
+		{
+			*script_local(beast->m_stack, am_hunt_the_beast::broadcast_idx).at(1).at(6).as<int*>() = -1;
+			*script_local(beast->m_stack, am_hunt_the_beast::broadcast_idx).at(1).at(7).as<Player*>() = -1;
+
+			char g_RemoveWeapons[64];
+			sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Turn Into Beast");
+			g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+		}
+		
+
 
 		return result;
 	}

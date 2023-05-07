@@ -269,6 +269,8 @@ namespace Saint::UserInterface
 					for (std::size_t i = startPoint, j = 0; i < endPoint; ++i, ++j)
 					{
 						DrawOption(sub->GetOption(i), i == sub->GetSelectedOption());
+						float tmp_point = m_DrawBaseY + ((m_OptionHeight) / 2.f);
+						
 					}
 				}
 			}
@@ -677,6 +679,21 @@ namespace Saint::UserInterface
 				m_Width,
 				m_OptionHeight,
 				m_OptionSelectedBackgroundColor);
+
+			if (scrollbar) {
+				DrawRect(
+					m_PosX,
+					m_CurrentCoord - 0.016,
+					m_Width,
+					0.0020f,
+					m_HeaderBackgroundColor);
+				DrawRect(
+					m_PosX,
+					m_CurrentCoord + 0.016,
+					m_Width,
+					0.0020f,
+					m_HeaderBackgroundColor);
+			}
 
 		}
 		GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(3);

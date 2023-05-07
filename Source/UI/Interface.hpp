@@ -367,6 +367,8 @@ namespace Saint::UserInterface
 		float description_x2 = 0.22f;
 		float description_y2 = 0.0f;
 
+		bool scrollbar = false;
+
 		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
 
 	private:
@@ -403,6 +405,7 @@ namespace Saint::UserInterface
 		bool IsMouseLocked();
 		Rectangle GetMenuRect();
 
+		
 
 		std::vector<std::unique_ptr<AbstractSubmenu>> m_AllSubmenus;
 

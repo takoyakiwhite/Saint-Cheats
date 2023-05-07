@@ -4,11 +4,11 @@
 
 namespace Saint::UserInterface {
     template <typename NumberType, typename BoolType = bool>
-    class toggle_number_option : public BaseOption<toggle_number_option<NumberType, BoolType>>
+    class ToggleWithNumber : public BaseOption<ToggleWithNumber<NumberType, BoolType>>
     {
     public:
-        explicit toggle_number_option() = default;
-        explicit toggle_number_option(const char* text, const char* description, BoolType* b00l, NumberType* number, NumberType min, NumberType max, NumberType step = 1, std::size_t precision = 3, bool actionOnHorizontal = true, const char* prefix = "", const char* suffix = "", std::function<void()> action = [] {}) :
+        explicit ToggleWithNumber() = default;
+        explicit ToggleWithNumber(const char* text, const char* description, BoolType* b00l, NumberType* number, NumberType min, NumberType max, NumberType step = 1, std::size_t precision = 3, bool actionOnHorizontal = true, const char* prefix = "", const char* suffix = "", std::function<void()> action = [] {}) :
             m_ActionOnHorizontal(actionOnHorizontal),
             m_Bool(b00l),
             m_Number(number),
@@ -26,11 +26,11 @@ namespace Saint::UserInterface {
             std::strncpy(&m_Suffix[0], suffix, sizeof(m_Suffix) - 1);
         }
 
-        ~toggle_number_option() noexcept = default;
-        toggle_number_option(toggle_number_option const&) = default;
-        toggle_number_option& operator=(toggle_number_option const&) = default;
-        toggle_number_option(toggle_number_option&&) = default;
-        toggle_number_option& operator=(toggle_number_option&&) = default;
+        ~ToggleWithNumber() noexcept = default;
+        ToggleWithNumber(ToggleWithNumber const&) = default;
+        ToggleWithNumber& operator=(ToggleWithNumber const&) = default;
+        ToggleWithNumber(ToggleWithNumber&&) = default;
+        ToggleWithNumber& operator=(ToggleWithNumber&&) = default;
 
         bool GetFlag(OptionFlag flag) override
         {
@@ -98,7 +98,7 @@ namespace Saint::UserInterface {
         std::size_t m_Precision{};
 
 
-        using Base = BaseOption<toggle_number_option<NumberType, BoolType>>;
+        using Base = BaseOption<ToggleWithNumber<NumberType, BoolType>>;
         using DisplayType = std::conditional_t<sizeof(NumberType) == 1, std::uint32_t, NumberType>;
     };
 }

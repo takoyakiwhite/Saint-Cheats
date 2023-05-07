@@ -3,11 +3,11 @@
 
 namespace Saint::UserInterface
 {
-	class RegularOption : public BaseOption<RegularOption>
+	class Button : public BaseOption<Button>
 	{
 	public:
-		explicit RegularOption() = default;
-		explicit RegularOption(const char* text, const char* description = nullptr, std::function<void()> action = [] {})
+		explicit Button() = default;
+		explicit Button(const char* text, const char* description = nullptr, std::function<void()> action = [] {})
 		{
 			SetLeftText(text);
 			if (description)
@@ -15,10 +15,10 @@ namespace Saint::UserInterface
 			SetAction(std::move(action));
 		}
 
-		~RegularOption() noexcept = default;
-		RegularOption(RegularOption const&) = default;
-		RegularOption& operator=(RegularOption const&) = default;
-		RegularOption(RegularOption&&) = default;
-		RegularOption& operator=(RegularOption&&) = default;
+		~Button() noexcept = default;
+		Button(Button const&) = default;
+		Button& operator=(Button const&) = default;
+		Button(Button&&) = default;
+		Button& operator=(Button&&) = default;
 	};
 }
