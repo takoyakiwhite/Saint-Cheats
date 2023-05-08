@@ -132,7 +132,7 @@ namespace Saint::UserInterface
 		bool welcomemessage = false;
 
 		// Glare
-		bool m_render_glare = { true };
+		bool m_render_glare = { false };
 		int m_glare_handle;
 		float m_glare_direction;
 		void draw_glare();
@@ -160,12 +160,12 @@ namespace Saint::UserInterface
 		};
 		std::size_t reso = 1920;
 		// Header
-		float m_HeaderHeight = { 0.083f };
+		float m_HeaderHeight = { 0.056f };
 		bool m_HeaderTextData = false;
 		bool m_HeaderNativeText = true;
-		float m_HeaderTextSize = 1.f;
-		Font m_HeaderFont = Font::HouseScript;
-		Color m_HeaderBackgroundColor{ 255, 150, 184, 255 };
+		float m_HeaderTextSize = 0.67f;
+		Font m_HeaderFont = Font::Pricedown;
+		Color m_HeaderBackgroundColor{ 3, 218, 1, 200 };
 		Color m_HeaderTextColor{ 255, 255, 255, 255 };
 		HeaderType m_HeaderType = HeaderType::Static;
 		HeaderType m_HeaderType2 = HeaderType::Static;
@@ -186,8 +186,8 @@ namespace Saint::UserInterface
 		Color m_FooterTextColor{ 255,255,255, 255 };
 
 		//enables
-		bool footer_enabled = true;
-		bool lines_enabled = true;
+		bool footer_enabled = false;
+		bool lines_enabled = false;
 
 		// Smooth Scrolling
 		float lerp(float a, float b, float t)
@@ -200,6 +200,9 @@ namespace Saint::UserInterface
 		//Themes
 		const char* ThemeList[9]
 		{
+
+
+		
 			"Saint Purple",
 			"Red Salmon",
 			"Sapphire Blue",
@@ -207,7 +210,7 @@ namespace Saint::UserInterface
 			"Emerald Green",
 			"Violet Purple",
 			"Salmon Pink",
-			"Stash Skid Menu",
+			"Skid Menu",
 			"Ozark"
 		};
 		std::size_t ThemeIterator = 0;
@@ -220,6 +223,7 @@ namespace Saint::UserInterface
 			"Wingdings",
 			"Chalet Comprime Cologne",
 			"Pricedown"
+			"Custom"
 		};
 		const char* HeaderFont2[7]
 		{
@@ -242,17 +246,17 @@ namespace Saint::UserInterface
 		// Options
 		float m_OptionHeight = 0.0315f;
 		float m_OptionTextSize = 0.26f;
-		Font m_OptionFont = Font::ChaletLondon;
-		Font m_SeperatorFont = Font::HouseScript;
+		Font m_OptionFont = Font::Pricedown;
+		Font m_SeperatorFont = Font::Pricedown;
 		float m_OptionPadding = 2.1f;
 		Color m_OptionSelectedTextColor{ 0,0,0, 255 };
-		Color m_OptionUnselectedTextColor{ 255,255,255, 255 };
+		Color m_OptionUnselectedTextColor{ 0,255,0, 255 };
 		Color m_OptionSelectedBackgroundColor{ 255, 255, 255, 255 };
 		Color m_OptionUnselectedBackgroundColor{ 0, 0, 0, 160 };
-		std::size_t option_font_it = 0;
+		std::size_t option_font_it = 7;
 
 		//submenubar
-		bool submenu_enabled = true;
+		bool submenu_enabled = false;
 
 		bool dynamic_text = false;
 
@@ -265,7 +269,7 @@ namespace Saint::UserInterface
 
 		bool animation_enabled = false;
 
-		std::string header_name = "Saint";
+		std::string header_name = "nigger menu v6";
 
 		// Footer
 		bool m_dynamic_footer = { false };
@@ -285,7 +289,7 @@ namespace Saint::UserInterface
 			"Lines",
 			"None"
 		};
-		std::size_t IndicatorIterator = 1;
+		std::size_t IndicatorIterator = 0;
 		bool controlsEnabled = true;
 		// Bool Toogles
 		bool ToggledOn = false;
@@ -302,7 +306,7 @@ namespace Saint::UserInterface
 			"Checkmarks",
 			"Custom",
 		};
-		std::size_t ToggleIterator = 3;
+		std::size_t ToggleIterator = 0;
 		std::string custom_toggle_dict_on = "commonmenu";
 		std::string custom_toggle_asset_on = "shop_tick_icon";
 		std::string custom_toggle_dict_off = "commonmenu";
@@ -317,7 +321,7 @@ namespace Saint::UserInterface
 		float toggle_off_rotation = 45.000;
 
 		//Header
-		float header_x_offset = -0.068;
+		float header_x_offset = -0.000;
 		//smooth scroll
 		float smooth_scroll_speed = 0.170000f;
 
@@ -367,7 +371,7 @@ namespace Saint::UserInterface
 		float description_x2 = 0.22f;
 		float description_y2 = 0.0f;
 
-		bool scrollbar = false;
+		bool scrollbar = true;
 
 		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
 

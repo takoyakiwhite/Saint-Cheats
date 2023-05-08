@@ -93,6 +93,7 @@ namespace Saint::UserInterface
 		"dude, where's my car?",
 		"rate the ozark exit scam 1 thru 10",
 		"fuck you",
+		"anyway last week",
 		"sponsored by cheatengine",
 		"\"Such an obvious exit scam\" - DoneWithDegeneracy",
 		"wow we can edit the sky color, we're so cool",
@@ -106,6 +107,8 @@ namespace Saint::UserInterface
 		"Get Good Get Saint",
 		"Sexy Saint Cheats",
 		"what am i doing wrong??? - patek",
+			"Ok then I don't know anymore",
+
 		"Kiddions VIP On Top",
 		"I've been on my KTM drip hopefully i dont fall off",
 		"stash doesn't like juice wrld ):",
