@@ -11140,21 +11140,21 @@ namespace Saint {
 	class Windows {
 	public:
 		const char* action[4] = { "Fix", "Roll Down", "Roll Up", "Smash" };
-		const char* windowNames[9] = {"Front Left Window", "Front Right Window", "Rear Left Window", "Rear Right Window", "Front Windscreen", "Rear Windscreen",
+		const char* windowNames[9] = {"Front Left", "Front Right", "Rear Left", "Rear Right", "Front Windscreen", "Rear Windscreen",
 			"Mid Left", "Mid Right", "Invalid" };
 		std::size_t pos;
 		void editWindow(int windowIndex, int windowAction) {
 			if (windowAction == 0) {
-				VEHICLE::FIX_VEHICLE_WINDOW(Game->Self(), windowIndex);
+				VEHICLE::FIX_VEHICLE_WINDOW(Game->Vehicle(), windowIndex);
 			}
 			if (windowAction == 1) {
-				VEHICLE::ROLL_DOWN_WINDOW(Game->Self(), windowIndex);
+				VEHICLE::ROLL_DOWN_WINDOW(Game->Vehicle(), windowIndex);
 			}
 			if (windowAction == 2) {
-				VEHICLE::ROLL_UP_WINDOW(Game->Self(), windowIndex);
+				VEHICLE::ROLL_UP_WINDOW(Game->Vehicle(), windowIndex);
 			}
 			if (windowAction == 3) {
-				VEHICLE::SMASH_VEHICLE_WINDOW(Game->Self(), windowIndex);
+				VEHICLE::SMASH_VEHICLE_WINDOW(Game->Vehicle(), windowIndex);
 			}
 		}
 	};
