@@ -1101,13 +1101,26 @@ namespace Saint::UserInterface
 						false, true);
 				}
 				if (RightFooterText) {
-					DrawRightText(
-						g_GameVariables->m_version,
-						m_PosX + (m_Width / m_FooterTextPadding),
-						m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
-						m_FooterTextSize, m_FooterTextFont,
-						m_FooterTextColor,
-						false, true);
+					if (Flags->isDev()) 
+					{
+						DrawRightText(
+							"Developer",
+							m_PosX + (m_Width / m_FooterTextPadding),
+							m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
+							m_FooterTextSize, m_FooterTextFont,
+							m_FooterTextColor,
+							false, true);
+					}
+					else 
+					{
+						DrawRightText(
+							g_GameVariables->m_version,
+							m_PosX + (m_Width / m_FooterTextPadding),
+							m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
+							m_FooterTextSize, m_FooterTextFont,
+							m_FooterTextColor,
+							false, true);
+					}
 				}
 				if (lines_enabled) {
 					GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (0.001f / 2.0f), m_Width, 0.0018f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
