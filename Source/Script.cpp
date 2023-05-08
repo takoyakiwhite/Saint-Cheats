@@ -369,6 +369,26 @@ namespace Saint
 		m_Initialized = true;
 		using namespace UserInterface;
 		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_JOINING"), "Loading GTA Online with " BRANDING "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_QUITTING"), "Leaving with " BRANDING "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_QUIT_MP"), "Exiting GTA Online with " BRANDING);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_ENTER_MP"), "Play GTA Online with " BRANDING);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_EXIT_GAME"), "Quit GTA with" BRANDING);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_GO"), "Online with " BRANDING);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_MPREENTER"), "Joining a new session with " BRANDING "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_FRIEND_FM"), "Closed Friend Session with " BRANDING "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_GOTO_STORE"), "Purchase Shark Cards with " BRANDING "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INF_EXIT"), "Quit to desktop with " BRANDING "?");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_CRESES"), "Joining A Crew Only Session with " BRANDING "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INF_PGOB"), "Cut to the chase and	 head straight into the world of GTA Online with " BRANDING "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INF_PGOT"), "Online w/ " BRANDING "!");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_INVO_FM"), "Join A Invite Only Session with " BRANDING ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("LOADING_SPLAYER_L"), "Loading Story Mode with " BRANDING "...");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_NCREW_FM"), "Join A Crew Session with " BRANDING ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_CREW_FM"), "Join A Closed Crew Session with " BRANDING ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_SOLO_FM"), "Join A Solo Session with " BRANDING ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("PM_FRESES"), "Join A Friends Only Session with " BRANDING ".");
+		g_CustomText->AddText(CONSTEXPR_JOAAT("HUD_MAINTIT"), BRANDING);
+		g_CustomText->AddText(CONSTEXPR_JOAAT("MP_CHAT_ALL"), BRANDING);
 		if (!std::filesystem::exists("C:\\Saint\\Translations"))
 			std::filesystem::create_directory("C:\\Saint\\Translations");
 
