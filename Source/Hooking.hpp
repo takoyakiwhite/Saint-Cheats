@@ -34,6 +34,7 @@ namespace Saint
 			#endif	
 		}
 	};
+	
 	inline MenuFlag* Flags;
 	struct Hooks
 	{

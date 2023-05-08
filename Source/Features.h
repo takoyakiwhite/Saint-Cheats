@@ -8979,6 +8979,8 @@ namespace Saint {
 		float sliderFloat;
 		std::string buffer;
 		bool savedTheme = false;
+		bool notisounds = false;
+		std::string path_to_load = "None";
 		bool fileExists(const std::string& filePath) {
 			std::ifstream file(filePath);
 			return file.good();
@@ -9015,13 +9017,48 @@ namespace Saint {
 			std::string MenuFolderPath = "C:\\Saint\\";
 			Ini* ColorIni = new Ini(MenuFolderPath + "tutorial" + ".ini");
 
-
+			std::string MenuFolderPath2 = "C:\\Saint\\Themes\\";
+			std::string path_to = path_to_load;
 			ColorIni->WriteBool(true, "Tutorial", "Value");
+			ColorIni->WriteBool(notisounds, "Tutorial", "Sounds");
+			ColorIni->WriteString(path_to, "Theme", "Path");
 
 
 		}
+		std::string get_theme_path() {
+			std::string MenuFolderPath = "C:\\Saint\\";
+			if (DoesIniExists((MenuFolderPath + "tutorial" + ".ini").c_str())) {
+				Ini* ColorIni = new Ini(MenuFolderPath + "tutorial" + ".ini");
+				if (ColorIni->GetString("Theme", "Path") != "None") {
+					return ColorIni->GetString("Theme", "Path");
+				}
+				if (ColorIni->GetString("Theme", "Path") == "None") {
+					return "NoneActive";
+				}
+			}
+			return "";
+		}
+		bool wants_sounds() {
+
+			std::string MenuFolderPath = "C:\\Saint\\";
+			if (DoesIniExists((MenuFolderPath + "tutorial" + ".ini").c_str())) {
+				Ini* ColorIni = new Ini(MenuFolderPath + "tutorial" + ".ini");
+
+				if (ColorIni->GetBool("Tutorial", "Sounds") == true) {
+					return true;
+				}
+				if (ColorIni->GetBool("Tutorial", "Sounds") == false) {
+					return false;
+				}
+				return false;
+
+
+
+
+			}
+		}
 		bool is_finished() {
-			return true;
+			
 			std::string MenuFolderPath = "C:\\Saint\\";
 			if (DoesIniExists((MenuFolderPath + "tutorial" + ".ini").c_str())) {
 				Ini* ColorIni = new Ini(MenuFolderPath + "tutorial" + ".ini");
@@ -11005,7 +11042,63 @@ namespace Saint {
 		}
 		
 	}
-	
+	class fileHandler {
+	public:
+		fileHandler(std::string m_path, std::string m_name) {
+			path = m_path;
+			name = m_name;
+		}
+	public:
+		std::string path;
+		std::string name;
+	};
+	inline std::vector<fileHandler> GetFilesFromFolder(const std::string& folderPath) {
+		std::vector<fileHandler> files;
+
+		for (const auto& entry : fs::directory_iterator(folderPath)) {
+			if (entry.is_regular_file()) {
+				fs::path filePath = entry.path();
+				std::string filename = filePath.stem().string();
+				if (filePath.extension() == ".wav") {
+					files.push_back({ entry.path().string(), filename });
+				}
+			}
+		}
+
+		return files;
+	}
+	inline std::vector<fileHandler> GetFilesFromFolder2(const std::string& folderPath) {
+		std::vector<fileHandler> files;
+
+		for (const auto& entry : fs::directory_iterator(folderPath)) {
+			if (entry.is_regular_file()) {
+				fs::path filePath = entry.path();
+				std::string filename = filePath.filename().string();
+				files.push_back({ entry.path().string(), filename });
+				
+			}
+		}
+
+		return files;
+	}
+	inline std::string search_sounds;
+	class FileExplorer {
+	public:
+		const char* action[3] = { "None", "Delete", "Move"};
+		std::size_t pos;
+		std::string path;
+		std::string path2;
+		std::string command;
+		void deleteFile(fs::path filePath) {
+			fs::remove(filePath);
+		}
+		void moveFile(fs::path filePath, fs::path newPath) {
+			fs::rename(filePath, newPath);
+		}
+		
+
+	};
+	inline FileExplorer fileExplorer;
 	inline void FeatureInitalize() {
 		#ifndef DEV
 			m_menu_data.m_flag = eMenuFlags::REGULAR_USER;

@@ -36,6 +36,7 @@ typedef int ImGuiToastPos;
 #include <mmsystem.h>
 
 
+
 enum ImGuiToastType_
 {
 	ImGuiToastType_None,
@@ -66,7 +67,66 @@ enum ImGuiToastPos_
 	ImGuiToastPos_Center,
 	ImGuiToastPos_COUNT
 };
+class Ini2
+{
+private:
+	std::string inifile;
+public:
+	Ini2(std::string file)
+	{
+		this->inifile = file;
+	}
 
+	void WriteString(std::string string, std::string app, std::string key)
+	{
+		WritePrivateProfileStringA(app.c_str(), key.c_str(), string.c_str(), this->inifile.c_str());
+	}
+	std::string GetString(std::string app, std::string key)
+	{
+		char buf[100];
+		GetPrivateProfileStringA(app.c_str(), key.c_str(), "NULL", buf, 100, this->inifile.c_str());
+		return (std::string)buf;
+	}
+
+	void WriteInt(int value, std::string app, std::string key)
+	{
+		WriteString(std::to_string(value), app, key);
+	}
+	void WriteHash(Hash value, std::string app, std::string key)
+	{
+		WriteString(std::to_string(value), app, key);
+	}
+	int GetInt(std::string app, std::string key)
+	{
+		return std::stoi(GetString(app, key));
+	}
+
+	void WriteFloat(float value, std::string app, std::string key)
+	{
+		WriteString(std::to_string(value), app, key);
+	}
+	float GetFloat(std::string app, std::string key)
+	{
+		return std::stof(GetString(app, key));
+	}
+
+	void WriteBool(bool value, std::string app, std::string key)
+	{
+		WriteString(std::to_string(value), app, key);
+	}
+	bool GetBool(std::string app, std::string key)
+	{
+		std::string Fetched = GetString(app, key);
+		if (Fetched == "1") {
+			return true;
+		}
+		if (Fetched == "0") {
+			return false;
+		}
+		return false;
+	}
+
+};
 class ImGuiToast
 {
 private:
@@ -232,7 +292,32 @@ namespace Saint {
 			NOTIFY_PADDING_Y = 1330.f;
 		}
 	}
-	
+	inline bool DoesIniExists(const char* path)
+	{
+
+		struct stat buffer;
+		return (stat(path, &buffer) == 0);
+
+	}
+	inline bool wants_sounds() {
+
+		std::string MenuFolderPath = "C:\\Saint\\";
+		if (DoesIniExists((MenuFolderPath + "tutorial" + ".ini").c_str())) {
+			Ini2* ColorIni = new Ini2(MenuFolderPath + "tutorial" + ".ini");
+
+			if (ColorIni->GetBool("Tutorial", "Sounds") == true) {
+				return true;
+			}
+			if (ColorIni->GetBool("Tutorial", "Sounds") == false) {
+				return false;
+			}
+			return false;
+
+
+
+
+		}
+	}
 	namespace Noti
 	{
 		
@@ -243,8 +328,9 @@ namespace Saint {
 		/// </summary>
 		NOTIFY_INLINE VOID InsertNotification(const ImGuiToast& toast)
 		{
-
-			PlaySound(TEXT("C:\\Saint\\Sounds\\Notification.wav"), NULL, SND_FILENAME | SND_ASYNC);
+			if (wants_sounds()) {
+				PlaySound(TEXT("C:\\Saint\\Sounds\\Notification.wav"), NULL, SND_FILENAME | SND_ASYNC);
+			}
 			update();
 			if (notifications.size() < 10) {
 

@@ -25,7 +25,7 @@
 #include <iostream>
 #include <windows.h>
 #include <mmsystem.h>
-
+#include "Features.h"
 
 #pragma comment (lib, "urlmon.lib") 
 #pragma comment(lib, "winmm.lib")
@@ -55,11 +55,12 @@ void load_dir() {
 		int yes19 = _wmkdir((const wchar_t*)"C:\\Saint\\Textures.ytd");
 	}
 	int yes18 = _wmkdir((const wchar_t*)"C:\\Saint\\Sounds\\Intro.wav");
-	int yes20 = _wmkdir((const wchar_t*)"C:\\Saint\\Sounds\\Notification.wav");
+	if (!does_exist("C:\\Saint\\Sounds\\", "Notification.wav")) {
+		//int yes20 = _wmkdir((const wchar_t*)"C:\\Saint\\Sounds\\Notification.wav");
+	}
 
 	std::string path;
 	std::ofstream file;
-	std::string DownloadPP = std::string("C:\\Saint\\Sounds\\Intro.wav");
 	std::string DownloadPP3 = std::string("C:\\Saint\\Sounds\\Notification.wav");
 	std::string DownloadPP2 = std::string("C:\\Saint\\Textures.ytd");
 
@@ -68,8 +69,10 @@ void load_dir() {
 	if (!does_exist("C:\\Saint\\", "Textures.ytd")) {
 		URLDownloadToFileA(0, "https://saintcheats.xyz/Textures.ytd", DownloadPP2.c_str(), 0, 0);
 	}
-	URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1104892686386876427/1104915044472475759/Intro.wav", DownloadPP.c_str(), 0, 0);
-	URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1104892686386876427/1104911641499418675/Notifications.wav", DownloadPP3.c_str(), 0, 0);
+	
+	if (!does_exist("C:\\Saint\\Sounds\\", "Notification.wav")) {
+		URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1104892686386876427/1104911641499418675/Notifications.wav", DownloadPP3.c_str(), 0, 0);
+	}
 }
 std::string wideToString(std::wstring strw) {
 	if (strw.empty()) return std::string();
@@ -216,8 +219,12 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				//registering
 				load_dir();
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome, thanks for buying Saint!",PLAYER::GET_PLAYER_NAME(PLAYER::PLAYER_PED_ID()) });
-				PlaySound(TEXT("C:\\Saint\\Sounds\\Intro.wav"), NULL, SND_FILENAME | SND_ASYNC);
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome, thanks for buying Saint!", });
+				//PlaySound(TEXT("C:\\Saint\\Sounds\\Intro.wav"), NULL, SND_FILENAME | SND_ASYNC);
+
+				if (tutorial.get_theme_path() != "NoneActive" || tutorial.get_theme_path() != "") {
+					g_ThemeLoading.load(tutorial.get_theme_path());
+				}
 
 				
 				while (g_Running)

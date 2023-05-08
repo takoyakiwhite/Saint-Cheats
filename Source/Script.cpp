@@ -412,29 +412,23 @@ namespace Saint
 					}
 				}
 				else {
-					if (!tutorial.savedTheme) {
-						sub->draw_option<submenu>("Create you're theme.", "Tip: create a theme and save it.", rage::joaat("TutorialSettings"));
-						sub->draw_option<Button>(("Skip"), nullptr, []
+					sub->draw_option<submenu>("Theme", nullptr, rage::joaat("TutorialSettings"));
+					sub->draw_option<Button>(("Save & Loadup On Start"), nullptr, [=]
+						{
+							showKeyboard("Enter Something", "", 25, &tutorial.path_to_load, [] {
+								g_ThemeLoading.save(tutorial.path_to_load);
+								
+							});
+
+
+						});
+					sub->draw_option<toggle<bool>>(("Notification Sounds"), nullptr, &tutorial.notisounds, BoolDisplay::OnOff);
+						sub->draw_option<Button>(("Confirm"), nullptr, []
 							{
 								tutorial.set_finished();
 							});
-					}
-					if (tutorial.savedTheme) {
-						sub->draw_option<Button>(("Let's get used to the controls."), nullptr, []
-							{
-								
-							});
-						sub->draw_option<toggle<bool>>(("Toggle"), nullptr, &hornboost.onlyOnGround, BoolDisplay::OnOff);
-
-						sub->draw_option<number<std::int32_t>>("Set this value to 10.", nullptr, &tutorial.sliderInt, 0, 1000);
-						if (tutorial.sliderInt == 10) {
-							sub->draw_option<Button>(("Finish"), nullptr, []
-								{
-									tutorial.set_finished();
-								});
-						}
-						
-					}
+					
+					
 
 				}
 			
@@ -445,7 +439,6 @@ namespace Saint
 				sub->draw_option<submenu>("Customization", "Customize most of the menu here.", Customization);
 				sub->draw_option<submenu>("Positions", nullptr, Positions);
 				sub->draw_option<submenu>("Colors", nullptr, SubmenuColors);
-				sub->draw_option<submenu>("Themes", nullptr, SubmenuThemes);
 				//sub->draw_option<submenu>("Hotkeys", nullptr, rage::joaat("Hotkeys"));
 				sub->draw_option<submenu>("Translations", nullptr, SubMenuTranslations);
 
@@ -10384,6 +10377,8 @@ namespace Saint
 				sub->draw_option<submenu>("Phone", nullptr, rage::joaat("Phone"));
 				sub->draw_option<submenu>("Cutscene", nullptr, rage::joaat("Cutscene"));
 				sub->draw_option<submenu>("Graphics", nullptr, rage::joaat("Graphics"));
+				sub->draw_option<submenu>("Sounds", nullptr, rage::joaat("Music"));
+				sub->draw_option<submenu>("File Explorer", nullptr, rage::joaat("Explorer"));
 				sub->draw_option<toggle<bool>>(("Reduce Ped Budget"), nullptr, &misc.reduce_ped_budget, BoolDisplay::OnOff, false, [] {
 					if (!misc.reduce_ped_budget) {
 						STREAMING::SET_REDUCE_PED_MODEL_BUDGET(false);
@@ -10396,6 +10391,96 @@ namespace Saint
 					});
 				sub->draw_option<toggle<bool>>(("Instant ALT + F4"), nullptr, &features.instantalt, BoolDisplay::OnOff);
 
+			});
+		g_Render->draw_submenu<sub>("File Explorer", rage::joaat("Explorer"), [](sub* sub)
+			{
+				sub->draw_option<Scroll<const char*, std::size_t>>("Action", nullptr, &fileExplorer.action, &fileExplorer.pos);
+				
+				sub->draw_option<KeyboardOption>("Path", nullptr, fileExplorer.path, []
+					{
+						showKeyboard("Enter Something, Example: C:\\Saint\\Sounds\\", "", 25, &fileExplorer.path, [] {
+
+							});
+					});
+				if (fileExplorer.pos == 2) {
+					sub->draw_option<KeyboardOption>("New Path", nullptr, fileExplorer.path2, []
+						{
+							showKeyboard("Enter Something, Example: C:\\Saint\\Teleports\\", "", 25, &fileExplorer.path2, [] {
+
+								});
+						});
+				}
+				sub->draw_option<KeyboardOption>("Command", "Example: saint", fileExplorer.command, []
+					{
+						showKeyboard("Enter Something", "", 25, &fileExplorer.command, [] {
+								if (fileExplorer.command == "saint") {
+									fileExplorer.path = "C:\\Saint\\";
+								}
+								if (fileExplorer.command == "saint_t") {
+									fileExplorer.path = "C:\\Saint\\Teleports\\";
+								}
+								if (fileExplorer.command == "saint_s") {
+									fileExplorer.path = "C:\\Saint\\Sounds\\";
+								}
+								if (fileExplorer.command == "saint_th") {
+									fileExplorer.path = "C:\\Saint\\Themes\\";
+								}
+								
+							});
+					});
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				if (fs::exists(fileExplorer.path)) {
+					std::vector<fileHandler> files = GetFilesFromFolder2(fileExplorer.path);
+
+					for (auto& file : files) {
+						sub->draw_option<Button>((file.name.c_str()), nullptr, [=]
+							{
+								if (fileExplorer.pos == 1) {
+									fileExplorer.deleteFile(file.path);
+								}
+								if (fileExplorer.pos == 2) {
+									if (fs::exists(fileExplorer.path2)) {
+										fileExplorer.moveFile(file.path, fileExplorer.path2 + file.name);
+									}
+								}
+							});
+					}
+				}
+			});
+		g_Render->draw_submenu<sub>("Sounds", rage::joaat("Music"), [](sub* sub)
+			{
+				sub->draw_option<KeyboardOption>("Search", nullptr, search_sounds, []
+					{
+						showKeyboard("Enter Something", "", 25, &search_sounds, [] {
+
+							});
+					});
+				sub->draw_option<Button>(("Stop"), nullptr, [=]
+					{
+						PlaySound(NULL, NULL, 0);
+					});
+				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+				if (search_sounds != "") {
+					std::vector<fileHandler> files = GetFilesFromFolder("C:\\Saint\\Sounds\\");
+
+					for (auto& file : files) {
+						if (has_string_attached(file.name, search_sounds))
+						sub->draw_option<Button>((file.name.c_str()), nullptr, [=]
+							{
+								PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC);
+							});
+					}
+				}
+				if (search_sounds == "") {
+					std::vector<fileHandler> files = GetFilesFromFolder("C:\\Saint\\Sounds\\");
+
+					for (auto& file : files) {
+						sub->draw_option<Button>((file.name.c_str()), nullptr, [=]
+							{
+								PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC);
+							});
+					}
+				}
 			});
 		g_Render->draw_submenu<sub>("Graphics", rage::joaat("Graphics"), [](sub* sub)
 			{
