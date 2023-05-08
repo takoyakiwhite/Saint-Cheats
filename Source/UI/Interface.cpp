@@ -93,7 +93,6 @@ namespace Saint::UserInterface
 		"dude, where's my car?",
 		"rate the ozark exit scam 1 thru 10",
 		"fuck you",
-		"anyway last week",
 		"sponsored by cheatengine",
 		"\"Such an obvious exit scam\" - DoneWithDegeneracy",
 		"wow we can edit the sky color, we're so cool",
@@ -107,8 +106,6 @@ namespace Saint::UserInterface
 		"Get Good Get Saint",
 		"Sexy Saint Cheats",
 		"what am i doing wrong??? - patek",
-			"Ok then I don't know anymore",
-
 		"Kiddions VIP On Top",
 		"I've been on my KTM drip hopefully i dont fall off",
 		"stash doesn't like juice wrld ):",
@@ -273,7 +270,7 @@ namespace Saint::UserInterface
 					{
 						DrawOption(sub->GetOption(i), i == sub->GetSelectedOption());
 						float tmp_point = m_DrawBaseY + ((m_OptionHeight) / 2.f);
-						
+
 					}
 				}
 			}
@@ -1104,7 +1101,7 @@ namespace Saint::UserInterface
 						false, true);
 				}
 				if (RightFooterText) {
-					if (Flags->isDev()) 
+					if (Flags->isDev())
 					{
 						DrawRightText(
 							"Developer",
@@ -1114,7 +1111,7 @@ namespace Saint::UserInterface
 							m_FooterTextColor,
 							false, true);
 					}
-					else 
+					else
 					{
 						DrawRightText(
 							g_GameVariables->m_version,
