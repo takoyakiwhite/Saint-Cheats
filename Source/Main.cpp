@@ -219,7 +219,9 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				//registering
 				load_dir();
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome, thanks for buying Saint!", });
+				if (does_exist("C:\\Saint\\Sounds\\", "Notification.wav")) { // prevent crashes
+					Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome, thanks for buying Saint!", });
+				}
 				//PlaySound(TEXT("C:\\Saint\\Sounds\\Intro.wav"), NULL, SND_FILENAME | SND_ASYNC);
 
 				if (tutorial.get_theme_path() != "NoneActive" || tutorial.get_theme_path() != "") {

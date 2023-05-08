@@ -1442,6 +1442,7 @@ namespace Saint
 				sub->draw_option<submenu>("Radio", nullptr, rage::joaat("Radio"));
 				sub->draw_option<submenu>("Tuning", nullptr, rage::joaat("Tuning"));
 				sub->draw_option<submenu>("Weapons", nullptr, rage::joaat("VWeapons"));
+				sub->draw_option<submenu>("Windows", nullptr, rage::joaat("Windows"));
 				//sub->draw_option<submenu>("Cargobob", nullptr, rage::joaat("CARGO_BOB"));
 				sub->draw_option<toggle<bool>>(("Godmode"), "Prevents your vehicle from taking damage.", &features.vehicle_godmode, BoolDisplay::OnOff, false, [] {
 					if (!features.vehicle_godmode) {
@@ -1579,6 +1580,17 @@ namespace Saint
 					});
 
 			});
+			g_Render->draw_submenu<sub>(("Windows"), rage::joaat("Windows"), [](sub* sub)
+				{
+					sub->draw_option<Scroll<const char*, std::size_t>>("Action", nullptr, &windows.action, &windows.pos);
+					sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
+					for (int i = 0; i < 8; i++) {
+						sub->draw_option<Button>(windows.windowNames[i], nullptr, [=]
+							{
+								windows.editWindow(i, windows.pos);
+							});
+					}
+				});
 			g_Render->draw_submenu<sub>(("Weapons"), rage::joaat("VWeapons"), [](sub* sub)
 				{
 					sub->draw_option<toggle<bool>>(("Enabled"), "", &v_weapons.enabled, BoolDisplay::OnOff);
@@ -3261,6 +3273,10 @@ namespace Saint
 				sub->draw_option<Button>("Limo", "", []
 					{
 						VehicleModifier(MOD_WINDOWS, 3);
+					});
+				sub->draw_option<Button>("Green", "", []
+					{
+						VehicleModifier(MOD_WINDOWS, 4);
 					});
 			});
 		g_Render->draw_submenu<sub>("Armor", LosSantosArmor, [](sub* sub)
@@ -10410,6 +10426,14 @@ namespace Saint
 								});
 						});
 				}
+				if (fileExplorer.pos == 3) {
+					sub->draw_option<KeyboardOption>("Extension", nullptr, fileExplorer.extension, []
+						{
+							showKeyboard("Enter Something, .mp3", "", 25, &fileExplorer.extension, [] {
+
+								});
+						});
+				}
 				sub->draw_option<KeyboardOption>("Command", "Example: saint", fileExplorer.command, []
 					{
 						showKeyboard("Enter Something", "", 25, &fileExplorer.command, [] {
@@ -10430,7 +10454,7 @@ namespace Saint
 					});
 				sub->draw_option<UnclickOption>(("List"), nullptr, [] {});
 				if (fs::exists(fileExplorer.path)) {
-					std::vector<fileHandler> files = GetFilesFromFolder2(fileExplorer.path);
+					std::vector<fileHandler2> files = GetFilesFromFolder2(fileExplorer.path);
 
 					for (auto& file : files) {
 						sub->draw_option<Button>((file.name.c_str()), nullptr, [=]
@@ -10443,12 +10467,17 @@ namespace Saint
 										fileExplorer.moveFile(file.path, fileExplorer.path2 + file.name);
 									}
 								}
+								if (fileExplorer.pos == 3) {
+									fileExplorer.moveFile(file.path, fileExplorer.path + file.nwe + fileExplorer.extension);
+									
+								}
 							});
 					}
 				}
 			});
 		g_Render->draw_submenu<sub>("Sounds", rage::joaat("Music"), [](sub* sub)
 			{
+				sub->draw_option<toggle<bool>>(("Looped"), nullptr, &loop_sound, BoolDisplay::OnOff);
 				sub->draw_option<KeyboardOption>("Search", nullptr, search_sounds, []
 					{
 						showKeyboard("Enter Something", "", 25, &search_sounds, [] {
@@ -10467,7 +10496,12 @@ namespace Saint
 						if (has_string_attached(file.name, search_sounds))
 						sub->draw_option<Button>((file.name.c_str()), nullptr, [=]
 							{
-								PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC);
+								if (loop_sound) {
+									PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+								}
+								if (!loop_sound) {
+									PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC);
+								}
 							});
 					}
 				}
@@ -10477,7 +10511,12 @@ namespace Saint
 					for (auto& file : files) {
 						sub->draw_option<Button>((file.name.c_str()), nullptr, [=]
 							{
-								PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC);
+								if (loop_sound) {
+									PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+								}
+								if (!loop_sound) {
+									PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC);
+								}
 							});
 					}
 				}

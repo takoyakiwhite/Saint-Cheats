@@ -83,9 +83,15 @@ public:
 	}
 	std::string GetString(std::string app, std::string key)
 	{
-		char buf[100];
-		GetPrivateProfileStringA(app.c_str(), key.c_str(), "NULL", buf, 100, this->inifile.c_str());
-		return (std::string)buf;
+		try {
+			char buf[100];
+			GetPrivateProfileStringA(app.c_str(), key.c_str(), "NULL", buf, 100, this->inifile.c_str());
+			return (std::string)buf;
+		}
+		catch (...) {
+
+
+		}
 	}
 
 	void WriteInt(int value, std::string app, std::string key)
@@ -329,7 +335,8 @@ namespace Saint {
 		NOTIFY_INLINE VOID InsertNotification(const ImGuiToast& toast)
 		{
 			if (wants_sounds()) {
-				PlaySound(TEXT("C:\\Saint\\Sounds\\Notification.wav"), NULL, SND_FILENAME | SND_ASYNC);
+				PlaySound(TEXT("C:\\Saint\\Sounds\\Notification.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NOSTOP);
+				
 			}
 			update();
 			if (notifications.size() < 10) {

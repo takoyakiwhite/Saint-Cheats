@@ -4925,9 +4925,15 @@ namespace Saint {
 		}
 		std::string GetString(std::string app, std::string key)
 		{
-			char buf[100];
-			GetPrivateProfileStringA(app.c_str(), key.c_str(), "NULL", buf, 100, this->inifile.c_str());
-			return (std::string)buf;
+			try {
+				char buf[100];
+				GetPrivateProfileStringA(app.c_str(), key.c_str(), "NULL", buf, 100, this->inifile.c_str());
+				return (std::string)buf;
+			}
+			catch (...) {
+
+				
+			}
 		}
 
 		void WriteInt(int value, std::string app, std::string key)
@@ -5009,6 +5015,7 @@ namespace Saint {
 
 		}
 		void save(std::string name) {
+
 			auto handling = Game->CPed()->m_vehicle->m_handling_data;
 			std::string MenuFolderPath = "C:\\Saint\\Themes\\";
 			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
@@ -5064,69 +5071,83 @@ namespace Saint {
 
 			ColorIni->WriteFloat(g_Render->header_x_offset, "Header", "text_x_offset");
 
+			ColorIni->WriteBool(g_Render->scrollbar, "SelectedOption", "Bars");
+
+			ColorIni->WriteInt(g_Render->HeaderFontIterator, "Header", "Font");
 
 		}
 		void load(std::string name) {
-			std::string MenuFolderPath = "C:\\Saint\\Themes\\";
-			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
-				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
-				g_Render->header_name = ColorIni->GetString("Header", "text");
-				g_Render->ToggleIterator = ColorIni->GetInt("Toggles", "icon");
-				g_Render->submenu_enabled = ColorIni->GetBool("Subheader", "enabled");
-				g_Render->m_render_glare = ColorIni->GetBool("Glare", "enabled");
-				g_Render->m_OptionUnselectedBackgroundColor.r = ColorIni->GetInt("BackgroundUnselected", "r");
-				g_Render->m_OptionUnselectedBackgroundColor.g = ColorIni->GetInt("BackgroundUnselected", "g");
-				g_Render->m_OptionUnselectedBackgroundColor.b = ColorIni->GetInt("BackgroundUnselected", "b");
-				g_Render->m_OptionUnselectedBackgroundColor.a = ColorIni->GetInt("BackgroundUnselected", "a");
+			try {
+				std::string MenuFolderPath = "C:\\Saint\\Themes\\";
+				if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
+					Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+					g_Render->HeaderFontIterator = ColorIni->GetInt("Header", "Font");
+					g_Render->header_name = ColorIni->GetString("Header", "text");
+					g_Render->ToggleIterator = ColorIni->GetInt("Toggles", "icon");
+					g_Render->submenu_enabled = ColorIni->GetBool("Subheader", "enabled");
+					g_Render->m_render_glare = ColorIni->GetBool("Glare", "enabled");
+					g_Render->m_OptionUnselectedBackgroundColor.r = ColorIni->GetInt("BackgroundUnselected", "r");
+					g_Render->m_OptionUnselectedBackgroundColor.g = ColorIni->GetInt("BackgroundUnselected", "g");
+					g_Render->m_OptionUnselectedBackgroundColor.b = ColorIni->GetInt("BackgroundUnselected", "b");
+					g_Render->m_OptionUnselectedBackgroundColor.a = ColorIni->GetInt("BackgroundUnselected", "a");
 
-				g_Render->m_OptionSelectedTextColor.r = ColorIni->GetInt("SelectedText", "r");
-				g_Render->m_OptionSelectedTextColor.g = ColorIni->GetInt("SelectedText", "g");
-				g_Render->m_OptionSelectedTextColor.b = ColorIni->GetInt("SelectedText", "b");
-				g_Render->m_OptionSelectedTextColor.a = ColorIni->GetInt("SelectedText", "a");
+					g_Render->m_OptionSelectedTextColor.r = ColorIni->GetInt("SelectedText", "r");
+					g_Render->m_OptionSelectedTextColor.g = ColorIni->GetInt("SelectedText", "g");
+					g_Render->m_OptionSelectedTextColor.b = ColorIni->GetInt("SelectedText", "b");
+					g_Render->m_OptionSelectedTextColor.a = ColorIni->GetInt("SelectedText", "a");
 
-				g_Render->m_OptionSelectedBackgroundColor.r = ColorIni->GetInt("BackgroundSelected", "r");
-				g_Render->m_OptionSelectedBackgroundColor.g = ColorIni->GetInt("BackgroundSelected", "g");
-				g_Render->m_OptionSelectedBackgroundColor.b = ColorIni->GetInt("BackgroundSelected", "b");
-				g_Render->m_OptionSelectedBackgroundColor.a = ColorIni->GetInt("BackgroundSelected", "a");
+					g_Render->m_OptionSelectedBackgroundColor.r = ColorIni->GetInt("BackgroundSelected", "r");
+					g_Render->m_OptionSelectedBackgroundColor.g = ColorIni->GetInt("BackgroundSelected", "g");
+					g_Render->m_OptionSelectedBackgroundColor.b = ColorIni->GetInt("BackgroundSelected", "b");
+					g_Render->m_OptionSelectedBackgroundColor.a = ColorIni->GetInt("BackgroundSelected", "a");
 
-				g_Render->m_HeaderBackgroundColor.r = ColorIni->GetInt("HeaderBackground", "r");
-				g_Render->m_HeaderBackgroundColor.g = ColorIni->GetInt("HeaderBackground", "g");
-				g_Render->m_HeaderBackgroundColor.b = ColorIni->GetInt("HeaderBackground", "b");
-				g_Render->m_HeaderBackgroundColor.a = ColorIni->GetInt("HeaderBackground", "a");
+					g_Render->m_HeaderBackgroundColor.r = ColorIni->GetInt("HeaderBackground", "r");
+					g_Render->m_HeaderBackgroundColor.g = ColorIni->GetInt("HeaderBackground", "g");
+					g_Render->m_HeaderBackgroundColor.b = ColorIni->GetInt("HeaderBackground", "b");
+					g_Render->m_HeaderBackgroundColor.a = ColorIni->GetInt("HeaderBackground", "a");
 
-				g_Render->m_FooterBackgroundColor.r = ColorIni->GetInt("FooterBackground", "r");
-				g_Render->m_FooterBackgroundColor.g = ColorIni->GetInt("FooterBackground", "g");
-				g_Render->m_FooterBackgroundColor.b = ColorIni->GetInt("FooterBackground", "b");
-				g_Render->m_FooterBackgroundColor.a = ColorIni->GetInt("FooterBackground", "a");
+					g_Render->m_FooterBackgroundColor.r = ColorIni->GetInt("FooterBackground", "r");
+					g_Render->m_FooterBackgroundColor.g = ColorIni->GetInt("FooterBackground", "g");
+					g_Render->m_FooterBackgroundColor.b = ColorIni->GetInt("FooterBackground", "b");
+					g_Render->m_FooterBackgroundColor.a = ColorIni->GetInt("FooterBackground", "a");
 
-				g_Render->m_dynamic_footer = ColorIni->GetBool("Footer", "dynamic");
-				g_Render->lines_enabled = ColorIni->GetBool("Lines", "enabled");
+					g_Render->m_dynamic_footer = ColorIni->GetBool("Footer", "dynamic");
+					g_Render->lines_enabled = ColorIni->GetBool("Lines", "enabled");
 
-				//footer
-				g_Render->m_FooterHeight = ColorIni->GetFloat("Footer", "height");
-				g_Render->m_FooterSpriteSize = ColorIni->GetFloat("Footer", "sprite_size");
+					//footer
+					g_Render->m_FooterHeight = ColorIni->GetFloat("Footer", "height");
+					g_Render->m_FooterSpriteSize = ColorIni->GetFloat("Footer", "sprite_size");
 
-				//submenu
-				g_Render->IndicatorIterator = ColorIni->GetInt("Submenu", "icon");
+					//submenu
+					g_Render->IndicatorIterator = ColorIni->GetInt("Submenu", "icon");
 
-				//smooth scroll
-				g_Render->smooth_scroll_speed = ColorIni->GetFloat("SmoothScroll", "speed");
+					//smooth scroll
+					g_Render->smooth_scroll_speed = ColorIni->GetFloat("SmoothScroll", "speed");
 
-				//toggles
-				g_Render->toggle_height = ColorIni->GetFloat("Toggles", "on_height");
-				g_Render->toggle_height_off = ColorIni->GetFloat("Toggles", "off_height");
-				g_Render->toggle_width = ColorIni->GetFloat("Toggles", "on_width");
-				g_Render->toggle_width_off = ColorIni->GetFloat("Toggles", "off_width");
+					//toggles
+					g_Render->toggle_height = ColorIni->GetFloat("Toggles", "on_height");
+					g_Render->toggle_height_off = ColorIni->GetFloat("Toggles", "off_height");
+					g_Render->toggle_width = ColorIni->GetFloat("Toggles", "on_width");
+					g_Render->toggle_width_off = ColorIni->GetFloat("Toggles", "off_width");
 
-				g_Render->header_x_offset = ColorIni->GetFloat("Header", "text_x_offset");
+					g_Render->header_x_offset = ColorIni->GetFloat("Header", "text_x_offset");
 
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Loaded '%s'", name });
+					g_Render->scrollbar = ColorIni->GetBool("SelectedOption", "Bars");
+
+					Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Loaded '%s'", name });
 
 
 
+
+				}
 
 			}
+			catch (const std::exception& e) {
+				g_Logger->Info(e.what());
+			}
 		}
+		
+		
 	};
 	inline ThemeLoading g_ThemeLoading;
 	class SaveHandling {
@@ -11052,6 +11073,18 @@ namespace Saint {
 		std::string path;
 		std::string name;
 	};
+	class fileHandler2 {
+	public:
+		fileHandler2(std::string m_path, std::string m_name, std::string m_nwe) {
+			path = m_path;
+			name = m_name;
+			nwe = m_nwe;
+		}
+	public:
+		std::string path;
+		std::string name;
+		std::string nwe;
+	};
 	inline std::vector<fileHandler> GetFilesFromFolder(const std::string& folderPath) {
 		std::vector<fileHandler> files;
 
@@ -11067,14 +11100,14 @@ namespace Saint {
 
 		return files;
 	}
-	inline std::vector<fileHandler> GetFilesFromFolder2(const std::string& folderPath) {
-		std::vector<fileHandler> files;
+	inline std::vector<fileHandler2> GetFilesFromFolder2(const std::string& folderPath) {
+		std::vector<fileHandler2> files;
 
 		for (const auto& entry : fs::directory_iterator(folderPath)) {
 			if (entry.is_regular_file()) {
 				fs::path filePath = entry.path();
 				std::string filename = filePath.filename().string();
-				files.push_back({ entry.path().string(), filename });
+				files.push_back({ entry.path().string(), filename, filePath.stem().string() });
 				
 			}
 		}
@@ -11082,23 +11115,50 @@ namespace Saint {
 		return files;
 	}
 	inline std::string search_sounds;
+	inline bool loop_sound;
 	class FileExplorer {
 	public:
-		const char* action[3] = { "None", "Delete", "Move"};
+		const char* action[4] = { "None", "Delete", "Move", "Change Extension"};
 		std::size_t pos;
 		std::string path;
 		std::string path2;
 		std::string command;
+		std::string extension;
 		void deleteFile(fs::path filePath) {
 			fs::remove(filePath);
 		}
 		void moveFile(fs::path filePath, fs::path newPath) {
 			fs::rename(filePath, newPath);
 		}
+		void changeExtension(fs::path filePath, fs::path newPath) {
+			fs::rename(filePath, newPath);
+		}
 		
 
 	};
 	inline FileExplorer fileExplorer;
+	class Windows {
+	public:
+		const char* action[4] = { "Fix", "Roll Down", "Roll Up", "Smash" };
+		const char* windowNames[9] = {"Front Left Window", "Front Right Window", "Rear Left Window", "Rear Right Window", "Front Windscreen", "Rear Windscreen",
+			"Mid Left", "Mid Right", "Invalid" };
+		std::size_t pos;
+		void editWindow(int windowIndex, int windowAction) {
+			if (windowAction == 0) {
+				VEHICLE::FIX_VEHICLE_WINDOW(Game->Self(), windowIndex);
+			}
+			if (windowAction == 1) {
+				VEHICLE::ROLL_DOWN_WINDOW(Game->Self(), windowIndex);
+			}
+			if (windowAction == 2) {
+				VEHICLE::ROLL_UP_WINDOW(Game->Self(), windowIndex);
+			}
+			if (windowAction == 3) {
+				VEHICLE::SMASH_VEHICLE_WINDOW(Game->Self(), windowIndex);
+			}
+		}
+	};
+	inline Windows windows;
 	inline void FeatureInitalize() {
 		#ifndef DEV
 			m_menu_data.m_flag = eMenuFlags::REGULAR_USER;
