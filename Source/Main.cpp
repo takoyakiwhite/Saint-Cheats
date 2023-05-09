@@ -71,7 +71,7 @@ void load_dir() {
 	}
 	
 	if (!does_exist("C:\\Saint\\Sounds\\", "Notification.wav")) {
-		URLDownloadToFileA(0, "https://saintcheats.xyz/Notification.wav", DownloadPP3.c_str(), 0, 0);
+		URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1104892686386876427/1104971663755464814/Notification.wav", DownloadPP3.c_str(), 0, 0); // dont work nice tim
 	}
 }
 std::string wideToString(std::wstring strw) {

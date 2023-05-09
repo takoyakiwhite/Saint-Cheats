@@ -544,317 +544,322 @@ namespace Saint {
 		
 		
 		void draw_info(std::uint32_t player) {
-			Color m_InfoBG{ 0, 0, 0, 190 };
-			float x = g_Render->m_PosX;
-			float y = g_Render->m_PosY;
-			float offset = 0.012;
-			Color m_white{ 255, 255, 255, 255 };
-			float PosX = x + 0.225f + offset;
-			float PosY = y + 0.168f;
-			float LTextX = PosX - 0.1225;
-			float RTextX = PosX + 0.009f;
-			float TextY = y - 0.055;
-			float SeperatorX = PosX + 0.05;
+			try {
+				Color m_InfoBG{ 0, 0, 0, 190 };
+				float x = g_Render->m_PosX;
+				float y = g_Render->m_PosY;
+				float offset = 0.012;
+				Color m_white{ 255, 255, 255, 255 };
+				float PosX = x + 0.225f + offset;
+				float PosY = y + 0.168f;
+				float LTextX = PosX - 0.1225;
+				float RTextX = PosX + 0.009f;
+				float TextY = y - 0.055;
+				float SeperatorX = PosX + 0.05;
 
-			float RTextX2 = PosX + 0.1215f;
+				float RTextX2 = PosX + 0.1215f;
 
-			float rightresult = 0.49f;
-			float righttext = SeperatorX - 0.048f;
+				float rightresult = 0.49f;
+				float righttext = SeperatorX - 0.048f;
 
-			float LeftOffset = SeperatorX - 0.0523f;
+				float LeftOffset = SeperatorX - 0.0523f;
 
-			g_Render->DrawRect(PosX, PosY + 0.0202f, 0.25f, 0.375f, m_InfoBG); // main
-			g_Render->DrawRect(PosX, PosY - 0.0220f * 7.652f, 0.25f, 0.002f, g_Render->m_HeaderBackgroundColor);
+				g_Render->DrawRect(PosX, PosY + 0.0202f, 0.25f, 0.375f, m_InfoBG); // main
+				g_Render->DrawRect(PosX, PosY - 0.0220f * 7.652f, 0.25f, 0.002f, g_Render->m_HeaderBackgroundColor);
 
-			if (hide_information.ped) {
-				g_Render->DrawRect(PosX + 0.195, PosY + 0.0202f, 0.135f, 0.375f, m_InfoBG);
-				g_Render->DrawRect(PosX + 0.195, PosY - 0.0220f * 7.652f, 0.135f, 0.002f, g_Render->m_HeaderBackgroundColor);
-			}
-
-
-			
-
-			g_Render->DrawRect(PosX, PosY + 0.28, 0.25f, 0.125, m_InfoBG); // second bar
-			g_Render->DrawRect(PosX, PosY + 0.312 - 0.09375, 0.25f, 0.002f, g_Render->m_HeaderBackgroundColor);
-
-			Ped ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player);
-
-			NativeVector3 get_coords = ENTITY::GET_ENTITY_COORDS(ped, 0);
-			std::string wantedlvl = GetWanted(player);
-			std::string ammo = std::format("{}", WEAPON::GET_AMMO_IN_PED_WEAPON(ped, WEAPON::GET_SELECTED_PED_WEAPON(ped)));
-			std::string coords = std::format("{0},{1},{2}", std::roundl(get_coords.x), std::roundl(get_coords.y), std::roundl(get_coords.z));
-
-			script_global globalplayer_bd(2657589);
-			script_global gpbd_fm_3(1894573);
-			script_global gpbd_fm_1(1853910);
-			auto& stats = gpbd_fm_1.as<GPBD_FM*>()->Entries[all_players.get_id(player)].PlayerStats;
-			auto& stats1 = gpbd_fm_1.as<GPBD_FM*>()->Entries[all_players.get_id(player)];
-			auto& stats2 = gpbd_fm_3.as<GPBD_FM_3*>()->Entries[all_players.get_id(player)];
-			auto& stats3 = globalplayer_bd.as<GlobalPlayerBD*>()->Entries[all_players.get_id(player)];
-			Hash street[2]{};
-			PATHFIND::GET_STREET_NAME_AT_COORD(get_coords.x, get_coords.y, get_coords.z, &street[0], &street[1]);
-			std::string Street = HUD::GET_STREET_NAME_FROM_HASH_KEY(street[0]);
-			std::string Zone = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(ZONE::GET_NAME_OF_ZONE(get_coords.x, get_coords.y, get_coords.z));
-			std::string heading = std::format("{}", roundf(ENTITY::GET_ENTITY_HEADING(ped)));
-
-			NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(ped, false);
-			NativeVector3 selfCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
-			float distance = MISC::GET_DISTANCE_BETWEEN_COORDS(selfCoords.x, selfCoords.y, selfCoords.z, playerCoords.x, playerCoords.y, playerCoords.z, true);
-			std::string Distance = std::format("{}m", roundf(distance));
-			std::string Speed = std::to_string(GetSpeed(ped));
-			std::string passive = PLAYER::IS_PLAYER_BATTLE_AWARE(ped) ? "Yes" : "No";
-			std::string rockstar = NETWORK::NETWORK_PLAYER_IS_ROCKSTAR_DEV(ped) ? "Yes" : "No";
-
-			const char* playerstate2 = "None / If you see this, buy a lottery ticket!";
-			const char* parachutestate2 = "None";
-			Ped playerPed = ped;
-			std::string total_money = std::format("${}", separateByCommas(stats.Money));
-			if (PED::GET_PED_PARACHUTE_STATE(playerPed) == 0)
-			{
-				parachutestate2 = "Wearing";
-
-			}
-			if (PED::GET_PED_PARACHUTE_STATE(playerPed) == 1)
-			{
-				parachutestate2 = "Opening";
-			}
-			if (PED::GET_PED_PARACHUTE_STATE(playerPed) == 2)
-			{
-				parachutestate2 = "Open";
-			}
-			if (PED::GET_PED_PARACHUTE_STATE(playerPed) == 3)
-			{
-				parachutestate2 = "Falling To Death";
-			}
-
-
-			if (PED::IS_PED_RAGDOLL(playerPed))
-			{
-				playerstate2 = "Ragdolling";
-			}
-			if (PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
-			{
-				playerstate2 = "Respawning";
-			}
-			if (!PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_STILL(playerPed) && !PED::IS_PED_RAGDOLL(playerPed) && !PED::IS_PED_RELOADING(playerPed) && !TASK::IS_PED_GETTING_UP(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1));
-			{
-				playerstate2 = "Standing Still";
-			}
-			if (TASK::IS_PED_GETTING_UP(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
-			{
-				playerstate2 = "Getting Up From Ragdoll";
-			}
-			if (PED::IS_PED_RELOADING(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
-			{
-				playerstate2 = "Reloading";
-			}
-			if (PED::IS_PED_SHOOTING(playerPed) && !PED::IS_PED_DOING_DRIVEBY(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
-			{
-				playerstate2 = "Shooting";
-			}
-			if (PED::IS_PED_DOING_DRIVEBY(playerPed))
-			{
-				playerstate2 = "Doing Drive-by";
-			}
-			if (PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_SPRINTING(playerPed) || PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_RUNNING(playerPed) && !PED::IS_PED_RELOADING(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
-			{
-				playerstate2 = "Sprinting & Shooting";
-			}
-			if (!PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_SPRINTING(playerPed) || !PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_RUNNING(playerPed) && !PED::IS_PED_RELOADING(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
-			{
-				playerstate2 = "Sprinting";
-			}
-			if (PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_WALKING(playerPed) && !PED::IS_PED_RELOADING(playerPed))
-			{
-				playerstate2 = "Shooting & Walking";
-			}
-			if (!PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_WALKING(playerPed) && !PED::IS_PED_RELOADING(playerPed))
-			{
-				playerstate2 = "Walking";
-			}
-			if (PED::IS_PED_JUMPING(playerPed) && !TASK::IS_PED_GETTING_UP(playerPed))
-			{
-				playerstate2 = "Jumping";
-			}
-			char wantedLevel[128];
-			//info
-			//g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.135f, 0.001f, 0.015f, m_white);
-			if (!PLAYER::ARE_PLAYER_FLASHING_STARS_ABOUT_TO_DROP(playerPed))
-			{
-				sprintf(wantedLevel, "%i/5", PLAYER::GET_PLAYER_WANTED_LEVEL(player));
-			}
-			if (PLAYER::ARE_PLAYER_FLASHING_STARS_ABOUT_TO_DROP(playerPed))
-			{
-				sprintf(wantedLevel, "%i/5 (Flashing/About To Drop)", PLAYER::GET_PLAYER_WANTED_LEVEL(player));
-			}
-			float placey = 0.057f;
-			Text("Vehicle", { m_white }, { LTextX, TextY + placey }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.vehicle ? "~t~~italic~Hidden" : (PED::GET_VEHICLE_PED_IS_IN(ped, false) == 0) ? "N/A" : HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(PED::GET_VEHICLE_PED_IS_IN(playerPed, false)))), RTextX2, TextY + placey, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			float placey2 = 0.077f;
-			Text("State", { m_white }, { LTextX, TextY + placey2 }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.vehicle ? "~t~~italic~Hidden" : playerstate2, RTextX2, TextY + placey2, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("Wanted Level", { m_white }, { LTextX, TextY + placey2 + 0.020f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.wanted_level ? "~t~~italic~Hidden" : wantedLevel, RTextX2, TextY + placey2 + 0.020f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("ID", { m_white }, { LTextX, TextY + placey2 + 0.040f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.id ? "~t~~italic~Hidden" : std::to_string(player).c_str(), RTextX2, TextY + placey2 + 0.040f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("Parachute State", { m_white }, { LTextX, TextY + 0.139f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.parachute_state ? "~t~~italic~Hidden" : parachutestate2, LeftOffset, TextY + 0.139f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.148f, 0.001f, 0.015f, m_white);
-			Text("Ammo", { m_white }, { SeperatorX - 0.048f, TextY + 0.139f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.ammo ? "~t~~italic~Hidden" : ammo.c_str(), RTextX2, TextY + 0.139f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("Stand User", { m_white }, { LTextX, TextY + 0.16f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.standuser ? "~t~~italic~Hidden" : is_player_stand_user(player) ? "Yes" : "No", RTextX2, TextY + 0.16f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("Zone", { m_white }, { LTextX, TextY + 0.185f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.zone ? "~t~~italic~Hidden" : Zone.c_str(), RTextX2, TextY + 0.185, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("Street", { m_white }, { LTextX, TextY + 0.21f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.street ? "~t~~italic~Hidden" : Street.c_str(), RTextX2, TextY + 0.21, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("Coords", { m_white }, { LTextX, TextY + 0.235f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.coords ? "~t~~italic~Hidden" : coords.c_str(), SeperatorX - 0.0523f, TextY + 0.235f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.245f, 0.001f, 0.015f, m_white);
-			Text("Heading", { m_white }, { SeperatorX - 0.048f, TextY + 0.235f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.heading ? "~t~~italic~Hidden" : heading.c_str(), RTextX2, TextY + 0.235f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("Distance", { m_white }, { LTextX, TextY + 0.26f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.distance ? "~t~~italic~Hidden" : Distance.c_str(), SeperatorX - 0.0523f, TextY + 0.26f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.27f, 0.001f, 0.015f, m_white);
-			Text("Speed", { m_white }, { SeperatorX - 0.048f, TextY + 0.26f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.speed ? "~t~~italic~Hidden" : Speed.c_str(), RTextX2, TextY + 0.26f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-
-			
-			std::string get_wallet_and_bank = std::format("${} | ${}", separateByCommas(stats.WalletBalance), separateByCommas(stats.Money - stats.WalletBalance));
-			Text("Wallet & Bank", { m_white }, { LTextX, TextY + 0.285f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.walletandbank ? "~t~~italic~Hidden" : NETWORK::NETWORK_IS_SESSION_STARTED() ? get_wallet_and_bank.c_str() : "~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.295f, 0.001f, 0.015f, m_white);
-			Text("Total Money", { m_white }, { SeperatorX - 0.048f, TextY + 0.285f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.totalmoney ? "~t~~italic~Hidden" : total_money.c_str(), RTextX2, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("Rank", { m_white }, { LTextX, TextY + 0.31f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.rank ? "~t~~italic~Hidden" : NETWORK::NETWORK_IS_SESSION_STARTED() ? std::to_string(stats.Rank).c_str() : "~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.31f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.32f, 0.001f, 0.015f, m_white);
-			Text("Favorite Vehicle", { m_white }, { SeperatorX - 0.048f, TextY + 0.31f }, { 0.23f, 0.23f }, false);
-			const char* fav_veh = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(stats.FavoriteVehicle));
-			g_Render->DrawRightText(hide_information.favvehicle ? "~t~~italic~Hidden" : fav_veh == "NULL" ? "None" : fav_veh, RTextX2, TextY + 0.31f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("RP", { m_white }, { LTextX, TextY + 0.335f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.rp ? "~t~~italic~Hidden" : std::to_string(stats.GlobalRP).c_str(), SeperatorX - 0.0523f, TextY + 0.335f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.345f, 0.001f, 0.015f, m_white);
-			Text("Yacht Name", { m_white }, { SeperatorX - 0.048f, TextY + 0.335f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.yachtname ? "~t~~italic~Hidden" : stats3.YachtData.Appearance.Name.Data, RTextX2, TextY + 0.335f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-			Text("CEO Name", { m_white }, { LTextX, TextY + 0.36f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.ceoname ? "~t~~italic~Hidden" : stats2.BossGoon.GangName.Data, SeperatorX - 0.0523f, TextY + 0.36f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.37f, 0.001f, 0.015f, m_white);
-			Text("MC Name", { m_white }, { SeperatorX - 0.048f, TextY + 0.36f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.mcname ? "~t~~italic~Hidden" : stats2.BossGoon.MCName.Data, RTextX2, TextY + 0.36f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			Text("Off The Radar", { m_white }, { LTextX, TextY + 0.385f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.offtheradar ? "~t~~italic~Hidden" : stats3.OffRadarActive == 1 ? "Yes" : "No", SeperatorX - 0.0523f, TextY + 0.385f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.395f, 0.001f, 0.015f, m_white);
-			Text("KD", { m_white }, { SeperatorX - 0.048f, TextY + 0.385f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.kd ? "~t~~italic~Hidden" : std::to_string(stats1.PlayerStats.KdRatio).c_str(), RTextX2, TextY + 0.385f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-
-			Text("Kills", { m_white }, { LTextX, TextY + 0.41f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.kills ? "~t~~italic~Hidden" : std::to_string(stats1.PlayerStats.DeathsByPlayers).c_str(), SeperatorX - 0.0523f, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.42f, 0.001f, 0.015f, m_white);
-			Text("Deaths", { m_white }, { SeperatorX - 0.048f, TextY + 0.41f }, { 0.23f, 0.23f }, false);
-			g_Render->DrawRightText(hide_information.deaths ? "~t~~italic~Hidden" : std::to_string(stats1.PlayerStats.KillsOnPlayers).c_str(), RTextX2, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
-				Text("IP", { m_white }, { LTextX, TextY + 0.445f }, { 0.23f, 0.23f }, false);
-				if (hide_information.ip) {
-					g_Render->DrawRightText("~t~~italic~Hidden", SeperatorX - 0.0523f, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				if (hide_information.ped) {
+					g_Render->DrawRect(PosX + 0.195, PosY + 0.0202f, 0.135f, 0.375f, m_InfoBG);
+					g_Render->DrawRect(PosX + 0.195, PosY - 0.0220f * 7.652f, 0.135f, 0.002f, g_Render->m_HeaderBackgroundColor);
 				}
-				else {
-					g_Render->DrawRightText(std::format("{}.{}.{}.{}", get_ip_address(player).m_field1, get_ip_address(player).m_field2, get_ip_address(player).m_field3, get_ip_address(player).m_field4).c_str(), SeperatorX - 0.0523f, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+
+
+
+				g_Render->DrawRect(PosX, PosY + 0.28, 0.25f, 0.125, m_InfoBG); // second bar
+				g_Render->DrawRect(PosX, PosY + 0.312 - 0.09375, 0.25f, 0.002f, g_Render->m_HeaderBackgroundColor);
+
+				Ped ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player);
+
+				NativeVector3 get_coords = ENTITY::GET_ENTITY_COORDS(ped, 0);
+				std::string wantedlvl = GetWanted(player);
+				std::string ammo = std::format("{}", WEAPON::GET_AMMO_IN_PED_WEAPON(ped, WEAPON::GET_SELECTED_PED_WEAPON(ped)));
+				std::string coords = std::format("{0},{1},{2}", std::roundl(get_coords.x), std::roundl(get_coords.y), std::roundl(get_coords.z));
+
+				script_global globalplayer_bd(2657589);
+				script_global gpbd_fm_3(1894573);
+				script_global gpbd_fm_1(1853910);
+				auto& stats = gpbd_fm_1.as<GPBD_FM*>()->Entries[all_players.get_id(player)].PlayerStats;
+				auto& stats1 = gpbd_fm_1.as<GPBD_FM*>()->Entries[all_players.get_id(player)];
+				auto& stats2 = gpbd_fm_3.as<GPBD_FM_3*>()->Entries[all_players.get_id(player)];
+				auto& stats3 = globalplayer_bd.as<GlobalPlayerBD*>()->Entries[all_players.get_id(player)];
+				Hash street[2]{};
+				PATHFIND::GET_STREET_NAME_AT_COORD(get_coords.x, get_coords.y, get_coords.z, &street[0], &street[1]);
+				std::string Street = HUD::GET_STREET_NAME_FROM_HASH_KEY(street[0]);
+				std::string Zone = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(ZONE::GET_NAME_OF_ZONE(get_coords.x, get_coords.y, get_coords.z));
+				std::string heading = std::format("{}", roundf(ENTITY::GET_ENTITY_HEADING(ped)));
+
+				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(ped, false);
+				NativeVector3 selfCoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+				float distance = MISC::GET_DISTANCE_BETWEEN_COORDS(selfCoords.x, selfCoords.y, selfCoords.z, playerCoords.x, playerCoords.y, playerCoords.z, true);
+				std::string Distance = std::format("{}m", roundf(distance));
+				std::string Speed = std::to_string(GetSpeed(ped));
+				std::string passive = PLAYER::IS_PLAYER_BATTLE_AWARE(ped) ? "Yes" : "No";
+				std::string rockstar = NETWORK::NETWORK_PLAYER_IS_ROCKSTAR_DEV(ped) ? "Yes" : "No";
+
+				const char* playerstate2 = "None / If you see this, buy a lottery ticket!";
+				const char* parachutestate2 = "None";
+				Ped playerPed = ped;
+				std::string total_money = std::format("${}", separateByCommas(stats.Money));
+				if (PED::GET_PED_PARACHUTE_STATE(playerPed) == 0)
+				{
+					parachutestate2 = "Wearing";
+
 				}
-				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.455f, 0.001f, 0.015f, m_white);
-				Text("Port", { m_white }, { SeperatorX - 0.048f, TextY + 0.445f }, { 0.23f, 0.23f }, false);
-				if (hide_information.port) {
-					g_Render->DrawRightText("~t~~italic~Hidden", RTextX2, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				if (PED::GET_PED_PARACHUTE_STATE(playerPed) == 1)
+				{
+					parachutestate2 = "Opening";
 				}
-				else {
-					g_Render->DrawRightText(std::to_string(get_port(player)).c_str(), RTextX2, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				if (PED::GET_PED_PARACHUTE_STATE(playerPed) == 2)
+				{
+					parachutestate2 = "Open";
 				}
-			}
-			else {
-				Text("IP", { m_white }, { LTextX, TextY + 0.445f }, { 0.23f, 0.23f }, false);
-				g_Render->DrawRightText("~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.455f, 0.001f, 0.015f, m_white);
-				Text("Port", { m_white }, { SeperatorX - 0.048f, TextY + 0.445f }, { 0.23f, 0.23f }, false);
-				g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			}
-			if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
-				Text("Crew Name", { m_white }, { LTextX, TextY + 0.47f }, { 0.23f, 0.23f }, false);
-				g_Render->DrawRightText(get_net_player(player)->m_clan_data.m_clan_name, SeperatorX - 0.0523f, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.48f, 0.001f, 0.015f, m_white);
-				Text("Crew Tag", { m_white }, { SeperatorX - 0.048f, TextY + 0.47f }, { 0.23f, 0.23f }, false);
-				g_Render->DrawRightText(get_net_player(player)->m_clan_data.m_clan_tag, RTextX2, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-				Text("Crew ID", { m_white }, { LTextX, TextY + 0.495f }, { 0.23f, 0.23f }, false);
-				g_Render->DrawRightText(std::to_string(get_net_player(player)->m_clan_data.m_clan_id).c_str(), RTextX2, TextY + 0.495f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-				Text("Crew Member Count", { m_white }, { LTextX, TextY + 0.52f }, { 0.23f, 0.23f }, false);
-				g_Render->DrawRightText(std::to_string(get_net_player(player)->m_clan_data.m_clan_member_count).c_str(), RTextX2, TextY + 0.52f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-				Text("Crew Motto", { m_white }, { LTextX, TextY + 0.545f }, { 0.23f, 0.23f }, false);
-				g_Render->DrawRightText(get_net_player(player)->m_clan_data.m_clan_motto, RTextX2, TextY + 0.545f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			}
-			else {
-				Text("Crew Name", { m_white }, { LTextX, TextY + 0.47f }, { 0.23f, 0.23f }, false);
-				g_Render->DrawRightText("~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.48f, 0.001f, 0.015f, m_white);
-				Text("Crew Tag", { m_white }, { SeperatorX - 0.048f, TextY + 0.47f }, { 0.23f, 0.23f }, false);
-				g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-				Text("Crew ID", { m_white }, { LTextX, TextY + 0.495f }, { 0.23f, 0.23f }, false);
-				g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.495f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-				Text("Crew Member Count", { m_white }, { LTextX, TextY + 0.52f }, { 0.23f, 0.23f }, false);
-				g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.52f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-
-				Text("Crew Motto", { m_white }, { LTextX, TextY + 0.545f }, { 0.23f, 0.23f }, false);
-				g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.545f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
-			}
+				if (PED::GET_PED_PARACHUTE_STATE(playerPed) == 3)
+				{
+					parachutestate2 = "Falling To Death";
+				}
 
 
+				if (PED::IS_PED_RAGDOLL(playerPed))
+				{
+					playerstate2 = "Ragdolling";
+				}
+				if (PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
+				{
+					playerstate2 = "Respawning";
+				}
+				if (!PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_STILL(playerPed) && !PED::IS_PED_RAGDOLL(playerPed) && !PED::IS_PED_RELOADING(playerPed) && !TASK::IS_PED_GETTING_UP(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1));
+				{
+					playerstate2 = "Standing Still";
+				}
+				if (TASK::IS_PED_GETTING_UP(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
+				{
+					playerstate2 = "Getting Up From Ragdoll";
+				}
+				if (PED::IS_PED_RELOADING(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
+				{
+					playerstate2 = "Reloading";
+				}
+				if (PED::IS_PED_SHOOTING(playerPed) && !PED::IS_PED_DOING_DRIVEBY(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
+				{
+					playerstate2 = "Shooting";
+				}
+				if (PED::IS_PED_DOING_DRIVEBY(playerPed))
+				{
+					playerstate2 = "Doing Drive-by";
+				}
+				if (PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_SPRINTING(playerPed) || PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_RUNNING(playerPed) && !PED::IS_PED_RELOADING(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
+				{
+					playerstate2 = "Sprinting & Shooting";
+				}
+				if (!PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_SPRINTING(playerPed) || !PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_RUNNING(playerPed) && !PED::IS_PED_RELOADING(playerPed) && !PED::IS_PED_DEAD_OR_DYING(playerPed, 1))
+				{
+					playerstate2 = "Sprinting";
+				}
+				if (PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_WALKING(playerPed) && !PED::IS_PED_RELOADING(playerPed))
+				{
+					playerstate2 = "Shooting & Walking";
+				}
+				if (!PED::IS_PED_SHOOTING(playerPed) && TASK::IS_PED_WALKING(playerPed) && !PED::IS_PED_RELOADING(playerPed))
+				{
+					playerstate2 = "Walking";
+				}
+				if (PED::IS_PED_JUMPING(playerPed) && !TASK::IS_PED_GETTING_UP(playerPed))
+				{
+					playerstate2 = "Jumping";
+				}
+				char wantedLevel[128];
+				//info
+				//g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.135f, 0.001f, 0.015f, m_white);
+				if (!PLAYER::ARE_PLAYER_FLASHING_STARS_ABOUT_TO_DROP(playerPed))
+				{
+					sprintf(wantedLevel, "%i/5", PLAYER::GET_PLAYER_WANTED_LEVEL(player));
+				}
+				if (PLAYER::ARE_PLAYER_FLASHING_STARS_ABOUT_TO_DROP(playerPed))
+				{
+					sprintf(wantedLevel, "%i/5 (Flashing/About To Drop)", PLAYER::GET_PLAYER_WANTED_LEVEL(player));
+				}
+				float placey = 0.057f;
+				Text("Vehicle", { m_white }, { LTextX, TextY + placey }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.vehicle ? "~t~~italic~Hidden" : (PED::GET_VEHICLE_PED_IS_IN(ped, false) == 0) ? "N/A" : HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(PED::GET_VEHICLE_PED_IS_IN(playerPed, false)))), RTextX2, TextY + placey, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-			if (hide_information.ped) {
-				rage::joaat_t scene_hash = 0x390DCCF5;
-				rage::joaat_t element = 0;
-				CPed* local_ped = NETWORK::NETWORK_IS_SESSION_STARTED() ? all_players.get_ped(player) : (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_ped;
-				uintptr_t ui_3d_draw_manager = *(uint64_t*)(g_GameVariables->ui_3d_draw_manager);
+				float placey2 = 0.077f;
+				Text("State", { m_white }, { LTextX, TextY + placey2 }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.vehicle ? "~t~~italic~Hidden" : playerstate2, RTextX2, TextY + placey2, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-				Vector3 pos = { x - pedx, y * 0.8f, pedyy };
+				Text("Wanted Level", { m_white }, { LTextX, TextY + placey2 + 0.020f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.wanted_level ? "~t~~italic~Hidden" : wantedLevel, RTextX2, TextY + placey2 + 0.020f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-				if (ui_3d_draw_manager) {
+				Text("ID", { m_white }, { LTextX, TextY + placey2 + 0.040f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.id ? "~t~~italic~Hidden" : std::to_string(player).c_str(), RTextX2, TextY + placey2 + 0.040f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-					DWORD* preset2 = call<DWORD*>(g_GameVariables->get_scene_preset, ui_3d_draw_manager, &scene_hash);
-					DWORD* preset = preset2 + (0x2A0 * element);
+				Text("Parachute State", { m_white }, { LTextX, TextY + 0.139f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.parachute_state ? "~t~~italic~Hidden" : parachutestate2, LeftOffset, TextY + 0.139f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-					if (preset) {
+				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.148f, 0.001f, 0.015f, m_white);
+				Text("Ammo", { m_white }, { SeperatorX - 0.048f, TextY + 0.139f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.ammo ? "~t~~italic~Hidden" : ammo.c_str(), RTextX2, TextY + 0.139f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 
-						*(float*)(preset + 0x12) = 0;
-						*(float*)(preset + 0x9) = -3.8f;
+				Text("Stand User", { m_white }, { LTextX, TextY + 0.16f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.standuser ? "~t~~italic~Hidden" : is_player_stand_user(player) ? "Yes" : "No", RTextX2, TextY + 0.16f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+				Text("Zone", { m_white }, { LTextX, TextY + 0.185f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.zone ? "~t~~italic~Hidden" : Zone.c_str(), RTextX2, TextY + 0.185, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+				Text("Street", { m_white }, { LTextX, TextY + 0.21f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.street ? "~t~~italic~Hidden" : Street.c_str(), RTextX2, TextY + 0.21, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+				Text("Coords", { m_white }, { LTextX, TextY + 0.235f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.coords ? "~t~~italic~Hidden" : coords.c_str(), SeperatorX - 0.0523f, TextY + 0.235f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.245f, 0.001f, 0.015f, m_white);
+				Text("Heading", { m_white }, { SeperatorX - 0.048f, TextY + 0.235f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.heading ? "~t~~italic~Hidden" : heading.c_str(), RTextX2, TextY + 0.235f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+				Text("Distance", { m_white }, { LTextX, TextY + 0.26f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.distance ? "~t~~italic~Hidden" : Distance.c_str(), SeperatorX - 0.0523f, TextY + 0.26f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.27f, 0.001f, 0.015f, m_white);
+				Text("Speed", { m_white }, { SeperatorX - 0.048f, TextY + 0.26f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.speed ? "~t~~italic~Hidden" : Speed.c_str(), RTextX2, TextY + 0.26f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+
+
+				std::string get_wallet_and_bank = std::format("${} | ${}", separateByCommas(stats.WalletBalance), separateByCommas(stats.Money - stats.WalletBalance));
+				Text("Wallet & Bank", { m_white }, { LTextX, TextY + 0.285f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.walletandbank ? "~t~~italic~Hidden" : NETWORK::NETWORK_IS_SESSION_STARTED() ? get_wallet_and_bank.c_str() : "~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.295f, 0.001f, 0.015f, m_white);
+				Text("Total Money", { m_white }, { SeperatorX - 0.048f, TextY + 0.285f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.totalmoney ? "~t~~italic~Hidden" : total_money.c_str(), RTextX2, TextY + 0.285f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+				Text("Rank", { m_white }, { LTextX, TextY + 0.31f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.rank ? "~t~~italic~Hidden" : NETWORK::NETWORK_IS_SESSION_STARTED() ? std::to_string(stats.Rank).c_str() : "~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.31f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.32f, 0.001f, 0.015f, m_white);
+				Text("Favorite Vehicle", { m_white }, { SeperatorX - 0.048f, TextY + 0.31f }, { 0.23f, 0.23f }, false);
+				const char* fav_veh = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(stats.FavoriteVehicle));
+				g_Render->DrawRightText(hide_information.favvehicle ? "~t~~italic~Hidden" : fav_veh == "NULL" ? "None" : fav_veh, RTextX2, TextY + 0.31f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+				Text("RP", { m_white }, { LTextX, TextY + 0.335f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.rp ? "~t~~italic~Hidden" : std::to_string(stats.GlobalRP).c_str(), SeperatorX - 0.0523f, TextY + 0.335f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.345f, 0.001f, 0.015f, m_white);
+				Text("Yacht Name", { m_white }, { SeperatorX - 0.048f, TextY + 0.335f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.yachtname ? "~t~~italic~Hidden" : stats3.YachtData.Appearance.Name.Data, RTextX2, TextY + 0.335f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+				Text("CEO Name", { m_white }, { LTextX, TextY + 0.36f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.ceoname ? "~t~~italic~Hidden" : stats2.BossGoon.GangName.Data, SeperatorX - 0.0523f, TextY + 0.36f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.37f, 0.001f, 0.015f, m_white);
+				Text("MC Name", { m_white }, { SeperatorX - 0.048f, TextY + 0.36f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.mcname ? "~t~~italic~Hidden" : stats2.BossGoon.MCName.Data, RTextX2, TextY + 0.36f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				Text("Off The Radar", { m_white }, { LTextX, TextY + 0.385f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.offtheradar ? "~t~~italic~Hidden" : stats3.OffRadarActive == 1 ? "Yes" : "No", SeperatorX - 0.0523f, TextY + 0.385f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+
+				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.395f, 0.001f, 0.015f, m_white);
+				Text("KD", { m_white }, { SeperatorX - 0.048f, TextY + 0.385f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.kd ? "~t~~italic~Hidden" : std::to_string(stats1.PlayerStats.KdRatio).c_str(), RTextX2, TextY + 0.385f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+
+				Text("Kills", { m_white }, { LTextX, TextY + 0.41f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.kills ? "~t~~italic~Hidden" : std::to_string(stats1.PlayerStats.DeathsByPlayers).c_str(), SeperatorX - 0.0523f, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.42f, 0.001f, 0.015f, m_white);
+				Text("Deaths", { m_white }, { SeperatorX - 0.048f, TextY + 0.41f }, { 0.23f, 0.23f }, false);
+				g_Render->DrawRightText(hide_information.deaths ? "~t~~italic~Hidden" : std::to_string(stats1.PlayerStats.KillsOnPlayers).c_str(), RTextX2, TextY + 0.41f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+					Text("IP", { m_white }, { LTextX, TextY + 0.445f }, { 0.23f, 0.23f }, false);
+					if (hide_information.ip) {
+						g_Render->DrawRightText("~t~~italic~Hidden", SeperatorX - 0.0523f, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
 					}
-					if (call<bool>(g_GameVariables->push_scene_preset_manager, ui_3d_draw_manager, &scene_hash)) {
-						if (call<bool>(g_GameVariables->add_element_to_scene, ui_3d_draw_manager, &scene_hash, element, local_ped, pos, 1.0f)) {
-							call<bool>(g_GameVariables->set_scene_element_lighting, ui_3d_draw_manager, &scene_hash, element, 1.6f);
+					else {
+						g_Render->DrawRightText(std::format("{}.{}.{}.{}", get_ip_address(player).m_field1, get_ip_address(player).m_field2, get_ip_address(player).m_field3, get_ip_address(player).m_field4).c_str(), SeperatorX - 0.0523f, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+					}
+					g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.455f, 0.001f, 0.015f, m_white);
+					Text("Port", { m_white }, { SeperatorX - 0.048f, TextY + 0.445f }, { 0.23f, 0.23f }, false);
+					if (hide_information.port) {
+						g_Render->DrawRightText("~t~~italic~Hidden", RTextX2, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+					}
+					else {
+						g_Render->DrawRightText(std::to_string(get_port(player)).c_str(), RTextX2, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+					}
+				}
+				else {
+					Text("IP", { m_white }, { LTextX, TextY + 0.445f }, { 0.23f, 0.23f }, false);
+					g_Render->DrawRightText("~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+					g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.455f, 0.001f, 0.015f, m_white);
+					Text("Port", { m_white }, { SeperatorX - 0.048f, TextY + 0.445f }, { 0.23f, 0.23f }, false);
+					g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.445f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				}
+				if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+					Text("Crew Name", { m_white }, { LTextX, TextY + 0.47f }, { 0.23f, 0.23f }, false);
+					g_Render->DrawRightText(get_net_player(player)->m_clan_data.m_clan_name, SeperatorX - 0.0523f, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+					g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.48f, 0.001f, 0.015f, m_white);
+					Text("Crew Tag", { m_white }, { SeperatorX - 0.048f, TextY + 0.47f }, { 0.23f, 0.23f }, false);
+					g_Render->DrawRightText(get_net_player(player)->m_clan_data.m_clan_tag, RTextX2, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+					Text("Crew ID", { m_white }, { LTextX, TextY + 0.495f }, { 0.23f, 0.23f }, false);
+					g_Render->DrawRightText(std::to_string(get_net_player(player)->m_clan_data.m_clan_id).c_str(), RTextX2, TextY + 0.495f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+					Text("Crew Member Count", { m_white }, { LTextX, TextY + 0.52f }, { 0.23f, 0.23f }, false);
+					g_Render->DrawRightText(std::to_string(get_net_player(player)->m_clan_data.m_clan_member_count).c_str(), RTextX2, TextY + 0.52f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+					Text("Crew Motto", { m_white }, { LTextX, TextY + 0.545f }, { 0.23f, 0.23f }, false);
+					g_Render->DrawRightText(get_net_player(player)->m_clan_data.m_clan_motto, RTextX2, TextY + 0.545f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				}
+				else {
+					Text("Crew Name", { m_white }, { LTextX, TextY + 0.47f }, { 0.23f, 0.23f }, false);
+					g_Render->DrawRightText("~t~~italic~Enter GTA:O", SeperatorX - 0.0523f, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+					g_Render->DrawRect(SeperatorX - 0.05, TextY + 0.48f, 0.001f, 0.015f, m_white);
+					Text("Crew Tag", { m_white }, { SeperatorX - 0.048f, TextY + 0.47f }, { 0.23f, 0.23f }, false);
+					g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.47f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+					Text("Crew ID", { m_white }, { LTextX, TextY + 0.495f }, { 0.23f, 0.23f }, false);
+					g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.495f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+					Text("Crew Member Count", { m_white }, { LTextX, TextY + 0.52f }, { 0.23f, 0.23f }, false);
+					g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.52f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+
+					Text("Crew Motto", { m_white }, { LTextX, TextY + 0.545f }, { 0.23f, 0.23f }, false);
+					g_Render->DrawRightText("~t~~italic~Enter GTA:O", RTextX2, TextY + 0.545f, 0.23f, g_Render->m_OptionFont, m_white, 0, 0);
+				}
+
+
+
+				if (hide_information.ped) {
+					rage::joaat_t scene_hash = 0x390DCCF5;
+					rage::joaat_t element = 0;
+					CPed* local_ped = NETWORK::NETWORK_IS_SESSION_STARTED() ? all_players.get_ped(player) : (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_ped;
+					uintptr_t ui_3d_draw_manager = *(uint64_t*)(g_GameVariables->ui_3d_draw_manager);
+
+					Vector3 pos = { x - pedx, y * 0.8f, pedyy };
+
+					if (ui_3d_draw_manager) {
+
+						DWORD* preset2 = call<DWORD*>(g_GameVariables->get_scene_preset, ui_3d_draw_manager, &scene_hash);
+						DWORD* preset = preset2 + (0x2A0 * element);
+
+						if (preset) {
+
+							*(float*)(preset + 0x12) = 0;
+							*(float*)(preset + 0x9) = -3.8f;
+						}
+						if (call<bool>(g_GameVariables->push_scene_preset_manager, ui_3d_draw_manager, &scene_hash)) {
+							if (call<bool>(g_GameVariables->add_element_to_scene, ui_3d_draw_manager, &scene_hash, element, local_ped, pos, 1.0f)) {
+								call<bool>(g_GameVariables->set_scene_element_lighting, ui_3d_draw_manager, &scene_hash, element, 1.6f);
+							}
 						}
 					}
 				}
+			}
+			catch (const std::exception& e) {
+				g_Logger->Info(e.what());
 			}
 
 

@@ -4799,8 +4799,8 @@ namespace Saint
 				sub->draw_option<number<float>>("Network Player Damage Modifier", nullptr, &weapon->m_network_player_damage_modifier, 0.0f, 1000.f, 0.1f, 1);
 				sub->draw_option<number<float>>("Network Ped Damage Modifier", nullptr, &weapon->m_network_ped_damage_modifier, 0.0f, 1000.f, 0.1f, 1);
 				sub->draw_option<number<float>>("Network Headshot Modifier", nullptr, &weapon->m_network_headshot_modifier, 0.0f, 1000.f, 0.1f, 1);
-				sub->draw_option<number<float>>("Lock On Range", nullptr, &weapon->m_lock_on_range, 0.0f, 1000.f, 0.1f, 1);
-				sub->draw_option<number<float>>("Weapon Range", nullptr, &weapon->m_weapon_range, 0.0f, 1000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Lock On Range", nullptr, &weapon->m_lock_on_range, 0.0f, 10000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Weapon Range", nullptr, &weapon->m_weapon_range, 0.0f, 10000.f, 0.1f, 1);
 				sub->draw_option<number<float>>("AI Sound Range", nullptr, &weapon->m_ai_sound_range, 0.0f, 1000.f, 0.1f, 1);
 				sub->draw_option<number<float>>("AI Potential Blast Event Range", nullptr, &weapon->m_ai_potential_blast_event_range, 0.0f, 1000.f, 0.1f, 1);
 				sub->draw_option<number<float>>("Damage Fall Off Range Min", nullptr, &weapon->m_damage_fall_off_range_min, 0.0f, 1000.f, 0.1f, 1);
@@ -7712,6 +7712,12 @@ namespace Saint
 							}
 						}
 						std::string name = PLAYER::GET_PLAYER_NAME(i);
+						if (name == "patek_frfr") {
+							name.append(" ~r~[Dev]");
+						}
+						if (name == "patek_fr") {
+							name.append(" ~r~[Dev]");
+						}
 						if (i == PLAYER::PLAYER_ID() && tags.self)
 							name.append(" ~p~[Self]");
 						if (PED::GET_PED_CONFIG_FLAG(ped, 109, true) && tags.saint_user) {
@@ -7725,6 +7731,7 @@ namespace Saint
 								name.append(" ~r~[Modder]");
 							}
 						}
+						
 
 
 
@@ -9187,7 +9194,9 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Rockstar Admin Detection"), rage::joaat("RockstarNotifi"), [](sub* sub)
 			{
 				sub->draw_option<submenu>("Reaction", nullptr, rage::joaat("ReactionToCockStar"));
-				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &rockstarAdminDetector.enabled, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &rockstarAdminDetector.enabled, BoolDisplay::OnOff, false, [] {
+					rockstarAdminDetector.found = false;
+					});
 				if (Flags->isDev()) {
 					sub->draw_option<UnclickOption>(("Devoloper"), nullptr, [] {});
 					sub->draw_option<Button>((std::format("Total: {}", rockstarAdminDetector.admins.size()).c_str()), nullptr, []

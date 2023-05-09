@@ -10969,17 +10969,22 @@ namespace Saint {
 		int adminsFound;
 		bool excludedAdmin[460];
 		std::string addToList;
+		bool found = false;
 		bool isRockstarAdminInSession() {
 			for (int i = 0; i < 32; i++) {
 				for (auto& rockstarAdmin : admins) {
-						if (PLAYER::GET_PLAYER_NAME(i) == rockstarAdmin.name) {
+					std::string name = PLAYER::GET_PLAYER_NAME(i);
+					if (!found) {
+						if (name == rockstarAdmin.name) {
 							adminsFound++;
+							found = true;
 							return true;
 						}
 						else {
 							return false;
 						}
 					}
+				}
 				
 			}
 			return false;
@@ -10989,12 +10994,17 @@ namespace Saint {
 				if (isRockstarAdminInSession()) {
 					if (reaction.leave) {
 						session.join(eSessionType::JOIN_PUBLIC);
+						found = false;
 					}
 					if (reaction.notify) {
 						char name[128];
 						sprintf(name, ICON_FA_SHIELD_ALT"  A rockstar admin is in your session.");
 						g_NotificationManager->add(name, 2000);
+						
 					}
+				}
+				else {
+					found = false;
 				}
 			}
 		}
