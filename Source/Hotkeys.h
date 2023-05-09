@@ -20,7 +20,7 @@ namespace Saint {
 	};
 	inline void hotkey_tick() {
 		for (auto& hotkey : m_Hotkeys) {
-			if (GetAsyncKeyState(hotkey.key) & 1) {
+			if (Game->KeyPress(hotkey.key) & 1) {
 				*hotkey.toggle = !*hotkey.toggle;
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, "'%s' hotkey was used.", hotkey.name });
 				

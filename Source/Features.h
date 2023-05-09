@@ -187,7 +187,7 @@ namespace Saint {
 		void Wait(std::optional<std::chrono::high_resolution_clock::duration> time = std::nullopt) {
 			fbr::cur()->wait(time);
 		}
-		void PlaySound(const char* first, const char* second) {
+		void PlaySound2(const char* first, const char* second) {
 			AUDIO::PLAY_SOUND_FRONTEND(-1, first, second, false);
 		}
 		void DisableControl(int control, bool related) {
@@ -1068,19 +1068,12 @@ namespace Saint {
 	inline Give_ammo give_ammo;
 	inline bool has_string_attached(std::string str, std::string check)
 	{
-		std::size_t found = str.find(' ');
-		if (found != std::string::npos)
-		{
-			if (str.substr(0, found) == check)
-			{
-				str = str.substr(found + 1, str.size());
-				return true;
-			}
+		size_t found = str.find(check);
+		if (found != std::string::npos) {
+			return true;
 		}
-		else
-		{
-			if (str == check)
-				return true;
+		else {
+			return false;
 		}
 		return false;
 	}
@@ -1216,7 +1209,26 @@ namespace Saint {
 				PED::SET_PED_PROP_INDEX(Game->Self(), 0, 90, index, 0);
 			}
 		}
+		bool disable_towing = false;
+		bool easy_to_land = false;
+		float lagging_rate = 1.0f;
+		bool disable_attach = false;
+		bool bike_wheelie = false;
 		void init() {
+			if (bike_wheelie) {
+				if (VEHICLE::IS_THIS_MODEL_A_BIKE(Game->GetHash(Game->Vehicle()))) {
+					VEHICLE::SET_WHEELIE_ENABLED(Game->Vehicle(), FALSE);
+				}
+			}
+			if (disable_attach) {
+				VEHICLE::HIDE_TOMBSTONE(Game->Vehicle(), TRUE);
+			}
+			if (easy_to_land) {
+				VEHICLE::SET_BIKE_EASY_TO_LAND(Game->Vehicle(), TRUE);
+			}
+			if (disable_towing) {
+				VEHICLE::SET_VEHICLE_DISABLE_TOWING(Game->Vehicle(), TRUE);
+			}
 			if (block_rid_joins) {
 				NETWORK::NETWORK_SESSION_BLOCK_JOIN_REQUESTS(true);
 				NETWORK::NETWORK_SESSION_CANCEL_INVITE();
@@ -1224,18 +1236,18 @@ namespace Saint {
 			if (drift_on_shift) {
 				if (drift_pos == 0) {
 					if (Game->KeyPress(VK_SHIFT)) {
-						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), 1);
+						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), TRUE);
 					}
 					else {
-						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), 0);
+						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), FALSE);
 					}
 				}
 				if (drift_pos == 1) {
 					if (Game->KeyPress(VK_SPACE)) {
-						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), 1);
+						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), TRUE);
 					}
 					else {
-						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), 0);
+						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), FALSE);
 					}
 				}
 				if (drift_pos == 2) {
@@ -8474,11 +8486,11 @@ namespace Saint {
 		}
 	};
 	inline Radio radio;
-	inline std::string modelsearchresults = "";
-	inline std::string modelsearchresults2 = "";
+	inline std::string modelsearchresults = "None";
+	inline std::string modelsearchresults2 = "None";
 	class HudColor {
 	public:
-		std::string search = "";
+		std::string search = "None";
 		const char* HudIndexNames[171] = {
 		"Pure White",
 		"White",
@@ -11114,7 +11126,7 @@ namespace Saint {
 
 		return files;
 	}
-	inline std::string search_sounds;
+	inline std::string search_sounds = "";
 	inline bool loop_sound;
 	class FileExplorer {
 	public:

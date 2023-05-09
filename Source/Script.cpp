@@ -626,6 +626,14 @@ namespace Saint
 					{
 						PED::CLONE_PED(Game->Self(), true, false, true);
 					});
+				sub->draw_option<Button>(("Suicide"), nullptr, []
+					{
+						Game->CPed()->m_health = 0.0;
+					});
+				sub->draw_option<Button>(("Remove Armour"), nullptr, []
+					{
+						Game->CPed()->m_armor = 0.0;
+					});
 
 			});
 			g_Render->draw_submenu<sub>(("Proofs"), rage::joaat("Proofs"), [](sub* sub)
@@ -1545,6 +1553,28 @@ namespace Saint
 						VEHICLE::SET_CAN_USE_HYDRAULICS(Game->Vehicle(), true);
 					}
 					});
+				sub->draw_option<toggle<bool>>(("Disable Towing"), "", &features.disable_towing, BoolDisplay::OnOff, false, [] {
+					if (!features.disable_towing) {
+						VEHICLE::SET_VEHICLE_DISABLE_TOWING(Game->Vehicle(), FALSE);
+					}
+					});
+				sub->draw_option<toggle<bool>>(("Disable Detachable Bumpers"), "", &features.disable_attach, BoolDisplay::OnOff, false, [] {
+					if (!features.disable_attach) {
+						VEHICLE::HIDE_TOMBSTONE(Game->Vehicle(), FALSE);
+					}
+					});
+				sub->draw_option<toggle<bool>>(("Disable Bike Wheelie"), "", &features.bike_wheelie, BoolDisplay::OnOff, false, [] {
+					if (!features.bike_wheelie) {
+						if (VEHICLE::IS_THIS_MODEL_A_BIKE(Game->GetHash(Game->Vehicle()))) {
+							VEHICLE::SET_WHEELIE_ENABLED(Game->Vehicle(), TRUE);
+						}
+					}
+					});
+				sub->draw_option<toggle<bool>>(("Easy To Land"), "When enabled, the player won't fall off the bike when landing.", &features.easy_to_land, BoolDisplay::OnOff, false, [] {
+					if (!features.easy_to_land) {
+						VEHICLE::SET_BIKE_EASY_TO_LAND(Game->Vehicle(), FALSE);
+					}
+					});
 				sub->draw_option<toggle<bool>>(("Force Skidmarks"), nullptr, &features.show_skidmarks, BoolDisplay::OnOff, false, [] {
 					if (!features.show_skidmarks) {
 						GRAPHICS::USE_SNOW_WHEEL_VFX_WHEN_UNSHELTERED(false);
@@ -1561,6 +1591,7 @@ namespace Saint
 						VEHICLE::SET_VEHICLE_HAS_MUTED_SIRENS(Game->Vehicle(), false);
 					}
 					});
+				
 				sub->draw_option<toggle<bool>>(("Auto Clean"), "", &features.clean_veh, BoolDisplay::OnOff);
 				if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false)) {
 					sub->draw_option<KeyboardOption>(("Liscene Plate"), nullptr, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle()), []
@@ -1577,6 +1608,9 @@ namespace Saint
 					});
 				sub->draw_option<number<float>>("Shell Shakiness", nullptr, &features.speedbumpsev, 0.0f, 1000.f, .1f, 2, true, "", "", [=] {
 					VEHICLE::SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(features.speedbumpsev);
+					});
+				sub->draw_option<number<float>>("Helicopter Lagging Rate", nullptr, &features.lagging_rate, 0.0f, 1000.f, .1f, 2, true, "", "", [=] {
+					VEHICLE::SET_HELI_CONTROL_LAGGING_RATE_SCALAR(Game->Vehicle(), features.lagging_rate);
 					});
 				sub->draw_option<Button>("Delete", nullptr, [] 
 					{ 
@@ -2571,7 +2605,7 @@ namespace Saint
 			{
 				sub->draw_option<KeyboardOption>(("Value"), "Note: this is case sensitive.", modelsearchresults2, []
 					{
-						showKeyboard("Enter Something", "", 8, &modelsearchresults2, [=] {});
+						showKeyboard("Enter Something", "", 25, &modelsearchresults2, [=] {});
 					});
 				sub->draw_option<UnclickOption>(("Results"), nullptr, [] {});
 				if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {
@@ -2598,6 +2632,7 @@ namespace Saint
 									}
 								}
 								Hash hash = *(std::uint32_t*)(info + 0x18);
+								
 								if (has_string_attached(Game->VehicleNameHash(hash), modelsearchresults2)) {
 									sub->draw_option<Button>(Game->VehicleNameHash(hash), nullptr, [=]
 										{
@@ -5216,6 +5251,12 @@ namespace Saint
 				sub->draw_option<Button>("Scope POIS", "", [] {
 					STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_POI"), 268435455, true);
 					STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_ACCESSPOINTS"), 2047, true);
+					});
+				sub->draw_option<Button>("Disable Armoured Gaurds", "", [] {
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_DISRUPTSHIP"), 3, 1);
+				});
+				sub->draw_option<Button>("Upgrade Keycard", "", [] {
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_H3OPT_KEYLEVELS"), 2, 1);
 					});
 
 
@@ -8634,19 +8675,19 @@ namespace Saint
 			{
 				sub->draw_option<Button>(("Orbital Cannon"), nullptr, [=]
 					{
-						g_players.get_selected.PlaySound("DLC_XM_Explosions_Orbital_Cannon", 0);
+						g_players.get_selected.PlaySound22("DLC_XM_Explosions_Orbital_Cannon", 0);
 					});
 				sub->draw_option<Button>(("Beep"), nullptr, [=]
 					{
-						g_players.get_selected.PlaySound("Hack_Success", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS");
+						g_players.get_selected.PlaySound22("Hack_Success", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS");
 					});
 				sub->draw_option<Button>(("Yacht Horn"), nullptr, [=]
 					{
-						g_players.get_selected.PlaySound("Horn", "DLC_Apt_Yacht_Ambient_Soundset");
+						g_players.get_selected.PlaySound22("Horn", "DLC_Apt_Yacht_Ambient_Soundset");
 					});
 				sub->draw_option<Button>(("Garage Door"), nullptr, [=]
 					{
-						g_players.get_selected.PlaySound("Garage_Door", "DLC_HEISTS_GENERIC_SOUNDS");
+						g_players.get_selected.PlaySound22("Garage_Door", "DLC_HEISTS_GENERIC_SOUNDS");
 					});
 			});
 		g_Render->draw_submenu<sub>(("Shoot Single Bullet"), rage::joaat("SHOOT_BULLET"), [](sub* sub)
@@ -10516,11 +10557,16 @@ namespace Saint
 						if (has_string_attached(file.name, search_sounds))
 						sub->draw_option<Button>((file.name.c_str()), nullptr, [=]
 							{
-								if (loop_sound) {
-									PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+								try {
+									if (loop_sound) {
+										PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+									}
+									if (!loop_sound) {
+										PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC);
+									}
 								}
-								if (!loop_sound) {
-									PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC);
+								catch (const std::exception& e) {
+									g_Logger->Info(e.what());
 								}
 							});
 					}
@@ -10531,11 +10577,16 @@ namespace Saint
 					for (auto& file : files) {
 						sub->draw_option<Button>((file.name.c_str()), nullptr, [=]
 							{
-								if (loop_sound) {
-									PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+								try {
+									if (loop_sound) {
+										PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+									}
+									if (!loop_sound) {
+										PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC);
+									}
 								}
-								if (!loop_sound) {
-									PlaySound(TEXT(file.path.c_str()), NULL, SND_FILENAME | SND_ASYNC);
+								catch (const std::exception& e) {
+									g_Logger->Info(e.what());
 								}
 							});
 					}

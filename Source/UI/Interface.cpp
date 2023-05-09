@@ -309,7 +309,7 @@ namespace Saint::UserInterface
 				}
 
 				if (m_Sounds)
-					Game->PlaySound(m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+					Game->PlaySound2(m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 			}
 			if (!PAD::IS_USING_KEYBOARD_AND_MOUSE(2)) {
 				if (Game->DisabledControlPressed(227) && Game->DisabledControlPressed(INPUT_CELLPHONE_RIGHT) && openTimer.Update())
@@ -323,7 +323,7 @@ namespace Saint::UserInterface
 					}
 
 					if (m_Sounds)
-						Game->PlaySound(m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+						Game->PlaySound2(m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 				}
 			}
 			if (m_OpenKeyPressed2 && openTimer.Update())
@@ -337,14 +337,14 @@ namespace Saint::UserInterface
 				}
 
 				if (m_Sounds)
-					Game->PlaySound(m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+					Game->PlaySound2(m_Opened ? "SELECT" : "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 			}
 			static Timer backTimer(0ms);
 			backTimer.SetDelay(std::chrono::milliseconds(m_BackDelay));
 			if (m_Opened && m_BackKeyPressed && backTimer.Update())
 			{
 				if (m_Sounds)
-					Game->PlaySound("BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+					Game->PlaySound2("BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 				if (m_SubmenuStack.size() <= 1)
 				{
@@ -359,7 +359,7 @@ namespace Saint::UserInterface
 			if (m_Opened && Game->DisabledControlPressed(194) && backTimer.Update())
 			{
 				if (m_Sounds)
-					Game->PlaySound("BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+					Game->PlaySound2("BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 				if (m_SubmenuStack.size() <= 1)
 				{
@@ -394,7 +394,7 @@ namespace Saint::UserInterface
 				{
 
 					if (m_Sounds)
-						Game->PlaySound("SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+						Game->PlaySound2("SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
@@ -410,7 +410,7 @@ namespace Saint::UserInterface
 				if (Game->DisabledControlPressed(191) && sub->GetNumOptions() != 0 && enterTimer.Update())
 				{
 					if (m_Sounds)
-						Game->PlaySound("SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+						Game->PlaySound2("SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
@@ -422,7 +422,7 @@ namespace Saint::UserInterface
 				if (m_UpKeyPressed && sub->GetNumOptions() != 0 && upTimer.Update())
 				{
 					if (m_Sounds)
-						Game->PlaySound("NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+						Game->PlaySound2("NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					sub->ScrollBackward();
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
@@ -436,7 +436,7 @@ namespace Saint::UserInterface
 				if (Game->DisabledControlPressed(172) && sub->GetNumOptions() != 0 && upTimer.Update())
 				{
 					if (m_Sounds)
-						Game->PlaySound("NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+						Game->PlaySound2("NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					sub->ScrollBackward();
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
@@ -452,7 +452,7 @@ namespace Saint::UserInterface
 				if (m_DownKeyPressed && sub->GetNumOptions() != 0 && downTimer.Update())
 				{
 					if (m_Sounds)
-						Game->PlaySound("NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+						Game->PlaySound2("NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					sub->ScrollForward();
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
@@ -467,7 +467,7 @@ namespace Saint::UserInterface
 				if (Game->DisabledControlPressed(173) && sub->GetNumOptions() != 0 && downTimer.Update())
 				{
 					if (m_Sounds)
-						Game->PlaySound("NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+						Game->PlaySound2("NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					sub->ScrollForward();
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
@@ -484,7 +484,7 @@ namespace Saint::UserInterface
 				if (m_LeftKeyPressed && sub->GetNumOptions() != 0 && leftTimer.Update())
 				{
 					if (m_Sounds)
-						Game->PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+						Game->PlaySound2("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
@@ -494,7 +494,7 @@ namespace Saint::UserInterface
 				if (Game->DisabledControlPressed(174) && sub->GetNumOptions() != 0 && leftTimer.Update())
 				{
 					if (m_Sounds)
-						Game->PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+						Game->PlaySound2("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
@@ -506,7 +506,7 @@ namespace Saint::UserInterface
 				if (m_RightKeyPressed && sub->GetNumOptions() != 0 && rightTimer.Update())
 				{
 					if (m_Sounds)
-						Game->PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+						Game->PlaySound2("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
@@ -516,7 +516,7 @@ namespace Saint::UserInterface
 				if (Game->DisabledControlPressed(175) && !Game->ControlPressed(227) && sub->GetNumOptions() != 0 && rightTimer.Update())
 				{
 					if (m_Sounds)
-						Game->PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+						Game->PlaySound2("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{

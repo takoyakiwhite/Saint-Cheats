@@ -259,11 +259,11 @@
     <ClInclude Include="ColorSubmenu.hpp">
       <Filter>Interface\Option</Filter>
     </ClInclude>
-    <ClInclude Include="Features.h">
-      <Filter>Core\Features\Vehicle</Filter>
-    </ClInclude>
     <ClInclude Include="Vehicle.h">
       <Filter>Core\Features\Vehicle\Features</Filter>
+    </ClInclude>
+    <ClInclude Include="Features.h">
+      <Filter>Core\Features</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

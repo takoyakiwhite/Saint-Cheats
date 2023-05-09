@@ -334,13 +334,13 @@ namespace Saint {
 		/// </summary>
 		NOTIFY_INLINE VOID InsertNotification(const ImGuiToast& toast)
 		{
-			if (wants_sounds()) {
-				PlaySound(TEXT("C:\\Saint\\Sounds\\Notification.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NOSTOP);
-				
-			}
+			
 			update();
 			if (notifications.size() < 10) {
+				if (wants_sounds()) {
+					PlaySound(TEXT("C:\\Saint\\Sounds\\Notification.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NOSTOP);
 
+				}
 				notifications.push_back(toast);
 			}
 		}

@@ -57,11 +57,11 @@ namespace Saint {
         { "DLC_XM_Explosions_Orbital_Cannon", "Hack_Success", "Horn", "Garage_Door"},
         { 0, "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS", "DLC_Apt_Yacht_Ambient_Soundset", "DLC_HEISTS_GENERIC_SOUNDS"},
         };
-        void PlaySound(const char* first, const char* second) {
+        void PlaySound22(const char* first, const char* second) {
             NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
             AUDIO::PLAY_SOUND_FROM_COORD(AUDIO::GET_SOUND_ID(), first, coords.x, coords.y, coords.z, second, true, 0, true);
         }
-        void PlaySound(const char* first, int second) {
+        void PlaySound22(const char* first, int second) {
             NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), false);
             AUDIO::PLAY_SOUND_FROM_COORD(AUDIO::GET_SOUND_ID(), first, coords.x, coords.y, coords.z, PlaySounds[2][0], true, 0, true);
         }
