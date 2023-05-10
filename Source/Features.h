@@ -77,6 +77,43 @@ namespace Saint {
 		}
 	};
 	inline std::size_t acrobatic_int4 = 0;
+	inline bool ChangeNetworkObjectOwner(std::int32_t script_index, CNetGamePlayer* owner)
+	{
+		if (*g_GameVariables->m_is_session_started && !ENTITY::IS_ENTITY_A_PED(script_index))
+		{
+			std::uint64_t NetworkObjectMgrInterface = *(std::uint64_t*)(g_GameFunctions->m_NetworkObjectMgrInterface);
+			if (NetworkObjectMgrInterface == NULL)
+				return false;
+
+			if (!ENTITY::DOES_ENTITY_EXIST(script_index))
+				return false;
+
+			std::uint64_t Entity = g_GameFunctions->m_GetEntityFromScript(script_index);
+			if (Entity == NULL)
+				return false;
+
+			std::uint64_t NetObject = *(std::uint64_t*)(Entity + 0xD0);
+			if (NetObject == NULL)
+				return false;
+
+			if (*(std::uint16_t*)(NetObject + 0x8) == 11)
+				return false;
+
+			int NetworkHandle = NETWORK::NETWORK_GET_NETWORK_ID_FROM_ENTITY(script_index);
+			g_GameFunctions->m_ChangeNetworkObjectOwner(NetworkObjectMgrInterface, NetObject, owner, 0ui64);
+			NETWORK::SET_NETWORK_ID_CAN_MIGRATE(NetworkHandle, TRUE);
+
+			return true;
+		}
+
+	}
+	class Particles {
+	public:
+		const char* type[8] = { "Banknotes", "Fireworks (Trailburst)", "Fireworks (Burst)", "Fireworks (Spiral Starburst)","Fireworks (Trailburst Spawn)","Clown Appears", "Water Splash", "Cartoon" };
+		const char* asset[8] = { "scr_ornate_heist", "scr_indep_fireworks", "proj_xmas_firework", "proj_xmas_firework","scr_rcpaparazzo1","scr_rcbarry2", "scr_fbi5a", "scr_rcbarry2" };
+		const char* fx[8] = { "scr_heist_ornate_banknotes", "scr_indep_firework_trailburst", "scr_firework_xmas_burst_rgw", "scr_firework_xmas_spiral_burst_rgw","scr_mich4_firework_trailburst_spawn","scr_clown_appears", "scr_fbi5_ped_water_splash", "muz_clown" };
+	};
+	inline Particles particles;
 	class Weapon {
 	public:
 		const char* Name[106]
@@ -113,13 +150,15 @@ namespace Saint {
 	};
 	class game {
 	public:
-		Weapon* Weapon;
 		Stats* Stats;
 		Player Id() {
 			return PLAYER::PLAYER_ID();
 		}
 		Ped Self() {
 			return PLAYER::PLAYER_PED_ID();
+		}
+		Entity Weapon() {
+			return WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Self(), 0);
 		}
 		Vehicle Vehicle() {
 			return PED::GET_VEHICLE_PED_IS_IN(Self(), false);
@@ -180,6 +219,15 @@ namespace Saint {
 			STREAMING::REQUEST_NAMED_PTFX_ASSET(dict);
 			GRAPHICS::USE_PARTICLE_FX_ASSET(dict);
 			GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE(particle, Self(), 0.00f, 0.00f, 0.00f, 0.00f, 0.00f, 0.0f, bone, scale, TRUE, TRUE, TRUE);
+			if (color)
+				GRAPHICS::SET_PARTICLE_FX_NON_LOOPED_COLOUR(r, g, b);
+			STREAMING::REMOVE_PTFX_ASSET();
+		}
+		void ParticleOnCoord(const char* dict, const char* particle, NativeVector3 coords, float scale, bool color = false, float r = 1.f, float g = 1.f, float b = 1.f)
+		{
+			STREAMING::REQUEST_NAMED_PTFX_ASSET(dict);
+			GRAPHICS::USE_PARTICLE_FX_ASSET(dict);
+			GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle, coords, {0, 0, 0}, scale, false, false, false, true);
 			if (color)
 				GRAPHICS::SET_PARTICLE_FX_NON_LOOPED_COLOUR(r, g, b);
 			STREAMING::REMOVE_PTFX_ASSET();
@@ -696,7 +744,7 @@ namespace Saint {
 				PED::SET_PED_AS_GROUP_MEMBER(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
 				PED::SET_PED_NEVER_LEAVES_GROUP(ped, PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer));
 				PED::SET_PED_COMBAT_ABILITY(ped, 100);
-				Game->GiveWeapon(ped, Game->Weapon->Hash[WeaponInt], 9998);
+				Game->GiveWeapon(ped, all_weapons.hash[WeaponInt], 9998);
 				PED::SET_PED_CAN_SWITCH_WEAPON(ped, true);
 				PED::SET_GROUP_FORMATION(PLAYER::GET_PLAYER_GROUP(g_SelectedPlayer), 3);
 				PED::SET_PED_MAX_HEALTH(ped, 5000);
@@ -1036,6 +1084,7 @@ namespace Saint {
 		std::size_t destination_i = 0;
 	};
 	inline Autopilot autopilot;
+
 	class Give_weapon {
 	public:
 		const char* selected_class = "";
@@ -1093,6 +1142,13 @@ namespace Saint {
 		}
 
 		return result;
+	}
+	inline void TeleportToBlip(int blipID) {
+		int WaypointHandle = HUD::GET_FIRST_BLIP_INFO_ID(blipID);
+		if (HUD::DOES_BLIP_EXIST(WaypointHandle)) {
+			NativeVector3 WaypointPos = HUD::GET_BLIP_COORDS(WaypointHandle);
+			PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), WaypointPos.x, WaypointPos.y, WaypointPos.z);
+		}
 	}
 	class Features {
 	public:
@@ -1215,7 +1271,173 @@ namespace Saint {
 		bool disable_attach = false;
 		bool bike_wheelie = false;
 		bool instant_enter = false;
+		bool recolor = false;
+		bool steal_gun2 = false;
+		bool max_gun = false;
+		bool repair_gun = false;
+		void DeleteEntity(Entity ent)
+		{
+			ENTITY::DETACH_ENTITY(ent, TRUE, TRUE);
+			ENTITY::SET_ENTITY_VISIBLE(ent, FALSE, FALSE);
+			NETWORK::NETWORK_SET_ENTITY_ONLY_EXISTS_FOR_PARTICIPANTS(ent, TRUE);
+			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ent, 0.f, 0.f, 0.f, FALSE, FALSE, FALSE);
+			ENTITY::SET_ENTITY_AS_MISSION_ENTITY(ent, TRUE, TRUE);
+			ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&ent);
+			ENTITY::DELETE_ENTITY(&ent);
+			OBJECT::DELETE_OBJECT(&ent);
+		}
+		bool flame_thrower = false;
+		bool naruto_run = false;
+		bool auto_flip = false;
+		bool plate_test = false;
+		const char* plate_test_text = "Saint";
+		int plate_test_delay = 200;
+		const char* plate_test_direction[2] = { "Left", "Right" };
+		std::size_t plate_test_pos = 0;
+		bool invis_weapon = false;
 		void init() {
+			if (invis_weapon) {
+				ENTITY::SET_ENTITY_VISIBLE(Game->Weapon(), FALSE, FALSE);
+			}
+			if (plate_test) {
+				static int TIMER;
+				static int increment = 0;
+				static const char* message = plate_test_text;
+				static int delay2 = 0;
+				if (delay2 == 0 || (int)(GetTickCount64() - delay2) > plate_test_delay)
+				{
+					if (plate_test_pos == 0) {
+						if (increment > strlen(message)) increment = 0;
+						char temp[8];
+						for (int i = 0; i < 8; i++) temp[i] = message[i + increment];
+						increment++;
+						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle(), temp);
+					}
+					if (plate_test_pos == 1) {
+						if (increment > strlen(message)) increment = 0;
+						char temp[8];
+						for (int i = 0; i < 8; i++) temp[i] = message[i - increment];
+						increment--;
+						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle(), temp);
+					}
+
+					
+					delay2 = GetTickCount64();
+				}
+			}
+			if (auto_flip) {
+				if (!ENTITY::IS_ENTITY_UPRIGHT(Game->Vehicle(), 120)) {
+					NativeVector3 rotation = ENTITY::GET_ENTITY_ROTATION(Game->Vehicle(), false);
+					ENTITY::SET_ENTITY_ROTATION(Game->Vehicle(), 0, rotation.y, rotation.z, 0, 1);
+				}
+			}
+
+			if (naruto_run) {
+				g_CallbackScript->AddCallback<AnimationCallback>("mp_suicide", [=]
+					{
+						TASK::TASK_PLAY_ANIM(Game->Self(), (char*)"mp_suicide", (char*)"pill", 8.0f, 0.0f, -1, 120, 0, 0, 0, 0);
+
+					});
+			}
+			if (flame_thrower) {
+				Hash weaponhash = NULL;
+				if (WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, false))
+				{
+					PLAYER::DISABLE_PLAYER_FIRING(Game->Self(), true);
+
+					if (Game->ControlPressed(25) || IsKeyPressed(VK_LBUTTON))
+					{
+						static int timer;
+						if ((GetTickCount() - timer) > 75) {
+							STREAMING::REQUEST_NAMED_PTFX_ASSET("core");
+							GRAPHICS::USE_PARTICLE_FX_ASSET("core");
+							GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("ent_sht_flame", 
+								WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Game->Self(), 0), 
+								0.4f, 0.0f, 0.02f, 89.5f, 0.0f, 90.0f, 
+								ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Game->Self(), 0), "Gun_Nuzzle"), 
+								0.85f, 0, 0, 0
+							);
+							STREAMING::REMOVE_PTFX_ASSET();
+							timer = GetTickCount();
+						}
+					}
+				}
+			}
+			if (steal_gun2) {
+				if (Game->Shooting())
+				{
+					Entity hitEntity;
+					if (raycast(hitEntity)) {
+						
+						if (ENTITY::IS_ENTITY_A_VEHICLE(hitEntity))
+						{
+							if (ChangeNetworkObjectOwner(hitEntity, g_GameFunctions->m_GetNetPlayer(PLAYER::PLAYER_ID())))
+							{
+								if (!VEHICLE::IS_VEHICLE_SEAT_FREE(hitEntity, -1, FALSE))
+								{
+									auto Ped = VEHICLE::GET_PED_IN_VEHICLE_SEAT(hitEntity, -1, FALSE);
+									TASK::CLEAR_PED_TASKS_IMMEDIATELY(Ped);
+									DeleteEntity(Ped);
+								}
+
+								PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), hitEntity, -1);
+							}
+						}
+
+					}
+				}
+			}
+			if (repair_gun) {
+				if (Game->Shooting())
+				{
+					Entity hitEntity;
+					if (raycast(hitEntity)) {
+
+						if (ENTITY::IS_ENTITY_A_VEHICLE(hitEntity))
+						{
+							Vehicle playerVehicle = hitEntity;
+							VEHICLE::SET_VEHICLE_FIXED(playerVehicle);
+							VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(playerVehicle);
+							VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVehicle, false);
+						}
+					}
+				}
+			}
+			if (max_gun) {
+				if (Game->Shooting())
+				{
+					Entity hitEntity;
+					if (raycast(hitEntity)) {
+
+						if (ENTITY::IS_ENTITY_A_VEHICLE(hitEntity))
+						{
+							Vehicle playerVehicle = hitEntity;
+							VEHICLE::SET_VEHICLE_MOD_KIT(playerVehicle, 0);
+							for (int i = 0; i < 50; i++)
+							{
+								VEHICLE::SET_VEHICLE_MOD(playerVehicle, i, MISC::GET_RANDOM_INT_IN_RANGE(0, VEHICLE::GET_NUM_VEHICLE_MODS(playerVehicle, i) - 1), false);
+
+							}
+							VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 2));
+							//VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+							VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVehicle, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+						}
+					}
+				}
+			}
+			if (recolor) {
+				if (Game->Shooting())
+				{
+
+					Entity hitEntity;
+					if (raycast(hitEntity)) {
+						if (ENTITY::IS_ENTITY_A_VEHICLE(hitEntity))
+						{
+							VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(hitEntity, MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255), MISC::GET_RANDOM_INT_IN_RANGE(0, 255));
+						}
+					}
+				}
+			}
 			if (instant_enter) {
 				if (PED::GET_VEHICLE_PED_IS_TRYING_TO_ENTER(Game->Self())) {
 					PED::SET_PED_INTO_VEHICLE(Game->Self(), PED::GET_VEHICLE_PED_IS_TRYING_TO_ENTER(Game->Self()), -1);
@@ -6158,9 +6380,7 @@ namespace Saint {
 		float vscale = 0.50f;
 		bool enabled = false;
 		bool networked = true;
-		const char* type[8] = { "Banknotes", "Fireworks (Trailburst)", "Fireworks (Burst)", "Fireworks (Spiral Starburst)","Fireworks (Trailburst Spawn)","Clown Appears", "Water Splash", "Cartoon" };
-		const char* particle_asset[8] = { "scr_ornate_heist", "scr_indep_fireworks", "proj_xmas_firework", "proj_xmas_firework","scr_rcpaparazzo1","scr_rcbarry2", "scr_fbi5a", "scr_rcbarry2" };
-		const char* particle_fx[8] = { "scr_heist_ornate_banknotes", "scr_indep_firework_trailburst", "scr_firework_xmas_burst_rgw", "scr_firework_xmas_spiral_burst_rgw","scr_mich4_firework_trailburst_spawn","scr_clown_appears", "scr_fbi5_ped_water_splash", "muz_clown" };
+		
 		std::size_t size = 0;
 		bool gas_cap = false;
 		void init() {
@@ -6176,62 +6396,62 @@ namespace Saint {
 			NativeVector3 trailright = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "taillight_r"));
 			NativeVector3 spoiler = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "spoiler"));
 			NativeVector3 gas_cap_location = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(vplayerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(vplayerVehicle, "petrolcap"));
-			g_CallbackScript->AddCallback<PTFXCallback>(particle_asset[size], [=] {
+			g_CallbackScript->AddCallback<PTFXCallback>(particles.asset[size], [=] {
 				if (gas_cap)
 				{
-					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
-					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], gas_cap_location, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particles.asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particles.fx[size], gas_cap_location, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
 				}
 				if (lf)
 				{
-					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
-					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], wheelOne, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particles.asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particles.fx[size], wheelOne, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
 				}
 				if (bl5)
 				{
-					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particles.asset[size]);
 
-					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], wheelTwo, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particles.fx[size], wheelTwo, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
 				}
 				if (fr5)
 				{
-					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
-					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], wheelThree, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particles.asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particles.fx[size], wheelThree, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
 				}
 				if (br)
 				{
-					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
-					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], wheelFour, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particles.asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particles.fx[size], wheelFour, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
 				}
 				if (exaust2)
 				{
-					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
-					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], exaust, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particles.asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particles.fx[size], exaust, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
 				}
 				if (brakele)
 				{
-					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
-					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], brakeleft, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particles.asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particles.fx[size], brakeleft, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
 				}
 				if (brakerig)
 				{
-					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
-					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], brakeright, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particles.asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particles.fx[size], brakeright, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
 				}
 				if (taill)
 				{
-					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
-					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], tailleft, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particles.asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particles.fx[size], tailleft, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
 				}
 				if (tailr)
 				{
-					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
-					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], trailright, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particles.asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particles.fx[size], trailright, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
 				}
 				if (spoilerr)
 				{
-					GRAPHICS::USE_PARTICLE_FX_ASSET(particle_asset[size]);
-					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle_fx[size], spoiler, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
+					GRAPHICS::USE_PARTICLE_FX_ASSET(particles.asset[size]);
+					GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particles.fx[size], spoiler, { 0.f, 0.f, 0.f }, vscale, false, false, false, true);
 				}
 				});
 		}
@@ -11063,36 +11283,7 @@ namespace Saint {
 		}
 	};
 	inline Proofs proofs;
-	inline bool ChangeNetworkObjectOwner(std::int32_t script_index, CNetGamePlayer* owner)
-	{
-		if (*g_GameVariables->m_is_session_started && !ENTITY::IS_ENTITY_A_PED(script_index))
-		{
-			std::uint64_t NetworkObjectMgrInterface = *(std::uint64_t*)(g_GameFunctions->m_NetworkObjectMgrInterface);
-			if (NetworkObjectMgrInterface == NULL)
-				return false;
-
-			if (!ENTITY::DOES_ENTITY_EXIST(script_index))
-				return false;
-
-			std::uint64_t Entity = g_GameFunctions->m_GetEntityFromScript(script_index);
-			if (Entity == NULL)
-				return false;
-
-			std::uint64_t NetObject = *(std::uint64_t*)(Entity + 0xD0);
-			if (NetObject == NULL)
-				return false;
-
-			if (*(std::uint16_t*)(NetObject + 0x8) == 11)
-				return false;
-
-			int NetworkHandle = NETWORK::NETWORK_GET_NETWORK_ID_FROM_ENTITY(script_index);
-			g_GameFunctions->m_ChangeNetworkObjectOwner(NetworkObjectMgrInterface, NetObject, owner, 0ui64);
-			NETWORK::SET_NETWORK_ID_CAN_MIGRATE(NetworkHandle, TRUE);
-
-			return true;
-		}
-		
-	}
+	
 	class fileHandler {
 	public:
 		fileHandler(std::string m_path, std::string m_name) {
@@ -11246,16 +11437,249 @@ namespace Saint {
 		int volume = 100;
 		void init() {
 			if (enabled) {
-				GRAPHICS::SET_TV_AUDIO_FRONTEND(TRUE);
-				float real_coords[4] = { (float)x / 100.0f, (float)y / 100.0f, (float)width / 100.0f, (float)height / 100.0f };
-				GRAPHICS::DRAW_TV_CHANNEL(real_coords[0], real_coords[1], real_coords[2], real_coords[3], rotation, 255, 255, 255, alpha);
+				HUD::SET_HUD_COMPONENT_POSITION(15, 0.0f, -0.0375f);
+				HUD::SET_TEXT_RENDER_ID(1);
+				GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(4);
+				GRAPHICS::SET_SCRIPT_GFX_DRAW_BEHIND_PAUSEMENU(1);
+				GRAPHICS::DRAW_TV_CHANNEL(x, y, width, height, rotation, 255, 255, 255, alpha);
+				HUD::SET_TEXT_RENDER_ID(HUD::GET_DEFAULT_SCRIPT_RENDERTARGET_RENDER_ID());
 				GRAPHICS::SET_TV_VOLUME(volume);
 
 			}
 		}
 	};
 	inline TV tv;
+	
+	class ParticleShooter {
+	public:
+		bool enabled = false;
+		std::size_t pos;
+		float scale = 1.0f;
+		bool color = false;
+		int r = 255;
+		int g;
+		int b;
+		int a;
+		bool rainbow;
+		void init() {
+			if (enabled) {
+				if (rainbow) {
+					if (r > 0 && b == 0) {
+						r--;
+						g++;
+					}
+					if (g > 0 && r == 0) {
+						g--;
+						b++;
+					}
+					if (b > 0 && g == 0) {
+						r++;
+						b--;
+					}
+				}
+				if (Game->Shooting())
+				{
+					NativeVector3 c;
+					if (raycast(c)) {
+						g_CallbackScript->AddCallback<PTFXCallback>(particles.asset[pos], [=] {
+							if (color) {
+								float r2 = r / 255.f;
+								float g2 = g / 255.f;
+								float b2 = b / 255.f;
+								Game->ParticleOnCoord(particles.asset[pos], particles.fx[pos], c, scale, true, r2, g2, b2);
+							}
+							else {
+								GRAPHICS::USE_PARTICLE_FX_ASSET(particles.asset[pos]);
+								GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particles.fx[pos], c, { 0.f, 0.f, 0.f }, scale, false, false, false, true);
+							}
+							
+
+						});
+					}
+				}
+			}
+		}
+	};
+	inline ParticleShooter particle_shooter;
+	class visionHandler {
+	public:
+		visionHandler(const char* m_name, const char* m_modifier) {
+			name = m_name;
+			modifier = m_modifier;
+
+		}
+	public:
+		const char* name;
+		const char* modifier;
+	};
+	class Vision {
+	public:
+		std::vector<visionHandler> cycles = {
+			{ "Damage", "damage" },
+			{ "Cops", "CopsSPLASH" },
+			{ "Barry Fade Out", "BarryFadeOut" },
+			{ "Water Lab", "WATER_lab" },
+			{ "Dying", "dying" },
+			{ "Red Mist", "REDMIST" },
+			{ "Prologue Shootout", "prologue_shootout" },
+			{ "Secret Camera", "secret_camera" },
+			{ "Spectator Camera", "Multipayer_spectatorCam" },
+			{ "UFO", "ufo" },
+			{ "UFO Deathray", "ufo_deathray" },
+			{ "Wobbly", "drug_wobbly" },
+			{ "Killstreak", "MP_Killstreak" },
+			{ "Hint", "Hint_cam" },
+			{ "Black & White", "blackNwhite" },
+			{ "Sniper", "sniper" },
+			{ "Crane", "crane_cam" },
+			{ "Bikers", "BikersSPLASH" },
+			{ "Vagos", "VagosSPLASH" },
+			{ "Vagos 2", "vagos" },
+			{ "Cops", "cops" },
+			{ "Spectator 1", "spectator1" },
+			{ "Sunglasses", "sunglasses" },
+			{ "Blurry", "CHOP" },
+			{ "Stoned", "stoned" },
+		};
+		bool thermal;
+		bool night;
+		std::string search;
+		void init() {
+			if (night) {
+				*script_global(1853910).at(Game->Id(), 862).at(821).at(11).as<int*>() = -1;
+				GRAPHICS::SET_NIGHTVISION(TRUE);
+			}
+			if (thermal) {
+				*script_global(1853910).at(Game->Id(), 862).at(821).at(11).as<int*>() = -1;
+				GRAPHICS::SET_SEETHROUGH(TRUE);
+			}
+		}
+		float strength = 1;
+		void change(const char* name, float s) {
+			GRAPHICS::SET_TIMECYCLE_MODIFIER(name);
+			GRAPHICS::SET_TIMECYCLE_MODIFIER_STRENGTH(s);
+		}
+	};
+	inline Vision vision;
+	class Valk {
+	public:
+		bool enabled = false;
+		std::int32_t Rocket, Cam;
+		std::uint8_t YPos;
+		float Meter;
+		bool Initialized;
+		bool hud = true;
+		bool vision = true;
+		bool meter = true;
+		std::size_t pos = 41;
+		bool restart = false;
+		NativeVector3 Multiply2(NativeVector3 vector, float incline)
+		{
+			vector.x *= incline;
+			vector.y *= incline;
+			vector.z *= incline;
+			return vector;
+		}
+
+		NativeVector3 Add2(NativeVector3 vector, NativeVector3 vector2)
+		{
+			vector.x += vector2.x;
+			vector.y += vector2.y;
+			vector.z += vector2.z;
+			return vector;
+		}
+		void init() {
+			if (enabled) {
+				if (Game->Shooting())
+				{
+					if (!Initialized)
+						Initialized = true;
+				}
+
+				if (Initialized)
+				{
+					if (ENTITY::DOES_ENTITY_EXIST(Rocket))
+					{
+						auto Rotation = CAM::GET_GAMEPLAY_CAM_ROT(0);
+						CAM::SET_CAM_ROT(Cam, Rotation, 0);
+						ENTITY::SET_ENTITY_ROTATION(Rocket, Rotation.x, Rotation.y, Rotation.z, 0, TRUE);
+
+						auto RocketPos = ENTITY::GET_ENTITY_COORDS(Rocket, FALSE);
+						auto Coords = Add2(RocketPos, Multiply2(RotationToDirection(Rotation), .8f));
+						ENTITY::SET_ENTITY_COORDS(Rocket, Coords.x, Coords.y, Coords.z, FALSE, FALSE, FALSE, FALSE);
+
+						HUD::HIDE_HUD_AND_RADAR_THIS_FRAME();
+						PLAYER::DISABLE_PLAYER_FIRING(Game->Self(), TRUE);
+						ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), TRUE);
+						HUD::HUD_SUPPRESS_WEAPON_WHEEL_RESULTS_THIS_FRAME();
+
+						if (hud) {
+							GRAPHICS::DRAW_RECT(0.5f, 0.5f - 0.025f, 0.050f, 0.002f, 255, 255, 255, 255, FALSE);
+							GRAPHICS::DRAW_RECT(0.5f, 0.5f + 0.025f, 0.050f, 0.002f, 255, 255, 255, 255, FALSE);
+							GRAPHICS::DRAW_RECT(0.5f - 0.025f, 0.5f, 0.002f, 0.050f, 255, 255, 255, 255, FALSE);
+							GRAPHICS::DRAW_RECT(0.5f + 0.025f, 0.5f, 0.002f, 0.050f, 255, 255, 255, 255, FALSE);
+							GRAPHICS::DRAW_RECT(0.5f + 0.05f, 0.5f, 0.050f, 0.002f, 255, 255, 255, 255, FALSE);
+							GRAPHICS::DRAW_RECT(0.5f - 0.05f, 0.5f, 0.050f, 0.002f, 255, 255, 255, 255, FALSE);
+							GRAPHICS::DRAW_RECT(0.5f, 0.5f + 0.05f, 0.002f, 0.050f, 255, 255, 255, 255, FALSE);
+							GRAPHICS::DRAW_RECT(0.5f, 0.5f - 0.05f, 0.002f, 0.050f, 255, 255, 255, 255, FALSE);
+						}
+						if (vision) {
+							GRAPHICS::SET_TIMECYCLE_MODIFIER("CAMERA_secuirity");
+						}
+						if (meter) {
+							GRAPHICS::DRAW_RECT(0.25f, 0.5f, 0.03f, 0.5f, 255, 255, 255, 255, FALSE);
+						}
+						static auto Ticker = GetTickCount();
+						if (GetTickCount() - Ticker >= 250)
+						{
+							Meter -= .01f; YPos -= 4;
+							Ticker = GetTickCount();
+						}
+						if (meter) {
+							GRAPHICS::DRAW_RECT(0.25f, 0.75f - (Meter / 2.f), 0.03f, Meter, 255, YPos, 0, 255, FALSE);
+						}
+
+						float GroundZ;
+						MISC::GET_GROUND_Z_FOR_3D_COORD(RocketPos.x, RocketPos.y, RocketPos.z, &GroundZ, FALSE, FALSE);
+						if (ENTITY::HAS_ENTITY_COLLIDED_WITH_ANYTHING(Rocket) ||
+							(std::abs(RocketPos.z - GroundZ) < .5f) ||
+							Meter <= 0.01)
+						{
+							FIRE::ADD_EXPLOSION(RocketPos.x, RocketPos.y, RocketPos.z, pos, 1000.f, TRUE, FALSE, .4f, FALSE);
+							features.DeleteEntity(Rocket);
+							Rocket = 0;
+							PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), 0);
+							CAM::RENDER_SCRIPT_CAMS(FALSE, TRUE, 700, TRUE, TRUE, NULL);
+							CAM::DESTROY_CAM(Cam, TRUE);
+							GRAPHICS::SET_TIMECYCLE_MODIFIER("DEFAULT");
+							ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), FALSE);
+							Initialized = false;
+							
+						}
+					}
+					else
+					{
+						auto Weapon = WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Game->Self(), NULL);
+						auto Coords = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(Weapon, 0.f, 1.f, 0.f);
+						Rocket = OBJECT::CREATE_OBJECT(rage::joaat("w_lr_rpg_rocket"), Coords.x, Coords.y, Coords.z, TRUE, TRUE, FALSE);
+						CAM::DESTROY_ALL_CAMS(TRUE);
+						Cam = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", TRUE);
+						CAM::ATTACH_CAM_TO_ENTITY(Cam, Rocket, 0.f, 0.f, 0.f, TRUE);
+						CAM::RENDER_SCRIPT_CAMS(TRUE, TRUE, 700, TRUE, TRUE, NULL);
+						CAM::SET_CAM_ACTIVE(Cam, TRUE);
+						ENTITY::SET_ENTITY_VISIBLE(Rocket, FALSE, FALSE);
+						YPos = 255; Meter = .5f;
+					}
+				}
+			
+			}
+		}
+	};
+	inline Valk valk;
 	inline void FeatureInitalize() {
+		valk.init();
+		vision.init();
+		particle_shooter.init();
 		tv.init();
 		regen.init();
 		#ifndef DEV

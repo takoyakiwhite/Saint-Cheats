@@ -1137,7 +1137,7 @@ namespace GRAPHICS
 	static void SET_SCRIPT_GFX_ALIGN(int horizontalAlign, int verticalAlign) { Invoke<int>(0xB8A850F20A067EB6, horizontalAlign, verticalAlign); } // 0xB8A850F20A067EB6 0x228A2598 b323
 	static void RESET_SCRIPT_GFX_ALIGN() { Invoke<int>(0xE3A3DB414A373DAB); } // 0xE3A3DB414A373DAB 0x3FE33BD6 b323
 	static void SET_SCRIPT_GFX_ALIGN_PARAMS(float x, float y, float w, float h) { Invoke<int>(0xF5A2C681787E579D, x, y, w, h); } // 0xF5A2C681787E579D 0x76C641E4 b323
-	static void GET_SCRIPT_GFX_ALIGN_POSITION(float x, float y, float* calculatedX, float* calculatedY) { Invoke<int>(0x6DD8F5AA635EB4B2, x, y, calculatedX, calculatedY); } // 0x6DD8F5AA635EB4B2  b323
+	static void GET_SCRIPT_GFX_ALIGN_POSITION(float x, float y, float* calculatedX, float* calculatedY) { Invoke<int>(0x6DD8F5AA635EB4B2, x, y, calculatedX, calculatedY); } // 0x6DD8F50x52F0982D7FD156B6AA635EB4B2  b323
 	static float GET_SAFE_ZONE_SIZE() { return Invoke<float>(0xBAF107B6BB2C97F0); } // 0xBAF107B6BB2C97F0 0x3F0D1A6F b323
 	static void DRAW_SPRITE(const char* textureDict, const char* textureName, float screenX, float screenY, float width, float height, float heading, int red, int green, int blue, int alpha, BOOL p11, Any p12) { Invoke<int>(0xE7FFAE5EBF23D890, textureDict, textureName, screenX, screenY, width, height, heading, red, green, blue, alpha, p11, p12); } // 0xE7FFAE5EBF23D890 0x1FEC16B0 b323
 	static void DRAW_SPRITE_ARX(const char* textureDict, const char* textureName, float x, float y, float width, float height, float p6, int red, int green, int blue, int alpha, Any p11, Any p12) { Invoke<int>(0x2D3B147AFAD49DE0, textureDict, textureName, x, y, width, height, p6, red, green, blue, alpha, p11, p12); } // 0x2D3B147AFAD49DE0  b1290

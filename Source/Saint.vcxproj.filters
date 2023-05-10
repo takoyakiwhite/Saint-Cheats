@@ -265,6 +265,9 @@
     <ClInclude Include="Features.h">
       <Filter>Core\Features</Filter>
     </ClInclude>
+    <ClInclude Include="VectorLists.h">
+      <Filter>Core\Features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">

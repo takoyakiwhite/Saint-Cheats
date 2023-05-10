@@ -35,6 +35,7 @@
 #include "ScriptLocal.h"
 #include "Hotkeys.h"
 #include <GTAV-Classes/vehicle/CVehicleModelInfo.hpp>
+#include "VectorLists.h"
 namespace Saint
 {
 #define QUEUE(...)g_FiberPool.queue([__VA_ARGS__] {
@@ -363,7 +364,28 @@ namespace Saint
 		return ScriptType::Game;
 	}
 
+	using namespace UserInterface;
+	void addBreak(const char* name, sub* sub) {
+		sub->draw_option<UnclickOption>((name), nullptr, [] {});
+	}
+	void addSubmenu(const char* name, sub* sub) {
+		sub->draw_option<submenu>(name, nullptr, rage::joaat(name));
+	}
+	void addToggle(const char* name, const char* desc, bool* value, sub* sub, std::function<void()> action = [] {}) {
+		sub->draw_option<toggle<bool>>((name), desc, value, BoolDisplay::OnOff, false, [=] {
+			if (!&value) {
+				action();
+			}
+			});
+	}
+	void addButton(const char* name, sub* sub, std::function<void()> action = [] {}) {
+		sub->draw_option<Button>((name), nullptr, [=]
+			{
+				
+				action();
 
+			});
+	}
 	void MainScript::Initialize()
 	{
 		m_Initialized = true;
@@ -424,24 +446,22 @@ namespace Saint
 					sub->draw_option<submenu>("World", nullptr, SubmenuWorld);
 					sub->draw_option<submenu>("Settings", nullptr, SubmenuSettings);
 					if (Flags->isDev()) {
-						sub->draw_option<UnclickOption>(("Devoloper"), nullptr, [] {});
+						addBreak("Devoloper", sub);
 						sub->draw_option<Button>(("Set Tutorial Unfinished"), nullptr, []
 							{
 								tutorial.set_unfinished();
 							});
+						
 					}
 				}
 				else {
 					sub->draw_option<submenu>("Theme", nullptr, rage::joaat("TutorialSettings"));
-					sub->draw_option<Button>(("Save & Loadup On Start"), nullptr, [=]
-						{
-							showKeyboard("Enter Something", "", 25, &tutorial.path_to_load, [] {
-								g_ThemeLoading.save(tutorial.path_to_load);
-								
+					addButton("Save & Loadup On Start", sub, [] {
+						showKeyboard("Enter Something", "", 25, &tutorial.path_to_load, [] {
+							g_ThemeLoading.save(tutorial.path_to_load);
+
 							});
-
-
-						});
+					});
 					sub->draw_option<toggle<bool>>(("Notification Sounds"), nullptr, &tutorial.notisounds, BoolDisplay::OnOff);
 						sub->draw_option<Button>(("Confirm"), nullptr, []
 							{
@@ -482,7 +502,8 @@ namespace Saint
 				sub->draw_option<submenu>("Damage Packs", nullptr, rage::joaat("DamagePacks"));
 				sub->draw_option<submenu>("Face Editor", nullptr, rage::joaat("FaceEditor"));
 				sub->draw_option<submenu>("Proofs", nullptr, rage::joaat("Proofs"));
-				sub->draw_option<submenu>("Regenerate Health/Armour", nullptr, rage::joaat("Regen"));
+				sub->draw_option<submenu>("Regeneration", nullptr, rage::joaat("Regen"));
+				addSubmenu("Vision", sub);
 				sub->draw_option<toggle<bool>>(("Godmode"), nullptr, &godmode, BoolDisplay::OnOff, false, [] {
 					if (!godmode)
 					{
@@ -496,6 +517,11 @@ namespace Saint
 					});
 				
 				sub->draw_option<ToggleWithNumber<float, bool>>("Slide Run", nullptr, &features.slide_run, &features.slide_run_speed, 0.1f, 100.f, 0.1f, 2);
+				sub->draw_option<toggle<bool>>(("Glitch"), "Disables the wanted level system.", &features.naruto_run, BoolDisplay::OnOff, false, [] {
+					if (!features.naruto_run) {
+						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
+					}
+					});
 				sub->draw_option<toggle<bool>>(("Seatbelt"), "Click you're seatbelt so you don't fly out of the vehicle.", &features.seatbelt, BoolDisplay::OnOff, false, [] {
 					if (!features.seatbelt) {
 						PED::SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(Game->Self(), false);
@@ -510,12 +536,9 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Infinite Stamina"), "", &features.infinite_stamina, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Instantly Enter Vehicle"), "", &features.instant_enter, BoolDisplay::OnOff);
 				//sub->draw_option<toggle<bool>>(("Beast Landing"), "", &BeastLanding, BoolDisplay::OnOff); not sure what it does, dont seem to do anything
-				sub->draw_option<toggle<bool>>(("Swim Anywhere"), nullptr, &features.swim_anywhere, BoolDisplay::OnOff, false, [] {
-					if (!features.swim_anywhere)
-					{
-						PED::SET_PED_CONFIG_FLAG(Game->Self(), 65, false);
-					}
-					});
+				addToggle("Swim Anywhere", "", &features.swim_anywhere, sub, [] {
+					PED::SET_PED_CONFIG_FLAG(Game->Self(), 65, false);
+				});
 				sub->draw_option<toggle<bool>>(("Tiny Ped"), "Shrinks you're ped.", &features.tiny_ped, BoolDisplay::OnOff, false, [] {
 					if (!features.tiny_ped)
 					{
@@ -633,13 +656,75 @@ namespace Saint
 					{
 						Game->CPed()->m_health = 0.0;
 					});
-				sub->draw_option<Button>(("Remove Armour"), nullptr, []
+				addButton("Remove Armour", sub, [] 
 					{
 						Game->CPed()->m_armor = 0.0;
 					});
+				
 
 			});
-			g_Render->draw_submenu<sub>(("Regenerate Health/Armour"), rage::joaat("Regen"), [](sub* sub)
+			g_Render->draw_submenu<sub>(("Vision"), rage::joaat("Vision"), [](sub* sub)
+				{
+					sub->draw_option<toggle<bool>>(("Thermal"), "", &vision.thermal, BoolDisplay::OnOff, false, [] {
+						if (!vision.thermal)
+						{
+							*script_global(1853910).at(Game->Id(), 862).at(821).at(11).as<int*>() = 0;
+							GRAPHICS::SET_SEETHROUGH(FALSE);
+						}
+						});
+					sub->draw_option<toggle<bool>>(("Night"), "", &vision.night, BoolDisplay::OnOff, false, [] {
+						if (!vision.night)
+						{
+							*script_global(1853910).at(Game->Id(), 862).at(821).at(11).as<int*>() = 0;
+
+							GRAPHICS::SET_NIGHTVISION(FALSE);
+						}
+						});
+					sub->draw_option<UnclickOption>(("Timecycle"), nullptr, [] {});
+					sub->draw_option<number<float>>("Strength", nullptr, &vision.strength, 0, 100.0, 1.0, 0);
+					sub->draw_option<Button>("Clear", nullptr, [=]
+						{
+
+							GRAPHICS::CLEAR_TIMECYCLE_MODIFIER();
+
+						});
+					for (auto& cycle : vision.cycles) {
+						sub->draw_option<Button>(cycle.name, nullptr, [=]
+							{
+
+								vision.change(cycle.modifier, vision.strength);
+
+							});
+					}
+					sub->draw_option<UnclickOption>(("Other"), nullptr, [] {});
+					sub->draw_option<KeyboardOption>(("Search"), "Note: this is case sensitive.", vision.search, []
+						{
+							showKeyboard("Enter Something", "", 8, &vision.search, [=] {});
+						});
+					if (vision.search == "") {
+						for (auto& cycle : m_Visions) {
+							sub->draw_option<Button>(cycle.name, nullptr, [=]
+								{
+
+									vision.change(cycle.name, vision.strength);
+
+								});
+						}
+					}
+					if (vision.search != "") {
+						for (auto& cycle : m_Visions) {
+							if (has_string_attached(cycle.name, vision.search)) {
+								sub->draw_option<Button>(cycle.name, nullptr, [=]
+									{
+
+										vision.change(cycle.name, vision.strength);
+
+									});
+							}
+						}
+					}
+				});
+			g_Render->draw_submenu<sub>(("Regeneration"), rage::joaat("Regen"), [](sub* sub)
 				{
 					sub->draw_option<toggle<bool>>(("Health"), "", &regen.health, BoolDisplay::OnOff, false);
 					sub->draw_option<toggle<bool>>(("Armour"), "", &regen.armour, BoolDisplay::OnOff, false);
@@ -1483,6 +1568,7 @@ namespace Saint
 				sub->draw_option<submenu>("Tuning", nullptr, rage::joaat("Tuning"));
 				sub->draw_option<submenu>("Weapons", nullptr, rage::joaat("VWeapons"));
 				sub->draw_option<submenu>("Windows", nullptr, rage::joaat("Windows"));
+				sub->draw_option<submenu>("Plate", nullptr, rage::joaat("LPlate"));
 				//sub->draw_option<submenu>("Cargobob", nullptr, rage::joaat("CARGO_BOB"));
 				sub->draw_option<toggle<bool>>(("Godmode"), "Prevents your vehicle from taking damage.", &features.vehicle_godmode, BoolDisplay::OnOff, false, [] {
 					if (!features.vehicle_godmode) {
@@ -1514,7 +1600,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Infinite Countermeasures"), "", &features.inf_c, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("No Plane Turbulence"), "Removes your plane's turbulance. When turning off, it can make turbulance levels a little messed up.", &NoPlaneTurbulance, BoolDisplay::OnOff);
 				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>(auto_repair.name, "Automaticly repairs you're vehicle.", &features.auto_repair, &features.auto_repair_type, &features.get_repair_type);
-
+				sub->draw_option<toggle<bool>>(("Auto Flip"), "", &features.auto_flip, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Can Be Used By Fleeing Peds"), nullptr, &features.can_be_used_by_peds, BoolDisplay::OnOff, false, [] {
 					if (!features.can_be_used_by_peds) {
 						VEHICLE::SET_VEHICLE_CAN_BE_USED_BY_FLEEING_PEDS(Game->Vehicle(), false);
@@ -1605,15 +1691,7 @@ namespace Saint
 					});
 				
 				sub->draw_option<toggle<bool>>(("Auto Clean"), "", &features.clean_veh, BoolDisplay::OnOff);
-				if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false)) {
-					sub->draw_option<KeyboardOption>(("Liscene Plate"), nullptr, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle()), []
-						{
-
-							showKeyboard("Enter Something", "", 8, &Bufferfrrrr, [=] {
-								VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle(), Bufferfrrrr.c_str());
-								});
-						});
-				}
+				
 				
 				sub->draw_option<number<float>>("Forklift Height", nullptr, &features.forklight_height, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
 					VEHICLE::SET_FORKLIFT_FORK_HEIGHT(Game->Vehicle(), features.forklight_height);
@@ -1646,6 +1724,28 @@ namespace Saint
 					});
 
 			});
+			g_Render->draw_submenu<sub>(("Plate"), rage::joaat("LPlate"), [](sub* sub)
+				{
+					if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false)) {
+						sub->draw_option<KeyboardOption>(("Text"), nullptr, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle()), []
+							{
+
+								showKeyboard("Enter Something", "", 8, &Bufferfrrrr, [=] {
+									VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle(), Bufferfrrrr.c_str());
+									});
+							});
+					}
+					sub->draw_option<UnclickOption>(("Moving"), nullptr, [] {});
+					sub->draw_option<toggle<bool>>(("Enabled"), "", &features.plate_test, BoolDisplay::OnOff);
+					//sub->draw_option<Scroll<const char*, std::size_t>>("Direction", nullptr, &features.plate_test_direction, &features.plate_test_pos);
+					sub->draw_option<number<std::int32_t>>("Delay", nullptr, &features.plate_test_delay, 0, 5000, 50, 3, true, "", "ms");
+					sub->draw_option<KeyboardOption>(("Text"), nullptr, features.plate_test_text, []
+						{
+
+							showKeyboard2("Enter Something", "", 8, &features.plate_test_text, [] {});
+						});
+
+				});
 			g_Render->draw_submenu<sub>(("Windows"), rage::joaat("Windows"), [](sub* sub)
 				{
 					sub->draw_option<Scroll<const char*, std::size_t>>("Action", nullptr, &windows.action, &windows.pos);
@@ -2263,7 +2363,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Particles"), SubmenuVehParticles, [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Particle", nullptr, &m_fx.type, &m_fx.size);
+				sub->draw_option<Scroll<const char*, std::size_t>>("Particle", nullptr, &particles.type, &m_fx.size);
 				sub->draw_option<number<float>>("Scale", nullptr, &m_fx.vscale, 0.01f, 1000.f, 0.05f, 2);
 				sub->draw_option<UnclickOption>(("Bones"), nullptr, [] {});
 				sub->draw_option<toggle<bool>>(("Front Left Wheel"), nullptr, &m_fx.lf, BoolDisplay::OnOff);
@@ -4464,6 +4564,8 @@ namespace Saint
 				sub->draw_option<submenu>("Entity Shooter", nullptr, EntityShooter);
 				sub->draw_option<submenu>("Light", nullptr, rage::joaat("Paint"));
 				sub->draw_option<submenu>("Bullet Changer", nullptr, rage::joaat("BULLET_CHANGER"));
+				sub->draw_option<submenu>("Particle", nullptr, rage::joaat("ParticleS"));
+				sub->draw_option<submenu>("Valkyrie", nullptr, rage::joaat("Valk"));
 				sub->draw_option<toggle<bool>>(("Infinite Ammo"), nullptr, &features.infinite_ammo, BoolDisplay::OnOff, false, [] {
 					if (!features.infinite_ammo) {
 						WEAPON::SET_PED_INFINITE_AMMO_CLIP(Game->Self(), false);
@@ -4480,6 +4582,11 @@ namespace Saint
 					}
 					});
 				sub->draw_option<toggle<bool>>(("Aim Tracer"), nullptr, &features.aim_tracer, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Invisible"), nullptr, &features.invis_weapon, BoolDisplay::OnOff, false, [] {
+					if (!features.invis_weapon) {
+						ENTITY::SET_ENTITY_VISIBLE(Game->Weapon(), TRUE, FALSE);
+					}
+					});
 				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Rope", nullptr, &rope_gun.enabled, &rope_gun.type, &rope_gun.pos);
 				//sub->draw_option<toggle<bool>>(("Steal"), nullptr, &features.steal_gun, BoolDisplay::OnOff);
 				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Money", nullptr, &wdrop.money, &wdrop.money_model, &wdrop.money_model_data);
@@ -4491,7 +4598,51 @@ namespace Saint
 					});
 				sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Force", nullptr, &features.force_gun, &features.force_gun_mult, 0, 300, 10);
 				sub->draw_option<ToggleWithNumber<float, bool>>("Grapple Hook", nullptr, &ghook.enabled, &ghook.speed, 0.1f, 50.f, 0.1f);
+				sub->draw_option<toggle<bool>>(("Max"), nullptr, &features.max_gun, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Recolor"), nullptr, &features.recolor, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Hijack"), nullptr, &features.steal_gun2, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Repair"), nullptr, &features.repair_gun, BoolDisplay::OnOff);
+				
 
+			});
+		g_Render->draw_submenu<sub>(("Valkyrie"), rage::joaat("Valk"), [](sub* sub)
+			{
+				
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &valk.enabled, BoolDisplay::OnOff, false, [] {
+					if (!valk.enabled) {
+						CAM::DESTROY_CAM(valk.Cam, TRUE);
+						PLAYER::DISABLE_PLAYER_FIRING(Game->Self(), FALSE);
+						valk.Rocket = 0;
+						valk.YPos = 255;
+						valk.Meter = .5f;
+						ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), FALSE);
+					}
+				});
+				sub->draw_option<UnclickOption>("Settings", nullptr, [] {});
+				sub->draw_option<Scroll<const char*, std::size_t>>("Explosion On End", nullptr, &all_weapons.explosion, &valk.pos);
+				//sub->draw_option<toggle<bool>>(("Restart On End"), nullptr, &valk.restart, BoolDisplay::OnOff);
+				sub->draw_option<UnclickOption>("Elements", nullptr, [] {});
+				sub->draw_option<toggle<bool>>(("Crosshair"), nullptr, &valk.hud, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Meter"), nullptr, &valk.meter, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Screen Effect"), nullptr, &valk.vision, BoolDisplay::OnOff);
+			});
+		g_Render->draw_submenu<sub>(("Particle"), rage::joaat("ParticleS"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &particle_shooter.enabled, BoolDisplay::OnOff);
+				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &particles.type, &particle_shooter.pos);
+				sub->draw_option<number<float>>("Scale", nullptr, &bullet_changer.velocity, 0.1f, 1000.f, 1.f);
+				sub->draw_option<UnclickOption>("Color", nullptr, [] {});
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &particle_shooter.color, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Rainbow"), nullptr, &particle_shooter.rainbow, BoolDisplay::OnOff);
+				sub->draw_option<number<std::int32_t>>("Red", nullptr, &particle_shooter.r, 0, 255, 1, 3, true, "", "", [] {
+
+					});
+				sub->draw_option<number<std::int32_t>>("Green", nullptr, &particle_shooter.g, 0, 255, 1, 3, true, "", "", [] {
+
+					});
+				sub->draw_option<number<std::int32_t>>("Blue", nullptr, &particle_shooter.b, 0, 255, 1, 3, true, "", "", [] {
+
+					});
 			});
 		g_Render->draw_submenu<sub>(("Bullet Changer"), rage::joaat("BULLET_CHANGER"), [](sub* sub)
 			{
@@ -5512,7 +5663,8 @@ namespace Saint
 
 
 				sub->draw_option<Button>("Allow Gender Change", "", [] {
-					statSetInt("ALLOW_GENDER_CHANGE", -1);
+					statSetBool("MP0_ALLOW_GENDER_CHANGE", 0);
+					statSetBool("MP1_ALLOW_GENDER_CHANGE", 0);
 					});
 
 				sub->draw_option<Button>("Increase Throwable Cap", "", [] {
@@ -7300,6 +7452,11 @@ namespace Saint
 						}
 						if (m_recovery.pos == 1) {
 							STATS::STAT_SET_INT(Game->HashKey("MP0_CURRENT_CREW_RANK"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], true);
+							STATS::STAT_SET_INT(Game->HashKey("MPPLY_CREW_LOCAL_XP_0"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], 1);
+							STATS::STAT_SET_INT(Game->HashKey("MPPLY_CREW_LOCAL_XP_1"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], 1);
+							STATS::STAT_SET_INT(Game->HashKey("MPPLY_CREW_LOCAL_XP_2"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], 1);
+							STATS::STAT_SET_INT(Game->HashKey("MPPLY_CREW_LOCAL_XP_3"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], 1);
+							STATS::STAT_SET_INT(Game->HashKey("MPPLY_CREW_LOCAL_XP_4"), m_recovery.m_level.Levels[m_recovery.m_level.m_level - 1], 1);
 						}
 						Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Change session for the level to apply." });
 					});
@@ -9369,7 +9526,10 @@ namespace Saint
 				}
 				sub->draw_option<UnclickOption>(("Locations"), nullptr, [] {});
 				sub->draw_option<submenu>("Saved", nullptr, rage::joaat("CustomTeles"));
+				sub->draw_option<submenu>("Properties", nullptr, rage::joaat("PROPS"));
+				sub->draw_option<submenu>("Mission", nullptr, rage::joaat("Mission"));
 				sub->draw_option<submenu>("Popular", nullptr, rage::joaat("populartps"));
+				sub->draw_option<submenu>("Inside Interior", nullptr, rage::joaat("InsideINT"));
 				sub->draw_option<submenu>("Airfields", nullptr, rage::joaat("airfield"));
 				sub->draw_option<submenu>("Mountains", nullptr, rage::joaat("MountainsTele"));
 				sub->draw_option<submenu>("Landmarks", nullptr, rage::joaat("Landmarks"));
@@ -9381,6 +9541,121 @@ namespace Saint
 				sub->draw_option<submenu>("IPLs", nullptr, rage::joaat("IPLS"));
 
 
+			});
+		g_Render->draw_submenu<sub>(("Inside Interior"), rage::joaat("InsideINT"), [](sub* sub)
+			{
+				sub->draw_option<Button>(("Laptop"), nullptr, [=]
+					{
+						TeleportToBlip(521);
+					});
+				sub->draw_option<UnclickOption>(("Casino"), nullptr, [] {});
+				sub->draw_option<Button>(("Lucky Wheel"), nullptr, [=]
+					{
+						TeleportToBlip(681);
+					});
+				sub->draw_option<Button>(("Chip Cashier"), nullptr, [=]
+					{
+						TeleportToBlip(683);
+					});
+				sub->draw_option<Button>(("Inside Track"), nullptr, [=]
+					{
+						TeleportToBlip(684);
+					});
+				sub->draw_option<Button>(("Table Games"), nullptr, [=]
+					{
+						TeleportToBlip(680);
+					});
+			});
+		g_Render->draw_submenu<sub>(("Mission"), rage::joaat("Mission"), [](sub* sub)
+			{
+				sub->draw_option<Button>(("Supplies"), nullptr, [=]
+					{
+						TeleportToBlip(556);
+					});
+				sub->draw_option<Button>(("Package"), nullptr, [=]
+					{
+						TeleportToBlip(501);
+					});
+				sub->draw_option<Button>(("Gold"), nullptr, [=]
+					{
+						TeleportToBlip(618);
+					});
+				sub->draw_option<Button>(("Diamond"), nullptr, [=]
+					{
+						TeleportToBlip(617);
+					});
+			});
+		g_Render->draw_submenu<sub>(("Properties"), rage::joaat("PROPS"), [](sub* sub)
+			{
+				sub->draw_option<Button>(("Apartment"), nullptr, [=]
+					{
+						TeleportToBlip(40);
+					});
+				sub->draw_option<Button>(("Yacht"), nullptr, [=]
+					{
+						TeleportToBlip(455);
+					});
+				sub->draw_option<Button>(("Office"), nullptr, [=]
+					{
+						TeleportToBlip(475);
+					});
+				sub->draw_option<Button>(("Bunker"), nullptr, [=]
+					{
+						TeleportToBlip(557);
+					});
+				sub->draw_option<Button>(("Hanger"), nullptr, [=]
+					{
+						TeleportToBlip(569);
+					});
+				sub->draw_option<Button>(("Agency"), nullptr, [=]
+					{
+						TeleportToBlip(826);
+					});
+				sub->draw_option<Button>(("Warehouse"), nullptr, [=]
+					{
+						TeleportToBlip(473);
+					});
+				sub->draw_option<Button>(("Vehicle Warehouse"), nullptr, [=]
+					{
+						TeleportToBlip(524);
+					});
+				sub->draw_option<Button>(("Nightclub"), nullptr, [=]
+					{
+						TeleportToBlip(614);
+					});
+				sub->draw_option<Button>(("Clubhouse"), nullptr, [=]
+					{
+						TeleportToBlip(492);
+					});
+				sub->draw_option<Button>(("Arena"), nullptr, [=]
+					{
+						TeleportToBlip(643);
+					});
+				sub->draw_option<Button>(("Autoshop"), nullptr, [=]
+					{
+						TeleportToBlip(779);
+					});
+				sub->draw_option<UnclickOption>(("Illegal Businesses"), nullptr, [] {});
+				sub->draw_option<Button>(("Weed Farm"), nullptr, [=]
+					{
+						TeleportToBlip(469);
+					});
+				sub->draw_option<Button>(("Cocaine Lockup"), nullptr, [=]
+					{
+						TeleportToBlip(497);
+					});
+				sub->draw_option<Button>(("Document Forgery"), nullptr, [=]
+					{
+						TeleportToBlip(498);
+					});
+				sub->draw_option<Button>(("Meth Lab"), nullptr, [=]
+					{
+						TeleportToBlip(499);
+					});
+				sub->draw_option<Button>(("Counterfeit Cash"), nullptr, [=]
+					{
+						TeleportToBlip(500);
+					});
 			});
 		g_Render->draw_submenu<sub>(("Saved"), rage::joaat("CustomTeles"), [](sub* sub)
 			{
@@ -10497,7 +10772,7 @@ namespace Saint
 				sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
 				sub->draw_option<number<std::int32_t>>("X", nullptr, &tv.x, -1000, 1000, 1, 3);
 				sub->draw_option<number<std::int32_t>>("Y", nullptr, &tv.y, -1000, 1000, 1, 3);
-				sub->draw_option<number<float>>("Rotation", nullptr, &tv.rotation, 0.0f, 180.f, 5.f, 2);
+				sub->draw_option<number<float>>("Rotation", nullptr, &tv.rotation, 0.0f, 360.0f, 5.f, 2);
 				sub->draw_option<number<float>>("Width", nullptr, &tv.width, 0.0f, 180.f, 5.f, 2);
 				sub->draw_option<number<float>>("Height", nullptr, &tv.height, 0.0f, 180.f, 5.f, 2);
 				sub->draw_option<number<std::int32_t>>("Volume", nullptr, &tv.volume, 0, 100, 1, 3);
@@ -11022,7 +11297,7 @@ namespace Saint
 			{
 				sub->draw_option<toggle<bool>>("Move With Mouse", "Works best in fullscreen.", &features.move_with_mouse, BoolDisplay::OnOff, false, [] {
 					g_Settings.m_LockMouse = false;
-					});
+				});
 				sub->draw_option<number<float>>("X", nullptr, &g_Render->m_PosX, 0.f, 1.f, 0.01f, 2);
 				sub->draw_option<number<float>>("Y", nullptr, &g_Render->m_PosY, 0.f, 1.f, 0.01f, 2);
 				sub->draw_option<Button>("Reset", nullptr, [=]

@@ -14,7 +14,7 @@ namespace Saint::UserInterface
 	class toggle : public BaseOption<toggle<BoolType>>
 	{
 	public:
-		explicit toggle(const char* text, const char* description, BoolType* b00l, BoolDisplay displayType, bool displayInverted = false, std::function<void()> action = [] {}) :
+		explicit toggle(const char* text, const char* description, bool* b00l, BoolDisplay displayType, bool displayInverted = false, std::function<void()> action = [] {}) :
 			m_Text(text),
 			m_Bool(b00l),
 			m_DisplayInverted(displayInverted),

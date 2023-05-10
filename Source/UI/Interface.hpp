@@ -118,6 +118,8 @@ namespace Saint::UserInterface
 			}
 		}
 
+		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> GetSubmenus() { return m_SubmenuStack; }
+
 		void OnTick();
 	public:
 		std::mutex m_Mutex;
