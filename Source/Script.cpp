@@ -482,6 +482,7 @@ namespace Saint
 				sub->draw_option<submenu>("Damage Packs", nullptr, rage::joaat("DamagePacks"));
 				sub->draw_option<submenu>("Face Editor", nullptr, rage::joaat("FaceEditor"));
 				sub->draw_option<submenu>("Proofs", nullptr, rage::joaat("Proofs"));
+				sub->draw_option<submenu>("Regenerate Health/Armour", nullptr, rage::joaat("Regen"));
 				sub->draw_option<toggle<bool>>(("Godmode"), nullptr, &godmode, BoolDisplay::OnOff, false, [] {
 					if (!godmode)
 					{
@@ -507,6 +508,7 @@ namespace Saint
 				sub->draw_option<toggle<bool>>(("Auto Clean"), "Automaticly cleans you're ped from visual damage.", &features.autoclean, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Forcefield"), "", &features.force_field, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Infinite Stamina"), "", &features.infinite_stamina, BoolDisplay::OnOff);
+				sub->draw_option<toggle<bool>>(("Instantly Enter Vehicle"), "", &features.instant_enter, BoolDisplay::OnOff);
 				//sub->draw_option<toggle<bool>>(("Beast Landing"), "", &BeastLanding, BoolDisplay::OnOff); not sure what it does, dont seem to do anything
 				sub->draw_option<toggle<bool>>(("Swim Anywhere"), nullptr, &features.swim_anywhere, BoolDisplay::OnOff, false, [] {
 					if (!features.swim_anywhere)
@@ -609,7 +611,8 @@ namespace Saint
 					});
 				sub->draw_option<toggle<bool>>(("Walk Underwater"), "Disables the swimming animation.", &features.walk_underwater, BoolDisplay::OnOff);
 				sub->draw_option<toggle<bool>>(("Push Water Away"), "Pushes water away from you.", &features.push_water_away, BoolDisplay::OnOff);
-
+				sub->draw_option<toggle<bool>>(("Remove Attachments"), "", &features.remove_stickys , BoolDisplay::OnOff);
+				
 				sub->draw_option<number<std::int32_t>>("Wanted Level", nullptr, &i_hate_niggers, 0, 5, 1, 3, true, "", "", [] 
 					{
 					(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_wanted_level = i_hate_niggers;
@@ -636,6 +639,15 @@ namespace Saint
 					});
 
 			});
+			g_Render->draw_submenu<sub>(("Regenerate Health/Armour"), rage::joaat("Regen"), [](sub* sub)
+				{
+					sub->draw_option<toggle<bool>>(("Health"), "", &regen.health, BoolDisplay::OnOff, false);
+					sub->draw_option<toggle<bool>>(("Armour"), "", &regen.armour, BoolDisplay::OnOff, false);
+					sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
+					sub->draw_option<toggle<bool>>(("In Cover"), "", &regen.inCover, BoolDisplay::OnOff, false);
+					sub->draw_option<number<std::int32_t>>("Delay", nullptr, &regen.delay, 0, 5000, 50, 3, true, "", "ms");
+					sub->draw_option<number<std::int32_t>>("Amount", nullptr, &regen.amount, 0, ENTITY::GET_ENTITY_MAX_HEALTH(Game->Self()));
+				});
 			g_Render->draw_submenu<sub>(("Proofs"), rage::joaat("Proofs"), [](sub* sub)
 				{
 					sub->draw_option<toggle<bool>>(("Bullet"), "", &proofs.bulletProof, BoolDisplay::OnOff, false);
@@ -4799,8 +4811,8 @@ namespace Saint
 				sub->draw_option<number<float>>("Network Player Damage Modifier", nullptr, &weapon->m_network_player_damage_modifier, 0.0f, 1000.f, 0.1f, 1);
 				sub->draw_option<number<float>>("Network Ped Damage Modifier", nullptr, &weapon->m_network_ped_damage_modifier, 0.0f, 1000.f, 0.1f, 1);
 				sub->draw_option<number<float>>("Network Headshot Modifier", nullptr, &weapon->m_network_headshot_modifier, 0.0f, 1000.f, 0.1f, 1);
-				sub->draw_option<number<float>>("Lock On Range", nullptr, &weapon->m_lock_on_range, 0.0f, 10000.f, 0.1f, 1);
-				sub->draw_option<number<float>>("Weapon Range", nullptr, &weapon->m_weapon_range, 0.0f, 10000.f, 0.1f, 1);
+				sub->draw_option<number<float>>("Lock On Range", nullptr, &weapon->m_lock_on_range, 0.0f, 10000.f, 50.0f, 1);
+				sub->draw_option<number<float>>("Weapon Range", nullptr, &weapon->m_weapon_range, 0.0f, 10000.f, 50.0f, 1);
 				sub->draw_option<number<float>>("AI Sound Range", nullptr, &weapon->m_ai_sound_range, 0.0f, 1000.f, 0.1f, 1);
 				sub->draw_option<number<float>>("AI Potential Blast Event Range", nullptr, &weapon->m_ai_potential_blast_event_range, 0.0f, 1000.f, 0.1f, 1);
 				sub->draw_option<number<float>>("Damage Fall Off Range Min", nullptr, &weapon->m_damage_fall_off_range_min, 0.0f, 1000.f, 0.1f, 1);
@@ -10465,6 +10477,7 @@ namespace Saint
 				sub->draw_option<submenu>("Graphics", nullptr, rage::joaat("Graphics"));
 				sub->draw_option<submenu>("Sounds", nullptr, rage::joaat("Music"));
 				sub->draw_option<submenu>("File Explorer", nullptr, rage::joaat("Explorer"));
+				//sub->draw_option<submenu>("TV", nullptr, rage::joaat("TV"));
 				sub->draw_option<toggle<bool>>(("Reduce Ped Budget"), nullptr, &misc.reduce_ped_budget, BoolDisplay::OnOff, false, [] {
 					if (!misc.reduce_ped_budget) {
 						STREAMING::SET_REDUCE_PED_MODEL_BUDGET(false);
@@ -10477,6 +10490,18 @@ namespace Saint
 					});
 				sub->draw_option<toggle<bool>>(("Instant ALT + F4"), nullptr, &features.instantalt, BoolDisplay::OnOff);
 
+			});
+		g_Render->draw_submenu<sub>("TV", rage::joaat("TV"), [](sub* sub)
+			{
+				sub->draw_option<toggle<bool>>(("Enabled"), nullptr, &tv.enabled, BoolDisplay::OnOff);
+				sub->draw_option<UnclickOption>(("Settings"), nullptr, [] {});
+				sub->draw_option<number<std::int32_t>>("X", nullptr, &tv.x, -1000, 1000, 1, 3);
+				sub->draw_option<number<std::int32_t>>("Y", nullptr, &tv.y, -1000, 1000, 1, 3);
+				sub->draw_option<number<float>>("Rotation", nullptr, &tv.rotation, 0.0f, 180.f, 5.f, 2);
+				sub->draw_option<number<float>>("Width", nullptr, &tv.width, 0.0f, 180.f, 5.f, 2);
+				sub->draw_option<number<float>>("Height", nullptr, &tv.height, 0.0f, 180.f, 5.f, 2);
+				sub->draw_option<number<std::int32_t>>("Volume", nullptr, &tv.volume, 0, 100, 1, 3);
+				sub->draw_option<number<std::int32_t>>("Alpha", nullptr, &tv.alpha, 0, 255, 1, 3);
 			});
 		g_Render->draw_submenu<sub>("File Explorer", rage::joaat("Explorer"), [](sub* sub)
 			{

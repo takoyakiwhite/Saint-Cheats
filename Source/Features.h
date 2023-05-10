@@ -1214,7 +1214,13 @@ namespace Saint {
 		float lagging_rate = 1.0f;
 		bool disable_attach = false;
 		bool bike_wheelie = false;
+		bool instant_enter = false;
 		void init() {
+			if (instant_enter) {
+				if (PED::GET_VEHICLE_PED_IS_TRYING_TO_ENTER(Game->Self())) {
+					PED::SET_PED_INTO_VEHICLE(Game->Self(), PED::GET_VEHICLE_PED_IS_TRYING_TO_ENTER(Game->Self()), -1);
+				}
+			}
 			if (bike_wheelie) {
 				if (VEHICLE::IS_THIS_MODEL_A_BIKE(Game->GetHash(Game->Vehicle()))) {
 					VEHICLE::SET_WHEELIE_ENABLED(Game->Vehicle(), FALSE);
@@ -8832,6 +8838,8 @@ namespace Saint {
 				MISC::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("re_lossantosintl");
 				MISC::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("re_prison");
 				MISC::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("re_prisonvanbreak");
+				PLAYER::EXTEND_WORLD_BOUNDARY_FOR_PLAYER(50000.0, 50000.0, 50.0);
+				PLAYER::EXTEND_WORLD_BOUNDARY_FOR_PLAYER(-50000.0, -50000.0, 50.0);
 			}
 			if (ambient_sirens) {
 				AUDIO::DISTANT_COP_CAR_SIRENS(true);
@@ -11181,7 +11189,75 @@ namespace Saint {
 		}
 	};
 	inline Windows windows;
+	class RegenHealth {
+	public:
+		bool health;
+		bool armour;
+		bool inCover;
+		int delay = 550;
+		int amount = 10;
+		void init() {
+			if (health) {
+				if (inCover) {
+					if (!PED::IS_PED_IN_COVER(Game->Self(), false)) {
+						return;
+					}
+				}
+				int upgradedelay = 0;
+				if (upgradedelay == 0 || (int)(GetTickCount64() - upgradedelay) > delay)
+				{
+					ENTITY::SET_ENTITY_HEALTH(Game->Self(), ENTITY::GET_ENTITY_HEALTH(Game->Self()) + amount, 0);
+							
+				}
+				upgradedelay = GetTickCount64();
+				
+
+			}
+			if (armour) {
+				if (inCover) {
+					if (!PED::IS_PED_IN_COVER(Game->Self(), false)) {
+						return;
+					}
+				}
+				int upgradedelay = 0;
+				if (upgradedelay == 0 || (int)(GetTickCount64() - upgradedelay) > delay)
+				{
+					PED::SET_PED_ARMOUR(Game->Self(), PED::GET_PED_ARMOUR(Game->Self()) + amount);
+
+				}
+				upgradedelay = GetTickCount64();
+
+
+			}
+
+		}
+		
+	};
+	inline RegenHealth regen;
+	class TV {
+	public:
+		bool enabled = false;
+		int x = 50;
+		int y = 50;
+		float height = 30;
+		float width = 30;
+		float rotation = 0.0;
+		int alpha = 255;
+		int volume = 100;
+		void init() {
+			if (enabled) {
+				GRAPHICS::SET_TV_AUDIO_FRONTEND(TRUE);
+				float real_coords[4] = { (float)x / 100.0f, (float)y / 100.0f, (float)width / 100.0f, (float)height / 100.0f };
+				GRAPHICS::DRAW_TV_CHANNEL(real_coords[0], real_coords[1], real_coords[2], real_coords[3], rotation, 255, 255, 255, alpha);
+				GRAPHICS::SET_TV_VOLUME(volume);
+
+			}
+		}
+	};
+	inline TV tv;
 	inline void FeatureInitalize() {
+		tv.init();
+		regen.init();
 		#ifndef DEV
 			m_menu_data.m_flag = eMenuFlags::REGULAR_USER;
 		#else

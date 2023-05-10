@@ -74,14 +74,14 @@ namespace Saint::UserInterface
 					if (g_Render->m_Opened) {
 						if (Game->KeyPress(0xA0, true)) {
 							for (auto& keys : m_Hotkeys) {
-								//Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s, key: %s", keys.name, get_name(keys.key) });
+								//Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %s, key: %s", keys.name, get_name(keys.key) });
 							}
 						}
 						if (Game->KeyPress(i, true)) {
 							PAD::DISABLE_ALL_CONTROL_ACTIONS(0);
 							UINT vk = MapVirtualKey(i, MAPVK_VSC_TO_VK);
 							if (vk == 56) {
-								Noti::InsertNotification({ ImGuiToastType_None, 2000, "%i hotkeys cleared.", m_Hotkeys.size() });
+								Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %i hotkeys cleared.", m_Hotkeys.size() });
 								m_Hotkeys.clear();
 							}
 							if (vk != 86 && vk != 0 && vk != 87 && vk != 68 && vk != 122 && vk != 56 && vk != 121 && vk != 118 && vk != 46) {
@@ -89,67 +89,67 @@ namespace Saint::UserInterface
 								GetKeyNameText(vk << 16, keyName, 32);
 								g_Render->controlsEnabled = false;
 								if (vk == 35) {
-									m_Hotkeys.push_back({ m_Text, 0x4F, (bool*)m_Bool, "o"});
-									Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s was binded to 'o'", m_Text, keyName, vk });
+									m_Hotkeys.push_back({ m_Text, 0x4F, (bool*)m_Bool, "o", Base::m_Action});
+									Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %s was binded to 'o'", m_Text, keyName, vk });
 									g_Render->controlsEnabled = true;
 								}
 								else if (vk == 33) {
-									m_Hotkeys.push_back({ m_Text, 0x49, (bool*)m_Bool, "i"});
-									Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s was binded to 'i'", m_Text, keyName, vk });
+									m_Hotkeys.push_back({ m_Text, 0x49, (bool*)m_Bool, "i", Base::m_Action });
+									Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %s was binded to 'i'", m_Text, keyName, vk });
 									g_Render->controlsEnabled = true;
 								}
 								else if (vk == 12) {
-									m_Hotkeys.push_back({ m_Text, 0x59, (bool*)m_Bool, "y"});
-									Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s was binded to 'y'", m_Text, keyName, vk });
+									m_Hotkeys.push_back({ m_Text, 0x59, (bool*)m_Bool, "y", Base::m_Action });
+									Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %s was binded to 'y'", m_Text, keyName, vk });
 									g_Render->controlsEnabled = true;
 								}
 								else if (vk == 144) {
-									m_Hotkeys.push_back({ m_Text, 0x45, (bool*)m_Bool, "e"});
-									Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s was binded to 'e'", m_Text, keyName, vk });
+									m_Hotkeys.push_back({ m_Text, 0x45, (bool*)m_Bool, "e", Base::m_Action });
+									Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %s was binded to 'e'", m_Text, keyName, vk });
 									g_Render->controlsEnabled = true;
 								}
 								else if (vk == 145) {
-									m_Hotkeys.push_back({ m_Text, 0x46, (bool*)m_Bool, "f"});
-									Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s was binded to 'f'", m_Text, keyName, vk });
+									m_Hotkeys.push_back({ m_Text, 0x46, (bool*)m_Bool, "f", Base::m_Action });
+									Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %s was binded to 'f'", m_Text, keyName, vk });
 									g_Render->controlsEnabled = true;
 								}
 								else if (vk == 119) {
-									m_Hotkeys.push_back({ m_Text, 0x42, (bool*)m_Bool, "b"});
-									Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s was binded to 'b'", m_Text, keyName, vk });
+									m_Hotkeys.push_back({ m_Text, 0x42, (bool*)m_Bool, "b", Base::m_Action });
+									Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %s was binded to 'b'", m_Text, keyName, vk });
 									g_Render->controlsEnabled = true;
 								}
 								else if (vk == 107) {
-									m_Hotkeys.push_back({ m_Text, 0x4E, (bool*)m_Bool, "n"});
-									Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s was binded to 'n'", m_Text, keyName, vk });
+									m_Hotkeys.push_back({ m_Text, 0x4E, (bool*)m_Bool, "n", Base::m_Action });
+									Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %s was binded to 'n'", m_Text, keyName, vk });
 									g_Render->controlsEnabled = true;
 								}
 								else if (vk == 39) {
-									m_Hotkeys.push_back({ m_Text, 0x4D, (bool*)m_Bool, "m"});
-									Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s was binded to 'm'", m_Text, keyName, vk });
+									m_Hotkeys.push_back({ m_Text, 0x4D, (bool*)m_Bool, "m", Base::m_Action });
+									Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %s was binded to 'm'", m_Text, keyName, vk });
 									g_Render->controlsEnabled = true;
 								}
 								else if (vk == 109) {
-									m_Hotkeys.push_back({ m_Text, 0x4A, (bool*)m_Bool, "j"});
-									Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s was binded to 'j'", m_Text, keyName, vk });
+									m_Hotkeys.push_back({ m_Text, 0x4A, (bool*)m_Bool, "j", Base::m_Action });
+									Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %s was binded to 'j'", m_Text, keyName, vk });
 									g_Render->controlsEnabled = true;
 								}
 								else if (vk == 38) {
-									m_Hotkeys.push_back({ m_Text, 0x48, (bool*)m_Bool, "h"});
-									Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s was binded to 'h'", m_Text, keyName, vk });
+									m_Hotkeys.push_back({ m_Text, 0x48, (bool*)m_Bool, "h", Base::m_Action });
+									Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %s was binded to 'h'", m_Text, keyName, vk });
 									g_Render->controlsEnabled = true;
 								}
 								else if (vk == 36) {
-									m_Hotkeys.push_back({ m_Text, 0x47, (bool*)m_Bool, "g"});
-									Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s was binded to 'g'", m_Text, keyName, vk });
+									m_Hotkeys.push_back({ m_Text, 0x47, (bool*)m_Bool, "g", Base::m_Action });
+									Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %s was binded to 'g'", m_Text, keyName, vk });
 									g_Render->controlsEnabled = true;
 								}
 								else if (vk == 37) {
-									m_Hotkeys.push_back({ m_Text, 0x4B, (bool*)m_Bool, "k"});
-									Noti::InsertNotification({ ImGuiToastType_None, 2000, "%s was binded to 'k'", m_Text, keyName, vk });
+									m_Hotkeys.push_back({ m_Text, 0x4B, (bool*)m_Bool, "k", Base::m_Action });
+									Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %s was binded to 'k'", m_Text, keyName, vk });
 									g_Render->controlsEnabled = true;
 								}
 								else {
-									//Noti::InsertNotification({ ImGuiToastType_None, 2000, "%i was pressed", vk });
+									//Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_KEY "  %i was pressed", vk });
 									g_Render->controlsEnabled = true;
 								}
 
