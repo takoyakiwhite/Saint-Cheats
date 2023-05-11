@@ -208,17 +208,7 @@ namespace Saint::UserInterface
 
 
 		}
-		if (g_Settings.command_window)
-		{
-			PAD::DISABLE_ALL_CONTROL_ACTIONS(0);
-			if (!g_Render->m_Opened) {
-				ShowCursor(true);
-				SetCursor(LoadCursorA(NULL, IDC_ARROW));
-			}
-
-
-
-		}
+		
 
 		if (g_Render->m_Opened && g_Settings.m_LockMouse)
 		{

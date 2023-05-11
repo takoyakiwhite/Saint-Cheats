@@ -243,7 +243,7 @@ namespace Saint::UserInterface
 
 		// Options
 		float m_OptionHeight = 0.0315f;
-		float m_OptionTextSize = 0.26f;
+		float m_OptionTextSize = 0.25f;
 		Font m_OptionFont = Font::ChaletLondon;
 		Font m_SeperatorFont = Font::HouseScript;
 		float m_OptionPadding = 2.1f;
@@ -372,6 +372,9 @@ namespace Saint::UserInterface
 		bool scrollbar = false;
 
 		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
+		std::vector<std::unique_ptr<AbstractSubmenu>> m_AllSubmenus;
+		
+		
 
 	private:
 		bool m_OpenKeyPressed = false;
@@ -409,7 +412,7 @@ namespace Saint::UserInterface
 
 
 
-		std::vector<std::unique_ptr<AbstractSubmenu>> m_AllSubmenus;
+		
 
 	};
 }

@@ -2354,6 +2354,7 @@ namespace Saint {
 		}
 	};
 	inline Drops drops;
+	inline std::string fortniter = "None";
 	class Fake_Drops {
 	public:
 		bool money = false;
@@ -4795,8 +4796,8 @@ namespace Saint {
 				m_queue.add(10ms, "Adding Cage", [=] {
 					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), false);
 
-					Object cage = OBJECT::CREATE_OBJECT(Game->HashKey("p_cablecar_s"), c.x, c.y, c.z - 1, true, false, false);
-					Object cage2 = OBJECT::CREATE_OBJECT(Game->HashKey("p_cablecar_s"), c.x, c.y, c.z - 1, true, false, false);
+					Object cage = OBJECT::CREATE_OBJECT(Game->HashKey("p_cablecar_s"), c.x, c.y, c.z + 3, true, false, false);
+					Object cage2 = OBJECT::CREATE_OBJECT(Game->HashKey("p_cablecar_s"), c.x, c.y, c.z + 3, true, false, false);
 					ENTITY::FREEZE_ENTITY_POSITION(cage, true);
 					ENTITY::FREEZE_ENTITY_POSITION(cage2, true);
 					ENTITY::SET_ENTITY_ROTATION(cage2, 0, 0, 90, 0, false);
@@ -4809,8 +4810,8 @@ namespace Saint {
 				m_queue.add(10ms, "Adding Cage", [=] {
 					NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), false);
 
-					Object cage = OBJECT::CREATE_OBJECT(0x7B059043, c.x, c.y, c.z - 1, true, false, false);
-					Object cage2 = OBJECT::CREATE_OBJECT(0x7B059043, c.x, c.y, c.z + 1, true, true, false);
+					Object cage = OBJECT::CREATE_OBJECT(0x7B059043, c.x, c.y, c.z + 1, true, false, false);
+					Object cage2 = OBJECT::CREATE_OBJECT(0x7B059043, c.x, c.y, c.z - 1, true, true, false);
 					ENTITY::FREEZE_ENTITY_POSITION(cage, true);
 					ENTITY::FREEZE_ENTITY_POSITION(cage2, true);
 					ENTITY::SET_ENTITY_ROTATION(cage2, 0, 180, 90, 0, false);
