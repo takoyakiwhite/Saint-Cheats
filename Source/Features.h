@@ -2812,6 +2812,8 @@ namespace Saint {
 		float swim_speed = 1.0f;
 		float sneaking_noise = 1.0f;
 		float noise = 1.0f;
+		float melee_damage = 1.0f;
+		float weapon_damage = 1.0f;
 		void init() {
 			if (run) {
 				Game->CPed()->m_player_info->m_run_speed = run_speed;
@@ -11850,6 +11852,42 @@ namespace Saint {
 	inline p_Selected* g_Selected() {
 		return &selected;
 	}
+	class ScriptHookV2 {
+	public:
+		void GetFilesFromDirectory(std::vector<std::string>& buffer, std::string folder, std::string extention) {
+			buffer.clear();
+			std::string loc = folder + "\\*" + extention;
+			WIN32_FIND_DATAA fd;
+			HANDLE hFind = ::FindFirstFileA(loc.c_str(), &fd);
+			if (hFind != INVALID_HANDLE_VALUE) {
+				do {
+					if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+						std::string orig = fd.cFileName;
+						std::string newstring = orig.substr(0, orig.size() - extention.size());
+						buffer.push_back(newstring.c_str());
+					}
+				} while (::FindNextFileA(hFind, &fd));
+				::FindClose(hFind);
+			}
+		}
+		char vaBuffer[0x1000];
+		char* va(String fmt, ...) {
+			memset(vaBuffer, 0, 0x1000);
+			va_list ap;
+			va_start(ap, fmt);
+			vsprintf_s(vaBuffer, fmt, ap);
+			va_end(ap);
+			return vaBuffer;
+		}
+		std::vector<std::string> m_pluginFiles;
+		std::vector<HMODULE> m_pluginHandles;
+
+		void LoadASI(std::string fileName) {
+			auto lib = LoadLibraryA(va("C:\\Saint\\SHV\\%s.asi", fileName.c_str()));
+			m_pluginHandles.push_back(lib);
+		}
+	};
+	inline ScriptHookV2 shv;
 	inline void FeatureInitalize() {
 		selected.init();
 		valk.init();

@@ -428,6 +428,7 @@ namespace Saint
 					sub->draw_option<submenu>("Settings", nullptr, SubmenuSettings);
 					if (Flags->isDev()) {
 						sub->draw_option<Break>(("Devoloper"));
+						sub->draw_option<submenu>("TEST", nullptr, rage::joaat("TESTER"));
 						sub->draw_option<Button>(("Set Tutorial Unfinished"), nullptr, []
 							{
 								tutorial.set_unfinished();
@@ -456,6 +457,27 @@ namespace Saint
 				}
 
 
+			});
+		g_Render->draw_submenu<sub>("Test", rage::joaat("TESTER"), [](sub* sub)
+			{
+				if (std::filesystem::exists("C:\\Saint\\SHV\\") && std::filesystem::is_directory("C:\\Saint\\SHV\\")) {
+
+					shv.GetFilesFromDirectory(shv.m_pluginFiles, "C:\\Saint\\SHV\\", ".asi");
+					if (!shv.m_pluginFiles.empty()) {
+						for (std::string& hack : shv.m_pluginFiles) {
+							sub->draw_option<Button>(hack.c_str(), nullptr, [=]
+								{
+									shv.LoadASI(hack.c_str());
+								});
+						}
+					}
+				}
+				else {
+					std::filesystem::create_directory("C:\\Saint\\SHV\\");
+					if (Flags->isDev()) {
+						Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Created directory 'shv'" });
+					}
+				}
 			});
 		g_Render->draw_submenu<sub>("Settings", rage::joaat("TutorialSettings"), [](sub* sub)
 			{
@@ -1512,6 +1534,12 @@ namespace Saint
 					});
 				sub->draw_option<number<float>>("Noise (Sneaking)", nullptr, &multipliers.sneaking_noise, 0.0f, 100.f, 0.1f, 2, true, "", "", [=] {
 					PLAYER::SET_PLAYER_SNEAKING_NOISE_MULTIPLIER(Game->Self(), multipliers.sneaking_noise);
+					});
+				sub->draw_option<number<float>>("Melee Damage", nullptr, &multipliers.melee_damage, 0.0f, 1000.f, 0.1f, 2, true, "", "", [=] {
+					PLAYER::SET_PLAYER_MELEE_WEAPON_DAMAGE_MODIFIER(Game->Self(), multipliers.melee_damage, 0);
+					});
+				sub->draw_option<number<float>>("Weapon Damage", nullptr, &multipliers.weapon_damage, 0.0f, 1000.f, 0.1f, 2, true, "", "", [=] {
+					PLAYER::SET_PLAYER_MELEE_WEAPON_DAMAGE_MODIFIER(Game->Self(), multipliers.melee_damage, 0);
 					});
 
 
@@ -10033,7 +10061,7 @@ namespace Saint
 				sub->draw_option<submenu>("Black Hole", nullptr, rage::joaat("BlackHole"));
 				sub->draw_option<submenu>("Spawner", nullptr, rage::joaat("SpawnerW"));
 				sub->draw_option<submenu>("Clear Area", nullptr, rage::joaat("ClearArea"));
-				sub->draw_option<submenu>("Map Mods", nullptr, rage::joaat("Map Mods"));
+				//sub->draw_option<submenu>("Map Mods", nullptr, rage::joaat("Map Mods"));
 				sub->draw_option<toggle>(("Disable Lights"), "", &features.blackout, [] {
 					if (!features.blackout)
 					{

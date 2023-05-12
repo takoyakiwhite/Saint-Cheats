@@ -271,6 +271,18 @@
     <ClInclude Include="json.h">
       <Filter>Core\Script</Filter>
     </ClInclude>
+    <ClInclude Include="ScriptHookV.h">
+      <Filter>Hooking\SHV</Filter>
+    </ClInclude>
+    <ClInclude Include="Required.h">
+      <Filter>Hooking\SHV</Filter>
+    </ClInclude>
+    <ClInclude Include="Loger.h">
+      <Filter>Hooking\SHV</Filter>
+    </ClInclude>
+    <ClInclude Include="PoolManager.h">
+      <Filter>Hooking\SHV</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">
@@ -360,6 +372,9 @@
     </ClCompile>
     <ClCompile Include="md5.cpp">
       <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptHookV.cpp">
+      <Filter>Hooking\SHV</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -491,6 +506,9 @@
     </Filter>
     <Filter Include="Interface\Fonts">
       <UniqueIdentifier>{69dc5430-83bb-4cda-a536-b9a1139de3ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooking\SHV">
+      <UniqueIdentifier>{ee2d41a1-2168-49ac-a834-9629e4fabf18}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

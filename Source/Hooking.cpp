@@ -8,7 +8,7 @@
 #include "Natives.hpp"
 #include "FiberHelper.hpp"
 #include <MinHook/MinHook.h>
-
+#include "ScriptHookV.h"
 #include "Chat Commands.h"
 #include "Features.h"
 #include "Spoofing.h"
@@ -1539,7 +1539,77 @@ namespace Saint
 			data->SerializeArray(&node->m_gadget_data[i].m_data, size);
 		}
 	}
-	
+	typedef FARPROC(*pGetProcAddress)(HMODULE hModule, const char* lpProcName);
+	pGetProcAddress OriginalGetProcAddress;
+	FARPROC GetProcAddressHook(HMODULE hModule, const char* lpProcName) {
+		if ((unsigned int)hModule == 0xf9d38c98) { // penis_enlargement_pills
+#ifdef HARD_DEV
+			LOG_DEBUG("ScriptHookV module accessing from EAT -> %s", lpProcName);
+#endif
+			if (strstr(lpProcName, "nativePush64")) {
+				return (FARPROC)&ScriptHookV::nativePush64;
+			}
+			else if (strstr(lpProcName, "createTexture")) {
+				return (FARPROC)&ScriptHookV::createTexture;
+			}
+			else if (strstr(lpProcName, "drawTexture")) {
+				return (FARPROC)&ScriptHookV::drawTexture;
+			}
+			else if (strstr(lpProcName, "getGlobalPtr")) {
+				return (FARPROC)&ScriptHookV::getGlobalPtr;
+			}
+			else if (strstr(lpProcName, "scriptRegister")) {
+				return (FARPROC)&ScriptHookV::scriptRegister;
+			}
+			else if (strstr(lpProcName, "keyboardHandlerRegister")) {
+				return (FARPROC)&ScriptHookV::keyboardHandlerRegister;
+			}
+			else if (strstr(lpProcName, "scriptRegisterAdditionalThread")) {
+				return (FARPROC)&ScriptHookV::scriptRegisterAdditionalThread;
+			}
+			else if (strstr(lpProcName, "keyboardHandlerUnregister")) {
+				return (FARPROC)&ScriptHookV::keyboardHandlerUnregister;
+			}
+			else if (strstr(lpProcName, "scriptUnregister")) {
+				return (FARPROC)&ScriptHookV::scriptUnregister;
+			}
+			else if (strstr(lpProcName, "nativeInit")) {
+				return (FARPROC)&ScriptHookV::nativeInit;
+			}
+			else if (strstr(lpProcName, "getGameVersion")) {
+				return (FARPROC)&ScriptHookV::getGameVersion;
+			}
+			else if (strstr(lpProcName, "scriptWait")) {
+				return (FARPROC)&ScriptHookV::scriptWait;
+			}
+			else if (strstr(lpProcName, "nativeCall")) {
+				return (FARPROC)&ScriptHookV::nativeCall;
+			}
+			else if (strstr(lpProcName, "getScriptHandleBaseAddress")) {
+				return (FARPROC)&ScriptHookV::getScriptHandleBaseAddress;
+			}
+			else if (strstr(lpProcName, "presentCallbackRegister")) {
+				return (FARPROC)&ScriptHookV::presentCallbackRegister;
+			}
+			else if (strstr(lpProcName, "presentCallbackUnregister")) {
+				return (FARPROC)&ScriptHookV::presentCallbackUnregister;
+			}
+			else if (strstr(lpProcName, "worldGetAllVehicles")) {
+				return (FARPROC)&ScriptHookV::worldGetAllVehicles;
+			}
+			else if (strstr(lpProcName, "worldGetAllPeds")) {
+				return (FARPROC)&ScriptHookV::worldGetAllPeds;
+			}
+			else if (strstr(lpProcName, "worldGetAllObjects")) {
+				return (FARPROC)&ScriptHookV::worldGetAllObjects;
+			}
+			else if (strstr(lpProcName, "worldGetAllPickups")) {
+				return (FARPROC)&ScriptHookV::worldGetAllPickups;
+			}
+		}
+
+		return OriginalGetProcAddress(hModule, lpProcName);
+	}
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
