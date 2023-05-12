@@ -15,7 +15,7 @@
 #define LOG_DEVENH( fmt, ...)			GetLog()->MessageEnhanced(ConsoleForeground::WHITE, " [DevE]",		fmt, ##__VA_ARGS__ )
 
 class UILoggerComponent;
-
+/*
 enum ConsoleForeground {
 	BLACK = 0,
 	DARKBLUE = FOREGROUND_BLUE,
@@ -64,5 +64,5 @@ private:
 	void ClearLog();
 	void SetTextColor(const int color);
 };
-
+*/
 //Log3* GetLog();
