@@ -19,7 +19,12 @@
 #include <GTAV-Classes/rage/rlTaskStatus.hpp>
 #include <GTAV-Classes/network/Network.hpp>
 #include <GTAV-Classes/socialclub/FriendRegistry.hpp>
-
+#include <GTAV-Classes/netsync/nodes/vehicle/CVehicleGadgetDataNode.hpp>
+#include <GTAV-Classes/base/HashTable.hpp>
+#include <iostream>
+#include <vector>
+#include <list>
+#include <algorithm>
 namespace Saint
 {
 	class datBitBuffer2;
@@ -37,6 +42,12 @@ namespace Saint
 		uint8_t m_platform; //0x001E
 	};
 	static_assert(sizeof(netConnectionPeer) == 0x20);
+
+
+
+
+	
+
 
 	class GameVariables
 	{
@@ -265,7 +276,22 @@ namespace Saint
 		using GetNetPlayer = CNetGamePlayer * (std::uint32_t id);
 		GetNetPlayer* m_GetNetPlayer;
 		
+		using get_vehicle_gadget_array_size = int (*)(eVehicleGadgetType type);
+		get_vehicle_gadget_array_size m_get_vehicle_gadget_array_size;
 
+		PVOID m_serialize_vehicle_gadget_data_node;
+
+		using get_sync_tree_for_type = rage::netSyncTree* (*)(CNetworkObjectMgr* mgr, uint16_t sync_type);
+		get_sync_tree_for_type m_get_sync_tree_for_type{};
+		CNetworkObjectMgr** m_network_object_mgr{};
+
+		using get_entity_attached_to = rage::CDynamicEntity* (*)(rage::CDynamicEntity* entity);
+		get_entity_attached_to m_get_entity_attached_to;
+
+		HashTable<CBaseModelInfo*>* m_model_table;
+
+
+		PVOID m_can_apply_data;
 		
 
 

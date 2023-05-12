@@ -46,6 +46,7 @@
     <ClInclude Include="Hotkeys.h" />
     <ClInclude Include="Images.h" />
     <ClInclude Include="Jets.h" />
+    <ClInclude Include="json.h" />
     <ClInclude Include="KeyboardOption.h" />
     <ClInclude Include="Kick.h" />
     <ClInclude Include="Math.h" />

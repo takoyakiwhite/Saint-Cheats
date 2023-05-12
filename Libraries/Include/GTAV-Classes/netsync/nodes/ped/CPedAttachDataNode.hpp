@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
-#include "rage/vector.hpp"
-#include "netsync/CProjectBaseSyncDataNode.hpp"
+#include <GTAV-Classes/rage/vector.hpp>
+#include <GTAV-Classes/netsync/CProjectBaseSyncDataNode.hpp>
 
 #pragma pack(push,4)
 class CPedAttachDataNode : CSyncDataNodeInfrequent

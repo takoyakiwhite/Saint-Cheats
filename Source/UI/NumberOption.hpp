@@ -33,6 +33,8 @@ namespace Saint::UserInterface
 		number(number&&) = default;
 		number& operator=(number&&) = default;
 
+
+
 		bool GetFlag(OptionFlag flag) override
 		{
 			if (flag == OptionFlag::Horizontal)

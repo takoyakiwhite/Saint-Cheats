@@ -9,6 +9,25 @@
 #include <GTAV-Classes/netsync/nodes/ped/CPedCreationDataNode.hpp>
 #include <GTAV-Classes/netsync/nodes/vehicle/CVehicleCreationDataNode.hpp>
 #include <GTAV-Classes/netsync/nodes/task/ClonedTakeOffPedVariationInfo.hpp>
+#include <GTAV-Classes/netsync/nodes/vehicle/CVehicleGadgetDataNode.hpp>
+#include <GTAV-Classes/netsync/netSyncDataNode.hpp>
+#include <GTAV-Classes/netsync/netSyncTree.hpp>
+#include <GTAV-Classes/netsync/nodes/door/CDoorCreationDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/dynamic_entity/CDynamicEntityGameStateDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/object/CObjectCreationDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/ped/CPedAttachDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/ped/CPedCreationDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/ped/CPedInventoryDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/physical/CPhysicalAttachDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/pickup/CPickupCreationDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/player/CPlayerAppearanceDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/player/CPlayerCreationDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/proximity_migrateable/CSectorDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/train/CTrainGameStateDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/vehicle/CVehicleCreationDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/vehicle/CVehicleGadgetDataNode.hpp>
+#include <GTAV-Classes/netsync/nodes/vehicle/CVehicleProximityMigrationDataNode.hpp>
+#include <GTAV-Classes/network/CNetGamePlayer.hpp>
 namespace Saint
 {
 	
@@ -98,6 +117,8 @@ namespace Saint
 
 		static bool can_apply_data(rage::netSyncTree* tree, rage::netObject* object);
 
+		static void serialize_vehicle_gadget_data_node(CVehicleGadgetDataNode* node, rage::CSyncDataBase* data);
+
 		
 
 		
@@ -167,6 +188,10 @@ namespace Saint
 		void* m_OriginalFallTaskConstructor{};
 
 		void* crashover{};
+
+		void* yim_crash{};
+
+		void* yim_crash2{};
 	
 
 

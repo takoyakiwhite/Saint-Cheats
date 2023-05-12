@@ -107,6 +107,8 @@ namespace Saint {
 		}
 
 	}
+	template <typename T, size_t N>
+	inline constexpr size_t NUMOF(T(&)[N]) { return N; }
 	class Particles {
 	public:
 		const char* type[8] = { "Banknotes", "Fireworks (Trailburst)", "Fireworks (Burst)", "Fireworks (Spiral Starburst)","Fireworks (Trailburst Spawn)","Clown Appears", "Water Splash", "Cartoon" };
@@ -689,6 +691,17 @@ namespace Saint {
 		Ped m_id = 0;
 		std::string m_name;
 	};
+	class objectHandler {
+	public:
+		objectHandler(Object id, std::string name) {
+			m_id = id;
+			m_name = name;
+
+		}
+	public:
+		Object m_id = 0;
+		std::string m_name;
+	};
 	class Bodygaurd {
 	public:
 		bool godmode = false;
@@ -1112,6 +1125,8 @@ namespace Saint {
 	public:
 		const char* type[2] = { "All", "Current" };
 		std::size_t type_int = 0;
+		const char* action[3] = { "Weapon", "Components", "Both"};
+		std::size_t action_type = 0;
 		int amount = 9999;
 	};
 	inline Give_ammo give_ammo;
@@ -2244,13 +2259,15 @@ namespace Saint {
 		CustomDrop custom;
 		bool money = false;
 		bool rp = false;
-		bool health = false;
-		bool armor = false;
 		int height = 0;
 		int delay = 1100;
 		bool random_rp_model = false;
 		bool random_money_model = false;
-
+		bool weapons = false;
+		bool health = false;
+		bool armour = false;
+		bool snacks = false;
+		bool ammo = false;
 		const char* location[2] = { "Traditional", "Rain" };
 		std::size_t data = 0;
 		const char* rp_model[8] = { "Alien", "Beast", "Impotent Rage", "Pogo", "Princess Bubblegum", "Ranger", "Generic", "Sasquatch" };
@@ -2300,6 +2317,7 @@ namespace Saint {
 			Player p = Game->PlayerIndex(g_SelectedPlayer);
 			NativeVector3 rp_c;
 			NativeVector3 money_c;
+			NativeVector3 get_other;
 			if (data == 0) {
 				rp_c = ENTITY::GET_ENTITY_COORDS(p, false);
 				money_c = ENTITY::GET_ENTITY_COORDS(p, false);
@@ -2313,10 +2331,77 @@ namespace Saint {
 				NativeVector3 pos2 = { pos_get2.x - MISC::GET_RANDOM_INT_IN_RANGE(-20, 15), pos_get2.y + MISC::GET_RANDOM_INT_IN_RANGE(-13, 6), pos_get2.z };
 				money_c = pos2;
 			}
+			NativeVector3 random = { MISC::GET_RANDOM_FLOAT_IN_RANGE(-20, 15), MISC::GET_RANDOM_FLOAT_IN_RANGE(-13, 6), (float)height };
+			
 			static int delayfr3 = 0;
 			if (delayfr3 == 0 || (int)(GetTickCount64() - delayfr3) > delay)
 			{
-
+				if (ammo) {
+					NativeVector3 get_other;
+					if (data == 0) {
+						get_other = ENTITY::GET_ENTITY_COORDS(p, false);
+					}
+					if (data == 1) {
+						get_other = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(p, random.x, random.y, random.z);
+					}
+					float dz = rp_c.z;
+					rp_c.z = dz + height;
+					OBJECT::CREATE_AMBIENT_PICKUP(Game->HashKey("PICKUP_AMMO_BULLET_MP"), get_other.x, get_other.y, get_other.z, 0, 255, 0xB5DAAEC, false, true);
+					delayfr3 = GetTickCount64();
+				}
+				if (snacks) {
+					NativeVector3 get_other;
+					if (data == 0) {
+						get_other = ENTITY::GET_ENTITY_COORDS(p, false);
+					}
+					if (data == 1) {
+						get_other = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(p, random.x, random.y, random.z);
+					}
+					float dz = rp_c.z;
+					rp_c.z = dz + height;
+					OBJECT::CREATE_AMBIENT_PICKUP(Game->HashKey("PICKUP_HEALTH_SNACK"), get_other.x, get_other.y, get_other.z, 0, 255, 483577702, false, true);
+					delayfr3 = GetTickCount64();
+				}
+				if (armour) {
+					NativeVector3 get_other;
+					if (data == 0) {
+						get_other = ENTITY::GET_ENTITY_COORDS(p, false);
+					}
+					if (data == 1) {
+						get_other = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(p, random.x, random.y, random.z);
+					}
+					float dz = rp_c.z;
+					rp_c.z = dz + height;
+					OBJECT::CREATE_AMBIENT_PICKUP(Game->HashKey("PICKUP_ARMOUR_STANDARD"), get_other.x, get_other.y, get_other.z, 0, 255, 0x29CB0F3C, false, true);
+					delayfr3 = GetTickCount64();
+				}
+				if (health) {
+					NativeVector3 get_other;
+					if (data == 0) {
+						get_other = ENTITY::GET_ENTITY_COORDS(p, false);
+					}
+					if (data == 1) {
+						get_other = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(p, random.x, random.y, random.z);
+					}
+					float dz = rp_c.z;
+					rp_c.z = dz + height;
+					OBJECT::CREATE_AMBIENT_PICKUP(Game->HashKey("PICKUP_HEALTH_STANDARD"), get_other.x, get_other.y, get_other.z, 0, 255, 0x28781518, false, true);
+					delayfr3 = GetTickCount64();
+				}
+				if (weapons) {
+					NativeVector3 get_other;
+					if (data == 0) {
+						get_other = ENTITY::GET_ENTITY_COORDS(p, false);
+					}
+					if (data == 1) {
+						get_other = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(p, random.x, random.y, random.z);
+					}
+					float dz = rp_c.z;
+					rp_c.z = dz + height;
+					static Hash WepPickupArray[49] = { 0x6E4E65C2, 0x741C684A, 0x6C5B941A, 0xF33C83B0, 0xDF711959, 0xB2B5325E, 0x85CAA9B1, 0xB2930A14, 0xFE2A352C, 0x693583AD, 0x1D9588D3, 0x3A4C2AD2, 0x4D36C349, 0x2F36B434, 0xA9355DCD, 0x96B412A3, 0x9299C95B, 0x5E0683A1, 0x2DD30479, 0x1CD604C7, 0x7C119D58, 0xF9AFB48F, 0x8967B4F3, 0x3B662889, 0x2E764125, 0xFD16169E, 0xCB13D282, 0xC69DE3FF, 0x278D8734, 0x5EA16D74, 0x295691A9, 0x81EE601E, 0x88EAACA7, 0x872DC888, 0x815D66E8, 0xFA51ABF5, 0xC5B72713, 0x5307A4EC, 0x9CF13918, 0x0968339D, 0xBFEE6C3B, 0xEBF89D5F, 0x22B15640, 0x763F7121, 0xBED46EC5, 0x079284A9, 0x624F7213, 0xC01EB678, 0xBD4DE242 };
+					OBJECT::CREATE_AMBIENT_PICKUP(WepPickupArray[MISC::GET_RANDOM_INT_IN_RANGE(0, NUMOF(WepPickupArray) - 1)], get_other.x, get_other.y, get_other.z, 0, 0, 1, false, true);
+					delayfr3 = GetTickCount64();
+				}
 				if (rp) {
 					float dz = rp_c.z;
 					rp_c.z = dz + height;
@@ -3574,7 +3659,7 @@ namespace Saint {
 				Ped PlayerPed = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i);
 				NativeVector3 PedCoords = Game->SCoords();
 				NativeVector3 Coords = ENTITY::GET_ENTITY_COORDS(PlayerPed, false);
-				float distance = GetDistanceFloat(PedCoords, Coords);
+				
 
 				if (PLAYER::IS_PLAYER_FREE_AIMING(Game->Id()))
 				{
@@ -3609,6 +3694,7 @@ namespace Saint {
 										BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
 										if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
 										{
+											float distance = SYSTEM::VDIST(PedCoords.x, PedCoords.y, PedCoords.z, ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z);
 											if (distance_check) {
 												if (distance < distance_to_check) {
 													CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
@@ -3666,6 +3752,7 @@ namespace Saint {
 									BOOL onScreen = GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z, &screenX, &screenY);
 									if (closest != NULL && !ENTITY::IS_ENTITY_DEAD(closest, 0) && onScreen)
 									{
+										float distance = SYSTEM::VDIST(self_coords.x, self_coords.y, self_coords.z, ENTITY::GET_ENTITY_COORDS(closest, true).x, ENTITY::GET_ENTITY_COORDS(closest, true).y, ENTITY::GET_ENTITY_COORDS(closest, true).z);
 										if (distance_check) {
 											if (distance < distance_to_check) {
 												CAM::POINT_CAM_AT_PED_BONE(aimcam, closest, BoneHashes[data], 0, 0, .1, 0);
@@ -7028,11 +7115,12 @@ namespace Saint {
 						if (raycast_with_cam(creator_cam, get_coords55)) {
 							AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
 							Hash hash = Game->HashKey(m_selected.c_str());
-
-							Object cage = OBJECT::CREATE_OBJECT_NO_OFFSET(hash, get_coords55.x, get_coords55.y, get_coords55.z, true, false, false);
-							if (frozen) {
-								ENTITY::FREEZE_ENTITY_POSITION(cage, true);
-							}
+							g_CallbackScript->AddCallback<ModelCallback>(hash, [=] {
+								Object cage = OBJECT::CREATE_OBJECT_NO_OFFSET(hash, get_coords55.x, get_coords55.y, get_coords55.z, true, false, false);
+								if (frozen) {
+									ENTITY::FREEZE_ENTITY_POSITION(cage, true);
+								}
+							});
 						}
 					}
 				}
@@ -8390,9 +8478,16 @@ namespace Saint {
 		int selected;
 		std::string selected_model = "";
 		Ped selected_ped;
+		std::string selected_model2 = "";
+		Object selected_object;
 		std::vector<pedHandler> spawned = {
 
 		};
+		std::vector<objectHandler> spawned_objects = {
+
+		};
+		NativeVector3 pos;
+		NativeVector3 rotation;
 		bool change(const Hash hash)
 		{
 			g_FiberPool.queue([=] {
@@ -11337,7 +11432,20 @@ namespace Saint {
 		return files;
 	}
 	inline std::string search_sounds = "";
+	inline std::string search_objects = "";
 	inline bool loop_sound;
+	inline Object SpawnMapModObject(String toSpawn, bool blip, NativeVector3 coords)
+	{
+
+		DWORD model = Game->HashKey(toSpawn);
+		Object* object;
+		g_CallbackScript->AddCallback<ModelCallback>(model, [=] {
+			*object = OBJECT::CREATE_OBJECT_NO_OFFSET(model, coords.x, coords.y, coords.z, true, false, false);
+		});
+		
+
+		return *object;
+	}
 	class FileExplorer {
 	public:
 		const char* action[4] = { "None", "Delete", "Move", "Change Extension"};
@@ -11562,6 +11670,7 @@ namespace Saint {
 		}
 	};
 	inline Vision vision;
+	
 	class Valk {
 	public:
 		bool enabled = false;
@@ -11570,10 +11679,13 @@ namespace Saint {
 		float Meter;
 		bool Initialized;
 		bool hud = true;
-		bool vision = true;
+		bool vision = false;
 		bool meter = true;
-		std::size_t pos = 41;
+		std::size_t pos = 82;
 		bool restart = false;
+		bool only_explode_on_impact = false;
+		bool no_clip = false;
+		NativeVector3 offset;
 		NativeVector3 Multiply2(NativeVector3 vector, float incline)
 		{
 			vector.x *= incline;
@@ -11607,7 +11719,26 @@ namespace Saint {
 
 						auto RocketPos = ENTITY::GET_ENTITY_COORDS(Rocket, FALSE);
 						auto Coords = Add2(RocketPos, Multiply2(RotationToDirection(Rotation), .8f));
-						ENTITY::SET_ENTITY_COORDS(Rocket, Coords.x, Coords.y, Coords.z, FALSE, FALSE, FALSE, FALSE);
+						NativeVector3 coords4 = ENTITY::GET_ENTITY_COORDS(Rocket, FALSE);
+						NativeVector3 coords5 = CAM::GET_CAM_COORD(Cam);
+						auto ped = Game->Self();
+						auto startDist = std::distance(&coords5, &coords4);
+						NativeVector3 meow2 = CAM::GET_CAM_ROT(Cam, 0);
+						NativeVector3 meow = rot_to_direction(&meow2);
+						NativeVector3 coords6 = multiply(&meow, 2.50);
+
+
+						
+						if (no_clip) {
+							if (Game->KeyPress(0x57) || Game->ControlPressed(32))
+							{
+								NativeVector3 pos = addn(&coords4, &coords6);
+								ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Rocket, pos.x, pos.y, pos.z, false, false, false);
+							}
+						}
+						else {
+							ENTITY::SET_ENTITY_COORDS(Rocket, Coords.x, Coords.y, Coords.z, FALSE, FALSE, FALSE, FALSE);
+						}
 
 						HUD::HIDE_HUD_AND_RADAR_THIS_FRAME();
 						PLAYER::DISABLE_PLAYER_FIRING(Game->Self(), TRUE);
@@ -11642,20 +11773,37 @@ namespace Saint {
 
 						float GroundZ;
 						MISC::GET_GROUND_Z_FOR_3D_COORD(RocketPos.x, RocketPos.y, RocketPos.z, &GroundZ, FALSE, FALSE);
-						if (ENTITY::HAS_ENTITY_COLLIDED_WITH_ANYTHING(Rocket) ||
-							(std::abs(RocketPos.z - GroundZ) < .5f) ||
-							Meter <= 0.01)
-						{
-							FIRE::ADD_EXPLOSION(RocketPos.x, RocketPos.y, RocketPos.z, pos, 1000.f, TRUE, FALSE, .4f, FALSE);
-							features.DeleteEntity(Rocket);
-							Rocket = 0;
-							PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), 0);
-							CAM::RENDER_SCRIPT_CAMS(FALSE, TRUE, 700, TRUE, TRUE, NULL);
-							CAM::DESTROY_CAM(Cam, TRUE);
-							GRAPHICS::SET_TIMECYCLE_MODIFIER("DEFAULT");
-							ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), FALSE);
-							Initialized = false;
-							
+						if (only_explode_on_impact) {
+							if (ENTITY::HAS_ENTITY_COLLIDED_WITH_ANYTHING(Rocket) || (std::abs(RocketPos.z - GroundZ) < .5f))
+							{
+								FIRE::ADD_EXPLOSION(RocketPos.x, RocketPos.y, RocketPos.z, pos, 1000.f, TRUE, FALSE, .4f, FALSE);
+								features.DeleteEntity(Rocket);
+								Rocket = 0;
+								PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), 0);
+								CAM::RENDER_SCRIPT_CAMS(FALSE, TRUE, 700, TRUE, TRUE, NULL);
+								CAM::DESTROY_CAM(Cam, TRUE);
+								GRAPHICS::SET_TIMECYCLE_MODIFIER("DEFAULT");
+								ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), FALSE);
+								Initialized = false;
+
+							}
+						}
+						else {
+							if (ENTITY::HAS_ENTITY_COLLIDED_WITH_ANYTHING(Rocket) ||
+								(std::abs(RocketPos.z - GroundZ) < .5f) ||
+								Meter <= 0.01)
+							{
+								FIRE::ADD_EXPLOSION(RocketPos.x, RocketPos.y, RocketPos.z, pos, 1000.f, TRUE, FALSE, .4f, FALSE);
+								features.DeleteEntity(Rocket);
+								Rocket = 0;
+								PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), 0);
+								CAM::RENDER_SCRIPT_CAMS(FALSE, TRUE, 700, TRUE, TRUE, NULL);
+								CAM::DESTROY_CAM(Cam, TRUE);
+								GRAPHICS::SET_TIMECYCLE_MODIFIER("DEFAULT");
+								ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), FALSE);
+								Initialized = false;
+
+							}
 						}
 					}
 					else
@@ -11665,7 +11813,7 @@ namespace Saint {
 						Rocket = OBJECT::CREATE_OBJECT(rage::joaat("w_lr_rpg_rocket"), Coords.x, Coords.y, Coords.z, TRUE, TRUE, FALSE);
 						CAM::DESTROY_ALL_CAMS(TRUE);
 						Cam = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", TRUE);
-						CAM::ATTACH_CAM_TO_ENTITY(Cam, Rocket, 0.f, 0.f, 0.f, TRUE);
+						CAM::ATTACH_CAM_TO_ENTITY(Cam, Rocket, offset.x, offset.y, offset.z, TRUE);
 						CAM::RENDER_SCRIPT_CAMS(TRUE, TRUE, 700, TRUE, TRUE, NULL);
 						CAM::SET_CAM_ACTIVE(Cam, TRUE);
 						ENTITY::SET_ENTITY_VISIBLE(Rocket, FALSE, FALSE);
@@ -11677,7 +11825,33 @@ namespace Saint {
 		}
 	};
 	inline Valk valk;
+	class p_Selected {
+	public:
+		bool taze = false;
+		
+		void init() {
+			if (taze) {
+				static int delay2;
+				if (!WEAPON::HAS_WEAPON_ASSET_LOADED(Game->HashKey("WEAPON_STUNGUN")))
+					WEAPON::REQUEST_WEAPON_ASSET(Game->HashKey("WEAPON_STUNGUN"), 31, 0);
+
+				if (delay2 == 0 || (int)(GetTickCount64() - delay2) > 550)
+				{
+					NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), 0);
+					NativeVector3 bone = PED::GET_PED_BONE_COORDS(Game->PlayerIndex(g_SelectedPlayer), 0x322c, 0, 0, 0);
+					MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(coords.x, coords.y, coords.z, bone.x, bone.y, bone.z, 0, TRUE, Game->HashKey("WEAPON_STUNGUN"), Game->Self(), TRUE, FALSE, -1.f);
+					
+					delay2 = GetTickCount64();
+				}
+			}
+		}
+	};
+	inline p_Selected selected;
+	inline p_Selected* g_Selected() {
+		return &selected;
+	}
 	inline void FeatureInitalize() {
+		selected.init();
 		valk.init();
 		vision.init();
 		particle_shooter.init();

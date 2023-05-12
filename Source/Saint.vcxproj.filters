@@ -268,6 +268,9 @@
     <ClInclude Include="VectorLists.h">
       <Filter>Core\Features</Filter>
     </ClInclude>
+    <ClInclude Include="json.h">
+      <Filter>Core\Script</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">

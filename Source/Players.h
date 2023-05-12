@@ -838,7 +838,7 @@ namespace Saint {
 					CPed* local_ped = NETWORK::NETWORK_IS_SESSION_STARTED() ? all_players.get_ped(player) : (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_ped;
 					uintptr_t ui_3d_draw_manager = *(uint64_t*)(g_GameVariables->ui_3d_draw_manager);
 
-					NativeVector3 pos = { x - pedx, y * 0.8f, pedyy };
+					Vector3 pos = { x - pedx, y * 0.8f, pedyy };
 
 					if (ui_3d_draw_manager) {
 

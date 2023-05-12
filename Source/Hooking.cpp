@@ -13,7 +13,7 @@
 #include "Features.h"
 #include "Spoofing.h"
 #include "../Libraries/Include/GTAV-Classes/netsync/nodes/player/CPlayerGameStateDataNode.hpp"
-
+#include <GTAV-Classes/base/CObject.hpp>
 #ifdef BIGBASE_DEBUG
 #  pragma comment(lib, "MinHook-Debug.lib")
 #else
@@ -27,6 +27,397 @@ namespace Saint
 	{
 		std::uint32_t g_HookFrameCount{};
 	}
+
+	static std::vector<std::pair<Hash, std::vector<uint64_t>>> trees = {
+		{rage::joaat("CAutomobileSyncTree"),
+			{
+				rage::joaat("CVehicleCreationDataNode"),
+				rage::joaat("CAutomobileCreationDataNode"),
+				rage::joaat("CGlobalFlagsDataNode"),
+				rage::joaat("CDynamicEntityGameStateDataNode"),
+				rage::joaat("CPhysicalGameStateDataNode"),
+				rage::joaat("CVehicleGameStateDataNode"),
+				rage::joaat("CEntityScriptGameStateDataNode"),
+				rage::joaat("CPhysicalScriptGameStateDataNode"),
+				rage::joaat("CVehicleScriptGameStateDataNode"),
+				rage::joaat("CEntityScriptInfoDataNode"),
+				rage::joaat("CPhysicalAttachDataNode"),
+				rage::joaat("CVehicleAppearanceDataNode"),
+				rage::joaat("CVehicleDamageStatusDataNode"),
+				rage::joaat("CVehicleComponentReservationDataNode"),
+				rage::joaat("CVehicleHealthDataNode"),
+				rage::joaat("CVehicleTaskDataNode"),
+				rage::joaat("CSectorDataNode"),
+				rage::joaat("CSectorPositionDataNode"),
+				rage::joaat("CEntityOrientationDataNode"),
+				rage::joaat("CPhysicalVelocityDataNode"),
+				rage::joaat("CVehicleAngVelocityDataNode"),
+				rage::joaat("CVehicleSteeringDataNode"),
+				rage::joaat("CVehicleControlDataNode"),
+				rage::joaat("CVehicleGadgetDataNode"),
+				rage::joaat("CMigrationDataNode"),
+				rage::joaat("CPhysicalMigrationDataNode"),
+				rage::joaat("CPhysicalScriptMigrationDataNode"),
+				rage::joaat("CVehicleProximityMigrationDataNode"),
+			}},
+		{rage::joaat("CBikeSyncTree"),
+			{
+				rage::joaat("CVehicleCreationDataNode"),
+				rage::joaat("CGlobalFlagsDataNode"),
+				rage::joaat("CDynamicEntityGameStateDataNode"),
+				rage::joaat("CPhysicalGameStateDataNode"),
+				rage::joaat("CVehicleGameStateDataNode"),
+				rage::joaat("CBikeGameStateDataNode"),
+				rage::joaat("CEntityScriptGameStateDataNode"),
+				rage::joaat("CPhysicalScriptGameStateDataNode"),
+				rage::joaat("CVehicleScriptGameStateDataNode"),
+				rage::joaat("CEntityScriptInfoDataNode"),
+				rage::joaat("CPhysicalAttachDataNode"),
+				rage::joaat("CVehicleAppearanceDataNode"),
+				rage::joaat("CVehicleDamageStatusDataNode"),
+				rage::joaat("CVehicleComponentReservationDataNode"),
+				rage::joaat("CVehicleHealthDataNode"),
+				rage::joaat("CVehicleTaskDataNode"),
+				rage::joaat("CSectorDataNode"),
+				rage::joaat("CSectorPositionDataNode"),
+				rage::joaat("CEntityOrientationDataNode"),
+				rage::joaat("CPhysicalVelocityDataNode"),
+				rage::joaat("CVehicleAngVelocityDataNode"),
+				rage::joaat("CVehicleSteeringDataNode"),
+				rage::joaat("CVehicleControlDataNode"),
+				rage::joaat("CVehicleGadgetDataNode"),
+				rage::joaat("CMigrationDataNode"),
+				rage::joaat("CPhysicalMigrationDataNode"),
+				rage::joaat("CPhysicalScriptMigrationDataNode"),
+				rage::joaat("CVehicleProximityMigrationDataNode"),
+			}},
+		{rage::joaat("CBoatSyncTree"),
+			{
+				rage::joaat("CVehicleCreationDataNode"),
+				rage::joaat("CGlobalFlagsDataNode"),
+				rage::joaat("CDynamicEntityGameStateDataNode"),
+				rage::joaat("CPhysicalGameStateDataNode"),
+				rage::joaat("CVehicleGameStateDataNode"),
+				rage::joaat("CBoatGameStateDataNode"),
+				rage::joaat("CEntityScriptGameStateDataNode"),
+				rage::joaat("CPhysicalScriptGameStateDataNode"),
+				rage::joaat("CVehicleScriptGameStateDataNode"),
+				rage::joaat("CEntityScriptInfoDataNode"),
+				rage::joaat("CPhysicalAttachDataNode"),
+				rage::joaat("CVehicleAppearanceDataNode"),
+				rage::joaat("CVehicleDamageStatusDataNode"),
+				rage::joaat("CVehicleComponentReservationDataNode"),
+				rage::joaat("CVehicleHealthDataNode"),
+				rage::joaat("CVehicleTaskDataNode"),
+				rage::joaat("CSectorDataNode"),
+				rage::joaat("CSectorPositionDataNode"),
+				rage::joaat("CEntityOrientationDataNode"),
+				rage::joaat("CPhysicalVelocityDataNode"),
+				rage::joaat("CVehicleAngVelocityDataNode"),
+				rage::joaat("CVehicleSteeringDataNode"),
+				rage::joaat("CVehicleControlDataNode"),
+				rage::joaat("CVehicleGadgetDataNode"),
+				rage::joaat("CMigrationDataNode"),
+				rage::joaat("CPhysicalMigrationDataNode"),
+				rage::joaat("CPhysicalScriptMigrationDataNode"),
+				rage::joaat("CVehicleProximityMigrationDataNode"),
+			}},
+		{rage::joaat("CDoorSyncTree"),
+			{
+				rage::joaat("CDoorCreationDataNode"),
+				rage::joaat("CGlobalFlagsDataNode"),
+				rage::joaat("CDoorScriptInfoDataNode"),
+				rage::joaat("CDoorScriptGameStateDataNode"),
+				rage::joaat("CDoorMovementDataNode"),
+				rage::joaat("CMigrationDataNode"),
+				rage::joaat("CPhysicalScriptMigrationDataNode"),
+			}},
+		{rage::joaat("CHeliSyncTree"),
+			{
+				rage::joaat("CVehicleCreationDataNode"),
+				rage::joaat("CAutomobileCreationDataNode"),
+				rage::joaat("CGlobalFlagsDataNode"),
+				rage::joaat("CDynamicEntityGameStateDataNode"),
+				rage::joaat("CPhysicalGameStateDataNode"),
+				rage::joaat("CVehicleGameStateDataNode"),
+				rage::joaat("CEntityScriptGameStateDataNode"),
+				rage::joaat("CPhysicalScriptGameStateDataNode"),
+				rage::joaat("CVehicleScriptGameStateDataNode"),
+				rage::joaat("CEntityScriptInfoDataNode"),
+				rage::joaat("CPhysicalAttachDataNode"),
+				rage::joaat("CVehicleAppearanceDataNode"),
+				rage::joaat("CVehicleDamageStatusDataNode"),
+				rage::joaat("CVehicleComponentReservationDataNode"),
+				rage::joaat("CVehicleHealthDataNode"),
+				rage::joaat("CVehicleTaskDataNode"),
+				rage::joaat("CHeliHealthDataNode"),
+				rage::joaat("CSectorDataNode"),
+				rage::joaat("CSectorPositionDataNode"),
+				rage::joaat("CEntityOrientationDataNode"),
+				rage::joaat("CPhysicalVelocityDataNode"),
+				rage::joaat("CVehicleAngVelocityDataNode"),
+				rage::joaat("CVehicleSteeringDataNode"),
+				rage::joaat("CVehicleControlDataNode"),
+				rage::joaat("CVehicleGadgetDataNode"),
+				rage::joaat("CHeliControlDataNode"),
+				rage::joaat("CMigrationDataNode"),
+				rage::joaat("CPhysicalMigrationDataNode"),
+				rage::joaat("CPhysicalScriptMigrationDataNode"),
+				rage::joaat("CVehicleProximityMigrationDataNode"),
+			}},
+		{rage::joaat("CObjectSyncTree"),
+			{
+				rage::joaat("CObjectCreationDataNode"),
+				rage::joaat("CGlobalFlagsDataNode"),
+				rage::joaat("CDynamicEntityGameStateDataNode"),
+				rage::joaat("CPhysicalGameStateDataNode"),
+				rage::joaat("CObjectGameStateDataNode"),
+				rage::joaat("CEntityScriptGameStateDataNode"),
+				rage::joaat("CPhysicalScriptGameStateDataNode"),
+				rage::joaat("CObjectScriptGameStateDataNode"),
+				rage::joaat("CEntityScriptInfoDataNode"),
+				rage::joaat("CPhysicalAttachDataNode"),
+				rage::joaat("CPhysicalHealthDataNode"),
+				rage::joaat("CSectorDataNode"),
+				rage::joaat("CObjectSectorPosNode"),
+				rage::joaat("CObjectOrientationNode"),
+				rage::joaat("CPhysicalVelocityDataNode"),
+				rage::joaat("CPhysicalAngVelocityDataNode"),
+				rage::joaat("CMigrationDataNode"),
+				rage::joaat("CPhysicalMigrationDataNode"),
+				rage::joaat("CPhysicalScriptMigrationDataNode"),
+			}},
+		{rage::joaat("CPedSyncTree"),
+			{
+				rage::joaat("CPedCreationDataNode"),
+				rage::joaat("CPedScriptCreationDataNode"),
+				rage::joaat("CGlobalFlagsDataNode"),
+				rage::joaat("CDynamicEntityGameStateDataNode"),
+				rage::joaat("CPhysicalGameStateDataNode"),
+				rage::joaat("CPedGameStateDataNode"),
+				rage::joaat("CPedComponentReservationDataNode"),
+				rage::joaat("CEntityScriptGameStateDataNode"),
+				rage::joaat("CPhysicalScriptGameStateDataNode"),
+				rage::joaat("CPedScriptGameStateDataNode"),
+				rage::joaat("CEntityScriptInfoDataNode"),
+				rage::joaat("CPedAttachDataNode"),
+				rage::joaat("CPedHealthDataNode"),
+				rage::joaat("CPedMovementGroupDataNode"),
+				rage::joaat("CPedAIDataNode"),
+				rage::joaat("CPedAppearanceDataNode"),
+				rage::joaat("CPedOrientationDataNode"),
+				rage::joaat("CPedMovementDataNode"),
+				rage::joaat("CPedTaskTreeDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CSectorDataNode"),
+				rage::joaat("CPedSectorPosMapNode"),
+				rage::joaat("CPedSectorPosNavMeshNode"),
+				rage::joaat("CMigrationDataNode"),
+				rage::joaat("CPhysicalMigrationDataNode"),
+				rage::joaat("CPhysicalScriptMigrationDataNode"),
+				rage::joaat("CPedInventoryDataNode"),
+				rage::joaat("CPedTaskSequenceDataNode"),
+			}},
+		{rage::joaat("CPickupSyncTree"),
+			{
+				rage::joaat("CPickupCreationDataNode"),
+				rage::joaat("CGlobalFlagsDataNode"),
+				rage::joaat("CDynamicEntityGameStateDataNode"),
+				rage::joaat("CPickupScriptGameStateNode"),
+				rage::joaat("CPhysicalGameStateDataNode"),
+				rage::joaat("CEntityScriptGameStateDataNode"),
+				rage::joaat("CPhysicalScriptGameStateDataNode"),
+				rage::joaat("CEntityScriptInfoDataNode"),
+				rage::joaat("CPhysicalHealthDataNode"),
+				rage::joaat("CPhysicalAttachDataNode"),
+				rage::joaat("CSectorDataNode"),
+				rage::joaat("CPickupSectorPosNode"),
+				rage::joaat("CEntityOrientationDataNode"),
+				rage::joaat("CPhysicalVelocityDataNode"),
+				rage::joaat("CPhysicalAngVelocityDataNode"),
+				rage::joaat("CMigrationDataNode"),
+				rage::joaat("CPhysicalMigrationDataNode"),
+				rage::joaat("CPhysicalScriptMigrationDataNode"),
+			}},
+		{rage::joaat("CPickupPlacementSyncTree"),
+			{
+				rage::joaat("CPickupPlacementCreationDataNode"),
+				rage::joaat("CMigrationDataNode"),
+				rage::joaat("CGlobalFlagsDataNode"),
+				rage::joaat("CPickupPlacementStateDataNode"),
+			}},
+		{rage::joaat("CPlaneSyncTree"),
+			{
+				rage::joaat("CVehicleCreationDataNode"),
+				rage::joaat("CGlobalFlagsDataNode"),
+				rage::joaat("CDynamicEntityGameStateDataNode"),
+				rage::joaat("CPhysicalGameStateDataNode"),
+				rage::joaat("CVehicleGameStateDataNode"),
+				rage::joaat("CEntityScriptGameStateDataNode"),
+				rage::joaat("CPhysicalScriptGameStateDataNode"),
+				rage::joaat("CVehicleScriptGameStateDataNode"),
+				rage::joaat("CEntityScriptInfoDataNode"),
+				rage::joaat("CPhysicalAttachDataNode"),
+				rage::joaat("CVehicleAppearanceDataNode"),
+				rage::joaat("CVehicleDamageStatusDataNode"),
+				rage::joaat("CVehicleComponentReservationDataNode"),
+				rage::joaat("CVehicleHealthDataNode"),
+				rage::joaat("CVehicleTaskDataNode"),
+				rage::joaat("CPlaneGameStateDataNode"),
+				rage::joaat("CSectorDataNode"),
+				rage::joaat("CSectorPositionDataNode"),
+				rage::joaat("CEntityOrientationDataNode"),
+				rage::joaat("CPhysicalVelocityDataNode"),
+				rage::joaat("CVehicleAngVelocityDataNode"),
+				rage::joaat("CVehicleSteeringDataNode"),
+				rage::joaat("CVehicleControlDataNode"),
+				rage::joaat("CVehicleGadgetDataNode"),
+				rage::joaat("CPlaneControlDataNode"),
+				rage::joaat("CMigrationDataNode"),
+				rage::joaat("CPhysicalMigrationDataNode"),
+				rage::joaat("CPhysicalScriptMigrationDataNode"),
+				rage::joaat("CVehicleProximityMigrationDataNode"),
+			}},
+		{rage::joaat("CSubmarineSyncTree"),
+			{
+				rage::joaat("CVehicleCreationDataNode"),
+				rage::joaat("CGlobalFlagsDataNode"),
+				rage::joaat("CDynamicEntityGameStateDataNode"),
+				rage::joaat("CPhysicalGameStateDataNode"),
+				rage::joaat("CVehicleGameStateDataNode"),
+				rage::joaat("CSubmarineGameStateDataNode"),
+				rage::joaat("CEntityScriptGameStateDataNode"),
+				rage::joaat("CPhysicalScriptGameStateDataNode"),
+				rage::joaat("CVehicleScriptGameStateDataNode"),
+				rage::joaat("CEntityScriptInfoDataNode"),
+				rage::joaat("CPhysicalAttachDataNode"),
+				rage::joaat("CVehicleAppearanceDataNode"),
+				rage::joaat("CVehicleDamageStatusDataNode"),
+				rage::joaat("CVehicleComponentReservationDataNode"),
+				rage::joaat("CVehicleHealthDataNode"),
+				rage::joaat("CVehicleTaskDataNode"),
+				rage::joaat("CSectorDataNode"),
+				rage::joaat("CSectorPositionDataNode"),
+				rage::joaat("CEntityOrientationDataNode"),
+				rage::joaat("CPhysicalVelocityDataNode"),
+				rage::joaat("CVehicleAngVelocityDataNode"),
+				rage::joaat("CVehicleSteeringDataNode"),
+				rage::joaat("CVehicleControlDataNode"),
+				rage::joaat("CVehicleGadgetDataNode"),
+				rage::joaat("CSubmarineControlDataNode"),
+				rage::joaat("CMigrationDataNode"),
+				rage::joaat("CPhysicalMigrationDataNode"),
+				rage::joaat("CPhysicalScriptMigrationDataNode"),
+				rage::joaat("CVehicleProximityMigrationDataNode"),
+			}},
+		{rage::joaat("CPlayerSyncTree"),
+			{
+				rage::joaat("CPlayerCreationDataNode"),
+				rage::joaat("CGlobalFlagsDataNode"),
+				rage::joaat("CDynamicEntityGameStateDataNode"),
+				rage::joaat("CPhysicalGameStateDataNode"),
+				rage::joaat("CPedGameStateDataNode"),
+				rage::joaat("CPedComponentReservationDataNode"),
+				rage::joaat("CEntityScriptGameStateDataNode"),
+				rage::joaat("CPlayerGameStateDataNode"),
+				rage::joaat("CPedAttachDataNode"),
+				rage::joaat("CPedHealthDataNode"),
+				rage::joaat("CPedMovementGroupDataNode"),
+				rage::joaat("CPedAIDataNode"),
+				rage::joaat("CPlayerAppearanceDataNode"),
+				rage::joaat("CPlayerPedGroupDataNode"),
+				rage::joaat("CPlayerAmbientModelStreamingNode"),
+				rage::joaat("CPlayerGamerDataNode"),
+				rage::joaat("CPlayerExtendedGameStateNode"),
+				rage::joaat("CPedOrientationDataNode"),
+				rage::joaat("CPedMovementDataNode"),
+				rage::joaat("CPedTaskTreeDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CPedTaskSpecificDataNode"),
+				rage::joaat("CSectorDataNode"),
+				rage::joaat("CPlayerSectorPosNode"),
+				rage::joaat("CPlayerCameraDataNode"),
+				rage::joaat("CPlayerWantedAndLOSDataNode"),
+				rage::joaat("CMigrationDataNode"),
+				rage::joaat("CPhysicalMigrationDataNode"),
+				rage::joaat("CPhysicalScriptMigrationDataNode"),
+			}},
+		{rage::joaat("CAutomobileSyncTree"),
+			{
+				rage::joaat("CVehicleCreationDataNode"),
+				rage::joaat("CAutomobileCreationDataNode"),
+				rage::joaat("CGlobalFlagsDataNode"),
+				rage::joaat("CDynamicEntityGameStateDataNode"),
+				rage::joaat("CPhysicalGameStateDataNode"),
+				rage::joaat("CVehicleGameStateDataNode"),
+				rage::joaat("CEntityScriptGameStateDataNode"),
+				rage::joaat("CPhysicalScriptGameStateDataNode"),
+				rage::joaat("CVehicleScriptGameStateDataNode"),
+				rage::joaat("CEntityScriptInfoDataNode"),
+				rage::joaat("CPhysicalAttachDataNode"),
+				rage::joaat("CVehicleAppearanceDataNode"),
+				rage::joaat("CVehicleDamageStatusDataNode"),
+				rage::joaat("CVehicleComponentReservationDataNode"),
+				rage::joaat("CVehicleHealthDataNode"),
+				rage::joaat("CVehicleTaskDataNode"),
+				rage::joaat("CSectorDataNode"),
+				rage::joaat("CSectorPositionDataNode"),
+				rage::joaat("CEntityOrientationDataNode"),
+				rage::joaat("CPhysicalVelocityDataNode"),
+				rage::joaat("CVehicleAngVelocityDataNode"),
+				rage::joaat("CVehicleSteeringDataNode"),
+				rage::joaat("CVehicleControlDataNode"),
+				rage::joaat("CVehicleGadgetDataNode"),
+				rage::joaat("CMigrationDataNode"),
+				rage::joaat("CPhysicalMigrationDataNode"),
+				rage::joaat("CPhysicalScriptMigrationDataNode"),
+				rage::joaat("CVehicleProximityMigrationDataNode"),
+			}},
+		{rage::joaat("CTrainSyncTree"),
+			{
+				rage::joaat("CVehicleCreationDataNode"),
+				rage::joaat("CGlobalFlagsDataNode"),
+				rage::joaat("CDynamicEntityGameStateDataNode"),
+				rage::joaat("CPhysicalGameStateDataNode"),
+				rage::joaat("CVehicleGameStateDataNode"),
+				rage::joaat("CTrainGameStateDataNode"),
+				rage::joaat("CEntityScriptGameStateDataNode"),
+				rage::joaat("CPhysicalScriptGameStateDataNode"),
+				rage::joaat("CVehicleScriptGameStateDataNode"),
+				rage::joaat("CEntityScriptInfoDataNode"),
+				rage::joaat("CPhysicalAttachDataNode"),
+				rage::joaat("CVehicleAppearanceDataNode"),
+				rage::joaat("CVehicleDamageStatusDataNode"),
+				rage::joaat("CVehicleComponentReservationDataNode"),
+				rage::joaat("CVehicleHealthDataNode"),
+				rage::joaat("CVehicleTaskDataNode"),
+				rage::joaat("CSectorDataNode"),
+				rage::joaat("CSectorPositionDataNode"),
+				rage::joaat("CEntityOrientationDataNode"),
+				rage::joaat("CPhysicalVelocityDataNode"),
+				rage::joaat("CVehicleAngVelocityDataNode"),
+				rage::joaat("CVehicleSteeringDataNode"),
+				rage::joaat("CVehicleControlDataNode"),
+				rage::joaat("CVehicleGadgetDataNode"),
+				rage::joaat("CMigrationDataNode"),
+				rage::joaat("CPhysicalMigrationDataNode"),
+				rage::joaat("CPhysicalScriptMigrationDataNode"),
+				rage::joaat("CVehicleProximityMigrationDataNode"),
+			}},
+	};
 
 	// By using this to hook natives, we are sacrificing performance for safety 
 	// Detouring it is faster, but cockstar detects that
@@ -681,7 +1072,7 @@ namespace Saint
 				}
 
 				buffer->Seek(0);
-				//g.m_syncing_player = source_player;
+				m_syncing_player = source;
 				break;
 			}
 			case eNetworkEvents::CNetworkPtfxEvent: {
@@ -1107,7 +1498,47 @@ namespace Saint
 			SetBits<std::uint32_t>(&flags, 10, 11, 12, 16);
 		return static_cast<decltype(&FallTaskConstructor)>(g_Hooking->m_OriginalFallTaskConstructor)(_this, flags);
 	}
-	
+	void Hooks::serialize_vehicle_gadget_data_node(CVehicleGadgetDataNode* node, rage::CSyncDataBase* data)
+	{
+		data->SerializeBool(&node->m_has_parent_offset);
+		if (node->m_has_parent_offset || data->IsSizeCalculator())
+		{
+			data->SerializeSignedFloat((float*)&node->m_parent_offset_x, 24.0f, 14);
+			data->SerializeSignedFloat((float*)&node->m_parent_offset_y, 24.0f, 14);
+			data->SerializeSignedFloat((float*)&node->m_parent_offset_z, 24.0f, 14);
+		}
+		else
+		{
+			node->m_parent_offset_x = 0;
+			node->m_parent_offset_y = 0;
+			node->m_parent_offset_z = 0;
+			node->m_parent_offset_w = 0;
+		}
+
+		data->SerializeDwordAlt(&node->m_gadget_count, 2);
+
+		if (data->IsSizeCalculator())
+			node->m_gadget_count = 2;
+
+		if (node->m_gadget_count > 2)
+		{
+			
+			return;
+		}
+
+		for (uint32_t i = 0; i < node->m_gadget_count; i++)
+		{
+			data->SerializeDwordAlt((uint32_t*)&node->m_gadget_data[i].m_gadget_type, 3);
+
+			int size;
+			if (data->IsSizeCalculator())
+				size = 94;
+			else
+				size = g_GameFunctions->m_get_vehicle_gadget_array_size(node->m_gadget_data[i].m_gadget_type);
+
+			data->SerializeArray(&node->m_gadget_data[i].m_data, size);
+		}
+	}
 	
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
@@ -1140,6 +1571,8 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_received_array_update, &Hooks::received_array_update, &array_update);
 		MH_CreateHook(g_GameFunctions->m_task_parachute_object_0x270, &Hooks::task_parachute_object_0x270, &parachute);
 		MH_CreateHook(g_GameFunctions->m_serialize_take_off_ped_variation_task, &Hooks::serialize_take_off_ped_variation_task, &parachute2);
+		MH_CreateHook(g_GameFunctions->m_serialize_vehicle_gadget_data_node, &Hooks::serialize_vehicle_gadget_data_node, &yim_crash);
+		//MH_CreateHook(g_GameFunctions->m_can_apply_data, &Hooks::can_apply_data, &yim_crash2);
 		//MH_CreateHook(g_GameFunctions->m_FallTaskConstructor, &Hooks::FallTaskConstructor, &m_OriginalFallTaskConstructor);
 		//MH_CreateHook(g_GameFunctions->m_GetScriptEvent, &Hooks::NetworkEventHandler, &m_OriginalNetworkHandler);
 		//MH_CreateHook(g_GameFunctions->m_get_network_event_data, &Hooks::GetNetworkEventData, &originalDetection);
@@ -1177,6 +1610,8 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->m_received_array_update);
 		MH_RemoveHook(g_GameFunctions->m_task_parachute_object_0x270);
 		MH_RemoveHook(g_GameFunctions->m_serialize_take_off_ped_variation_task);
+		MH_RemoveHook(g_GameFunctions->m_serialize_vehicle_gadget_data_node);
+		//MH_RemoveHook(g_GameFunctions->m_can_apply_data);
 		//MH_RemoveHook(g_GameFunctions->m_FallTaskConstructor);
 		//MH_RemoveHook(g_GameFunctions->m_GetScriptEvent);
 		//MH_RemoveHook(g_GameFunctions->m_get_network_event_data);

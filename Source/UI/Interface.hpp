@@ -265,6 +265,9 @@ namespace Saint::UserInterface
 		Color m_SubheaderTextRight{ 255,255,255, 255 };
 		float m_SubheaderHeight = 0.03f;
 
+		//misc
+		Color m_RadiusSphere{ 255, 0, 0, 160 };
+
 		bool animation_enabled = false;
 
 		std::string header_name = "Saint";

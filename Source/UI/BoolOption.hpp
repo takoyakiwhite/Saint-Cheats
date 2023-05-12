@@ -10,15 +10,12 @@ namespace Saint::UserInterface
 		YesNo
 	};
 
-	template <typename BoolType = bool>
-	class toggle : public BaseOption<toggle<BoolType>>
+	class toggle : public BaseOption<toggle>
 	{
 	public:
-		explicit toggle(const char* text, const char* description, bool* b00l, BoolDisplay displayType, bool displayInverted = false, std::function<void()> action = [] {}) :
+		explicit toggle(const char* text, const char* description, bool* b00l, std::function<void()> action = [] {}) :
 			m_Text(text),
-			m_Bool(b00l),
-			m_DisplayInverted(displayInverted),
-			m_DisplayType(displayType)
+			m_Bool(b00l)
 		{
 			Base::SetLeftText(text);
 			if (description != "" || description != nullptr) {
@@ -36,18 +33,11 @@ namespace Saint::UserInterface
 		toggle(toggle&&) = default;
 		toggle& operator=(toggle&&) = default;
 
+
 		
 		const char* GetRightText() override
 		{
-			switch (m_DisplayType)
-			{
-			case BoolDisplay::OnOff:
-				//Base::SetRightText((*m_Bool ^ m_DisplayInverted) ? "~g~ON" : "~r~OFF");
-				break;
-			case BoolDisplay::YesNo:
-				Base::SetRightText((*m_Bool ^ m_DisplayInverted) ? "~g~YES" : "~r~NO");
-				break;
-			}
+			
 			
 			return Base::GetRightText();
 		}
@@ -56,7 +46,7 @@ namespace Saint::UserInterface
 		{
 			if (flag == OptionFlag::BoolOption)
 			{
-				g_Render->ToggledOn = *m_Bool ^ m_DisplayInverted;
+				g_Render->ToggledOn = *m_Bool;
 				return true;
 			}
 
@@ -169,11 +159,9 @@ namespace Saint::UserInterface
 			Base::HandleAction(action);
 		}
 	private:
-		BoolType* m_Bool;
-		BoolDisplay m_DisplayType;
-		BoolType m_DisplayInverted = false;
+		bool* m_Bool;
 		const char* m_Text;
 
-		using Base = BaseOption<toggle<BoolType>>;
+		using Base = BaseOption<toggle>;
 	};
 }

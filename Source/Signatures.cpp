@@ -100,6 +100,7 @@ namespace Saint
 		m_received_array_update(Signature("48 89 5C 24 10 55 56 57 41 54 41 55 41 56 41 57 48 8B EC 48 83 EC 30 48 8B 05").Scan().As<PVOID>()),
 		m_task_parachute_object_0x270(Signature("0F 88 ? ? ? ? 75 34").Scan().Sub(6).As<PVOID>()),
 		m_serialize_take_off_ped_variation_task(Signature("40 55 53 57 41 56 48 8B EC 48 83 EC 68").Scan().As<PVOID>()),
+		m_get_entity_attached_to(Signature("48 83 EC 28 48 8B 51 50 48 85 D2 74 04").Scan().As<get_entity_attached_to>()),
 		m_invalid_player_crash_patch(Signature("48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC 20 48 8B 59 40 4C 8B F2 48 8B F1 48 85 DB 74 22 48 8B 02 48 8B CA FF 50 48 4C 8D 05 ? ? ? ? 48 8D 15 ? ? ? ? 4C 8B C8 48 8B CB E8 ? ? ? ? 44 0F B7 46 ? 33 DB 33 C9 49 63 D0 45 85 C0 7E 18 48 8B 46 50 48 8B 18 48 85 DB 75 0C 48 FF C1 48 83 C0 08 48 3B CA 7C EC 33 FF 33 C9 45 85 C0 7E 69 48 8B 46 50 48 8B 18 48 85 DB 75 10 48 FF C1 FF C7 48 83 C0 08 49 3B C8 7C EA EB 4D 48 8B 4B 08 48 85 C9 74 12 48 8B 49 48 48 85 C9 74 09 48 8B 01 49 8B D6 FF 50 10").Scan().As<PVOID>()),
 		//BreakupKick
 		m_get_connection_peer(Signature("8D 42 FF 83 F8 FD 77 3D").Scan().Add(23).Rip().As<get_connection_peer>()),
@@ -120,6 +121,11 @@ namespace Saint
 		m_GetEntityFromScript(Signature("E8 ? ? ? ? 8D 53 01 33 DB").Scan().Add(1).Rip().As<decltype(m_GetEntityFromScript)>()),
 		m_GetNetPlayer(Signature("48 83 EC 28 33 C0 38 05 ? ? ? ? 74 0A").Scan().As<decltype(m_GetNetPlayer)>()),
 		m_send_clone_sync(Signature("48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 0F B7 42").Scan().As<decltype(m_send_clone_sync)>()),
+		m_get_vehicle_gadget_array_size(Signature("40 53 48 83 EC 40 33 DB E8").Scan().As<decltype(m_get_vehicle_gadget_array_size)>()),
+		m_serialize_vehicle_gadget_data_node(Signature("48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 56 41 57 48 83 EC 30 48 8B 02 48 8D").Scan().Add(0x14).Rip().As<PVOID>()),
+		m_get_sync_tree_for_type(Signature("4C 8B FA 41 0F B7 D1").Scan().As<decltype(m_get_sync_tree_for_type)>()),
+		m_network_object_mgr(Signature("48 8B 0D ? ? ? ? 45 33 C0 E8 ? ? ? ? 33 FF 4C 8B F0").Scan().Add(3).Rip().As<CNetworkObjectMgr**>()),
+		m_can_apply_data(Signature("E8 ? ? ? ? 84 C0 0F 84 AF 01 00 00 48 8B 03").Scan().Add(1).Rip().As<PVOID>()),
 		m_script_threads(Signature("45 33 F6 8B E9 85 C9 B8").Scan().Sub(4).Rip().Sub(8).As<decltype(m_script_threads)>())
 
 	{

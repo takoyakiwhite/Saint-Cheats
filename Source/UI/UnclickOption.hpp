@@ -4,18 +4,15 @@
 
 namespace Saint::UserInterface
 {
-	class UnclickOption : public BaseOption<UnclickOption>
+	class Break : public BaseOption<Break>
 	{
 	public:
-		explicit UnclickOption() = default;
-		explicit UnclickOption(const char* text, const char* description = nullptr, std::function<void()> action = [] {})
+		explicit Break() = default;
+		explicit Break(const char* text)
 		{
 			std::string text2 = std::string(text);
 			const char* textfinal = text2.c_str();
 			SetCenteredText(textfinal);
-			if (description)
-				SetDescription(description);
-			SetAction(std::move(action));
 		}
 
 		bool GetFlag(OptionFlag flag) override
@@ -28,10 +25,10 @@ namespace Saint::UserInterface
 			return BaseOption::GetFlag(flag);
 		}
 
-		~UnclickOption() noexcept = default;
-		UnclickOption(UnclickOption const&) = default;
-		UnclickOption& operator=(UnclickOption const&) = default;
-		UnclickOption(UnclickOption&&) = default;
-		UnclickOption& operator=(UnclickOption&&) = default;
+		~Break() noexcept = default;
+		Break(Break const&) = default;
+		Break& operator=(Break const&) = default;
+		Break(Break&&) = default;
+		Break& operator=(Break&&) = default;
 	};
 }
