@@ -1236,11 +1236,20 @@ namespace Saint
 
 		return static_cast<decltype(&NetworkEventHandler)>(g_Hooking->m_OriginalNetworkHandler)(networkMgr, source, target, event_id, event_index, event_bitset, buffer_size, buffer);
 	}
+	bool is_in_car(Ped ped) {
+		if (PED::GET_VEHICLE_PED_IS_IN(ped, false) == PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 	bool Hooks::GetEventData(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount, int64_t sender)
 	{
 		bool dontreturn = false;
 		auto result = static_cast<decltype(&GetEventData)>(g_Hooking->m_OriginalGetEventData)(eventGroup, eventIndex, args, argCount, sender);
 		auto sender_id = static_cast<std::int32_t>(args[1]);
+		Ped sender_ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(sender_id);
 		const char* sender_name = PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1]));
 		if (protections.exclude_friends) {
 			int netHandle[13];
@@ -1254,29 +1263,35 @@ namespace Saint
 				return result;
 			}
 		}
-		for (auto evnt : m_scriptEvents) {
-			if (evnt.toggled) {
-				if (evnt.hash == args[0]) {
-					
-					char g_RemoveWeapons[64];
-					sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender_name, evnt.name.c_str());
-					g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-					switch (protections.reaction.type_2) {
-					case 0:
-						break;
-					case 1:
-						NativeVector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(static_cast<std::int32_t>(args[1])), false);
-
-						Object cage = OBJECT::CREATE_OBJECT(MISC::GET_HASH_KEY("prop_gold_cont_01"), c.x, c.y, c.z - 1.f, true, false, false);
-						break;
+		
+		for (auto m_event : gameEvents) {
+			if (m_event.hash == args[0]) {
+				char notification[64];
+				sprintf(notification, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender_name, m_event.name.c_str());
+				if (m_event.allow_from_friends) {
+					int netHandle[13];
+					NETWORK::NETWORK_HANDLE_FROM_PLAYER(sender_ped, netHandle, 13);
+					if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
+						return result;
 					}
-					
+				}
+				if (m_event.log) {
+					if (args[0] == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(sender_ped)) {} //dont spam notifcation when in car
+					else {
+						g_Logger->Info(notification);
+					}
+				}
+				if (m_event.notify) {
+					if (args[0] == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(sender_ped)) {  } //dont spam notifcation when in car
+					else {
+						g_NotificationManager->add(notification, 2000, 0);
+					}
+				}
+				if (m_event.block) {
 					return false;
 				}
-				
 			}
 		}
-		
 		return result;
 	}
 	//crash protection

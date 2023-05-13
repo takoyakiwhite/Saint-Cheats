@@ -1717,6 +1717,20 @@ namespace Saint
 				sub->draw_option<number<float>>("Helicopter Lagging Rate", nullptr, &features.lagging_rate, 0.0f, 1000.f, .1f, 2, true, "", "", [=] {
 					VEHICLE::SET_HELI_CONTROL_LAGGING_RATE_SCALAR(Game->Vehicle(), features.lagging_rate);
 					});
+				sub->draw_option<number<float>>("Rust", nullptr, &features.rust, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
+					VEHICLE::SET_VEHICLE_ENVEFF_SCALE(Game->Vehicle(), features.rust);
+					});
+				sub->draw_option<Scroll<const char*, std::size_t>>("Explosive Device", nullptr, &features.phone_explosive, &features.phone_pos, false, -1, [] {
+					if (features.phone_pos == 0) {
+						VEHICLE::ADD_VEHICLE_PHONE_EXPLOSIVE_DEVICE(Game->Vehicle());
+					}
+					if (features.phone_pos == 1) {
+						VEHICLE::DETONATE_VEHICLE_PHONE_EXPLOSIVE_DEVICE();
+					}
+					if (features.phone_pos == 2) {
+						VEHICLE::CLEAR_VEHICLE_PHONE_EXPLOSIVE_DEVICE();
+					}
+				});
 				sub->draw_option<Button>("Delete", nullptr, []
 					{
 						Vehicle veh = Game->Vehicle();
@@ -1757,7 +1771,7 @@ namespace Saint
 				sub->draw_option<KeyboardOption>(("Text"), nullptr, features.plate_test_text, []
 					{
 
-						showKeyboard2("Enter Something", "", 8, &features.plate_test_text, [] {});
+						showKeyboard2("Enter Something", "", 25, &features.plate_test_text, [] {});
 					});
 
 			});
@@ -9527,50 +9541,64 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Script Events"), SubmenuScriptEvents, [](sub* sub)
 			{
-				sub->draw_option<submenu>("Teleport", nullptr, rage::joaat("ProtectionsTeleport"));
-				sub->draw_option<submenu>("CEO", nullptr, rage::joaat("ProtectionsCEO"));
-				sub->draw_option<submenu>("Text Message", nullptr, rage::joaat("ProtectionsSMS"));
-				sub->draw_option<submenu>("Notifications", nullptr, rage::joaat("ProtectionsNOTI"));
-				sub->draw_option<toggle>(("Vehicle Kick"), nullptr, &protections.ScriptEvents.vehicle_kick);
-				sub->draw_option<toggle>(("Rotate Camera"), nullptr, &protections.ScriptEvents.rotate_cam);
-				sub->draw_option<toggle>(("Tutorial"), nullptr, &protections.ScriptEvents.tutorial);
-				sub->draw_option<toggle>(("Sound Spam"), nullptr, &protections.sound_spam);
-				sub->draw_option<toggle>(("Bounty"), nullptr, &protections.ScriptEvents.bounty);
-				sub->draw_option<toggle>(("Activity"), nullptr, &protections.activity);
-				sub->draw_option<toggle>(("Kick"), nullptr, &protections.kick);
-				sub->draw_option<toggle>(("Transaction Error"), nullptr, &protections.ScriptEvents.transaction_error);
-				sub->draw_option<toggle>(("Globals"), nullptr, &protections.ScriptEvents.globals);
+				sub->draw_option<Scroll<const char*, std::size_t>>("Enable All", nullptr, &protections.types, &protections.data, false, -1, [] {
+
+					for (auto& evnt : gameEvents) {
+						switch (protections.data) {
+						case 0:
+							*evnt.block = true;
+							break;
+						case 1:
+							*evnt.notify = true;
+							break;
+						case 2:
+							*evnt.log = true;
+							break;
+						case 3:
+							*evnt.allow_from_friends = true;
+							break;
+						}
+					}
+				});
+				sub->draw_option<Scroll<const char*, std::size_t>>("Disable All", nullptr, &protections.types, &protections.data2, false, -1, [] {
+					for (auto& evnt : gameEvents) {
+						switch (protections.data2) {
+						case 0:
+							*evnt.block = false;
+							break;
+						case 1:
+							*evnt.notify = false;
+							break;
+						case 2:
+							*evnt.log = false;
+							break;
+						case 3:
+							*evnt.allow_from_friends = false;
+							break;
+						}
+					}
+				});
+				sub->draw_option<Break>("List");
+				for (auto& evnt : gameEvents) {
+					sub->draw_option<submenu>(evnt.name.c_str(), nullptr, rage::joaat("ScriptEvents"), [=]
+						{
+							selected_name = evnt.name;
+						});
+				}
 
 			});
-		g_Render->draw_submenu<sub>(("Notifications"), rage::joaat("ProtectionsNOTI"), [](sub* sub)
+		g_Render->draw_submenu<sub>(("Selected"), rage::joaat("ScriptEvents"), [](sub* sub)
 			{
-				sub->draw_option<toggle>(("Money Stolen"), nullptr, &protections.moneystolen);
-				sub->draw_option<toggle>(("Money Removed"), nullptr, &protections.moneyremoved);
-				sub->draw_option<toggle>(("Money Banked"), nullptr, &protections.moneybanked);
+				for (auto& evnt : gameEvents) {
+					if (evnt.name == selected_name) {
+						sub->draw_option<toggle>("Block", nullptr, evnt.block);
+						sub->draw_option<toggle>("Notify", nullptr, evnt.notify);
+						sub->draw_option<toggle>("Log", nullptr, evnt.log);
+						sub->draw_option<toggle>("Allow From Friends", nullptr, evnt.allow_from_friends);
+					}
+				}
 			});
-		g_Render->draw_submenu<sub>(("Text Message"), rage::joaat("ProtectionsSMS"), [](sub* sub)
-			{
-				sub->draw_option<toggle>(("Regular"), nullptr, &protections.ScriptEvents.text_messages);
-				sub->draw_option<toggle>(("Attachments"), nullptr, &protections.sms_with_attachment);
-			});
-		g_Render->draw_submenu<sub>(("CEO"), rage::joaat("ProtectionsCEO"), [](sub* sub)
-			{
-				sub->draw_option<toggle>(("Kick"), nullptr, &protections.ceo_kick);
-				sub->draw_option<toggle>(("Ban"), nullptr, &protections.ceo_ban);
-				sub->draw_option<toggle>(("Money"), nullptr, &protections.ceo_money);
-				sub->draw_option<toggle>(("Raid"), nullptr, &protections.ceo_raid);
-			});
-		g_Render->draw_submenu<sub>(("Teleport"), rage::joaat("ProtectionsTeleport"), [](sub* sub)
-			{
-				sub->draw_option<toggle>(("Send To Location"), nullptr, &protections.send_to_location);
-				sub->draw_option<toggle>(("Motorcycle Club"), nullptr, &protections.mc_teleport);
-				sub->draw_option<toggle>(("Regular"), nullptr, &protections.teleport);
-				sub->draw_option<toggle>(("Interior"), nullptr, &protections.Interior);
-				sub->draw_option<toggle>(("Cayo Perico"), nullptr, &protections.cayo_perico);
-				sub->draw_option<toggle>(("Warehouse"), nullptr, &protections.warehouse);
-				sub->draw_option<toggle>(("Mission"), nullptr, &protections.mission);
-
-			});
+		
 		g_Render->draw_submenu<sub>(("Teleport"), SubmenuTeleport, [](sub* sub)
 			{
 				sub->draw_option<toggle>(("Automaticly Teleport To Waypoint"), nullptr, &m_teleport.automatic);

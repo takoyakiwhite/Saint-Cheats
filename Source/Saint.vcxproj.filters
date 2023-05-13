@@ -283,6 +283,9 @@
     <ClInclude Include="PoolManager.h">
       <Filter>Hooking\SHV</Filter>
     </ClInclude>
+    <ClInclude Include="ScriptEventClasses.h">
+      <Filter>Core\Features\Protections</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">

@@ -1310,7 +1310,18 @@ namespace Saint {
 		const char* plate_test_direction[2] = { "Left", "Right" };
 		std::size_t plate_test_pos = 0;
 		bool invis_weapon = false;
+		bool fullbeam = false;
+		float rust = 0.0f;
+		bool disable_break_lights = false;
+		const char* phone_explosive[3] = { "Add", "Detonate", "Clear" };
+		std::size_t phone_pos = 0;
 		void init() {
+			if (disable_break_lights) {
+				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(Game->Vehicle(), FALSE);
+			}
+			if (fullbeam) {
+				VEHICLE::SET_VEHICLE_FULLBEAM(Game->Vehicle(), TRUE);
+			}
 			if (invis_weapon) {
 				ENTITY::SET_ENTITY_VISIBLE(Game->Weapon(), FALSE, FALSE);
 			}

@@ -1,8 +1,10 @@
 #pragma once
 #include "Render.h"
+#include "Enums.h"
+#include "ScriptEventClasses.h"
 namespace Saint {
 	
-	class Crash {
+	class Crash222 {
 	public:
 		bool loading_screen = true;
 		bool rope = true;
@@ -79,6 +81,24 @@ namespace Saint {
 		int64_t hash;
 		bool* toggled;
 	};
+	class eventHandler2 {
+	public:
+		eventHandler2(int64_t m_hash, std::string m_name, bool* m_block, bool* m_notify, bool* m_log, bool* m_allow_from_friends) {
+			hash = m_hash;
+			name = m_name;
+			block = m_block;
+			notify = m_notify;
+			log = m_log;
+			allow_from_friends = m_allow_from_friends;
+		}
+	public:
+		std::string name;
+		int64_t hash;
+		bool* block;
+		bool* notify;
+		bool* log;
+		bool* allow_from_friends;
+	};
 	class Reactions {
 	public:
 		const char* type[3] = { "None", "Cage", "Kick"};
@@ -86,8 +106,9 @@ namespace Saint {
 	};
 	class Protections {
 	public:
+		
 		Reactions reaction;
-		Crash Crashes;
+		Crash222 Crashes;
 		GameEvents GameEvents;
 		ScriptEvents ScriptEvents;
 		Entites Entities;
@@ -136,49 +157,334 @@ namespace Saint {
 		bool moneybanked = true;
 		bool moneystolen = true;
 		bool moneyremoved = true;
+
+		const char* types[4] = { "Block", "Notify", "Log", "Allow From Friends" };
+		std::size_t data;
+		std::size_t data2;
 		
 	};
 	inline Protections protections;
-	inline std::vector<eventHandler> m_scriptEvents = {
-			{ -1603050746, "Vehicle Kick", &protections.ScriptEvents.vehicle_kick },
-			{ 448051697, "Rotate Camera", &protections.ScriptEvents.rotate_cam },
-			{ -1428749433, "Rotate Camera", &protections.ScriptEvents.rotate_cam },
-			//Teleport
-			{ 330622597, "Send To Location", &protections.send_to_location },
-			{ 891653640, "MC Teleport", &protections.mc_teleport },
-			{ -702866045, "Teleport", &protections.teleport },
-			{ 1727896103, "Send To Interior", &protections.Interior },
-			{ -369672308, "Send To Cayo Perico", &protections.cayo_perico },
-			{ -1796714618, "Send To Warehouse", &protections.warehouse },
-			{ -2138393348, "Send To Mission", &protections.mission },
-			//Text
-			{ 1075676399, "Text Message (Attachment)", &protections.sms_with_attachment },
-			{ 53975141, "Text Message", &protections.ScriptEvents.text_messages },
-			//Crash
-			{ -992162568, "Crash", &protections.Crashes.loading_screen },
-			{ 1131623211, "Crash", &protections.Crashes.loading_screen },
-			{ 1556360603, "Crash", &protections.Crashes.loading_screen },
-			//Globals
-			{ 1141648445, "Off Radar", &protections.ScriptEvents.globals },
-			//Other
-			{ 54323524, "Transaction Error", &protections.ScriptEvents.transaction_error },
-			//Kyro
-			{ -95341040, "Start Script", &protections.ScriptEvents.tutorial },
-			{ 1742713914, "Start Script", &protections.ScriptEvents.tutorial },
-			//CEO
-			{ 1421455565, "Ceo Kick", &protections.ceo_kick },
-			{ 1517094008, "Ceo Ban", &protections.ceo_ban },
-			{ 75579707, "Ceo Money", &protections.ceo_money },
-			{-1388385133, "CEO Raid", &protections.ceo_raid},
-			//Kicks
-			{ 1017995959, "Kick", &protections.kick},
-			//Msc
-			{ 1104117595, "Activity", &protections.activity},
-			{ 36077543, "Sound Spam", &protections.sound_spam},
-			//Notifcations
-			{ 276906331, "Money Banked", &protections.moneybanked},
-			{ 82080686, "Money Stolen", &protections.moneystolen},
-			{ 853249803, "Money Removed", &protections.moneyremoved},
-			{ 1459520933, "Bounty", &protections.ScriptEvents.bounty},
+	
+	inline std::string selected_name;
+	inline std::vector<eventHandler2> gameEvents = {
+		{ -1603050746, "Vehicle Kick", &vehicle_kick.block, &vehicle_kick.notify, &vehicle_kick.log, &vehicle_kick.allow_from_friends},
+		{
+			ceo_kick.hash,
+			"CEO Kick",
+			& ceo_kick.block,
+			& ceo_kick.notify,
+			&ceo_money.log,
+			& ceo_kick.allow_from_friends
+		},
+		{ ceo_ban.hash, "CEO Ban", &ceo_ban.block,&ceo_ban.notify,&ceo_ban.log,&ceo_ban.allow_from_friends},
+		{ 
+			ceo_money.hash, 
+			"CEO Money", 
+			&ceo_money.block,
+			&ceo_money.notify,
+			&ceo_money.log,
+			&ceo_money.allow_from_friends
+		},
+		{
+			ceo_raid.hash,
+			"CEO Raid",
+			& ceo_raid.block,
+			& ceo_raid.notify,
+			& ceo_raid.log,
+			& ceo_raid.allow_from_friends
+		},
+		{
+			give_coll.hash,
+			"Give Collectible",
+			&give_coll.block,
+			&give_coll.notify,
+			&give_coll.log,
+			&give_coll.allow_from_friends
+		},
+		{
+			clear_wanted_level.hash,
+			"Clear Wanted Level",
+			& clear_wanted_level.block,
+			& clear_wanted_level.notify,
+			& clear_wanted_level.log,
+			& clear_wanted_level.allow_from_friends
+		},
+
+		{
+			force_mission.hash,
+			"Force Mission",
+			& force_mission.block,
+			& force_mission.notify,
+			& force_mission.log,
+			& force_mission.allow_from_friends
+		},
+		{
+			script_begin.hash,
+			"Script Begin",
+			& script_begin.block,
+			& script_begin.notify,
+			& script_begin.log,
+			& script_begin.allow_from_friends
+		},
+		{
+			script_proceed.hash,
+			"Script Proceed",
+			& script_proceed.block,
+			& script_proceed.notify,
+			& script_proceed.log,
+			& script_proceed.allow_from_friends
+		},
+		{
+			script_proceed.hash,
+			"Script Proceed",
+			&script_proceed.block,
+			&script_proceed.notify,
+			&script_proceed.log,
+			&script_proceed.allow_from_friends
+		},
+		{
+			destroy_personal_vehicle.hash,
+			"Destroy Personal Vehicle",
+			& destroy_personal_vehicle.block,
+			& destroy_personal_vehicle.notify,
+			& destroy_personal_vehicle.log,
+			& destroy_personal_vehicle.allow_from_friends
+		},
+		{
+			personal_veh_destroyed.hash,
+			"Destroy Personal Vehicle 2",
+			& personal_veh_destroyed.block,
+			& personal_veh_destroyed.notify,
+			& personal_veh_destroyed.log,
+			& personal_veh_destroyed.allow_from_friends
+		},
+		{
+			crash.hash,
+			"Crash",
+			& crash.block,
+			& crash.notify,
+			& crash.log,
+			& crash.allow_from_friends
+		},
+		{
+			crash2.hash,
+			"Crash 2",
+			& crash2.block,
+			& crash2.notify,
+			& crash2.log,
+			& crash2.allow_from_friends
+		},
+		{
+			crash3.hash,
+			"Crash 3",
+			& crash3.block,
+			& crash3.notify,
+			& crash3.log,
+			& crash3.allow_from_friends
+		},
+		{
+			crash3.hash,
+			"Crash 3",
+			&crash3.block,
+			&crash3.notify,
+			&crash3.log,
+			&crash3.allow_from_friends
+		},
+		{
+			gta_banner.hash,
+			"Banner",
+			& gta_banner.block,
+			& gta_banner.notify,
+			& gta_banner.log,
+			& gta_banner.allow_from_friends
+		},
+		{
+			off_radar.hash,
+			"Off The Radar",
+			& off_radar.block,
+			& off_radar.notify,
+			& off_radar.log,
+			& off_radar.allow_from_friends
+		},
+		{
+			teleport2.hash,
+			"Teleport",
+			& teleport2.block,
+			& teleport2.notify,
+			& teleport2.log,
+			& teleport2.allow_from_friends
+		},
+				{
+			mc_teleport.hash,
+			"Teleport To MC Bike",
+			& mc_teleport.block,
+			& mc_teleport.notify,
+			& mc_teleport.log,
+			& mc_teleport.allow_from_friends
+				},
+				{
+			tp_to_warehouse.hash,
+			"Teleport To Warehouse",
+			& tp_to_warehouse.block,
+			& tp_to_warehouse.notify,
+			& tp_to_warehouse.log,
+			& tp_to_warehouse.allow_from_friends
+				},
+				{
+			send_to_cayo_perico.hash,
+			"Teleport To Cayo Perico",
+			& send_to_cayo_perico.block,
+			& send_to_cayo_perico.notify,
+			& send_to_cayo_perico.log,
+			& send_to_cayo_perico.allow_from_friends
+				},
+				{
+			send_to_location.hash,
+			"Teleport To Location",
+			& send_to_location.block,
+			& send_to_location.notify,
+			& send_to_location.log,
+			& send_to_location.allow_from_friends
+				},
+				{
+			send_to_cutscene.hash,
+			"Start Cutscene",
+			& send_to_cutscene.block,
+			& send_to_cutscene.notify,
+			& send_to_cutscene.log,
+			& send_to_cutscene.allow_from_friends
+				},
+				{
+			sound_spam.hash,
+			"Sound Spam",
+			& sound_spam.block,
+			& sound_spam.notify,
+			& sound_spam.log,
+			& sound_spam.allow_from_friends
+				},
+				{
+			t_error.hash,
+			"Transaction Error",
+			& t_error.block,
+			& t_error.notify,
+			& t_error.log,
+			& t_error.allow_from_friends
+				},
+				{
+			spectate.hash,
+			"Spectate",
+			& spectate.block,
+			& spectate.notify,
+			& spectate.log,
+			& spectate.allow_from_friends
+				},
+				{
+			noti.hash,
+			"Notification",
+			& noti.block,
+			& noti.notify,
+			& noti.log,
+			& noti.allow_from_friends
+				},
+				{
+			money_banked.hash,
+			"Money Banked",
+			& money_banked.block,
+			& money_banked.notify,
+			& money_banked.log,
+			& money_banked.allow_from_friends
+				},
+				{
+			money_removed.hash,
+			"Money Removed",
+			& money_removed.block,
+			& money_removed.notify,
+			& money_removed.log,
+			& money_removed.allow_from_friends
+				},
+				{
+			money_stolen.hash,
+			"Money Stolen",
+			& money_stolen.block,
+			& money_stolen.notify,
+			& money_stolen.log,
+			& money_stolen.allow_from_friends
+				},
+				{
+			sms.hash,
+			"Text Message",
+			& sms.block,
+			& sms.notify,
+			& sms.log,
+			& sms.allow_from_friends
+				},
+				{
+			sms2.hash,
+			"Text Message (Label)",
+			& sms2.block,
+			& sms2.notify,
+			& sms2.log,
+			& sms2.allow_from_friends
+				},
+				{
+			tse_command.hash,
+			"Command",
+			& tse_command.block,
+			& tse_command.notify,
+			& tse_command.log,
+			& tse_command.allow_from_friends
+				},
+				{
+			rotate_cam.hash,
+			"Rotate Camera",
+			& rotate_cam.block,
+			& rotate_cam.notify,
+			& rotate_cam.log,
+			& rotate_cam.allow_from_friends
+				},
+				{
+			int_control.hash,
+			"Send To Interior",
+			& int_control.block,
+			& int_control.notify,
+			& int_control.log,
+			& int_control.allow_from_friends
+				},
+				{
+			kick_from_int.hash,
+			"Kick From Interior",
+			& kick_from_int.block,
+			& kick_from_int.notify,
+			& kick_from_int.log,
+			& kick_from_int.allow_from_friends
+				},
+				{
+			start_activ.hash,
+			"Start Activity ",
+			& start_activ.block,
+			& start_activ.notify,
+			& start_activ.log,
+			& start_activ.allow_from_friends
+				},
+				{
+			mark_as_beast.hash,
+			"Beast",
+			& mark_as_beast.block,
+			& mark_as_beast.notify,
+			& mark_as_beast.log,
+			& mark_as_beast.allow_from_friends
+				},
+				{
+			network_bail.hash,
+			"Bail",
+			& network_bail.block,
+			& network_bail.notify,
+			& network_bail.log,
+			& network_bail.allow_from_friends
+				},
+
+
+
 	};
+	
 }

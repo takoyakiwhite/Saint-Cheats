@@ -82,7 +82,7 @@ void ScriptHookV::scriptUnregister(HMODULE module) {
 }
 
 //was already slashed out
-/*void ScriptHookV::scriptUnregister(void(*LP_SCRIPT_MAIN)()) { // deprecated was already slashed out 
+/*void ScriptHookV::scriptUnregister(void(*LP_SCRIPT_MAIN)()) { // deprecated
 	LOG_DEBUG("[SHV] Unregistering thread with handle 0x%llx", LP_SCRIPT_MAIN);
 	auto fibers = GetFibers();
 	for (auto&e : fibers) {

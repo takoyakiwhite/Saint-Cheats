@@ -61,6 +61,7 @@
     <ClInclude Include="Queue.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="Required.h" />
+    <ClInclude Include="ScriptEventClasses.h" />
     <ClInclude Include="ScriptHookV.h" />
     <ClInclude Include="ScriptLocal.h" />
     <ClInclude Include="Selected.h" />
