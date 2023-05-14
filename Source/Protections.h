@@ -69,7 +69,7 @@ namespace Saint {
 			
 		}
 	};
-	//fortnier
+	//fortnier, // IT COULD GET FUCKING HECTIC
 	class eventHandler {
 	public:
 		eventHandler(int64_t m_hash, std::string m_name, bool* m_toggle) {
