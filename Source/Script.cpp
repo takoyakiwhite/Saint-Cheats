@@ -9970,16 +9970,16 @@ namespace Saint
 					for (auto& evnt : gameEvents) {
 						switch (protections.data) {
 						case 0:
-							*evnt.block = true;
+							evnt.block = true;
 							break;
 						case 1:
-							*evnt.notify = true;
+							evnt.notify = true;
 							break;
 						case 2:
-							*evnt.log = true;
+							evnt.log = true;
 							break;
 						case 3:
-							*evnt.allow_from_friends = true;
+							evnt.allow_from_friends = true;
 							break;
 						}
 					}
@@ -9988,16 +9988,16 @@ namespace Saint
 					for (auto& evnt : gameEvents) {
 						switch (protections.data2) {
 						case 0:
-							*evnt.block = false;
+							evnt.block = false;
 							break;
 						case 1:
-							*evnt.notify = false;
+							evnt.notify = false;
 							break;
 						case 2:
-							*evnt.log = false;
+							evnt.log = false;
 							break;
 						case 3:
-							*evnt.allow_from_friends = false;
+							evnt.allow_from_friends = false;
 							break;
 						}
 					}
@@ -10015,10 +10015,10 @@ namespace Saint
 			{
 				for (auto& evnt : gameEvents) {
 					if (evnt.name == selected_name) {
-						sub->draw_option<toggle>("Block", nullptr, evnt.block);
-						sub->draw_option<toggle>("Notify", nullptr, evnt.notify);
-						sub->draw_option<toggle>("Log", nullptr, evnt.log);
-						sub->draw_option<toggle>("Allow From Friends", nullptr, evnt.allow_from_friends);
+						sub->draw_option<toggle>("Block", nullptr, &evnt.block);
+						sub->draw_option<toggle>("Notify", nullptr, &evnt.notify);
+						sub->draw_option<toggle>("Log", nullptr, &evnt.log);
+						sub->draw_option<toggle>("Allow From Friends", nullptr, &evnt.allow_from_friends);
 					}
 				}
 			});
