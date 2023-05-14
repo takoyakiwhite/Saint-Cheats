@@ -43,11 +43,12 @@ namespace Saint {
 				});
 
 			g_CallbackScript->AddCallback<ModelCallback>(pedModelHash, [=]
-				{angryPlanesPed = PED::CREATE_PED(26, pedModelHash, spawnX, spawnY, spawnZ + 100.0f, spawnHeading, true, true);
-			PED::SET_PED_INTO_VEHICLE(angryPlanesPed, angryPlanesPlane, -1);
-			PED::SET_DRIVER_ABILITY(angryPlanesPed, 0.99f);
-			ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPed, 1);
-			TASK::TASK_COMBAT_PED(angryPlanesPed, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(buffer), 0, 16);
+				{
+					angryPlanesPed = PED::CREATE_PED(26, pedModelHash, spawnX, spawnY, spawnZ + 100.0f, spawnHeading, true, true);
+					PED::SET_PED_INTO_VEHICLE(angryPlanesPed, angryPlanesPlane, -1);
+					PED::SET_DRIVER_ABILITY(angryPlanesPed, 0.99f);
+					ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPed, 1);
+					TASK::TASK_COMBAT_PED(angryPlanesPed, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(buffer), 0, 16);
 				});
 		}
 		void spawn() {

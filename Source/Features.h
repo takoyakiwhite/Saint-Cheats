@@ -33,7 +33,7 @@ namespace Saint {
 
 	inline bool use_from_anywhere = false;
 	inline Vehicle use_from_anywhere_veh;
-
+	inline float tp_nearest_radius = 150.0f;
 	inline bool raycast_with_cam(Cam cam, NativeVector3& raycastHitCoords) {
 		bool raycastHit;
 		NativeVector3 surfaceNormal;
@@ -1352,7 +1352,18 @@ namespace Saint {
 		bool homing = false;
 		bool cluster = false;
 		bool instant_lockon = false;
+		bool auto_give_parachute = false;
+		bool blade_speeder = false;
+		float speed_blade = 1.0f;
 		void init() {
+			if (blade_speeder) {
+				VEHICLE::SET_HELI_BLADES_SPEED(Game->Vehicle(), speed_blade);
+			}
+			if (auto_give_parachute) {
+				if (!WEAPON::HAS_PED_GOT_WEAPON(Game->Self(), 0xFBAB5776, FALSE)) {
+					WEAPON::GIVE_DELAYED_WEAPON_TO_PED(Game->Self(), 0xFBAB5776, 9999, FALSE);
+				}
+			}
 			if (instant_lockon) {
 				if (Game->CPed()->m_weapon_manager->m_selected_weapon_hash == 0x63AB0442) {
 					auto const e = reinterpret_cast<CAmmoProjectileInfo*>(Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info);
@@ -3537,6 +3548,25 @@ namespace Saint {
 		const char* fade_speed[2] = { "Fast", "Slow" };
 		std::size_t fade_speed_i = 0;
 		bool max = false;
+		Vehicle spawn2(Hash hash, NativeVector3 coords) {
+			*script_global(4540726).as<bool*>() = true;
+			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
+				{
+					
+
+
+					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+					Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, coords.x, coords.y, coords.z, ENTITY::GET_ENTITY_HEADING(Game->Self()), true, false, false);
+					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+					DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+					auto networkId = NETWORK::VEH_TO_NET(vehicle);
+					if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
+						NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+					VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+					return vehicle;
+				});
+			return 0;
+		}
 		void spawn(Hash hash, Vehicle* buffer) {
 			*script_global(4540726).as<bool*>() = true;
 			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
@@ -12062,6 +12092,14 @@ namespace Saint {
 	"Giselle", "Amelia", "Isabella", "Zoe", "Ava", "Camila", "Violet", "Sophia",
 	"Evelyn", "Nicole", "Ashley", "Grace", "Brianna", "Natalie", "Olivia", "Elizabeth",
 	"Charlotte", "Emma", "Claude", "Niko", "John", "Misty" };
+	inline void start_activity(int target_id, eActivityType type)
+	{
+		const size_t arg_count = 4;
+		int64_t args[arg_count] = { (int64_t)eRemoteEvent::StartActivity, (int64_t)PLAYER::PLAYER_ID(), (int64_t)type, (int64_t)true};
+
+		g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << target_id);
+	}
+
 	inline void FeatureInitalize() {
 		enter_veh.update();
 		if (ped_test) {

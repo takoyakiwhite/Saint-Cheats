@@ -461,17 +461,8 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Test", rage::joaat("TESTER"), [](sub* sub)
 			{
-				static float wheel_size = 1.0f;
-				sub->draw_option<number<float>>("Wheel Size", nullptr, &wheel_size, 0, 100.0, 0.1, 3, true, "", "", []
-					{
-						auto const e = reinterpret_cast<CVehicleModelInfo*>(Game->CVehicle()->m_model_info);
-						e->m_wheel_scale = wheel_size;
-						e->m_wheel_scale_rear = wheel_size;
-
-					});
-				auto const e = reinterpret_cast<CVehicleModelInfo*>(Game->CVehicle()->m_model_info);
-				sub->draw_option<number<float>>("Move Rate", nullptr, &e->m_wheel_scale, 0, 100.0, 1.0, 3);
-				sub->draw_option<number<float>>("Move Rate 2", nullptr, &e->m_wheel_scale_rear, 0, 100.0, 1.0, 3);
+				
+				
 				sub->draw_option<toggle>(("Enabled"), nullptr, &ped_test);
 				for (int i = 0; i < 457; i++) {
 					sub->draw_option<toggle>((std::format("ped_tester | {}", i).c_str()), nullptr, &ped_tester[i], [=] {
@@ -1085,6 +1076,7 @@ namespace Saint
 					}
 					});
 				sub->draw_option<toggle>(("Auto Deploy"), "Automaticly pulls you're parachute.", &features.auto_parachute);
+				sub->draw_option<toggle>(("Auto Give"), "", &features.auto_give_parachute);
 				sub->draw_option<Break>(("Tint"));
 				for (std::uint32_t i = 0; i < 14; ++i) {
 					sub->draw_option<Button>((parachutes.types[i]), nullptr, [=]
@@ -1759,7 +1751,7 @@ namespace Saint
 					});
 
 				sub->draw_option<toggle>(("Auto Clean"), "", &features.clean_veh);
-
+				sub->draw_option<ToggleWithNumber<float, bool>>("Helicopter Blade Speed", nullptr, &features.blade_speeder, &features.speed_blade, 0.1f, 1.f, 0.1f, 1, false, "", "%");
 
 				sub->draw_option<number<float>>("Forklift Height", nullptr, &features.forklight_height, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
 					VEHICLE::SET_FORKLIFT_FORK_HEIGHT(Game->Vehicle(), features.forklight_height);
@@ -9157,6 +9149,7 @@ namespace Saint
 				sub->draw_option<submenu>("Cage", nullptr, SubmenuCage);
 				sub->draw_option<submenu>("Shoot Single Bullet", nullptr, rage::joaat("SHOOT_BULLET"));
 				sub->draw_option<submenu>("Play Sound", nullptr, rage::joaat("SOUND_PLAY"));
+				sub->draw_option<submenu>("Activites", nullptr, rage::joaat("ACTIVI"));
 				sub->draw_option<toggle>(("Water"), nullptr, &g_players.get_selected.water_loop);
 				sub->draw_option<toggle>(("Fire"), nullptr, &g_players.get_selected.fire_loop);
 				sub->draw_option<toggle>(("Always Wanted"), nullptr, &wanted_lev.always);
@@ -9166,6 +9159,7 @@ namespace Saint
 				sub->draw_option<number<std::int32_t>>("Bounty", nullptr, &boost_power, 0, 10000, 1, 3, false, "", "", [] {
 					g_players.get_selected.bounty(boost_power);
 					});
+			
 				sub->draw_option<Button>(("Taze"), nullptr, [=]
 					{
 						g_players.get_selected.taze();
@@ -9203,6 +9197,69 @@ namespace Saint
 
 
 					});
+				sub->draw_option<Button>("Sound Spam", nullptr, []
+					{
+						QUEUE()
+						{
+							const size_t ArgCount = 2;
+							std::int64_t Args[ArgCount] =
+							{
+								(std::int64_t)eRemoteEvent::SoundSpam,
+								(std::int64_t)PLAYER::PLAYER_ID()
+							};
+
+							g_GameFunctions->m_trigger_script_event(1, Args, ArgCount, 1 << g_SelectedPlayer);
+						}
+						STOP
+					});
+				sub->draw_option<Button>("MC Teleport", nullptr, []
+					{
+						QUEUE()
+						{
+							const size_t ArgCount = 2;
+							std::int64_t Args[ArgCount] =
+							{
+								(std::int64_t)eRemoteEvent::MCTeleport,
+								(std::int64_t)PLAYER::PLAYER_ID()
+							};
+
+							g_GameFunctions->m_trigger_script_event(1, Args, ArgCount, 1 << g_SelectedPlayer);
+						}
+						STOP
+					});
+				static int g_MoneyRemoved{ 500000 };
+				sub->draw_option<number<int>>("Money Removed", nullptr, &g_MoneyRemoved, 0, 15000000, 500000, 3, false, "", "", []
+					{
+						QUEUE()
+						{
+							const size_t ArgCount = 4;
+							std::int64_t Args[ArgCount] =
+							{
+								(std::int64_t)eRemoteEvent::Notification,
+								(std::int64_t)PLAYER::PLAYER_ID(),
+								(std::int64_t)eRemoteEvent::NotificationMoneyRemoved,
+								g_MoneyRemoved
+							};
+
+							g_GameFunctions->m_trigger_script_event(1, Args, ArgCount, 1 << g_SelectedPlayer);
+						}
+						STOP
+					});
+				sub->draw_option<Button>("Force To Mission", nullptr, []
+					{
+						QUEUE()
+						{
+							const size_t ArgCount = 2;
+							std::int64_t Args[ArgCount] =
+							{
+								(std::int64_t)eRemoteEvent::ForceMission,
+								(std::int64_t)PLAYER::PLAYER_ID()
+							};
+
+							g_GameFunctions->m_trigger_script_event(1, Args, ArgCount, 1 << g_SelectedPlayer);
+						}
+						STOP
+					});
 				sub->draw_option<Button>(("Airstrike"), nullptr, [=]
 					{
 
@@ -9224,6 +9281,79 @@ namespace Saint
 
 
 			});
+			g_Render->draw_submenu<sub>(("Activites"), rage::joaat("ACTIVI"), [](sub* sub)
+				{
+					sub->draw_option<Button>(("Tennis"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Tennis);
+						});
+					sub->draw_option<Button>(("Shooting Range"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::ShootingRange);
+						});
+					sub->draw_option<Button>(("Golf"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Golf);
+						});
+					sub->draw_option<Button>(("Flight School"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::PilotSchool);
+						});
+					sub->draw_option<Button>(("Deathmatch"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Deathmatch);
+						});
+					sub->draw_option<Button>(("Arm Wresling"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::ArmWresling);
+						});
+					sub->draw_option<Button>(("Survival"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Survival);
+						});
+					sub->draw_option<Button>(("Skydive"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Skydive);
+						});
+					sub->draw_option<Break>("CEO/MC");
+					sub->draw_option<Button>(("Sightseer"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Sightseer);
+						});
+					sub->draw_option<Button>(("Headhunter"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::HeadHunter);
+						});
+					sub->draw_option<Button>(("Executive Search"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::ExecutiveSearch);
+						});
+					sub->draw_option<Button>(("Asset Recovery"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::AssetRecovery);
+						});
+					sub->draw_option<Button>(("Hostile Takeover"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::HostileTakeover);
+						});
+					sub->draw_option<Button>(("MC Raid"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::BikerDefend);
+						});
+					sub->draw_option<Button>(("Marked For Death"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::MarkedForDeath);
+						});
+					sub->draw_option<Break>("Other");
+					sub->draw_option<Button>(("Heist Prep"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::HeistPrep);
+						});
+					sub->draw_option<Button>(("Resupply"), nullptr, [=]
+						{
+							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::BusinessResupply);
+						});
+				});
 		g_Render->draw_submenu<sub>(("Play Sound"), rage::joaat("SOUND_PLAY"), [](sub* sub)
 			{
 				sub->draw_option<Button>(("Orbital Cannon"), nullptr, [=]
@@ -9733,7 +9863,6 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Protection"), SubmenuProtections, [](sub* sub)
 			{
-				//sub->draw_option<submenu>("Excludes", nullptr, rage::joaat("ExcludesFromScripts")); not needed anymore
 				sub->draw_option<submenu>("Script Events", nullptr, SubmenuScriptEvents);
 				sub->draw_option<submenu>("Game Events", nullptr, SubmenuGameEvents);
 				sub->draw_option<submenu>("Entities", nullptr, SubmenuEntities);
@@ -9786,13 +9915,6 @@ namespace Saint
 			{
 				sub->draw_option<toggle>(("Leave"), nullptr, &rockstarAdminDetector.reaction.leave);
 				sub->draw_option<toggle>(("Notify"), nullptr, &rockstarAdminDetector.reaction.notify);
-			});
-		g_Render->draw_submenu<sub>(("Excludes"), rage::joaat("ExcludesFromScripts"), [](sub* sub)
-			{
-
-				sub->draw_option<toggle>(("Friends"), nullptr, &protections.exclude_friends);
-				sub->draw_option<toggle>(("Self"), nullptr, &protections.exclude_self);
-
 			});
 		g_Render->draw_submenu<sub>(("Game Events"), SubmenuGameEvents, [](sub* sub)
 			{
@@ -9939,10 +10061,10 @@ namespace Saint
 				sub->draw_option<submenu>("Indoors", nullptr, rage::joaat("indoors"));
 				sub->draw_option<submenu>("IPLs", nullptr, rage::joaat("IPLS"));
 				if (sub->GetSelectedOption() == sub->GetNumOptions()) {
-					GRAPHICS::DRAW_MARKER(28, Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, 0, 0, 0, 0, 0, 0, world.clear_area.radius, world.clear_area.radius, world.clear_area.radius, g_Render->m_RadiusSphere.r, g_Render->m_RadiusSphere.g, g_Render->m_RadiusSphere.b, g_Render->m_RadiusSphere.a, false, false, 0, false, NULL, NULL, false);
+					GRAPHICS::DRAW_MARKER(28, Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, 0, 0, 0, 0, 0, 0, tp_nearest_radius, tp_nearest_radius, tp_nearest_radius, g_Render->m_RadiusSphere.r, g_Render->m_RadiusSphere.g, g_Render->m_RadiusSphere.b, g_Render->m_RadiusSphere.a, false, false, 0, false, NULL, NULL, false);
 				}
-				sub->draw_option<number<float>>("Nearest Vehicle", nullptr, &world.clear_area.radius, 0, 1000.0, 1.0, 0, false, "", "m", [] {
-					Vehicle veh = VEHICLE::GET_CLOSEST_VEHICLE(Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, world.clear_area.radius, 0, 0);
+				sub->draw_option<number<float>>("Nearest Vehicle", nullptr, &tp_nearest_radius, 0, 1000.0, 1.0, 0, false, "", "m", [] {
+					Vehicle veh = VEHICLE::GET_CLOSEST_VEHICLE(Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, tp_nearest_radius, 0, 0);
 					if (!VEHICLE::IS_VEHICLE_SEAT_FREE(veh, -1, FALSE))
 					{
 						auto Ped = VEHICLE::GET_PED_IN_VEHICLE_SEAT(veh, -1, FALSE);

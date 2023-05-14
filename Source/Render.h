@@ -332,9 +332,13 @@ namespace Saint {
 		/// <summary>
 		/// Insert a new toast in the list
 		/// </summary>
-		NOTIFY_INLINE VOID InsertNotification(const ImGuiToast& toast)
+		NOTIFY_INLINE VOID InsertNotification(ImGuiToast toast)
 		{
-			
+			for (auto& noti : notifications) {
+				if (noti.get_title() == toast.get_title()) {
+					return;
+				}
+			}
 			update();
 			if (notifications.size() < 10) {
 				if (wants_sounds()) {

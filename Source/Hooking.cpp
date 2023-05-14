@@ -628,7 +628,7 @@ namespace Saint
 			
 		}
 
-		return static_cast<decltype(&IncrementStatEvent)>(g_Hooking->m_OriginalIncrementStatEvent)(neteventclass, Source);
+		return false;
 	}
 
 	bool Hooks::write_player_game_state_data_node(rage::netObject* player, CPlayerGameStateDataNode* node) {
@@ -823,6 +823,14 @@ namespace Saint
 
 		return nullptr;
 	}
+	bool is_in_car(Ped ped) {
+		if (PED::GET_VEHICLE_PED_IS_IN(ped, false) == PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 	bool scripted_game_event2(CScriptedGameEvent* scripted_game_event, CNetGamePlayer* player)
 	{
 		const auto args = scripted_game_event->m_args;
@@ -838,8 +846,8 @@ namespace Saint
 		}
 		
 
-		for (auto m_event : gameEvents) {
-			if (hash == m_event.hash) {
+		for (auto& m_event : gameEvents) {
+			if (m_event.hash == hash) {
 				char notification[64];
 				sprintf(notification, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", player->get_name(), m_event.name.c_str());
 				if (m_event.allow_from_friends) {
@@ -850,11 +858,23 @@ namespace Saint
 					}
 				}
 				if (m_event.log) {
-					g_Logger->Info(notification);
+					if (hash == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(Game->PlayerIndex(sender_id))) 
+					{
+						//dont spam notifcation when in car
+					} 
+					else {
+						g_Logger->Info(notification);
+					}
 					
 				}
 				if (m_event.notify) {
-					g_NotificationManager->add(notification, 2000, 0);
+					if (hash == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(Game->PlayerIndex(sender_id)))
+					{
+						//dont spam notifcation when in car
+					}
+					else {
+						g_NotificationManager->add(notification, 2000, 0);
+					}
 					
 				}
 				if (m_event.block) {
@@ -1294,14 +1314,7 @@ namespace Saint
 
 		return static_cast<decltype(&NetworkEventHandler)>(g_Hooking->m_OriginalNetworkHandler)(networkMgr, source, target, event_id, event_index, event_bitset, buffer_size, buffer);
 	}
-	bool is_in_car(Ped ped) {
-		if (PED::GET_VEHICLE_PED_IS_IN(ped, false) == PED::GET_VEHICLE_PED_IS_IN(Game->Self(), false)) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
+	
 	bool Hooks::GetEventData(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount, int64_t sender)
 	{
 		bool dontreturn = false;
