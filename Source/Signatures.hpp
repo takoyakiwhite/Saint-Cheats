@@ -262,6 +262,9 @@ namespace Saint
 		using ReadBitbufDword = bool(datBitBuffer2* buffer, PVOID read, int bits);
 		ReadBitbufDword* m_ReadBitbufDword;
 
+		using read_bitbuf_array = bool (*)(datBitBuffer2* buffer, PVOID read, int bits, int unk);
+		read_bitbuf_array m_read_bitbuf_array;
+
 		PVOID m_FallTaskConstructor;
 
 		bool* m_send_clone_sync;
@@ -324,6 +327,11 @@ namespace Saint
 				return true;
 			}
 			return false;
+		}
+
+		bool ReadArray(PVOID array, int size)
+		{
+			return get_functions_from_here.m_read_bitbuf_array(this, array, size, 0);
 		}
 
 		template<typename T>

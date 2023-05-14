@@ -37,6 +37,7 @@
 #include <GTAV-Classes/vehicle/CVehicleModelInfo.hpp>
 #include "VectorLists.h"
 #include "json.h"
+#include <GTAV-Classes/weapon/CAmmoRocketInfo.hpp>
 namespace Saint
 {
 #define QUEUE(...)g_FiberPool.queue([__VA_ARGS__] {
@@ -460,6 +461,31 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Test", rage::joaat("TESTER"), [](sub* sub)
 			{
+				static float wheel_size = 1.0f;
+				sub->draw_option<number<float>>("Wheel Size", nullptr, &wheel_size, 0, 100.0, 0.1, 3, true, "", "", []
+					{
+						auto const e = reinterpret_cast<CVehicleModelInfo*>(Game->CVehicle()->m_model_info);
+						e->m_wheel_scale = wheel_size;
+						e->m_wheel_scale_rear = wheel_size;
+
+					});
+				auto const e = reinterpret_cast<CVehicleModelInfo*>(Game->CVehicle()->m_model_info);
+				sub->draw_option<number<float>>("Move Rate", nullptr, &e->m_wheel_scale, 0, 100.0, 1.0, 3);
+				sub->draw_option<number<float>>("Move Rate 2", nullptr, &e->m_wheel_scale_rear, 0, 100.0, 1.0, 3);
+				sub->draw_option<toggle>(("Enabled"), nullptr, &ped_test);
+				for (int i = 0; i < 457; i++) {
+					sub->draw_option<toggle>((std::format("ped_tester | {}", i).c_str()), nullptr, &ped_tester[i], [=] {
+						if (!ped_tester[i])
+						{
+							PED::SET_PED_CONFIG_FLAG(Game->Self(), i, false);
+									
+								
+							
+						}
+						
+					});
+				}
+				sub->draw_option<Break>("SHV");
 				if (std::filesystem::exists("C:\\Saint\\SHV\\") && std::filesystem::is_directory("C:\\Saint\\SHV\\")) {
 
 					shv.GetFilesFromDirectory(shv.m_pluginFiles, "C:\\Saint\\SHV\\", ".asi");
@@ -612,7 +638,7 @@ namespace Saint
 						PLAYER::SET_IGNORE_LOW_PRIORITY_SHOCKING_EVENTS(PLAYER::PLAYER_ID(), false);
 
 					}
-					});
+				});
 				sub->draw_option<toggle>(("Drugs"), "Recreates the micheal strangers & things mission.", &features.drugs, [] {
 					if (!features.drugs)
 					{
@@ -755,28 +781,30 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Face Editor"), rage::joaat("FaceEditor"), [](sub* sub)
 			{
 				sub->draw_option<submenu>("Head Overlay", nullptr, rage::joaat("HeadO"));
-				sub->draw_option<number<std::int32_t>>("Shape First", nullptr, &face_editor.shapeFirstID, 0, 300);
-				sub->draw_option<number<std::int32_t>>("Shape Second", nullptr, &face_editor.shapeSecondID, 0, 300);
-				sub->draw_option<number<std::int32_t>>("Shape Third", nullptr, &face_editor.shapeThirdID, 0, 300);
-				sub->draw_option<number<std::int32_t>>("Skin First", nullptr, &face_editor.skinFirstID, 0, 300);
-				sub->draw_option<number<std::int32_t>>("Skin Second", nullptr, &face_editor.skinSecondID, 0, 300);
-				sub->draw_option<number<std::int32_t>>("Skin Third", nullptr, &face_editor.skinThirdID, 0, 300);
+				sub->draw_option<Scroll<const char*, int>>("Shape First", nullptr, &parents, &face_editor.shapeFirstID);
+				sub->draw_option<Scroll<const char*, int>>("Shape Second", nullptr, &parents, &face_editor.shapeSecondID);
+				sub->draw_option<Scroll<const char*, int>>("Shape Third", nullptr, &parents, &face_editor.shapeThirdID);
+				sub->draw_option<Scroll<const char*, int>>("Skin First", nullptr, &parents, &face_editor.skinFirstID);
+				sub->draw_option<Scroll<const char*, int>>("Skin Second", nullptr, &parents, &face_editor.skinSecondID);
+				sub->draw_option<Scroll<const char*, int>>("Skin Third", nullptr, &parents, &face_editor.skinThirdID);
+
 				sub->draw_option<number<float>>("Shape Mix", nullptr, &face_editor.shapeMix, 0, 1.0, 0.1, 3);
 				sub->draw_option<number<float>>("Skin Mix", nullptr, &face_editor.skinMix, 0, 1.0, 0.1, 3);
 				sub->draw_option<number<float>>("Third Mix", nullptr, &face_editor.thirdMix, 0, 1.0, 0.1, 3);
 				sub->draw_option<Button>(("Apply"), nullptr, []
 					{
-						PED::SET_PED_HEAD_BLEND_DATA(Game->Self(),
-						face_editor.shapeFirstID,
-						face_editor.shapeSecondID,
-						face_editor.shapeThirdID,
-						face_editor.skinFirstID,
-						face_editor.skinSecondID,
-						face_editor.skinThirdID,
-						face_editor.shapeMix,
-						face_editor.skinMix,
-						face_editor.thirdMix,
-						false
+						PED::SET_PED_HEAD_BLEND_DATA(
+							Game->Self(),
+							face_editor.shapeFirstID,
+							face_editor.shapeSecondID,
+							face_editor.shapeThirdID,
+							face_editor.skinFirstID,
+							face_editor.skinSecondID,
+							face_editor.skinThirdID,
+							face_editor.shapeMix,
+							face_editor.skinMix,
+							face_editor.thirdMix,
+							false
 						);
 					});
 				sub->draw_option<Break>(("Features"));
@@ -1584,6 +1612,7 @@ namespace Saint
 				sub->draw_option<submenu>("Weapons", nullptr, rage::joaat("VWeapons"));
 				sub->draw_option<submenu>("Windows", nullptr, rage::joaat("Windows"));
 				sub->draw_option<submenu>("Plate", nullptr, rage::joaat("LPlate"));
+				sub->draw_option<submenu>("Entered", nullptr, rage::joaat("entered"));
 				//sub->draw_option<submenu>("Cargobob", nullptr, rage::joaat("CARGO_BOB"));
 				sub->draw_option<toggle>(("Godmode"), "Prevents your vehicle from taking damage.", &features.vehicle_godmode, [] {
 					if (!features.vehicle_godmode) {
@@ -1619,6 +1648,14 @@ namespace Saint
 				sub->draw_option<toggle>(("Can Be Used By Fleeing Peds"), nullptr, &features.can_be_used_by_peds, [] {
 					if (!features.can_be_used_by_peds) {
 						VEHICLE::SET_VEHICLE_CAN_BE_USED_BY_FLEEING_PEDS(Game->Vehicle(), false);
+					}
+					});
+				sub->draw_option<toggle>(("Explode On Impact"), nullptr, &features.explode_on_impact, [] {
+					
+					});
+				sub->draw_option<toggle>(("Sink When Wrecked"), "Only works in boats.", &features.sinks_when_wrecked, [] {
+					if (!features.sinks_when_wrecked) {
+						VEHICLE::SET_BOAT_SINKS_WHEN_WRECKED(Game->Vehicle(), FALSE);
 					}
 					});
 				sub->draw_option<toggle>(("Remove Deformation"), "Removes deformation from you're vehicle.", &features.remove_def);
@@ -1683,6 +1720,11 @@ namespace Saint
 						}
 					}
 					});
+				sub->draw_option<toggle>(("Disable Break Lights"), "", &features.disable_break_lights, [] {
+					if (!features.disable_break_lights) {
+						VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(Game->Vehicle(), TRUE);
+					}
+					});
 				sub->draw_option<toggle>(("Easy To Land"), "When enabled, the player won't fall off the bike when landing.", &features.easy_to_land, [] {
 					if (!features.easy_to_land) {
 						VEHICLE::SET_BIKE_EASY_TO_LAND(Game->Vehicle(), FALSE);
@@ -1693,10 +1735,21 @@ namespace Saint
 						GRAPHICS::USE_SNOW_WHEEL_VFX_WHEN_UNSHELTERED(false);
 					}
 					});
+				sub->draw_option<toggle>(("Invert Controls"), "Dosen't work on planes/helis", &features.invert_controls, [] {
+					if (!features.invert_controls) {
+						VEHICLE::SET_INVERT_VEHICLE_CONTROLS(Game->Vehicle(), FALSE);
+					}
+					});
 				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Drift", "", &features.drift_on_shift, &features.drift_mode, &features.drift_pos);
 				sub->draw_option<toggle>(("No Gravity"), nullptr, &features.no_grav_veh, [] {
 					if (!features.no_grav_veh) {
 						VEHICLE::SET_VEHICLE_GRAVITY(Game->Vehicle(), true);
+					}
+					});
+
+				sub->draw_option<toggle>(("Fullbeam"), "", &features.fullbeam, [] {
+					if (!features.fullbeam) {
+						VEHICLE::SET_VEHICLE_FULLBEAM(Game->Vehicle(), FALSE);
 					}
 					});
 				sub->draw_option<toggle>(("Mute Sirens"), "", &features.mute_sirens, [] {
@@ -1717,20 +1770,10 @@ namespace Saint
 				sub->draw_option<number<float>>("Helicopter Lagging Rate", nullptr, &features.lagging_rate, 0.0f, 1000.f, .1f, 2, true, "", "", [=] {
 					VEHICLE::SET_HELI_CONTROL_LAGGING_RATE_SCALAR(Game->Vehicle(), features.lagging_rate);
 					});
-				sub->draw_option<number<float>>("Rust", nullptr, &features.rust, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
+				sub->draw_option<number<float>>("Rust", "Only works in vehicles like the besra", &features.rust, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
 					VEHICLE::SET_VEHICLE_ENVEFF_SCALE(Game->Vehicle(), features.rust);
 					});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Explosive Device", nullptr, &features.phone_explosive, &features.phone_pos, false, -1, [] {
-					if (features.phone_pos == 0) {
-						VEHICLE::ADD_VEHICLE_PHONE_EXPLOSIVE_DEVICE(Game->Vehicle());
-					}
-					if (features.phone_pos == 1) {
-						VEHICLE::DETONATE_VEHICLE_PHONE_EXPLOSIVE_DEVICE();
-					}
-					if (features.phone_pos == 2) {
-						VEHICLE::CLEAR_VEHICLE_PHONE_EXPLOSIVE_DEVICE();
-					}
-				});
+				
 				sub->draw_option<Button>("Delete", nullptr, []
 					{
 						Vehicle veh = Game->Vehicle();
@@ -1753,6 +1796,46 @@ namespace Saint
 					});
 
 			});
+			g_Render->draw_submenu<sub>(("Entered"), rage::joaat("entered"), [](sub* sub)
+				{
+					sub->draw_option<Button>("Clear", nullptr, []
+						{
+							enter_veh.vehicles.clear();
+							
+						});
+					sub->draw_option<Break>("List");
+					for (auto& model : enter_veh.vehicles) {
+						sub->draw_option<submenu>(model.m_name.c_str(), nullptr, rage::joaat("Fortniteeee4535"), [=]
+							{
+								enter_veh.selected = model.m_id;
+								
+							});
+
+					}
+				});
+			g_Render->draw_submenu<sub>("Entered", rage::joaat("Fortniteeee4535"), [](sub* sub)
+				{
+					for (auto& model : enter_veh.vehicles) {
+						if (enter_veh.selected == model.m_id) {
+							
+							sub->draw_option<Button>("Set Into", nullptr, [=]
+								{
+
+									PED::SET_PED_INTO_VEHICLE(Game->Self(), enter_veh.selected, -1);
+
+								});
+							sub->draw_option<Button>("Teleport To You", nullptr, [=]
+								{
+
+									NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
+									ENTITY::SET_ENTITY_COORDS(enter_veh.selected, coords.x, coords.y, coords.z, 0, 0, 0, 0);
+
+								});
+						}
+					}
+
+
+				});
 		g_Render->draw_submenu<sub>(("Plate"), rage::joaat("LPlate"), [](sub* sub)
 			{
 				if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false)) {
@@ -2553,6 +2636,10 @@ namespace Saint
 			{
 				for (auto& model : spawned_veh.spawned) {
 					if (spawned_veh.selectedveh == model.m_id) {
+						sub->draw_option<toggle>(("Use All Options"), "All options in vehicle will only work on this vehicle", &use_from_anywhere, [=] {
+							use_from_anywhere_veh = model.m_id;
+
+						});
 						sub->draw_option<Button>("Set Into", nullptr, [=]
 							{
 
@@ -4332,13 +4419,113 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Engine Sound"), SubmenuEngineSound, [](sub* sub)
 			{
 
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &sound_type, &sound_int);
+				sub->draw_option<Scroll<const char*, std::size_t>>("Preset", nullptr, &sound_type, &sound_int);
 				sub->draw_option<Button>(("Apply"), nullptr, []
 					{
 						Vehicle veh = Game->Vehicle();
 						AUDIO::FORCE_USE_AUDIO_GAME_OBJECT(veh, sound_data[sound_int]);
 					});
+				
+				sub->draw_option<Break>(("List"));
+				sub->draw_option<submenu>("Search", nullptr, rage::joaat("EngineSoundSearch"));
+				//sub->draw_option<submenu>("All", nullptr, SubmenuVehicleAll);
 
+				for (std::int32_t i = 0; i < 23; i++) {
+					sub->draw_option<submenu>(get_vehicle_class_name(i), nullptr, rage::joaat("EngineSoundSpawner"), [=]
+						{
+							m_selected_engine_class = i;
+						});
+
+				}
+
+
+			});
+		g_Render->draw_submenu<sub>((get_vehicle_class_name(m_selected_engine_class)), rage::joaat("EngineSoundSpawner"), [](sub* sub)
+			{
+				if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {
+					for (std::int32_t i = 0; i < g_GameFunctions->m_vehicle_hash_pool->capacity; i++) {
+						std::uint64_t info = g_GameFunctions->m_vehicle_hash_pool->get(i);
+						if (info != NULL) {
+							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
+								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
+								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
+								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(Game->HashKey(model_ptr.c_str())) == m_selected_engine_class) {
+									std::stringstream ss;
+									std::string make(make_ptr);
+									std::string model(model_ptr);
+									if (make[0] || model[0]) {
+										make = Game->Label(make.c_str());
+										model = Game->Label(model.c_str());
+										if (make != "NULL" && model != "NULL") {
+											ss << make << " " << model;
+										}
+										else if (model != "NULL") {
+											ss << model;
+										}
+										else {
+											ss << "Unknown";
+										}
+									}
+									Hash hash = *(std::uint32_t*)(info + 0x18);
+									if (sub->GetSelectedOption() == sub->GetNumOptions()) {
+										g_players.draw_info2(hash);
+									}
+
+									sub->draw_option<Button>(Game->VehicleNameHash(hash), nullptr, [=]
+										{
+											AUDIO::FORCE_USE_AUDIO_GAME_OBJECT(Game->Vehicle(), VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(hash));
+
+										});
+								}
+							}
+						}
+					}
+				}
+			});
+		g_Render->draw_submenu<sub>(("Search"), rage::joaat("EngineSoundSearch"), [](sub* sub)
+			{
+				sub->draw_option<KeyboardOption>(("Value"), "Note: this is case sensitive.", enginesearchresults, []
+					{
+						showKeyboard("Enter Something", "", 25, &enginesearchresults, [=] {});
+					});
+				sub->draw_option<Break>(("Results"));
+				if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {
+					for (std::int32_t i = 0; i < g_GameFunctions->m_vehicle_hash_pool->capacity; i++) {
+						std::uint64_t info = g_GameFunctions->m_vehicle_hash_pool->get(i);
+						if (info != NULL) {
+							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
+								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
+								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
+								std::stringstream ss;
+								std::string make(make_ptr);
+								std::string model(model_ptr);
+								if (make[0] || model[0]) {
+									make = Game->Label(make.c_str());
+									model = Game->Label(model.c_str());
+									if (make != "NULL" && model != "NULL") {
+										ss << make << " " << model;
+									}
+									else if (model != "NULL") {
+										ss << model;
+									}
+									else {
+										ss << "Unknown";
+									}
+								}
+								Hash hash = *(std::uint32_t*)(info + 0x18);
+
+								if (has_string_attached(Game->VehicleNameHash(hash), enginesearchresults)) {
+									sub->draw_option<Button>(Game->VehicleNameHash(hash), nullptr, [=]
+										{
+											AUDIO::FORCE_USE_AUDIO_GAME_OBJECT(Game->Vehicle(), VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(hash));
+
+										});
+								}
+
+							}
+						}
+					}
+				}
 
 			});
 		g_Render->draw_submenu<sub>(("Handling"), SubmenuVehicleMultipliers, [](sub* sub)
@@ -4582,6 +4769,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Weapon"), SubmenuWeapon, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Explosive Ammo", nullptr, SubmenuExplosiveAmmo);
+				sub->draw_option<submenu>("Explosion Editor", nullptr, rage::joaat("ED"));
 				sub->draw_option<submenu>("Rapid Fire", nullptr, SubmenuRapidFire);
 				sub->draw_option<submenu>("Triggerbot", nullptr, SubmenuTriggerbot);
 				sub->draw_option<submenu>("Aimbot", nullptr, SubmenuAimbot);
@@ -4595,6 +4783,7 @@ namespace Saint
 				sub->draw_option<submenu>("Bullet Changer", nullptr, rage::joaat("BULLET_CHANGER"));
 				sub->draw_option<submenu>("Particle", nullptr, rage::joaat("ParticleS"));
 				sub->draw_option<submenu>("Missle Launcher", nullptr, rage::joaat("Valk"));
+
 				sub->draw_option<toggle>(("Infinite Ammo"), nullptr, &features.infinite_ammo, [] {
 					if (!features.infinite_ammo) {
 						WEAPON::SET_PED_INFINITE_AMMO_CLIP(Game->Self(), false);
@@ -4603,19 +4792,23 @@ namespace Saint
 				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Teleport", nullptr, &features.teleport_gun, &features.teleport_gun_type, &features.teleport_gun_int);
 				sub->draw_option<toggle>(("Delete"), nullptr, &features.delete_gun);
 				sub->draw_option<toggle>(("Bypass C4 Limit"), nullptr, &features.bypass_c4_limit);
+				
 				sub->draw_option<toggle>(("Gravity"), nullptr, &gravity.enabled);
+				//sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Flags", "", &features.ammo_flag, &features.flag_type, &features.flag_int);
 				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Mark II", "", &weapon.mk2_ammo, &weapon.mk2, &weapon.pos, false, [] {
 					if (!weapon.mk2_ammo) {
 
 						Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info->m_ammo_special_type = eAmmoSpecialType::None;
 					}
 					});
+				
 				sub->draw_option<toggle>(("Aim Tracer"), nullptr, &features.aim_tracer);
 				sub->draw_option<toggle>(("Invisible"), nullptr, &features.invis_weapon, [] {
 					if (!features.invis_weapon) {
 						ENTITY::SET_ENTITY_VISIBLE(Game->Weapon(), TRUE, FALSE);
 					}
 					});
+
 				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Rope", nullptr, &rope_gun.enabled, &rope_gun.type, &rope_gun.pos);
 				//sub->draw_option<toggle>(("Steal"), nullptr, &features.steal_gun);
 				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Money", nullptr, &wdrop.money, &wdrop.money_model, &wdrop.money_model_data);
@@ -4631,10 +4824,114 @@ namespace Saint
 				sub->draw_option<toggle>(("Recolor"), nullptr, &features.recolor);
 				sub->draw_option<toggle>(("Hijack"), nullptr, &features.steal_gun2);
 				sub->draw_option<toggle>(("Repair"), nullptr, &features.repair_gun);
+				sub->draw_option<toggle>(("Revive"), nullptr, &features.revive);
+				sub->draw_option<toggle>(("Instant Lockon"), nullptr, &features.instant_lockon, [] {
+					if (!features.instant_lockon) {
+						if (Game->CPed()->m_weapon_manager->m_selected_weapon_hash == 0x63AB0442) {
+							auto const e = reinterpret_cast<CAmmoProjectileInfo*>(Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info);
+							auto const e2 = reinterpret_cast<CAmmoRocketInfo*>(e);
+							e2->m_time_before_homing = 2.0f;
+						}
+					}
+				});
 
 
 			});
-		g_Render->draw_submenu<sub>(("Valkyrie"), rage::joaat("Valk"), [](sub* sub)
+		g_Render->draw_submenu<sub>(("Explosion Editor"), rage::joaat("ED"), [](sub* sub)
+			{
+				
+				for (auto& weapon : all_weapons.m_Weapons) {
+					if (weapon.hash == Game->CPed()->m_weapon_manager->m_selected_weapon_hash) {
+						if (weapon.category == "Melee" || weapon.category == "Miscellaneous") {
+							return;
+						}
+					}
+				}
+				
+				auto const e = reinterpret_cast<CAmmoProjectileInfo*>(Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info);
+				auto const e2 = reinterpret_cast<CAmmoRocketInfo*>(e);
+				
+				sub->draw_option<number<float>>("Damage", nullptr, &e->m_damage, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Lifetime", nullptr, &e->m_lifetime, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Lifetime (From Vehicle)", nullptr, &e->m_from_vehicle_lifetime, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Lifetime (After Explosion)", nullptr, &e->m_lifetime_after_explosion, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Time", nullptr, &e->m_explosion_time, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Launch Speed", nullptr, &e->m_launch_speed, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Seperation Time", nullptr, &e->m_separation_time, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Time To Reach Target", nullptr, &e->m_time_to_reach_target, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Amping", nullptr, &e->m_amping, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Gravity", nullptr, &e->m_gravity_factor, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Ricochet Tolerance", nullptr, &e->m_ricochet_tolerance, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Ped Ricochet Tolerance", nullptr, &e->m_ped_ricochet_tolerance, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Vehicle Ricochet Tolerance", nullptr, &e->m_vehicle_ricochet_tolerance, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Friction Multiplier", nullptr, &e->m_friction_multiplier, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Trail FX Fade In Time", nullptr, &e->m_trail_fx_fade_in_time, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Trail FX Fade Out Time", nullptr, &e->m_trail_fx_fade_out_time, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Disturb Probe Dist", nullptr, &e->m_disturb_fx_probe_dist, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Disturb Scale", nullptr, &e->m_disturb_fx_scale, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Ground FX Probe Distance", nullptr, &e->m_ground_fx_probe_distance, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Ground FX Probe Distance", nullptr, &e->m_ground_fx_probe_distance, 0.1f, 5000.f, 1.f);
+				sub->draw_option<toggle>(("Alt Tint Colour"), nullptr, &e->m_fx_alt_tint_colour);
+				sub->draw_option<toggle>(("Light Only Active When Stuck"), nullptr, &e->m_light_only_active_when_stuck);
+				sub->draw_option<toggle>(("Light Flickers"), nullptr, &e->m_light_flickers);
+				sub->draw_option<toggle>(("Light Speeds Up"), nullptr, &e->m_light_speeds_up);
+				sub->draw_option<number<float>>("Light Red", nullptr, &e->m_light_colour.x, 0, 255, 1, 3);
+				sub->draw_option<number<float>>("Light Green", nullptr, &e->m_light_colour.y, 0, 255, 1, 3);
+				sub->draw_option<number<float>>("Light Blue", nullptr, &e->m_light_colour.z, 0, 255, 1, 3);
+				sub->draw_option<number<float>>("Light Intensity", nullptr, &e->m_light_intensity, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Light Range", nullptr, &e->m_light_range, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Light Falloff", nullptr, &e->m_light_falloff_exp, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Light Frequency", nullptr, &e->m_light_frequency, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Light Power", nullptr, &e->m_light_power, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Corona Size", nullptr, &e->m_corona_size, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Corona Intensity", nullptr, &e->m_corona_intensity, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Corona Z Bias", nullptr, &e->m_corona_z_bias, 0.1f, 5000.f, 1.f);
+				sub->draw_option<toggle>(("Proximity Affects Firing Player"), nullptr, &e->m_proximity_affects_firing_player);
+				sub->draw_option<toggle>(("Proximity Can Be Triggered By Peds"), nullptr, &e->m_proximity_can_be_triggered_by_peds);
+				sub->draw_option<number<float>>("Proximity Activation Time", nullptr, &e->m_proximity_activation_time, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Proximity Repeated Time", nullptr, &e->m_proximity_repeated_detonation_activation_time, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Proximity Trigger Radius", nullptr, &e->m_proximity_trigger_radius, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Proximity Fuse Time Ped", nullptr, &e->m_proximity_fuse_time_ped, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Proximity Fuse Time Vehicle Min", nullptr, &e->m_proximity_fuse_time_vehicle_min, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Proximity Fuse Time Vehicle Max", nullptr, &e->m_proximity_fuse_time_vehicle_max, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Proximity Fuse Time Vehicle Speed", nullptr, &e->m_proximity_fuse_time_vehicle_speed, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Proximity Light Colour Red", nullptr, &e->m_proximity_light_colour_untriggered.x, 0, 255, 1, 3);
+				sub->draw_option<number<float>>("Proximity Light Colour Green", nullptr, &e->m_proximity_light_colour_untriggered.y, 0, 255, 1, 3);
+				sub->draw_option<number<float>>("Proximity Light Colour Blue", nullptr, &e->m_proximity_light_colour_untriggered.z, 0, 255, 1, 3);
+				sub->draw_option<number<float>>("Proximity Light Frequency", nullptr, &e->m_proximity_light_frequency_multiplier_triggered, 0, 5000, 1.f);
+				sub->draw_option<number<float>>("Proximity Radius", nullptr, &e2->m_proximity_radius, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Time To Ignore Owner", nullptr, &e->m_time_to_ignore_owner, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Charged Launch Time", nullptr, &e->m_charged_launch_time, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Charged Launch Speed", nullptr, &e->m_charged_launch_speed_mult, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<uint32_t>>("Cluster Explosion Count", nullptr, &e->m_cluster_explosion_count, 0, 500, 1);
+				sub->draw_option<number<float>>("Cluster Radius (Min)", nullptr, &e->m_cluster_min_radius, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Cluster Radius (Max)", nullptr, &e->m_cluster_max_radius, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Cluster Initial Delay", nullptr, &e->m_cluster_initial_delay, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Cluster Inbetween Delay", nullptr, &e->m_cluster_inbetween_delay, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Forward Drag Coeff", nullptr, &e2->m_forward_drag_coeff, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Side Drag Coeff", nullptr, &e2->m_side_drag_coeff, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Time Before Homing", nullptr, &e2->m_time_before_homing, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Time Before Switch Target Min", nullptr, &e2->m_time_before_switch_target_min, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Time Before Switch Target Max", nullptr, &e2->m_time_before_switch_target_max, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Pitch Change Rate", nullptr, &e2->m_pitch_change_rate, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Yaw Change Rate", nullptr, &e2->m_yaw_change_rate, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Roll Change Rate", nullptr, &e2->m_roll_change_rate, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Max Roll Angle", nullptr, &e2->m_max_roll_angle_sin, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Lifetime Player Locked Override", nullptr, &e2->m_lifetime_player_vehicle_locked_override_mp, 0.1f, 5000.f, 1.f);
+				sub->draw_option<toggle>(("Should Use Homing Params"), nullptr, &e2->m_homing_rocket_params.m_should_use_homing_params_from_info);
+				sub->draw_option<toggle>(("Should Ignore Owner Combat"), nullptr, &e2->m_homing_rocket_params.m_should_ignore_owner_combat_behaviour);
+				sub->draw_option<number<float>>("Time Before Starting Homing", nullptr, &e2->m_homing_rocket_params.m_time_before_starting_homing, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Time Before Homing Angle Break", nullptr, &e2->m_homing_rocket_params.m_time_before_homing_angle_break, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Turn Rate", nullptr, &e2->m_homing_rocket_params.m_turn_rate_modifier, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Pitch Yaw Roll Clamp", nullptr, &e2->m_homing_rocket_params.m_pitch_yaw_roll_clamp, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Break Lock Angle", nullptr, &e2->m_homing_rocket_params.m_default_homing_rocket_break_lock_angle, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Break Lock Angle (Close)", nullptr, &e2->m_homing_rocket_params.m_default_homing_rocket_break_lock_angle_close, 0.1f, 5000.f, 1.f);
+				sub->draw_option<number<float>>("Break Lock Angle (Distance)", nullptr, &e2->m_homing_rocket_params.m_default_homing_rocket_break_lock_close_distance, 0.1f, 5000.f, 1.f);
+				sub->draw_option<toggle>(("Homing"), nullptr, &features.homing);
+				sub->draw_option<toggle>(("Cluster"), nullptr, &features.cluster);
+
+			});
+		g_Render->draw_submenu<sub>(("Missle Launcher"), rage::joaat("Valk"), [](sub* sub)
 			{
 
 				sub->draw_option<toggle>(("Enabled"), nullptr, &valk.enabled, [] {
@@ -4651,6 +4948,7 @@ namespace Saint
 				sub->draw_option<Scroll<const char*, std::size_t>>("Explosion On End", nullptr, &all_weapons.explosion, &valk.pos);
 				sub->draw_option<toggle>(("Only Explode On Impact"), nullptr, &valk.only_explode_on_impact);
 				sub->draw_option<toggle>(("No-Clip"), nullptr, &valk.no_clip);
+				//sub->draw_option<toggle>(("Nuke"), nullptr, &valk.nuke);
 				sub->draw_option<number<float>>("X", nullptr, &valk.offset.x, -1000000, 1000000, 0.1, 3);
 				sub->draw_option<number<float>>("Y", nullptr, &valk.offset.y, -1000000, 1000000, 0.1, 3);
 				sub->draw_option<number<float>>("Z", nullptr, &valk.offset.z, -1000000, 1000000, 0.1, 3);
@@ -4681,6 +4979,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Bullet Changer"), rage::joaat("BULLET_CHANGER"), [](sub* sub)
 			{
 				sub->draw_option<toggle>(("Enabled"), nullptr, &bullet_changer.enabled);
+				//sub->draw_option<toggle>(("Show Trajectory"), nullptr, &bullet_changer.trajectory);
 				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &all_weapons.name, &bullet_changer.weapon_pos);
 				sub->draw_option<Break>("Attributes");
 				sub->draw_option<toggle>(("Audible"), nullptr, &bullet_changer.Audible);
@@ -5125,6 +5424,9 @@ namespace Saint
 												}
 											}
 										}
+								}
+								if (give_ammo.action_type == 3) {
+									Game->CPed()->m_weapon_manager->m_selected_weapon_hash = weapon.hash;
 								}
 								
 
@@ -9431,7 +9733,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Protection"), SubmenuProtections, [](sub* sub)
 			{
-				sub->draw_option<submenu>("Excludes", nullptr, rage::joaat("ExcludesFromScripts"));
+				//sub->draw_option<submenu>("Excludes", nullptr, rage::joaat("ExcludesFromScripts")); not needed anymore
 				sub->draw_option<submenu>("Script Events", nullptr, SubmenuScriptEvents);
 				sub->draw_option<submenu>("Game Events", nullptr, SubmenuGameEvents);
 				sub->draw_option<submenu>("Entities", nullptr, SubmenuEntities);
@@ -9636,6 +9938,19 @@ namespace Saint
 				sub->draw_option<submenu>("Clubhouse & Warehouses", nullptr, rage::joaat("warhouse"));
 				sub->draw_option<submenu>("Indoors", nullptr, rage::joaat("indoors"));
 				sub->draw_option<submenu>("IPLs", nullptr, rage::joaat("IPLS"));
+				if (sub->GetSelectedOption() == sub->GetNumOptions()) {
+					GRAPHICS::DRAW_MARKER(28, Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, 0, 0, 0, 0, 0, 0, world.clear_area.radius, world.clear_area.radius, world.clear_area.radius, g_Render->m_RadiusSphere.r, g_Render->m_RadiusSphere.g, g_Render->m_RadiusSphere.b, g_Render->m_RadiusSphere.a, false, false, 0, false, NULL, NULL, false);
+				}
+				sub->draw_option<number<float>>("Nearest Vehicle", nullptr, &world.clear_area.radius, 0, 1000.0, 1.0, 0, false, "", "m", [] {
+					Vehicle veh = VEHICLE::GET_CLOSEST_VEHICLE(Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, world.clear_area.radius, 0, 0);
+					if (!VEHICLE::IS_VEHICLE_SEAT_FREE(veh, -1, FALSE))
+					{
+						auto Ped = VEHICLE::GET_PED_IN_VEHICLE_SEAT(veh, -1, FALSE);
+						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Ped);
+						features.DeleteEntity(Ped);
+					}
+					PED::SET_PED_INTO_VEHICLE(Game->Self(), veh, -1);
+				});
 
 
 			});
@@ -10109,6 +10424,7 @@ namespace Saint
 					}
 					});
 				sub->draw_option<toggle>(("Disable Restricted Areas"), "", &world.dra);
+				
 				sub->draw_option<Scroll<const char*, std::size_t>>("Vehicle Density", nullptr, &features.veh_density, &features.vden_pos, true, -1, [] {
 					switch (features.vden_pos) {
 					case 0:
@@ -10277,6 +10593,7 @@ namespace Saint
 							ped_spawner.selected_object = spawned.m_id;
 							ped_spawner.pos = ENTITY::GET_ENTITY_COORDS(spawned.m_id, 0);
 							ped_spawner.rotation = ENTITY::GET_ENTITY_ROTATION(spawned.m_id, 2);
+							ped_spawner.selected_model3 = spawned.m_name;
 						});
 				}
 			});
@@ -10300,6 +10617,34 @@ namespace Saint
 				sub->draw_option<number<float>>("Yaw", nullptr, &ped_spawner.rotation.z, 0, 360, 1, 3, true, "", "", [=] {
 					ENTITY::SET_ENTITY_ROTATION(ped_spawner.selected_object, ENTITY::GET_ENTITY_ROTATION(ped_spawner.selected_object, 2).x, ENTITY::GET_ENTITY_ROTATION(ped_spawner.selected_object, 2).y, ped_spawner.rotation.z, 2, 0);
 				});
+				sub->draw_option<Button>("Copy", nullptr, [=]
+					{
+						g_CallbackScript->AddCallback<ModelCallback>(Game->GetHash(ped_spawner.selected_object), [=] {
+							Hash hash = Game->GetHash(ped_spawner.selected_object);
+
+							Object obj = OBJECT::CREATE_OBJECT_NO_OFFSET(hash, Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, true, false, false);
+							ped_spawner.spawned_objects.push_back({ obj, ped_spawner.selected_model3 });
+
+
+
+
+							});
+
+					});
+				if (ped_spawner.selected_model3 == "prop_skate_halfpipe_cr") {
+					sub->draw_option<Button>("Copy (2)", nullptr, [=]
+						{
+							float length = 9.25f;
+							for (int i = 0; i < 2; i++)
+							{
+								NativeVector3 me = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER::PLAYER_PED_ID(), 0.f, (length * i), 0.f);
+								Object ramp = OBJECT::CREATE_OBJECT(Game->HashKey("prop_skate_halfpipe_cr"), me.x, me.y, me.z - 1.75f, 1, 1, 1);
+								ENTITY::SET_ENTITY_HEADING(ramp, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()));
+								//ENTITY::SET_ENTITY_ROTATION(ramp, CAM::GET_GAMEPLAY_CAM_ROT(0).x, CAM::GET_GAMEPLAY_CAM_ROT(0).y, CAM::GET_GAMEPLAY_CAM_ROT(0).z,  0, 0);
+								ped_spawner.spawned_objects.push_back({ ramp, "prop_skate_halfpipe_cr" });
+							}
+						});
+				}
 			});
 		g_Render->draw_submenu<sub>(("Ped"), rage::joaat("SpawnerWPed"), [](sub* sub)
 			{
@@ -10739,7 +11084,7 @@ namespace Saint
 						for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(Game->Self(), peds, 0); i++)
 						{
 							Ped ped = peds[(i * 2 + 2)];
-							ENTITY::DELETE_ENTITY(&ped);
+							PED::DELETE_PED(&ped);
 
 						}
 						delete peds;
@@ -11418,6 +11763,10 @@ namespace Saint
 				sub->draw_option<submenu>("Themes", nullptr, SubmenuThemes);
 				sub->draw_option<submenu>("Hotkeys", nullptr, rage::joaat("Hotkeys"));
 				sub->draw_option<submenu>("Translations", nullptr, SubMenuTranslations);
+				#ifndef DEV
+				#else
+					sub->draw_option<toggle>(("Spoof To Regular"), nullptr, &spoof_as_reg);
+				#endif	
 				if (Flags->isDev()) {
 
 					sub->draw_option<Button>("Unload", nullptr, []

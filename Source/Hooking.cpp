@@ -823,6 +823,47 @@ namespace Saint
 
 		return nullptr;
 	}
+	bool scripted_game_event2(CScriptedGameEvent* scripted_game_event, CNetGamePlayer* player)
+	{
+		const auto args = scripted_game_event->m_args;
+
+		const auto hash = static_cast<int64_t>(args[0]);
+		auto sender_id = static_cast<std::int32_t>(args[1]);
+		if (protections.exclude_friends) {
+			int netHandle[13];
+			NETWORK::NETWORK_HANDLE_FROM_PLAYER(static_cast<std::int32_t>(args[1]), netHandle, 13);
+			if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
+				return false;
+			}
+		}
+		
+
+		for (auto m_event : gameEvents) {
+			if (hash == m_event.hash) {
+				char notification[64];
+				sprintf(notification, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", player->get_name(), m_event.name.c_str());
+				if (m_event.allow_from_friends) {
+					int netHandle[13];
+					NETWORK::NETWORK_HANDLE_FROM_PLAYER(sender_id, netHandle, 13);
+					if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
+						return false;
+					}
+				}
+				if (m_event.log) {
+					g_Logger->Info(notification);
+					
+				}
+				if (m_event.notify) {
+					g_NotificationManager->add(notification, 2000, 0);
+					
+				}
+				if (m_event.block) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 	void Hooks::NetworkEventHandler(rage::netEventMgr* networkMgr, CNetGamePlayer* source, CNetGamePlayer* target, unsigned __int16 event_id, int event_index, int event_bitset, __int64 buffer_size, datBitBuffer2* buffer)
 	{
 		if (event_id > 91u)
@@ -989,6 +1030,23 @@ namespace Saint
 					return;
 				}
 				buffer->Seek(0);
+				break;
+			}
+			case eNetworkEvents::CScriptedGameEvent:
+			{
+				const auto scripted_game_event = std::make_unique<CScriptedGameEvent>();
+				buffer->ReadDword(&scripted_game_event->m_args_size, 32);
+				if (scripted_game_event->m_args_size - 1 <= 0x1AF)
+					buffer->ReadArray(&scripted_game_event->m_args, 8 * scripted_game_event->m_args_size);
+
+				if (scripted_game_event2(scripted_game_event.get(), source))
+				{
+					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+
+					return;
+				}
+				buffer->Seek(0);
+
 				break;
 			}
 			case eNetworkEvents::CExplosionEvent: {
@@ -1247,52 +1305,54 @@ namespace Saint
 	bool Hooks::GetEventData(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount, int64_t sender)
 	{
 		bool dontreturn = false;
-		auto result = static_cast<decltype(&GetEventData)>(g_Hooking->m_OriginalGetEventData)(eventGroup, eventIndex, args, argCount, sender);
-		auto sender_id = static_cast<std::int32_t>(args[1]);
-		Ped sender_ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(sender_id);
-		const char* sender_name = PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1]));
-		if (protections.exclude_friends) {
-			int netHandle[13];
-			NETWORK::NETWORK_HANDLE_FROM_PLAYER(static_cast<std::int32_t>(args[1]), netHandle, 13);
-			if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
-				return result;
+			auto result = static_cast<decltype(&GetEventData)>(g_Hooking->m_OriginalGetEventData)(eventGroup, eventIndex, args, argCount, sender);
+			auto sender_id = static_cast<std::int32_t>(args[1]);
+			Ped sender_ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(sender_id);
+			const char* sender_name = PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1]));
+			if (protections.exclude_friends) {
+				int netHandle[13];
+				NETWORK::NETWORK_HANDLE_FROM_PLAYER(static_cast<std::int32_t>(args[1]), netHandle, 13);
+				if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
+					return result;
+				}
 			}
-		}
-		if (protections.exclude_self) {
-			if (PLAYER::PLAYER_ID() == sender_id) {
-				return result;
+			if (protections.exclude_self) {
+				if (PLAYER::PLAYER_ID() == sender_id) {
+					return result;
+				}
 			}
-		}
+
+			for (auto m_event : gameEvents) {
+				if (args[0] == m_event.hash) {
+					char notification[64];
+					sprintf(notification, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender_name, m_event.name.c_str());
+					if (m_event.allow_from_friends) {
+						int netHandle[13];
+						NETWORK::NETWORK_HANDLE_FROM_PLAYER(sender_ped, netHandle, 13);
+						if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
+							return result;
+						}
+					}
+					if (m_event.log) {
+						if (args[0] == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(sender_ped)) {} //dont spam notifcation when in car
+						else {
+							g_Logger->Info(notification);
+						}
+					}
+					if (m_event.notify) {
+						if (args[0] == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(sender_ped)) {} //dont spam notifcation when in car
+						else {
+							g_NotificationManager->add(notification, 2000, 0);
+						}
+					}
+					if (m_event.block) {
+						return false;
+					}
+				}
+			}
+			return result;
 		
-		for (auto m_event : gameEvents) {
-			if (m_event.hash == args[0]) {
-				char notification[64];
-				sprintf(notification, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender_name, m_event.name.c_str());
-				if (m_event.allow_from_friends) {
-					int netHandle[13];
-					NETWORK::NETWORK_HANDLE_FROM_PLAYER(sender_ped, netHandle, 13);
-					if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
-						return result;
-					}
-				}
-				if (m_event.log) {
-					if (args[0] == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(sender_ped)) {} //dont spam notifcation when in car
-					else {
-						g_Logger->Info(notification);
-					}
-				}
-				if (m_event.notify) {
-					if (args[0] == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(sender_ped)) {  } //dont spam notifcation when in car
-					else {
-						g_NotificationManager->add(notification, 2000, 0);
-					}
-				}
-				if (m_event.block) {
-					return false;
-				}
-			}
-		}
-		return result;
+		
 	}
 	//crash protection
 	bool Hooks::fragment_physics_crash(uintptr_t a1, uint32_t a2, uintptr_t a3, uintptr_t a4, uintptr_t a5)
@@ -1625,6 +1685,7 @@ namespace Saint
 
 		return OriginalGetProcAddress(hModule, lpProcName);
 	}
+	
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
@@ -1642,7 +1703,7 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->crashProtection, &Hooks::InvalidModsCrashPatch, &m_OriginalModCrash);
 	
 		MH_CreateHook(g_GameFunctions->m_NetworkEvents, &Hooks::NetworkEventHandler, &m_OriginalNetworkHandler);
-		MH_CreateHook(g_GameFunctions->m_GetEventData, &Hooks::GetEventData, &m_OriginalGetEventData);
+		//MH_CreateHook(g_GameFunctions->m_GetEventData, &Hooks::GetEventData, &m_OriginalGetEventData);
 		//crashes
 		MH_CreateHook(g_GameFunctions->m_fragment_physics_crash, &Hooks::fragment_physics_crash, &m_OriginalFragmentCrash);
 		MH_CreateHook(g_GameFunctions->m_fragment_physics_crash_2, &Hooks::fragment_physics_crash_2, &m_OriginalFragmentCrash2);
@@ -1682,7 +1743,7 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->crashProtection);
 		//MH_RemoveHook(g_GameFunctions->m_pickup_creation);
 		MH_RemoveHook(g_GameFunctions->m_NetworkEvents);
-		MH_RemoveHook(g_GameFunctions->m_GetEventData);
+		//MH_RemoveHook(g_GameFunctions->m_GetEventData);
 		MH_RemoveHook(g_GameFunctions->m_fragment_physics_crash);
 		MH_RemoveHook(g_GameFunctions->m_fragment_physics_crash_2);
 		MH_RemoveHook(g_GameFunctions->m_received_clone_sync);

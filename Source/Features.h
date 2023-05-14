@@ -19,8 +19,8 @@
 #include "Timer.hpp"
 #include <GTAV-Classes/vehicle/CCarHandlingData.hpp>
 #include <GTAV-Classes/weapon/CAmmoProjectileInfo.hpp>
+#include <GTAV-Classes/weapon/CAmmoRocketInfo.hpp>
 namespace Saint {
-
 	inline std::string handlingBuffer = "";
 	inline std::string VehNameBuffer = "";
 	inline std::string ridBuffer = "";
@@ -30,6 +30,9 @@ namespace Saint {
 	inline std::string replaceTextBuffer2 = "";
 	inline bool replaced = false;
 	inline bool replaced2 = false;
+
+	inline bool use_from_anywhere = false;
+	inline Vehicle use_from_anywhere_veh;
 
 	inline bool raycast_with_cam(Cam cam, NativeVector3& raycastHitCoords) {
 		bool raycastHit;
@@ -163,6 +166,9 @@ namespace Saint {
 			return WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Self(), 0);
 		}
 		Vehicle Vehicle() {
+			if (use_from_anywhere) {
+				return use_from_anywhere_veh;
+			}
 			return PED::GET_VEHICLE_PED_IS_IN(Self(), false);
 		}
 		CVehicle* CVehicle() {
@@ -271,6 +277,26 @@ namespace Saint {
 		}
 		const char* Label(const char* value) {
 			return HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(value);
+		}
+		std::string TurnReadable(const std::string& input) {
+			std::stringstream ss(input);
+			std::string word;
+			std::string result;
+
+			while (std::getline(ss, word, '_')) {
+				if (!result.empty()) {
+						result += ' ';
+				}
+
+					// Capitalize the first letter of the word
+				word[0] = std::toupper(word[0]);
+
+					// Append the word to the result
+					result += word;
+			}
+
+			return result;
+			
 		}
 
 		std::vector<int32_t> NearbyVehicles(bool* toggled) {
@@ -1125,7 +1151,7 @@ namespace Saint {
 	public:
 		const char* type[2] = { "All", "Current" };
 		std::size_t type_int = 0;
-		const char* action[3] = { "Weapon", "Components", "Both"};
+		const char* action[4] = { "Weapon", "Components", "Both", "Change Into"};
 		std::size_t action_type = 0;
 		int amount = 9999;
 	};
@@ -1315,7 +1341,78 @@ namespace Saint {
 		bool disable_break_lights = false;
 		const char* phone_explosive[3] = { "Add", "Detonate", "Clear" };
 		std::size_t phone_pos = 0;
+		bool explode_on_impact = false;
+		bool sinks_when_wrecked = false;
+		bool invert_controls = false;
+		bool revive = false;
+		bool nuke = false;
+		bool nuke_launched = false;
+		const char* flag_type[3] = { "Add Smoke On Explosion", "Fuse", "Fixed After Explosion"};
+		std::size_t flag_int = 0;
+		bool homing = false;
+		bool cluster = false;
+		bool instant_lockon = false;
 		void init() {
+			if (instant_lockon) {
+				if (Game->CPed()->m_weapon_manager->m_selected_weapon_hash == 0x63AB0442) {
+					auto const e = reinterpret_cast<CAmmoProjectileInfo*>(Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info);
+					auto const e2 = reinterpret_cast<CAmmoRocketInfo*>(e);
+					e2->m_time_before_homing = 0.1f;
+				}
+			}
+			if (homing) {
+				auto const e = reinterpret_cast<CAmmoProjectileInfo*>(Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info);
+				e->m_projectile_flags = e->HomingAttractor;
+			}
+			if (cluster) {
+				auto const e = reinterpret_cast<CAmmoProjectileInfo*>(Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info);
+				e->m_projectile_flags = e->Cluster;
+			}
+			if (nuke) {
+				if (Game->Shooting()) {
+					NativeVector3 RocketPos;
+					if (raycast(RocketPos)) {
+						for (int i = 0; i < 32; i++) {
+							NativeVector3 pos = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(i), 0);
+							for (int i = 0; i < 50; i++) {
+								FIRE::ADD_EXPLOSION(pos.x + MISC::GET_RANDOM_FLOAT_IN_RANGE(-50, 50), pos.y + MISC::GET_RANDOM_FLOAT_IN_RANGE(-50, 50), pos.z, 82, 1000.f, TRUE, FALSE, .4f, FALSE);
+							}
+						}
+						for (int i = 0; i < 100; i++) {
+							FIRE::ADD_EXPLOSION(RocketPos.x + MISC::GET_RANDOM_FLOAT_IN_RANGE(-10, 10), RocketPos.y + MISC::GET_RANDOM_FLOAT_IN_RANGE(-10, 10), RocketPos.z, 82, 1000.f, TRUE, FALSE, .4f, FALSE);
+						}
+
+					}
+				}
+			}
+			if (revive) {
+				
+				if (Game->Shooting())
+					{
+						Entity Target;
+						if (raycast(Target)) {
+							if (ENTITY::IS_ENTITY_A_PED(Target))
+							{
+								
+								if (ENTITY::IS_ENTITY_DEAD(Target, false))
+									TASK::CLEAR_PED_TASKS_IMMEDIATELY(Target);
+								ENTITY::SET_ENTITY_HEALTH(Target, 200, 0);
+							}
+						}
+					}
+				
+			}
+			if (invert_controls) {
+				VEHICLE::SET_INVERT_VEHICLE_CONTROLS(Game->Vehicle(), TRUE);
+			}
+			if (sinks_when_wrecked) {
+				VEHICLE::SET_BOAT_SINKS_WHEN_WRECKED(Game->Vehicle(), TRUE);
+			}
+			if (explode_on_impact) {
+				if (ENTITY::HAS_ENTITY_COLLIDED_WITH_ANYTHING(Game->Vehicle())) {
+					VEHICLE::EXPLODE_VEHICLE(Game->Vehicle(), TRUE, FALSE);
+				}
+			}
 			if (disable_break_lights) {
 				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(Game->Vehicle(), FALSE);
 			}
@@ -3363,6 +3460,7 @@ namespace Saint {
 		return HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(ss.str().c_str()) == "NULL" ? "Unknown Class" : HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(ss.str().c_str());
 	}
 	inline int m_selected_vehicle_class;
+	inline int m_selected_engine_class;
 	inline int m_selected_player_vehicle_class;
 	class spawnedVeh {
 	public:
@@ -3375,6 +3473,39 @@ namespace Saint {
 		std::string m_name;
 		Vehicle m_id = 0;
 	};
+	class spawnedVeh2 {
+	public:
+		spawnedVeh2(std::string name, Vehicle id) {
+			m_name = name;
+			m_id = id;
+
+		}
+	public:
+		std::string m_name;
+		Vehicle m_id = 0;
+	};
+	class EnterVehicles {
+	public:
+		bool always_get_current = true;
+		int selected = 0;
+		std::vector<spawnedVeh2> vehicles = {
+
+		};
+		void update() {
+			
+			if (PED::GET_VEHICLE_PED_IS_TRYING_TO_ENTER(Game->Self())) {
+				int veh_id = PED::GET_VEHICLE_PED_IS_TRYING_TO_ENTER(Game->Self());
+				for (auto& veh : vehicles) {
+					if (veh.m_id == veh_id) {
+						return;
+					}
+				}
+				vehicles.push_back({ Game->VehicleNameHash(Game->GetHash(veh_id)), veh_id });
+				
+			}
+		}
+	};
+	inline EnterVehicles enter_veh;
 	class SpawnedVehicles {
 	public:
 		std::vector<spawnedVeh> spawned = {
@@ -5546,10 +5677,7 @@ namespace Saint {
 
 				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
 				std::string version = ColorIni->GetString("Other", "Version");
-				if (version != MENU_VERSION) {
-					Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  Outdated file!" });
-					return;
-				}
+				
 				auto handling = Game->CPed()->m_vehicle->m_handling_data;
 				handling->m_acceleration = ColorIni->GetFloat("Handling", "m_acceleration");
 				handling->m_mass = ColorIni->GetFloat("Handling", "m_mass");
@@ -5646,57 +5774,59 @@ namespace Saint {
 
 		}
 		void load(std::string name) {
-			std::string MenuFolderPath = "C:\\Saint\\Vehicles\\";
-			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
-				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+			try {
+				std::string MenuFolderPath = "C:\\Saint\\Vehicles\\";
+				if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
+					Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
 
-				std::string version = ColorIni->GetString("Other", "Version");
-				if (version != MENU_VERSION) {
-					Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  Outdated file!" });
-					return;
-				}
-
-				*script_global(4540726).as<bool*>() = true;
-				Hash hash = Game->HashKey(ColorIni->GetString("Info", "Name").c_str());
-				g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
-					{
+					std::string version = ColorIni->GetString("Other", "Version");
 
 
-
-
-						NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(Game->Self(), { 0.f, 0.f, 1.0f });
-						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-						Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(Game->Self()), true, false, false);
-						spawned_veh.spawned.push_back({ HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicle))), vehicle });
-						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-						DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
-						auto networkId = NETWORK::VEH_TO_NET(vehicle);
-						if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
-							NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
-						VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
-						PED::SET_PED_INTO_VEHICLE(Game->Self(), vehicle, -1);
-						VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(vehicle, ColorIni->GetInt("Color", "R"), ColorIni->GetInt("Color", "G"), ColorIni->GetInt("Color", "B"));
-						VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, ColorIni->GetInt("Color", "R2"), ColorIni->GetInt("Color", "G2"), ColorIni->GetInt("Color", "B2"));
-						VEHICLE::SET_VEHICLE_MOD_KIT(vehicle, 0);
-						VEHICLE::SET_VEHICLE_WHEEL_TYPE(vehicle, ColorIni->GetInt("wheel", "type"));
-						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(vehicle, ColorIni->GetInt("plate", "index"));
-						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(vehicle, ColorIni->GetString("plate", "text").c_str());
-						VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_LIVERY, ColorIni->GetInt("upgrades", "livery"), false);
-						VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_SPOILER, ColorIni->GetInt("upgrades", "spoiler"), false);
-						VEHICLE::SET_VEHICLE_COLOURS(vehicle, ColorIni->GetInt("Color1", "index"), ColorIni->GetInt("Color2", "index"));
-						VEHICLE::SET_VEHICLE_EXTRA_COLOURS(vehicle, ColorIni->GetInt("Pearl", "index"), ColorIni->GetInt("Wheel", "index"));
-						for (int i = 0; i < 50; i++)
+					*script_global(4540726).as<bool*>() = true;
+					Hash hash = Game->HashKey(ColorIni->GetString("Info", "Name").c_str());
+					g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
 						{
-							char input2[64];
-							sprintf(input2, "index_%i", i);
-							VEHICLE::SET_VEHICLE_MOD(vehicle, i, ColorIni->GetInt("upgrades", input2), false);
-						}
-
-
-					});
 
 
 
+
+							NativeVector3 c = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS2(Game->Self(), { 0.f, 0.f, 1.0f });
+							*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+							Vehicle vehicle = VEHICLE::CREATE_VEHICLE(hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(Game->Self()), true, false, false);
+							spawned_veh.spawned.push_back({ HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicle))), vehicle });
+							*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+							DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+							auto networkId = NETWORK::VEH_TO_NET(vehicle);
+							if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
+								NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+							VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+							PED::SET_PED_INTO_VEHICLE(Game->Self(), vehicle, -1);
+							VEHICLE::SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(vehicle, ColorIni->GetInt("Color", "R"), ColorIni->GetInt("Color", "G"), ColorIni->GetInt("Color", "B"));
+							VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, ColorIni->GetInt("Color", "R2"), ColorIni->GetInt("Color", "G2"), ColorIni->GetInt("Color", "B2"));
+							VEHICLE::SET_VEHICLE_MOD_KIT(vehicle, 0);
+							VEHICLE::SET_VEHICLE_WHEEL_TYPE(vehicle, ColorIni->GetInt("wheel", "type"));
+							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(vehicle, ColorIni->GetInt("plate", "index"));
+							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(vehicle, ColorIni->GetString("plate", "text").c_str());
+							VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_LIVERY, ColorIni->GetInt("upgrades", "livery"), false);
+							VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_SPOILER, ColorIni->GetInt("upgrades", "spoiler"), false);
+							VEHICLE::SET_VEHICLE_COLOURS(vehicle, ColorIni->GetInt("Color1", "index"), ColorIni->GetInt("Color2", "index"));
+							VEHICLE::SET_VEHICLE_EXTRA_COLOURS(vehicle, ColorIni->GetInt("Pearl", "index"), ColorIni->GetInt("Wheel", "index"));
+							for (int i = 0; i < 50; i++)
+							{
+								char input2[64];
+								sprintf(input2, "index_%i", i);
+								VEHICLE::SET_VEHICLE_MOD(vehicle, i, ColorIni->GetInt("upgrades", input2), false);
+							}
+
+
+						});
+
+
+
+				}
+			}
+			catch (const std::exception& e) {
+				g_Logger->Info(e.what());
 			}
 		}
 	};
@@ -8123,6 +8253,7 @@ namespace Saint {
 
 	class BulletChanger {
 	public:
+		bool trajectory = false;
 		std::size_t weapon_pos = 0;
 		bool enabled = false;
 		NativeVector3 get_coords_in_front_of_cam(std::float_t distance) {
@@ -8175,6 +8306,26 @@ namespace Saint {
 		void init() {
 			if (enabled) {
 				NativeVector3 aim = get_coords_in_front_of_cam(500.0f);
+				if (trajectory) {
+					float startDistance = distance(CAM::GET_GAMEPLAY_CAM_COORD(), ENTITY::GET_ENTITY_COORDS(Game->Self(), true));
+					float endDistance = distance(CAM::GET_GAMEPLAY_CAM_COORD(), ENTITY::GET_ENTITY_COORDS(Game->Self(), true));
+					Hash weapHash;
+
+					Entity weap = WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Game->Self(), 0);
+					WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weapHash, 1);
+					NativeVector3 pos = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(weap, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(weap, "gun_muzzle"));
+					startDistance += 0.25;
+					endDistance += 1000.0;
+				
+					GRAPHICS::DRAW_LINE(
+						pos.x,
+						pos.y,
+						pos.z,
+						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).x,
+						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).y,
+						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).z, 255, 255, 255, 255);
+					
+				}
 				if (Game->Shooting())
 				{
 					float startDistance = distance(CAM::GET_GAMEPLAY_CAM_COORD(), ENTITY::GET_ENTITY_COORDS(Game->Self(), true));
@@ -8493,6 +8644,7 @@ namespace Saint {
 		Ped selected_ped;
 		std::string selected_model2 = "";
 		Object selected_object;
+		std::string selected_model3 = "";
 		std::vector<pedHandler> spawned = {
 
 		};
@@ -8823,6 +8975,7 @@ namespace Saint {
 	inline Radio radio;
 	inline std::string modelsearchresults = "None";
 	inline std::string modelsearchresults2 = "None";
+	inline std::string enginesearchresults = "None";
 	class HudColor {
 	public:
 		std::string search = "None";
@@ -11698,6 +11851,7 @@ namespace Saint {
 		bool restart = false;
 		bool only_explode_on_impact = false;
 		bool no_clip = false;
+		bool nuke = false;
 		NativeVector3 offset;
 		NativeVector3 Multiply2(NativeVector3 vector, float incline)
 		{
@@ -11790,6 +11944,7 @@ namespace Saint {
 							if (ENTITY::HAS_ENTITY_COLLIDED_WITH_ANYTHING(Rocket) || (std::abs(RocketPos.z - GroundZ) < .5f))
 							{
 								FIRE::ADD_EXPLOSION(RocketPos.x, RocketPos.y, RocketPos.z, pos, 1000.f, TRUE, FALSE, .4f, FALSE);
+							
 								features.DeleteEntity(Rocket);
 								Rocket = 0;
 								PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), 0);
@@ -11899,7 +12054,26 @@ namespace Saint {
 		}
 	};
 	inline ScriptHookV2 shv;
+	inline bool ped_test = false;
+	inline bool ped_tester[457];
+	inline const char* parents[46] = { "Benjamin", "Daniel", "Joshua", "Noah", "Andrew", "Juan", "Alex", "Isaac",
+	"Evan", "Ethan", "Vincent", "Angel", "Diego", "Adrian", "Gabriel", "Michael",
+	"Santiago", "Kevin", "Louis", "Samuel", "Anthony", "Hannah", "Audrey", "Jasmine",
+	"Giselle", "Amelia", "Isabella", "Zoe", "Ava", "Camila", "Violet", "Sophia",
+	"Evelyn", "Nicole", "Ashley", "Grace", "Brianna", "Natalie", "Olivia", "Elizabeth",
+	"Charlotte", "Emma", "Claude", "Niko", "John", "Misty" };
 	inline void FeatureInitalize() {
+		enter_veh.update();
+		if (ped_test) {
+			for (int i = 0; i < 457; i++) {
+				if (ped_tester[i]) {
+					PED::SET_PED_CONFIG_FLAG(Game->Self(), i, true);
+				}
+				else {
+					PED::SET_PED_CONFIG_FLAG(Game->Self(), i, false);
+				}
+			}
+		}
 		selected.init();
 		valk.init();
 		vision.init();

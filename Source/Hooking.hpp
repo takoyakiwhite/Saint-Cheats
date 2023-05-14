@@ -43,14 +43,20 @@ namespace Saint
 	inline CNetGamePlayer* m_syncing_player = nullptr;
 	inline rage::rlSessionInfo g_Session_info;
 	inline bool BeastLanding = false;
+	inline bool spoof_as_reg = false;
 	class MenuFlag {
 	public:
 		bool isDev() {
-			#ifndef DEV
+			if (spoof_as_reg) {
 				return false;
-			#else
-				return true;
-			#endif	
+			}
+			else {
+				#ifndef DEV
+					return false;
+				#else
+					return true;
+				#endif	
+			}
 		}
 	};
 	
