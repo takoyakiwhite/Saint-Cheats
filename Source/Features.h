@@ -20,6 +20,7 @@
 #include <GTAV-Classes/vehicle/CCarHandlingData.hpp>
 #include <GTAV-Classes/weapon/CAmmoProjectileInfo.hpp>
 #include <GTAV-Classes/weapon/CAmmoRocketInfo.hpp>
+#include <signal.h>
 namespace Saint {
 	inline std::string handlingBuffer = "";
 	inline std::string VehNameBuffer = "";
@@ -375,6 +376,7 @@ namespace Saint {
 			{"Pistol", rage::joaat("weapon_pistol"), "Handguns"},
 			{"Pistol Mk II", rage::joaat("weapon_pistol_mk2"), "Handguns"},
 			{"Combat Pistol", rage::joaat("weapon_combatpistol"), "Handguns"},
+			{"WM 29 Pistol", rage::joaat("WEAPON_PISTOLXM3"), "Handguns"},
 			{"AP Pistol", rage::joaat("weapon_appistol"), "Handguns"},
 			{"Stun Gun", rage::joaat("weapon_stungun"), "Handguns"},
 			{"Pistol .50", rage::joaat("weapon_pistol50"), "Handguns"},
@@ -445,6 +447,7 @@ namespace Saint {
 			{"Minigun", rage::joaat("weapon_minigun"), "Heavy Weapons"},
 			{"Firework Launcher", rage::joaat("weapon_firework"), "Heavy Weapons"},
 			{"Railgun", rage::joaat("weapon_railgun"), "Heavy Weapons"},
+			{"Railgun 2", rage::joaat("WEAPON_RAILGUNXM3"), "Heavy Weapons"},
 			{"Homing Launcher", rage::joaat("weapon_hominglauncher"), "Heavy Weapons"},
 			{"Compact Grenade Launcher", rage::joaat("weapon_compactlauncher"), "Heavy Weapons"},
 			{"Widowmaker", rage::joaat("weapon_rayminigun"), "Heavy Weapons"},
@@ -467,6 +470,8 @@ namespace Saint {
 			{ "Fire Extinguisher", rage::joaat("weapon_fireextinguisher"), "Miscellaneous" },
 			{ "Hazardous Jerry Can", rage::joaat("weapon_hazardcan"), "Miscellaneous" },
 			{ "Fertilizer Can", rage::joaat("weapon_fertilizercan"), "Miscellaneous" },
+			{ "Garbage Bag", rage::joaat("WEAPON_GARBAGEBAG"), "Miscellaneous" },
+			//{ "Garbage Bag", rage::joaat("WEAPON_GARBAGEBAG"), "Miscellaneous" },
 		};
 		const char* weapon_class_names[11] = { "Melee", "Handguns", "Submachine Guns", "Shotguns", "Assault Rifles", "Light Machine Guns", "Sniper Rifles", "Heavy Weapons", "Throwables", "Miscellaneous"};
 		
@@ -907,6 +912,7 @@ namespace Saint {
 		const char* flip_type[2] = { "Front", "Back" };
 		std::size_t flip_int = 0;
 		bool use_super_jump = true;
+		float force = 1.5;
 		void init() {
 			if (enabled) {
 				if (Jump_Int == 0) {
@@ -937,8 +943,9 @@ namespace Saint {
 					}
 				}
 				if (add_force) {
+					
 					if (PED::IS_PED_JUMPING(Game->Self()) && !PED::IS_PED_RAGDOLL(Game->Self())) {
-						ENTITY::APPLY_FORCE_TO_ENTITY(Game->Self(), 1, 0.f, 1.5f, 0.f, 0.f, 0.f, 0.f, 1, true, true, true, false, true);
+						ENTITY::APPLY_FORCE_TO_ENTITY(Game->Self(), 1, 0.f, force, 0.0f, 0.0f, 0.0f, 0.0f, FALSE, TRUE, TRUE, TRUE, FALSE, TRUE);
 					}
 				}
 			}
@@ -1638,10 +1645,7 @@ namespace Saint {
 			}
 			if (instantalt) {
 				if (GetAsyncKeyState(0xA4) && GetAsyncKeyState(VK_F4)) {
-					g_Hooking->Unhook();
-					g_GameVariables.reset();
-					g_GameFunctions.reset();
-					FreeLibraryAndExitThread(g_Module, 0);
+					raise(SIGSEGV);
 				}
 			}
 			if (fuck_shell) {
@@ -12099,7 +12103,27 @@ namespace Saint {
 
 		g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << target_id);
 	}
+	inline sExplosionFX* GetExplosionFX(Hash ExplosionFXHash) {
+		for (int i = 0; i < 48; i++) {
+			sExplosionFX* ExplosionFX = &g_GameVariables->ExplosionsFXData[i];
+			if (ExplosionFX->NameHash == ExplosionFXHash) {
+				return ExplosionFX;
+			}
+		}
+		return nullptr;
+	}
+	struct transaction {
+		int m_id;
+		int m_variation;
+		int m_price;
+		int m_multiplier;
+		int m_value;
+	};
+	class Basket {
+	public:
+		
 
+	};
 	inline void FeatureInitalize() {
 		enter_veh.update();
 		if (ped_test) {

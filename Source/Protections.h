@@ -70,17 +70,20 @@ namespace Saint {
 		}
 	};
 	//fortnier, // IT COULD GET FUCKING HECTIC
+	
 	class eventHandler {
 	public:
-		eventHandler(int64_t m_hash, std::string m_name, bool* m_toggle) {
+		eventHandler(int64_t m_hash, std::string m_name, bool* m_toggle, std::function<void()> m_action = [] {}) {
 			hash = m_hash;
 			name = m_name;
 			toggled = m_toggle;
+			action = m_action;
 		}
 	public:
 		std::string name;
 		int64_t hash;
 		bool* toggled;
+		std::function<void()> action = [] {};
 	};
 	class eventHandler2 {
 	public:

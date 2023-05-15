@@ -3,9 +3,9 @@
 #include "../Types.hpp"
 #include "TextBox.hpp"
 #include "AbstractSubmenu.hpp"
-
 namespace Saint::UserInterface
 {
+	
 	class tooltipHandler {
 	public:
 		tooltipHandler(const char* m_name) {
@@ -122,6 +122,7 @@ namespace Saint::UserInterface
 
 		void OnTick();
 	public:
+		
 		std::mutex m_Mutex;
 
 		bool m_Opened = false;

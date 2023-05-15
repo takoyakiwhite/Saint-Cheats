@@ -111,57 +111,7 @@ namespace Saint {
 
 		void draw_friend_info(int selected) {
 
-			float x = g_Render->m_PosX;
-			float y = g_Render->m_PosY;
-			Color col;
-
-			float offset = 0.023f;
-			float xfr = x + 0.205f + offset - 0.025f;
-			GRAPHICS::DRAW_RECT(xfr, y + -0.090 + 0.178, 0.183f, 0.178, g_Render->m_OptionUnselectedBackgroundColor.r, g_Render->m_OptionUnselectedBackgroundColor.g, g_Render->m_OptionUnselectedBackgroundColor.b, 160, false);
-			Color col2 = { 255, 255, 255, 190 };
-
-			char timesince[128];
-			char max_speed[128];
-			char seats[64];
-			char price[128];
-			char make[128];
-			sprintf(timesince, "%s", g_GameVariables->m_friendRegistry->m_friends[selected]->m_is_joinable ? "Yes" : "No");
-			sprintf(max_speed, "%i", (int)g_GameVariables->m_friendRegistry->m_friends[selected]->m_rockstar_id);
-			//drawSprite(preview.dict, preview.texture, x + 0.3545595, y + -0.139, 0.1493f, 0.10f, { 255, 255, 255, 255 }, 0.0f);
-			draw_info_text("Joinable", timesince, 1, 0, true);
-			draw_info_text("RID", max_speed, 1, 0);
-
-			switch (g_Render->ThemeIterator) {
-			case 0:
-				col = { 138, 43, 226, 255 };
-				break;
-			case 1:
-				col = { 255, 108, 116, 255 };
-				break;
-			case 2:
-				col = { 15, 82, 186, 255 };
-				break;
-			case 3:
-				col = { 24, 26, 24, 255 };
-				break;
-			case 4:
-				col = { 0, 155, 119, 255 };
-				break;
-			case 5:
-				col = { 70, 38, 180, 255 };
-			case 6:
-				col = { 255, 145, 164, 255 };
-				break;
-			case 7:
-				col = { 17, 17, 17, 255 };
-				break;
-			case 8:
-				col = { 234, 90, 81, 255 };
-				break;
-
-			}
-			GRAPHICS::DRAW_RECT(x - 0.510, y + -0.000, 0.183, -0.002, g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255, false);
-			GRAPHICS::DRAW_RECT(xfr, y + -0.000, 0.183f, -0.002, g_Render->m_HeaderBackgroundColor.r, g_Render->m_HeaderBackgroundColor.g, g_Render->m_HeaderBackgroundColor.b, 255, false);
+			
 		}
 		std::string separateByCommas(int num) {
 			std::string numStr = std::to_string(num);

@@ -42,6 +42,12 @@ namespace Saint
 		uint8_t m_platform; //0x001E
 	};
 	static_assert(sizeof(netConnectionPeer) == 0x20);
+	struct sExplosionFX {
+		Hash NameHash;
+		char Unk[0x20];
+		float Scale;
+		char Unk2[0x38];
+	};
 
 
 
@@ -101,6 +107,8 @@ namespace Saint
 		int* m_resolution_x;
 		int* m_resolution_y;
 
+		sExplosionFX* ExplosionsFXData;
+
 		
 
 	};
@@ -115,9 +123,8 @@ namespace Saint
 		GameFunctions& operator=(GameFunctions const&) = delete;
 		GameFunctions& operator=(GameFunctions&&) = delete;
 
-		using NetworkHandler = void(__int64 a1, __int64 a2, __int64 a3, unsigned __int16 a4, int a5, int a6, __int64 a7, __int64 a8);
-		NetworkHandler* m_NetworkEvents;
-
+		
+		PVOID m_NetworkEvents{};
 
 		
 
@@ -295,6 +302,8 @@ namespace Saint
 
 
 		PVOID m_can_apply_data;
+
+		
 		
 
 

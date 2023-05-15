@@ -4,6 +4,31 @@
 
 namespace Saint
 {
+	class SimpleTimer
+	{
+	public:
+		void Initialize(std::uint64_t ticks)
+		{
+			if (this->m_Tick)
+			{
+				this->m_WakeTime = GetTickCount64() + ticks;
+				this->m_Tick = false;
+			}
+		}
+
+		bool IsReady()
+		{
+			return GetTickCount64() > this->m_WakeTime;
+		}
+
+		void Destroy()
+		{
+			this->m_Tick = true;
+		}
+	private:
+		std::uint64_t m_WakeTime;
+		bool m_Tick;
+	};
 	template<typename T>
 	inline bool is_valid_ptr(T ptr) {
 		uint64_t address = (uint64_t)ptr;
@@ -38,6 +63,23 @@ namespace Saint
 	 * \param key A virtual key code
 	 * \return bool
 	 */
+	inline void IsKeyHeld(bool& value, std::uint16_t key, std::size_t delay)
+	{
+		static SimpleTimer timer;
+		if (GetForegroundWindow() == g_GameVariables->m_GameWindow)
+		{
+			if (GetAsyncKeyState(key) & 1)
+				value = true;
+			else if (GetAsyncKeyState(key) & 0x8000)
+			{
+				timer.Initialize(delay * 100);
+				if (timer.IsReady())
+					value = true;
+			}
+			else
+				timer.Destroy();
+		}
+	}
 	inline bool IsKeyPressed(std::uint16_t key)
 	{
 		if (GetForegroundWindow() == g_GameVariables->m_GameWindow)

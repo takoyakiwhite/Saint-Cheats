@@ -1569,7 +1569,8 @@ namespace Saint
 				sub->draw_option<toggle>(("Enabled"), nullptr, &superjump.enabled);
 				sub->draw_option<Scroll<const char*, std::size_t>>("Animation", nullptr, &superjump.Jump_Type, &superjump.Jump_Int);
 				sub->draw_option<Break>(("Settings"));
-				sub->draw_option<toggle>(("Add Force"), nullptr, &superjump.add_force);
+				
+				sub->draw_option<ToggleWithNumber<float, bool>>("Add Force", nullptr, &superjump.add_force, &superjump.force, 0.1f, 100.f, 0.1f, 2);
 				if (superjump.Jump_Int == 2) {
 					sub->draw_option<toggle>(("Uses Super Jump"), nullptr, &superjump.use_super_jump);
 					sub->draw_option<Scroll<const char*, std::size_t>>("Direction", nullptr, &superjump.flip_type, &superjump.flip_int);
@@ -4761,7 +4762,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Weapon"), SubmenuWeapon, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Explosive Ammo", nullptr, SubmenuExplosiveAmmo);
-				sub->draw_option<submenu>("Explosion Editor", nullptr, rage::joaat("ED"));
+				sub->draw_option<submenu>("Projectile Editor", nullptr, rage::joaat("ED"));
 				sub->draw_option<submenu>("Rapid Fire", nullptr, SubmenuRapidFire);
 				sub->draw_option<submenu>("Triggerbot", nullptr, SubmenuTriggerbot);
 				sub->draw_option<submenu>("Aimbot", nullptr, SubmenuAimbot);
@@ -4775,6 +4776,7 @@ namespace Saint
 				sub->draw_option<submenu>("Bullet Changer", nullptr, rage::joaat("BULLET_CHANGER"));
 				sub->draw_option<submenu>("Particle", nullptr, rage::joaat("ParticleS"));
 				sub->draw_option<submenu>("Missle Launcher", nullptr, rage::joaat("Valk"));
+
 
 				sub->draw_option<toggle>(("Infinite Ammo"), nullptr, &features.infinite_ammo, [] {
 					if (!features.infinite_ammo) {
@@ -4829,9 +4831,11 @@ namespace Saint
 
 
 			});
-		g_Render->draw_submenu<sub>(("Explosion Editor"), rage::joaat("ED"), [](sub* sub)
+		g_Render->draw_submenu<sub>(("Projectile Editor"), rage::joaat("ED"), [](sub* sub)
 			{
-				
+				if (Game->CPed()->m_weapon_manager->m_selected_weapon_hash == 0xA2719263) {
+					return;
+				}
 				for (auto& weapon : all_weapons.m_Weapons) {
 					if (weapon.hash == Game->CPed()->m_weapon_manager->m_selected_weapon_hash) {
 						if (weapon.category == "Melee" || weapon.category == "Miscellaneous") {
@@ -4842,7 +4846,8 @@ namespace Saint
 				
 				auto const e = reinterpret_cast<CAmmoProjectileInfo*>(Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info);
 				auto const e2 = reinterpret_cast<CAmmoRocketInfo*>(e);
-				
+				//sExplosionFX* ExplosionFX = GetExplosionFX(0x8CBD7381); needs to be updated 
+				//sub->draw_option<number<float>>("Damage", nullptr, &ExplosionFX->Scale, 0.1f, 5000.f, 1.f);
 				sub->draw_option<number<float>>("Damage", nullptr, &e->m_damage, 0.1f, 5000.f, 1.f);
 				sub->draw_option<number<float>>("Lifetime", nullptr, &e->m_lifetime, 0.1f, 5000.f, 1.f);
 				sub->draw_option<number<float>>("Lifetime (From Vehicle)", nullptr, &e->m_from_vehicle_lifetime, 0.1f, 5000.f, 1.f);
@@ -5584,32 +5589,7 @@ namespace Saint
 							*script_local(criminal_damage->m_stack, am_criminal_damage::score_idx).as<int*>() = 999'999'999;
 					});
 			});
-		g_Render->draw_submenu<sub>("Friends", SubmenuFriends, [](sub* sub)
-			{
-				static auto friendReg = g_GameVariables->m_friendRegistry;
-
-
-
-				sub->draw_option<Break>(("List"));
-
-				for (int32_t i = 0; i < friendReg->m_friend_count; i++)
-				{
-					if (sub->GetSelectedOption() == sub->GetNumOptions()) {
-						g_players.draw_friend_info(i);
-					}
-					if (friendReg->m_friends[i]->m_name != " ") {
-						char make[128];
-						sprintf(make, "%s %s", friendReg->m_friends[i]->m_name, getFriendStateStr(friendReg->m_friends[i]->m_friend_state, friendReg->m_friends[i]->m_is_joinable).c_str());
-						sub->draw_option<submenu>(make, nullptr, SubmenuSelectedFriend, [=]
-							{
-								SelectedFriend = i;
-							});
-
-					}
-
-				}
-
-			});
+		
 		g_Render->draw_submenu<sub>(g_GameVariables->m_friendRegistry->m_friends[SelectedFriend]->m_name, SubmenuSelectedFriend, [](sub* sub)
 			{
 				sub->draw_option<Button>("Join", "", [] {
@@ -9227,8 +9207,8 @@ namespace Saint
 						}
 						STOP
 					});
-				static int g_MoneyRemoved{ 500000 };
-				sub->draw_option<number<int>>("Money Removed", nullptr, &g_MoneyRemoved, 0, 15000000, 500000, 3, false, "", "", []
+				static int g_MoneyRemoved{ 15000000 };
+				sub->draw_option<number<int>>("Money Removed", nullptr, &g_MoneyRemoved, 0, 15000000, 5000, 3, false, "", "", []
 					{
 						QUEUE()
 						{

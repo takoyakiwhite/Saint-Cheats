@@ -313,6 +313,7 @@ namespace Saint {
 		bool log = false;
 		bool allow_from_friends = false;
 		int64_t hash = (int64_t)eRemoteEvent::NotificationMoneyRemoved;
+		
 	};
 	inline NotificationMoneyRemoved  money_removed;
 	class NotificationMoneyStolen {

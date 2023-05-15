@@ -603,29 +603,24 @@ namespace Saint
 	bool Hooks::IncrementStatEvent(CNetworkIncrementStatEvent* neteventclass, CNetGamePlayer* Source)
 	{
 		if (protections.block_reports) {
-				switch (neteventclass->m_stat)
-				{
+			switch (neteventclass->m_stat)
+			{
 				
-				case rage::joaat("MPPLY_BAD_CREW_STATUS"):
-				case rage::joaat("MPPLY_BAD_CREW_MOTTO"):
-				case rage::joaat("MPPLY_BAD_CREW_NAME"):
-				case rage::joaat("MPPLY_BAD_CREW_EMBLEM"):
-				case rage::joaat("MPPLY_EXPLOITS"):
-				case rage::joaat("MPPLY_GAME_EXPLOITS"):
-				case rage::joaat("MPPLY_TC_ANNOYINGME"):
-				case rage::joaat("MPPLY_TC_HATE"):
-				case rage::joaat("MPPLY_VC_ANNOYINGME"):
-				case rage::joaat("MPPLY_VC_HATE"):
-					char name[128];
-					sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you!", Source->m_player_info->m_net_player_data.m_name);
-					g_NotificationManager->add(name, 2000);
-					return true;
-				}
-				return false;
-							  
-
-
-			
+			case rage::joaat("MPPLY_BAD_CREW_STATUS"):
+			case rage::joaat("MPPLY_BAD_CREW_MOTTO"):
+			case rage::joaat("MPPLY_BAD_CREW_NAME"):
+			case rage::joaat("MPPLY_BAD_CREW_EMBLEM"):
+			case rage::joaat("MPPLY_EXPLOITS"):
+			case rage::joaat("MPPLY_GAME_EXPLOITS"):
+			case rage::joaat("MPPLY_TC_ANNOYINGME"):
+			case rage::joaat("MPPLY_TC_HATE"):
+			case rage::joaat("MPPLY_VC_ANNOYINGME"):
+			case rage::joaat("MPPLY_VC_HATE"):
+				char name[128];
+				sprintf(name, ICON_FA_SHIELD_ALT"  %s reported you!", Source->m_player_info->m_net_player_data.m_name);
+				g_NotificationManager->add(name, 2000);
+				return true;
+			}
 		}
 
 		return false;
@@ -884,7 +879,7 @@ namespace Saint
 		}
 		return false;
 	}
-	void Hooks::NetworkEventHandler(rage::netEventMgr* networkMgr, CNetGamePlayer* source, CNetGamePlayer* target, unsigned __int16 event_id, int event_index, int event_bitset, __int64 buffer_size, datBitBuffer2* buffer)
+	void Hooks::NetworkEventHandler(rage::netEventMgr* networkMgr, CNetGamePlayer* source, CNetGamePlayer* target, uint16_t event_id, int event_index, int event_bitset, int buffer_size, datBitBuffer2* buffer)
 	{
 		if (event_id > 91u)
 		{
@@ -907,8 +902,9 @@ namespace Saint
 					g_NotificationManager->add(name1, 2000, 1);
 					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
 					return;
-					buffer->Seek(0);
+					
 				}
+				buffer->Seek(0);
 				break;
 			}
 			case eNetworkEvents::CRequestControlEvent: {
@@ -924,16 +920,25 @@ namespace Saint
 							return;
 						}
 					}
-					buffer->Seek(0);
+					
 				}
+				buffer->Seek(0);
 				break;
 			}
 			case eNetworkEvents::CNetworkPlaySoundEvent: {
 				if (protections.GameEvents.play_sound) {
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+					std::uint32_t sound_hash = buffer->Read<std::uint32_t>(32);
+
+					if (sound_hash == rage::joaat("Remote_Ring"))
+					{
+						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+						return;
+					}
+					
 					return;
-					buffer->Seek(0);
+					
 				}
+				buffer->Seek(0);
 				break;
 			}
 			case eNetworkEvents::CScriptWorldStateEvent:
@@ -1062,7 +1067,6 @@ namespace Saint
 				if (scripted_game_event2(scripted_game_event.get(), source))
 				{
 					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-
 					return;
 				}
 				buffer->Seek(0);
@@ -1088,9 +1092,11 @@ namespace Saint
 
 						g_NotificationManager->add(name2324, 2000, 1);
 						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+						return;
 					}
-					buffer->Seek(0);
+					
 				}
+				buffer->Seek(0);
 				break;
 			}
 			
@@ -1102,8 +1108,9 @@ namespace Saint
 					g_NotificationManager->add(name2324545645, 2000, 1);
 					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
 					return;
-					buffer->Seek(0);
+					
 				}
+				buffer->Seek(0);
 				break;
 			}
 			case eNetworkEvents::CNetworkClearPedTasksEvent: {
@@ -1116,9 +1123,10 @@ namespace Saint
 						g_NotificationManager->add(g_Freeze, 2000, 1);
 						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
 						return;
-						buffer->Seek(0);
+						
 					}
 				}
+				buffer->Seek(0);
 				break;
 			}
 			case eNetworkEvents::CGiveControlEvent:
@@ -1164,9 +1172,11 @@ namespace Saint
 						g_NotificationManager->add(g_PTFX, 2000, 1);
 						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
 						return;
-						buffer->Seek(0);
+						
 					}
+					
 				}
+				buffer->Seek(0);
 				break;
 			}
 			case eNetworkEvents::CRemoveWeaponEvent: {
@@ -1195,93 +1205,9 @@ namespace Saint
 							return;
 						}
 					}
-					buffer->Seek(0);
+					
 				}
-				break;
-			}\
-			case eNetworkEvents::CRequestPickupEvent: {
-				if (protections.GameEvents.request_pickup) {
-					char g_RemoveWeapons[64];
-					sprintf(g_RemoveWeapons, "Request pickup from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-					return;
-					buffer->Seek(0);
-				}
-				break;
-			}
-			case eNetworkEvents::CGivePickupRewardsEvent: {
-				if (protections.GameEvents.give_pickup_rewards) {
-					char g_RemoveWeapons[64];
-					sprintf(g_RemoveWeapons, "Give pickup rewards from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-					return;
-					buffer->Seek(0);
-				}
-				break;
-			}
-			case eNetworkEvents::CRequestMapPickupEvent: {
-				if (protections.GameEvents.request_map_pickup) {
-					char g_RemoveWeapons[64];
-					sprintf(g_RemoveWeapons, "Request map pickup from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-					return;
-					buffer->Seek(0);
-				}
-				break;
-			}
-			case eNetworkEvents::CRemoveStickyBombEvent: {
-				if (protections.GameEvents.remove_sticky_bomb) {
-					char g_RemoveWeapons[64];
-					sprintf(g_RemoveWeapons, "Remove sticky bomb from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-					return;
-					buffer->Seek(0);
-				}
-				break;
-			}
-			
-			case eNetworkEvents::CWeaponDamageEvent: {
-				if (protections.GameEvents.weapon_damage) {
-					char g_RemoveWeapons[64];
-					sprintf(g_RemoveWeapons, "Weapon damage from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-					return;
-					buffer->Seek(0);
-				}
-				break;
-			}
-			case eNetworkEvents::CVehicleComponentControlEvent: {
-				if (protections.GameEvents.vehicle_component_control) {
-					char g_RemoveWeapons[64];
-					sprintf(g_RemoveWeapons, "Component control from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-					return;
-					buffer->Seek(0);
-				}
-				break;
-			}
-			case eNetworkEvents::CChangeRadioStationEvent: {
-				if (protections.GameEvents.chnage_radio_station) {
-					char g_RemoveWeapons[64];
-					sprintf(g_RemoveWeapons, "Change radio station from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-					return;
-					buffer->Seek(0);
-				}
+				buffer->Seek(0);
 				break;
 			}
 			
@@ -1293,23 +1219,15 @@ namespace Saint
 					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
 					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
 					return;
-					buffer->Seek(0);
+					
 				}
+				buffer->Seek(0);
 				break;
 			}
 			
-			case eNetworkEvents::CBlowUpVehicleEvent: {
-				if (protections.GameEvents.blow_up_vehicle) {
-					char g_RemoveWeapons[64];
-					sprintf(g_RemoveWeapons, "Blow up vehicle from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-					return;
-					buffer->Seek(0);
-				}
-				break;
-			}
+			
+														
+		default: break;
 		}
 
 		return static_cast<decltype(&NetworkEventHandler)>(g_Hooking->m_OriginalNetworkHandler)(networkMgr, source, target, event_id, event_index, event_bitset, buffer_size, buffer);
@@ -1706,8 +1624,7 @@ namespace Saint
 		MH_Initialize();
 		MH_CreateHook(g_GameFunctions->m_GetLabelText, &Hooks::GetLabelText, &m_OriginalGetLabelText);
 		MH_CreateHook(g_GameFunctions->m_WndProc, &Hooks::WndProc, &m_OriginalWndProc);
-		MH_CreateHook(g_GameFunctions->m_PlayerListMenuConstructor, &Hooks::CPlayerListMenuConstructor, &m_OriginalJoinSessionHook);
-		MH_CreateHook(g_GameFunctions->m_PlayerWildcard, &Hooks::PlayerWildCardHandler, &m_OriginalRIDFunction);
+	
 		MH_CreateHook(g_GameFunctions->m_write_player_game_state_data_node, &Hooks::write_player_game_state_data_node, &m_Original_write_player_game_state_data_node);
 		MH_CreateHook(g_GameFunctions->m_write_player_gamer_data_node, &Hooks::write_player_gamer_data_node, &m_Original_write_player_gamer_data_node);
 		MH_CreateHook(g_GameFunctions->m_SendNetInfo, &Hooks::SendNetInfo, &m_OriginalSendNetInfo);
@@ -1716,7 +1633,6 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->crashProtection, &Hooks::InvalidModsCrashPatch, &m_OriginalModCrash);
 	
 		MH_CreateHook(g_GameFunctions->m_NetworkEvents, &Hooks::NetworkEventHandler, &m_OriginalNetworkHandler);
-		//MH_CreateHook(g_GameFunctions->m_GetEventData, &Hooks::GetEventData, &m_OriginalGetEventData);
 		//crashes
 		MH_CreateHook(g_GameFunctions->m_fragment_physics_crash, &Hooks::fragment_physics_crash, &m_OriginalFragmentCrash);
 		MH_CreateHook(g_GameFunctions->m_fragment_physics_crash_2, &Hooks::fragment_physics_crash_2, &m_OriginalFragmentCrash2);
@@ -1731,11 +1647,6 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_task_parachute_object_0x270, &Hooks::task_parachute_object_0x270, &parachute);
 		MH_CreateHook(g_GameFunctions->m_serialize_take_off_ped_variation_task, &Hooks::serialize_take_off_ped_variation_task, &parachute2);
 		MH_CreateHook(g_GameFunctions->m_serialize_vehicle_gadget_data_node, &Hooks::serialize_vehicle_gadget_data_node, &yim_crash);
-		//MH_CreateHook(g_GameFunctions->m_can_apply_data, &Hooks::can_apply_data, &yim_crash2);
-		//MH_CreateHook(g_GameFunctions->m_FallTaskConstructor, &Hooks::FallTaskConstructor, &m_OriginalFallTaskConstructor);
-		//MH_CreateHook(g_GameFunctions->m_GetScriptEvent, &Hooks::NetworkEventHandler, &m_OriginalNetworkHandler);
-		//MH_CreateHook(g_GameFunctions->m_get_network_event_data, &Hooks::GetNetworkEventData, &originalDetection);
-		//MH_CreateHook(g_GameFunctions->m_received_event, &Hooks::GameEvent, &OriginalRecivied);
 		m_D3DHook.Hook(&Hooks::Present, Hooks::PresentIndex);
 		m_D3DHook.Hook(&Hooks::ResizeBuffers, Hooks::ResizeBuffersIndex);
 	}
@@ -1745,18 +1656,13 @@ namespace Saint
 
 		MH_RemoveHook(g_GameFunctions->m_GetLabelText);
 		MH_RemoveHook(g_GameFunctions->m_WndProc);
-		MH_RemoveHook(g_GameFunctions->m_PlayerListMenuConstructor);
-		MH_RemoveHook(g_GameFunctions->m_PlayerWildcard);
-		//MH_RemoveHook(g_GameFunctions->m_ChatMessage);
 		MH_RemoveHook(g_GameFunctions->m_write_player_game_state_data_node);
 		MH_RemoveHook(g_GameFunctions->m_write_player_gamer_data_node);
 		MH_RemoveHook(g_GameFunctions->m_SendNetInfo);
 		MH_RemoveHook(g_GameFunctions->m_send_chat_message);
 		MH_RemoveHook(g_GameFunctions->m_AssignPhysicalIndexHandler);
 		MH_RemoveHook(g_GameFunctions->crashProtection);
-		//MH_RemoveHook(g_GameFunctions->m_pickup_creation);
 		MH_RemoveHook(g_GameFunctions->m_NetworkEvents);
-		//MH_RemoveHook(g_GameFunctions->m_GetEventData);
 		MH_RemoveHook(g_GameFunctions->m_fragment_physics_crash);
 		MH_RemoveHook(g_GameFunctions->m_fragment_physics_crash_2);
 		MH_RemoveHook(g_GameFunctions->m_received_clone_sync);
@@ -1770,12 +1676,6 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->m_task_parachute_object_0x270);
 		MH_RemoveHook(g_GameFunctions->m_serialize_take_off_ped_variation_task);
 		MH_RemoveHook(g_GameFunctions->m_serialize_vehicle_gadget_data_node);
-		//MH_RemoveHook(g_GameFunctions->m_can_apply_data);
-		//MH_RemoveHook(g_GameFunctions->m_FallTaskConstructor);
-		//MH_RemoveHook(g_GameFunctions->m_GetScriptEvent);
-		//MH_RemoveHook(g_GameFunctions->m_get_network_event_data);
-		//MH_RemoveHook(g_GameFunctions->m_received_event);
-		//MH_RemoveHook(g_GameFunctions->m_GetEventData);
 		MH_Uninitialize();
 	}
 
