@@ -286,6 +286,9 @@
     <ClInclude Include="ScriptEventClasses.h">
       <Filter>Core\Features\Protections</Filter>
     </ClInclude>
+    <ClInclude Include="EntityPool.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">

@@ -33,6 +33,7 @@
     <ClInclude Include="Discord\DiscordHandler.hpp" />
     <ClInclude Include="Discord\Discord_Register.h" />
     <ClInclude Include="Discord\Discord_RPC.h" />
+    <ClInclude Include="EntityPool.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Explode.h" />
     <ClInclude Include="fa_solid_900.h" />

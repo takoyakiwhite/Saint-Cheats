@@ -929,4 +929,112 @@ namespace Saint {
 		std::uint32_t m_stat;           // 0x30
 		std::uint32_t m_amount;// 0x34
 	};
+	class CFlyingHandlingData : public CBaseSubHandlingData {
+	public:
+		char pad_0x0000[0x8]; //0x0000
+		float fThrust; //0x0008 
+		float fThrustFallOff; //0x000C 
+		float fThrustVectoring; //0x0010 
+		char pad_0x0014[0x8]; //0x0014
+		float fYawMult; //0x001C 
+		float fYawStabilise; //0x0020 
+		float fSideSlipMult; //0x0024 
+		char pad_0x0028[0x4]; //0x0028
+		float fRollMult; //0x002C 
+		float fRollStabilise; //0x0030 
+		float N000026D3; //0x0034 
+		float fPitchMult; //0x0038 
+		float fPitchStabilise; //0x003C 
+		char pad_0x0040[0x4]; //0x0040
+		float fFormLiftMult; //0x0044 
+		float fAttackLiftMult; //0x0048 
+		float fAttackDiveMult; //0x004C 
+		float fGearDownDragV; //0x0050 
+		float fGearDownLiftMult; //0x0054 
+		float fWindMult; //0x0058 
+		float fMoveRes; //0x005C 
+		rage::fvector3 vecTurnRes; //0x0060 
+		char pad_0x006C[0x4]; //0x006C
+		rage::fvector3 vecSpeedRes; //0x0070 
+		char pad_0x007C[0x4]; //0x007C
+		float fGearDoorFrontOpen; //0x0080 
+		float fGearDoorRearOpen; //0x0084 
+		float fGearDoorRearOpen2; //0x0088 
+		float fGearDoorRearMOpen; //0x008C 
+		float fTurublenceMagnitudeMax; //0x0090 
+		float fTurublenceForceMulti; //0x0094 
+		float fTurublenceRollTorqueMulti; //0x0098 
+		float fTurublencePitchTorqueMulti; //0x009C 
+		float fBodyDamageControlEffectMult; //0x00A0 
+		float fInputSensitivityForDifficulty; //0x00A4 
+		float fOnGroundYawBoostSpeedPeak; //0x00A8 
+		float fOnGroundYawBoostSpeedCap; //0x00AC 
+		float fEngineOffGlideMulti; //0x00B0 
+
+	}; //Size=0x00B4
+
+	class CBoatHandlingData : public CBaseSubHandlingData {
+	public:
+		char pad_0x0000[0x8]; //0x0000
+		float fBoxFrontMult; //0x0008 
+		float fBoxRearMult; //0x000C 
+		float fBoxSideMult; //0x0010 
+		float fSampleTop; //0x0014 
+		float fSampleBottom; //0x0018 
+		float N000028C4; //0x001C 
+		float fAquaplaneForce; //0x0020 
+		float fAquaplanePushWaterMult; //0x0024 
+		float fAquaplanePushWaterCap; //0x0028 
+		float fAquaplanePushWaterApply; //0x002C 
+		float fRudderForce; //0x0030 
+		float fRudderOffsetSubmerge; //0x0034 
+		float fRudderOffsetForce; //0x0038 
+		float fRudderOffsetForceZMult; //0x003C 
+		float fWaveAudioMult; //0x0040 
+		float N000028CE; //0x0044 
+		float N0000283E; //0x0048 
+		float N000028D0; //0x004C 
+		rage::fvector3 vecMoveResistance; //0x0050 
+		float N000028D4; //0x005C 
+		rage::fvector3 vecTurnResistance; //0x0060 
+		float N000028D8; //0x006C 
+		float fLook_L_R_CamHeight; //0x0070 
+		float fDragCoefficient; //0x0074 
+		float fKeelSphereSize; //0x0078 
+		float fPropRadius; //0x007C 
+		float fLowLodAngOffset; //0x0080 
+		float fLowLodDraughtOffset; //0x0084 
+		float fImpellerOffset; //0x0088 
+		float fImpellerForceMult; //0x008C 
+		float fDinghySphereBuoyConst; //0x0090 
+		float fProwRaiseMult; //0x0094 
+
+	}; //Size=0x0098
+
+	class CBikeHandlingData : public CBaseSubHandlingData {
+	public:
+		char pad_0x0000[0x8]; //0x0000
+		float fLeanFwdCOMMult; //0x0008 
+		float fLeanFwdForceMult; //0x000C 
+		float fLeanBakCOMMult; //0x0010 
+		float fLeanBakForceMult; //0x0014 
+		float fMaxBankAngle; //0x0018 
+		char pad_0x001C[0x4]; //0x001C
+		float fFullAnimAngle; //0x0020 
+		float fDesLeanReturnFrac; //0x0024 
+		float fStickLeanMult; //0x0028 
+		float fBrakingStabilityMult; //0x002C 
+		float fInAirSteerMult; //0x0030 
+		float fWheelieBalancePoint; //0x0034 
+		float fStoppieBalancePoint; //0x0038 
+		float fWheelieSteerMult; //0x003C 
+		float fRearBalanceMult; //0x0040 
+		float fFrontBalanceMult; //0x0044 
+		float fBikeGroundSideFrictionMult; //0x0048 
+		float fBikeWheelGroundSideFrictionMult; //0x004C 
+		float fBikeOnStandLeanAngle; //0x0050 c
+		float fBikeOnStandSteerAngle; //0x0054 
+		float fJumpForce; //0x0058 
+
+	}; //Size=0x005C
 }

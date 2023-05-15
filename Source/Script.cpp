@@ -462,7 +462,6 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Test", rage::joaat("TESTER"), [](sub* sub)
 			{
 				
-				
 				sub->draw_option<toggle>(("Enabled"), nullptr, &ped_test);
 				for (int i = 0; i < 457; i++) {
 					sub->draw_option<toggle>((std::format("ped_tester | {}", i).c_str()), nullptr, &ped_tester[i], [=] {
@@ -1606,6 +1605,7 @@ namespace Saint
 				sub->draw_option<submenu>("Windows", nullptr, rage::joaat("Windows"));
 				sub->draw_option<submenu>("Plate", nullptr, rage::joaat("LPlate"));
 				sub->draw_option<submenu>("Entered", nullptr, rage::joaat("entered"));
+				sub->draw_option<submenu>("Wheels", nullptr, rage::joaat("Wheels2"));
 				//sub->draw_option<submenu>("Cargobob", nullptr, rage::joaat("CARGO_BOB"));
 				sub->draw_option<toggle>(("Godmode"), "Prevents your vehicle from taking damage.", &features.vehicle_godmode, [] {
 					if (!features.vehicle_godmode) {
@@ -1789,6 +1789,17 @@ namespace Saint
 					});
 
 			});
+			g_Render->draw_submenu<sub>(("Wheels"), rage::joaat("Wheels2"), [](sub* sub)
+				{
+					if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), NULL))
+						return;
+					static float nigger;
+					sub->draw_option<number<float>>("Size", nullptr, &nigger, 0, 1000.f, 0.1f, 1, true, "", "", [] {
+						Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize = (BYTE)nigger * 10.0f;
+						//nigger = (int)Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize;
+						});
+					sub->draw_option<number<float>>("Width", nullptr, &Game->CVehicle()->m_draw_data->m_vehicleStreamRender->m_tireWidth, 0, 1000.f, 0.1f, 1, false);
+				});
 			g_Render->draw_submenu<sub>(("Entered"), rage::joaat("entered"), [](sub* sub)
 				{
 					sub->draw_option<Button>("Clear", nullptr, []
@@ -4542,6 +4553,81 @@ namespace Saint
 					sub->draw_option<submenu>("Damage", nullptr, HandlingDamage);
 					sub->draw_option<submenu>("Gas", nullptr, HandlingGas);
 					sub->draw_option<submenu>("Camber", nullptr, rage::joaat("Camber"));
+
+					if (VEHICLE::IS_THIS_MODEL_A_PLANE(Game->GetHash(Game->Vehicle()))) {
+
+						for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
+						{
+							if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_FLYING)
+							{
+								auto const dc = reinterpret_cast<CFlyingHandlingData*>(d);
+								sub->draw_option<Break>(("Other"));
+								sub->draw_option<number<float>>("Thrust", nullptr, &dc->fThrust, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Thrust Falloff", nullptr, &dc->fThrustFallOff, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Thrust Vectoring", nullptr, &dc->fThrustVectoring, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Wind Multiplier", nullptr, &dc->fWindMult, 0.0f, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Yaw Multiplier", nullptr, &dc->fYawMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Yaw Stabilise", nullptr, &dc->fYawStabilise, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Roll Multiplier", nullptr, &dc->fRollMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Roll Stabilise", nullptr, &dc->fRollStabilise, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Pitch Multiplier", nullptr, &dc->fPitchMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Pitch Stabilise", nullptr, &dc->fPitchStabilise, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Form Lift", nullptr, &dc->fFormLiftMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Side Slip", nullptr, &dc->fSideSlipMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Attack Lift", nullptr, &dc->fAttackLiftMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Attack Lift (Dive)", nullptr, &dc->fAttackDiveMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Gear Down Drag", nullptr, &dc->fGearDownDragV, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Gear Down Lift", nullptr, &dc->fGearDownLiftMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Move Restistance", nullptr, &dc->fMoveRes, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Turn Restistance (X)", nullptr, &dc->vecTurnRes.x, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Turn Restistance (Y)", nullptr, &dc->vecTurnRes.y, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Turn Restistance (Z)", nullptr, &dc->vecTurnRes.z, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Turbulence Magnitude", nullptr, &dc->fTurublenceMagnitudeMax, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Turbulence Force", nullptr, &dc->fTurublenceForceMulti, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Turbulence Roll Torque", nullptr, &dc->fTurublenceRollTorqueMulti, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Turbulence Pitch Torque", nullptr, &dc->fTurublencePitchTorqueMulti, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Body Damage Control Effect", nullptr, &dc->fBodyDamageControlEffectMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Input Sensitivity", nullptr, &dc->fInputSensitivityForDifficulty, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("On Ground Yaw Boost", nullptr, &dc->fOnGroundYawBoostSpeedPeak, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("On Ground Yaw Boost Cap", nullptr, &dc->fOnGroundYawBoostSpeedCap, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Engine Off Glide", nullptr, &dc->fEngineOffGlideMulti, 0, 1000.f, 0.1f, 1);
+								break;
+							}
+						}
+					}
+					if (VEHICLE::IS_THIS_MODEL_A_BIKE(Game->GetHash(Game->Vehicle()))) {
+						for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
+						{
+							if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_BIKE)
+							{
+								auto const dc = reinterpret_cast<CBikeHandlingData*>(d);
+								sub->draw_option<Break>(("Other"));
+								sub->draw_option<number<float>>("Lean Forward", nullptr, &dc->fLeanFwdCOMMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Lean Forward (Force)", nullptr, &dc->fLeanFwdForceMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Lean Backwards", nullptr, &dc->fLeanBakCOMMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Lean Backwards (Force)", nullptr, &dc->fLeanBakForceMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Max Bank Angle", nullptr, &dc->fMaxBankAngle, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Max Anim Angle", nullptr, &dc->fFullAnimAngle, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Lean Return", nullptr, &dc->fDesLeanReturnFrac, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Stick Lean", nullptr, &dc->fStickLeanMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Breaking Stability", nullptr, &dc->fBrakingStabilityMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("In Air Steer", nullptr, &dc->fInAirSteerMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("In Air Steer", nullptr, &dc->fInAirSteerMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Wheelie Balance Point", nullptr, &dc->fWheelieBalancePoint, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Stoppie Balance Point", nullptr, &dc->fStoppieBalancePoint, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Wheelie Steer Multiplier", nullptr, &dc->fWheelieSteerMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Front Balance", nullptr, &dc->fFrontBalanceMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Rear Balance", nullptr, &dc->fRearBalanceMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Ground Side Friction", nullptr, &dc->fBikeGroundSideFrictionMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Wheel Ground Side Friction", nullptr, &dc->fBikeWheelGroundSideFrictionMult, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Stand Lean Angle", nullptr, &dc->fBikeOnStandLeanAngle, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Stand Steer Angle", nullptr, &dc->fBikeOnStandSteerAngle, 0, 1000.f, 0.1f, 1);
+								sub->draw_option<number<float>>("Jump Force", nullptr, &dc->fJumpForce, 0, 1000.f, 0.1f, 1);
+								break;
+							}
+						}
+					
+					}
 				}
 
 
