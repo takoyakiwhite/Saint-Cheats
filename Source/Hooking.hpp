@@ -106,7 +106,7 @@ namespace Saint
 
 		//crashes
 		static bool received_clone_create(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, eNetObjType object_type, int32_t object_id, int32_t object_flag, rage::datBitBuffer* buffer, int32_t timestamp);
-		static eAckCode received_clone_sync(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, eNetObjType object_type, uint16_t object_id, rage::datBitBuffer* bufer, uint16_t unk, uint32_t timestamp);
+		static eAckCode received_clone_sync(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, eNetObjType object_type, uint16_t object_id, datBitBuffer2* bufer, uint16_t unk, uint32_t timestamp);
 		static std::int64_t constraint_attachment_crash(std::uintptr_t a1);
 		static bool fragment_physics_crash(uintptr_t a1, uint32_t a2, uintptr_t a3, uintptr_t a4, uintptr_t a5);
 		static bool fragment_physics_crash_2(float* a1, float* a2);
@@ -198,6 +198,8 @@ namespace Saint
 		void* yim_crash{};
 
 		void* yim_crash2{};
+
+		void* can_applydata{};
 	
 
 

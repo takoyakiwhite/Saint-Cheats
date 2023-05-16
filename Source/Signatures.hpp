@@ -315,7 +315,28 @@ namespace Saint
 		{
 			return get_functions_from_here.m_ReadBitbufDword(this, integer, bits);
 		}
-
+		bool ReadQWord(uint64_t* integer, int bits)
+		{
+			if (bits <= 32)
+			{
+				uint32_t v10;
+				if (ReadDword(&v10, bits))
+				{
+					*integer = v10;
+					return true;
+				}
+			}
+			else
+			{
+				uint32_t v10, v11;
+				if (ReadDword(&v11, 32u) && ReadDword(&v10, bits - 32u))
+				{
+					*integer = v11 | ((uint64_t)v10 << 32);
+					return true;
+				}
+			}
+			return false;
+		}
 		bool Seek(std::uint32_t bits)
 		{
 			if (bits >= 0) {
@@ -325,7 +346,17 @@ namespace Saint
 			}
 			return false;
 		}
-
+		bool ReadInt64(int64_t* integer, int bits)
+		{
+			uint32_t v8;
+			uint64_t v9;
+			if (ReadDword(&v8, 1u) && ReadQWord(&v9, bits - 1))
+			{
+				*integer = v8 + (v9 ^ -(int64_t)v8);
+				return true;
+			}
+			return false;
+		}
 		bool ReadInt32(int32_t* integer, int bits)
 		{
 			int32_t v8;
@@ -363,6 +394,20 @@ namespace Saint
 			ReadDword(&val, length);
 
 			return T(val);
+		}
+		inline float ReadFloat(int length, float divisor)
+		{
+			auto integer = Read<int>(length);
+
+			float max = (1 << length) - 1;
+			return ((float)integer / max) * divisor;
+		}
+		inline float ReadSignedFloat(int length, float divisor)
+		{
+			auto integer = ReadSigned<int>(length);
+
+			float max = (1 << (length - 1)) - 1;
+			return ((float)integer / max) * divisor;
 		}
 	public:
 		void* m_data; //0x0000

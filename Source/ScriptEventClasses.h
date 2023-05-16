@@ -1,6 +1,15 @@
 #pragma once
 
 namespace Saint {
+	class TeleportToApartment {
+	public:
+		bool block;
+		bool notify = false;
+		bool log = false;
+		bool allow_from_friends = false;
+		int64_t hash = -168599209;
+	};
+	inline TeleportToApartment apartment_tp;
 	class VehicleKick {
 	public:
 		bool block;

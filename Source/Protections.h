@@ -336,12 +336,12 @@ namespace Saint {
 			send_to_cayo_perico.allow_from_friends
 				},
 				{
-			send_to_location.hash,
-			"Teleport To Location",
-			send_to_location.block,
-			send_to_location.notify,
-			send_to_location.log,
-			send_to_location.allow_from_friends
+			apartment_tp.hash,
+			"Teleport To Apartment",
+			apartment_tp.block,
+			apartment_tp.notify,
+			apartment_tp.log,
+			apartment_tp.allow_from_friends
 				},
 				{
 			send_to_cutscene.hash,

@@ -1754,7 +1754,7 @@ namespace Saint
 					});
 
 				sub->draw_option<toggle>(("Auto Clean"), "", &features.clean_veh);
-				sub->draw_option<ToggleWithNumber<float, bool>>("Helicopter Blade Speed", nullptr, &features.blade_speeder, &features.speed_blade, 0.1f, 1.f, 0.1f, 1, false, "", "%");
+				sub->draw_option<ToggleWithNumber<float, bool>>("Helicopter Blade Speed", nullptr, &features.blade_speeder, &features.speed_blade, 0.1f, 1.f, 0.1f, 1, false, "", "");
 
 				sub->draw_option<number<float>>("Forklift Height", nullptr, &features.forklight_height, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
 					VEHICLE::SET_FORKLIFT_FORK_HEIGHT(Game->Vehicle(), features.forklight_height);
@@ -1798,8 +1798,14 @@ namespace Saint
 				if (!VEHICLE::GET_VEHICLE_MOD_VARIATION(Game->Vehicle(), 23))
 					return;
 				static float nigger;
-				sub->draw_option<number<float>>("Size", nullptr, &nigger, 0, 1000.f, 1.0f, 1, true, "", "", [] {
-					Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize = (BYTE)nigger * 100.0f;
+				static float nigger2;
+				sub->draw_option<number<float>>("Size", nullptr, &nigger, 0, 1000.f, 0.1f, 1, true, "", "", [] {
+					Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize = (BYTE)nigger * 20.0f;
+					Game->CVehicle()->m_draw_data->m_vehicleStreamRender->m_tireWidth = nigger;
+					//nigger = (int)Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize;
+					});
+				sub->draw_option<number<float>>("Height", nullptr, &nigger2, 0, 1000.f, 0.1f, 1, true, "", "", [] {
+					Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize = (BYTE)nigger2 * 20.0f;
 					//nigger = (int)Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize;
 					});
 				sub->draw_option<number<float>>("Width", nullptr, &Game->CVehicle()->m_draw_data->m_vehicleStreamRender->m_tireWidth, 0, 1000.f, 0.1f, 1, false);
