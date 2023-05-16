@@ -236,7 +236,7 @@ namespace Saint {
 		{
 			STREAMING::REQUEST_NAMED_PTFX_ASSET(dict);
 			GRAPHICS::USE_PARTICLE_FX_ASSET(dict);
-			GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle, coords, {0, 0, 0}, scale, false, false, false, true);
+			GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particle, coords, { 0, 0, 0 }, scale, false, false, false, true);
 			if (color)
 				GRAPHICS::SET_PARTICLE_FX_NON_LOOPED_COLOUR(r, g, b);
 			STREAMING::REMOVE_PTFX_ASSET();
@@ -286,18 +286,18 @@ namespace Saint {
 
 			while (std::getline(ss, word, '_')) {
 				if (!result.empty()) {
-						result += ' ';
+					result += ' ';
 				}
 
-					// Capitalize the first letter of the word
+				// Capitalize the first letter of the word
 				word[0] = std::toupper(word[0]);
 
-					// Append the word to the result
-					result += word;
+				// Append the word to the result
+				result += word;
 			}
 
 			return result;
-			
+
 		}
 
 		std::vector<int32_t> NearbyVehicles(bool* toggled) {
@@ -348,8 +348,8 @@ namespace Saint {
 		Hash hash;
 
 	};
-	
-		
+
+
 	class m_all_weapons {
 	public:
 		std::vector<AllWeaponsHandler> m_Weapons = {
@@ -473,8 +473,8 @@ namespace Saint {
 			{ "Garbage Bag", rage::joaat("WEAPON_GARBAGEBAG"), "Miscellaneous" },
 			//{ "Garbage Bag", rage::joaat("WEAPON_GARBAGEBAG"), "Miscellaneous" },
 		};
-		const char* weapon_class_names[11] = { "Melee", "Handguns", "Submachine Guns", "Shotguns", "Assault Rifles", "Light Machine Guns", "Sniper Rifles", "Heavy Weapons", "Throwables", "Miscellaneous"};
-		
+		const char* weapon_class_names[11] = { "Melee", "Handguns", "Submachine Guns", "Shotguns", "Assault Rifles", "Light Machine Guns", "Sniper Rifles", "Heavy Weapons", "Throwables", "Miscellaneous" };
+
 		const char* explosion[84] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare",
 			"Dust", "Extinguisher", "Unknown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
 			"Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
@@ -943,7 +943,7 @@ namespace Saint {
 					}
 				}
 				if (add_force) {
-					
+
 					if (PED::IS_PED_JUMPING(Game->Self()) && !PED::IS_PED_RAGDOLL(Game->Self())) {
 						ENTITY::APPLY_FORCE_TO_ENTITY(Game->Self(), 1, 0.f, force, 0.0f, 0.0f, 0.0f, 0.0f, FALSE, TRUE, TRUE, TRUE, FALSE, TRUE);
 					}
@@ -1158,7 +1158,7 @@ namespace Saint {
 	public:
 		const char* type[2] = { "All", "Current" };
 		std::size_t type_int = 0;
-		const char* action[4] = { "Weapon", "Components", "Both", "Change Into"};
+		const char* action[4] = { "Weapon", "Components", "Both", "Change Into" };
 		std::size_t action_type = 0;
 		int amount = 9999;
 	};
@@ -1295,7 +1295,7 @@ namespace Saint {
 		bool fake_lag = false;
 		bool drift_on_shift = false;
 		bool block_rid_joins = false;
-		const char* drift_mode[3] = { "Shift", "Space", "RB"};
+		const char* drift_mode[3] = { "Shift", "Space", "RB" };
 		std::size_t drift_pos;
 		void set_tron_index(int index, int gender) {
 			if (gender == 0) {
@@ -1354,7 +1354,7 @@ namespace Saint {
 		bool revive = false;
 		bool nuke = false;
 		bool nuke_launched = false;
-		const char* flag_type[3] = { "Add Smoke On Explosion", "Fuse", "Fixed After Explosion"};
+		const char* flag_type[3] = { "Add Smoke On Explosion", "Fuse", "Fixed After Explosion" };
 		std::size_t flag_int = 0;
 		bool homing = false;
 		bool cluster = false;
@@ -1362,7 +1362,20 @@ namespace Saint {
 		bool auto_give_parachute = false;
 		bool blade_speeder = false;
 		float speed_blade = 1.0f;
+		int lightning_delay = 0;
+		int delay2 = 0;
+		bool light_nin = false;
+
 		void init() {
+			if (light_nin) {
+
+				if (delay2 == 0 || (int)(GetTickCount64() - delay2) > lightning_delay)
+				{
+
+					MISC::FORCE_LIGHTNING_FLASH();
+					delay2 = GetTickCount64();
+				}
+			}
 			if (blade_speeder) {
 				VEHICLE::SET_HELI_BLADES_SPEED(Game->Vehicle(), speed_blade);
 			}
@@ -1392,33 +1405,30 @@ namespace Saint {
 					if (raycast(RocketPos)) {
 						for (int i = 0; i < 32; i++) {
 							NativeVector3 pos = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(i), 0);
-							for (int i = 0; i < 50; i++) {
-								FIRE::ADD_EXPLOSION(pos.x + MISC::GET_RANDOM_FLOAT_IN_RANGE(-50, 50), pos.y + MISC::GET_RANDOM_FLOAT_IN_RANGE(-50, 50), pos.z, 82, 1000.f, TRUE, FALSE, .4f, FALSE);
-							}
+							FIRE::ADD_EXPLOSION(pos.x, pos.y, pos.z, 82, 1000.f, TRUE, FALSE, .4f, FALSE);
 						}
 						for (int i = 0; i < 100; i++) {
 							FIRE::ADD_EXPLOSION(RocketPos.x + MISC::GET_RANDOM_FLOAT_IN_RANGE(-10, 10), RocketPos.y + MISC::GET_RANDOM_FLOAT_IN_RANGE(-10, 10), RocketPos.z, 82, 1000.f, TRUE, FALSE, .4f, FALSE);
 						}
-
 					}
 				}
 			}
 			if (revive) {
-				
+
 				if (Game->Shooting())
-					{
-						Entity Target;
-						if (raycast(Target)) {
-							if (ENTITY::IS_ENTITY_A_PED(Target))
-							{
-								
-								if (ENTITY::IS_ENTITY_DEAD(Target, false))
-									TASK::CLEAR_PED_TASKS_IMMEDIATELY(Target);
-								ENTITY::SET_ENTITY_HEALTH(Target, 200, 0);
-							}
+				{
+					Entity Target;
+					if (raycast(Target)) {
+						if (ENTITY::IS_ENTITY_A_PED(Target))
+						{
+
+							if (ENTITY::IS_ENTITY_DEAD(Target, false))
+								TASK::CLEAR_PED_TASKS_IMMEDIATELY(Target);
+							ENTITY::SET_ENTITY_HEALTH(Target, 200, 0);
 						}
 					}
-				
+				}
+
 			}
 			if (invert_controls) {
 				VEHICLE::SET_INVERT_VEHICLE_CONTROLS(Game->Vehicle(), TRUE);
@@ -1462,7 +1472,7 @@ namespace Saint {
 						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle(), temp);
 					}
 
-					
+
 					delay2 = GetTickCount64();
 				}
 			}
@@ -1492,10 +1502,10 @@ namespace Saint {
 						if ((GetTickCount() - timer) > 75) {
 							STREAMING::REQUEST_NAMED_PTFX_ASSET("core");
 							GRAPHICS::USE_PARTICLE_FX_ASSET("core");
-							GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("ent_sht_flame", 
-								WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Game->Self(), 0), 
-								0.4f, 0.0f, 0.02f, 89.5f, 0.0f, 90.0f, 
-								ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Game->Self(), 0), "Gun_Nuzzle"), 
+							GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("ent_sht_flame",
+								WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Game->Self(), 0),
+								0.4f, 0.0f, 0.02f, 89.5f, 0.0f, 90.0f,
+								ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Game->Self(), 0), "Gun_Nuzzle"),
 								0.85f, 0, 0, 0
 							);
 							STREAMING::REMOVE_PTFX_ASSET();
@@ -1509,7 +1519,7 @@ namespace Saint {
 				{
 					Entity hitEntity;
 					if (raycast(hitEntity)) {
-						
+
 						if (ENTITY::IS_ENTITY_A_VEHICLE(hitEntity))
 						{
 							if (ChangeNetworkObjectOwner(hitEntity, g_GameFunctions->m_GetNetPlayer(PLAYER::PLAYER_ID())))
@@ -1652,7 +1662,7 @@ namespace Saint {
 				VEHICLE::SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(1000.00f);
 			}
 			if (tron_loop) {
-				
+
 				static int delay2 = 0;
 				if (delay2 == 0 || (int)(GetTickCount64() - delay2) > 1000)
 				{
@@ -1661,15 +1671,15 @@ namespace Saint {
 					}
 
 					if (Game->GetHash(Game->Self()) == rage::joaat("mp_m_freemode_01")) {
-							
-							set_tron_index(selected_tron, 0);
-						}
+
+						set_tron_index(selected_tron, 0);
+					}
 					if (Game->GetHash(Game->Self()) == rage::joaat("mp_f_freemode_01")) {
 						selected_tron += 1;
 						set_tron_index(selected_tron, 1);
 					}
 
-					
+
 					delay2 = GetTickCount64();
 					selected_tron++;
 				}
@@ -2455,7 +2465,7 @@ namespace Saint {
 				money_c = pos2;
 			}
 			NativeVector3 random = { MISC::GET_RANDOM_FLOAT_IN_RANGE(-20, 15), MISC::GET_RANDOM_FLOAT_IN_RANGE(-13, 6), (float)height };
-			
+
 			static int delayfr3 = 0;
 			if (delayfr3 == 0 || (int)(GetTickCount64() - delayfr3) > delay)
 			{
@@ -3507,7 +3517,7 @@ namespace Saint {
 
 		};
 		void update() {
-			
+
 			if (PED::GET_VEHICLE_PED_IS_TRYING_TO_ENTER(Game->Self())) {
 				int veh_id = PED::GET_VEHICLE_PED_IS_TRYING_TO_ENTER(Game->Self());
 				for (auto& veh : vehicles) {
@@ -3516,7 +3526,7 @@ namespace Saint {
 					}
 				}
 				vehicles.push_back({ Game->VehicleNameHash(Game->GetHash(veh_id)), veh_id });
-				
+
 			}
 		}
 	};
@@ -3556,7 +3566,7 @@ namespace Saint {
 			*script_global(4540726).as<bool*>() = true;
 			g_CallbackScript->AddCallback<ModelCallback>(hash, [=]
 				{
-					
+
 
 
 					*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
@@ -3837,7 +3847,7 @@ namespace Saint {
 				Ped PlayerPed = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i);
 				NativeVector3 PedCoords = Game->SCoords();
 				NativeVector3 Coords = ENTITY::GET_ENTITY_COORDS(PlayerPed, false);
-				
+
 
 				if (PLAYER::IS_PLAYER_FREE_AIMING(Game->Id()))
 				{
@@ -5030,7 +5040,7 @@ namespace Saint {
 	class Cage {
 	public:
 		bool is_invisible = false;
-		const char* type[4] = { "Stunt Tube", "Normal", "Cable", "Rub"};
+		const char* type[4] = { "Stunt Tube", "Normal", "Cable", "Rub" };
 		std::size_t data = 0;
 		void add() {
 			switch (data) {
@@ -5438,7 +5448,7 @@ namespace Saint {
 			}
 			catch (...) {
 
-				
+
 			}
 		}
 
@@ -5652,8 +5662,8 @@ namespace Saint {
 				g_Logger->Info(e.what());
 			}
 		}
-		
-		
+
+
 	};
 	inline ThemeLoading g_ThemeLoading;
 	class SaveHandling {
@@ -5711,7 +5721,7 @@ namespace Saint {
 
 				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
 				std::string version = ColorIni->GetString("Other", "Version");
-				
+
 				auto handling = Game->CPed()->m_vehicle->m_handling_data;
 				handling->m_acceleration = ColorIni->GetFloat("Handling", "m_acceleration");
 				handling->m_mass = ColorIni->GetFloat("Handling", "m_mass");
@@ -6645,7 +6655,7 @@ namespace Saint {
 		float vscale = 0.50f;
 		bool enabled = false;
 		bool networked = true;
-		
+
 		std::size_t size = 0;
 		bool gas_cap = false;
 		void init() {
@@ -6779,7 +6789,7 @@ namespace Saint {
 	public:
 
 
-		const char* type[3] = { "Normal", "Sphere", "Sphere (Less Fuzzy)"};
+		const char* type[3] = { "Normal", "Sphere", "Sphere (Less Fuzzy)" };
 		std::size_t size = 0;
 		bool enabled = false;
 		bool rainbow = false;
@@ -7297,7 +7307,7 @@ namespace Saint {
 								if (frozen) {
 									ENTITY::FREEZE_ENTITY_POSITION(cage, true);
 								}
-							});
+								});
 						}
 					}
 				}
@@ -8350,7 +8360,7 @@ namespace Saint {
 					NativeVector3 pos = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(weap, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(weap, "gun_muzzle"));
 					startDistance += 0.25;
 					endDistance += 1000.0;
-				
+
 					GRAPHICS::DRAW_LINE(
 						pos.x,
 						pos.y,
@@ -8358,7 +8368,7 @@ namespace Saint {
 						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).x,
 						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).y,
 						add(CAM::GET_GAMEPLAY_CAM_COORD(), multiply2(rotDirection(CAM::GET_GAMEPLAY_CAM_ROT(0)), endDistance)).z, 255, 255, 255, 255);
-					
+
 				}
 				if (Game->Shooting())
 				{
@@ -8520,11 +8530,11 @@ namespace Saint {
 				if (consume_entites) {
 					if (vehicles) {
 						MISC::CLEAR_AREA_OF_VEHICLES(c.x, c.y, c.z, size, false, false, false, false, false, false, false);
-						
+
 					}
 					if (peds2) {
 						MISC::CLEAR_AREA_OF_PEDS(c.x, c.y, c.z, size, 0);
-						
+
 					}
 				}
 				auto get_nearby_vehs = vehs();
@@ -8599,7 +8609,7 @@ namespace Saint {
 	inline ShootDrops wdrop;
 	class RopeGun {
 	public:
-		const char* type[6] = { "Normal", "Thick 1", "Thick 2", "Thick 3", "Metal Wire", "Metal Wire 2"};
+		const char* type[6] = { "Normal", "Thick 1", "Thick 2", "Thick 3", "Metal Wire", "Metal Wire 2" };
 		std::size_t pos = 0;
 		bool enabled = false;
 		Entity rope_ent0;
@@ -8702,7 +8712,7 @@ namespace Saint {
 				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 				NativeVector3 c = Game->SCoords();
 				Ped ped = PED::CREATE_PED(0, hash, c.x, c.y, c.z, 0, true, false);
-				spawned.push_back({ped, selected_model});
+				spawned.push_back({ ped, selected_model });
 				*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
 				fbr::cur()->wait();
 				STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
@@ -8859,7 +8869,7 @@ namespace Saint {
 		bool on_collison = false;
 		bool on_jump = false;
 		int threshold = 500;
-		const char* TypeName[4] = { "Normal", "Stiff Legs/Body", "Narrow Leg Stumble", "Wide Leg Stumble"};
+		const char* TypeName[4] = { "Normal", "Stiff Legs/Body", "Narrow Leg Stumble", "Wide Leg Stumble" };
 		std::size_t pos = 0;
 		void init() {
 			if (on_collison) {
@@ -9380,7 +9390,7 @@ namespace Saint {
 	};
 	class Speech {
 	public:
-		const char* voices[5] = { "Ambient", "Ballas", "Cop", "Franklin", "Lester"};
+		const char* voices[5] = { "Ambient", "Ballas", "Cop", "Franklin", "Lester" };
 		std::size_t pos;
 		const char* params[2] = { "Normal", "Megaphone" };
 		const char* paramnames[2] = { "SPEECH_PARAMS_STANDARD", "SPEECH_PARAMS_MEGAPHONE" };
@@ -9413,7 +9423,7 @@ namespace Saint {
 			{ "Hi", "GENERIC_HI", "LESTER"},
 			{ "Interrupt", "GENERIC_INTERRUPT_ANNOYED", "LESTER"},
 			{ "Wait For Me", "WAIT_FOR_ME", "LESTER"},
-			
+
 		};
 	};
 	inline Speech speech;
@@ -9444,7 +9454,7 @@ namespace Saint {
 				Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info->m_ammo_special_type = eAmmoSpecialType::Tracer;
 				break;
 			}
-			
+
 		}
 		void init() {
 			if (mk2_ammo) {
@@ -9455,7 +9465,7 @@ namespace Saint {
 	inline Weapon22 weapon;
 	class HeadOverlay {
 	public:
-		const char* names[13] = { "Blemishes", "Facial Hair", "Eyebrows", "Ageing", "Makeup", "Blush", "Complexion", "Sun Damage", "Lipstick", "Moles/Freckles", "Chest Hair", "Body Blemishes", "Add Body Blemishes"};
+		const char* names[13] = { "Blemishes", "Facial Hair", "Eyebrows", "Ageing", "Makeup", "Blush", "Complexion", "Sun Damage", "Lipstick", "Moles/Freckles", "Chest Hair", "Body Blemishes", "Add Body Blemishes" };
 		std::size_t index;
 		float opacity;
 		int indexValue;
@@ -9464,7 +9474,7 @@ namespace Saint {
 	public:
 		HeadOverlay headOverlay;
 		const char* faceFeatures[20] = { "Nose Width(Thin / Wide)", "Nose Peak(Up / Down)", "Nose Length(Long / Short)", "Nose Bone Curveness(Crooked / Curved)", "Nose Tip(Up / Down)", "Nose Bone Twist(Left / Right)",
-			"Eyebrow(Up / Down)", "Eyebrow(In / Out)", "Cheek Bones(Up / Down)", "Cheek Sideways Bone Size(In / Out)", "Cheek Bones Width(Puffed / Gaunt)", "Eye Opening(Both) (Wide / Squinted)", "Lip Thickness(Both) (Fat / Thin)", 
+			"Eyebrow(Up / Down)", "Eyebrow(In / Out)", "Cheek Bones(Up / Down)", "Cheek Sideways Bone Size(In / Out)", "Cheek Bones Width(Puffed / Gaunt)", "Eye Opening(Both) (Wide / Squinted)", "Lip Thickness(Both) (Fat / Thin)",
 			"Jaw Bone Width(Narrow / Wide)", "Jaw Bone Shape(Round / Square)", "Chin Bone(Up / Down)", "Chin Bone Length(In / Out or Backward / Forward)", "Chin Bone Shape(Pointed / Square)", "Chin Hole(Chin Bum)", "Neck Thickness(Thin / Thick)" };
 		int shapeFirstID;
 		int shapeSecondID;
@@ -9480,7 +9490,7 @@ namespace Saint {
 	};
 	inline FaceEditor face_editor;
 	inline void bits() {
-		
+
 	}
 	typedef const char* String;
 	inline void requestIplSet(String* ipls, int count) {
@@ -9490,8 +9500,8 @@ namespace Saint {
 			}
 		}
 	}
-	
-	
+
+
 	class TeleportLoading {
 	public:
 		std::string buffer;
@@ -9506,7 +9516,7 @@ namespace Saint {
 			auto handling = Game->CPed()->m_vehicle->m_handling_data;
 			std::string MenuFolderPath = "C:\\Saint\\Teleports\\";
 			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
-			
+
 
 			ColorIni->WriteFloat(Game->SCoords().x, "Location", "X");
 			ColorIni->WriteFloat(Game->SCoords().y, "Location", "Y");
@@ -9519,7 +9529,7 @@ namespace Saint {
 			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
 				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
 				PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), ColorIni->GetFloat("Location", "X"), ColorIni->GetFloat("Location", "Y"), ColorIni->GetFloat("Location", "Z"));
-				
+
 
 				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Loaded '%s'", name });
 
@@ -9615,7 +9625,7 @@ namespace Saint {
 			}
 		}
 		bool is_finished() {
-			
+
 			std::string MenuFolderPath = "C:\\Saint\\";
 			if (DoesIniExists((MenuFolderPath + "tutorial" + ".ini").c_str())) {
 				Ini* ColorIni = new Ini(MenuFolderPath + "tutorial" + ".ini");
@@ -11509,7 +11519,7 @@ namespace Saint {
 						}
 					}
 				}
-				
+
 			}
 			return false;
 		}
@@ -11524,7 +11534,7 @@ namespace Saint {
 						char name[128];
 						sprintf(name, ICON_FA_SHIELD_ALT"  A rockstar admin is in your session.");
 						g_NotificationManager->add(name, 2000);
-						
+
 					}
 				}
 				else {
@@ -11579,7 +11589,7 @@ namespace Saint {
 		}
 	};
 	inline Proofs proofs;
-	
+
 	class fileHandler {
 	public:
 		fileHandler(std::string m_path, std::string m_name) {
@@ -11625,7 +11635,7 @@ namespace Saint {
 				fs::path filePath = entry.path();
 				std::string filename = filePath.filename().string();
 				files.push_back({ entry.path().string(), filename, filePath.stem().string() });
-				
+
 			}
 		}
 
@@ -11641,14 +11651,14 @@ namespace Saint {
 		Object* object;
 		g_CallbackScript->AddCallback<ModelCallback>(model, [=] {
 			*object = OBJECT::CREATE_OBJECT_NO_OFFSET(model, coords.x, coords.y, coords.z, true, false, false);
-		});
-		
+			});
+
 
 		return *object;
 	}
 	class FileExplorer {
 	public:
-		const char* action[4] = { "None", "Delete", "Move", "Change Extension"};
+		const char* action[4] = { "None", "Delete", "Move", "Change Extension" };
 		std::size_t pos;
 		std::string path;
 		std::string path2;
@@ -11663,14 +11673,14 @@ namespace Saint {
 		void changeExtension(fs::path filePath, fs::path newPath) {
 			fs::rename(filePath, newPath);
 		}
-		
+
 
 	};
 	inline FileExplorer fileExplorer;
 	class Windows {
 	public:
 		const char* action[4] = { "Fix", "Roll Down", "Roll Up", "Smash" };
-		const char* windowNames[9] = {"Front Left", "Front Right", "Rear Left", "Rear Right", "Front Windscreen", "Rear Windscreen",
+		const char* windowNames[9] = { "Front Left", "Front Right", "Rear Left", "Rear Right", "Front Windscreen", "Rear Windscreen",
 			"Mid Left", "Mid Right", "Invalid" };
 		std::size_t pos;
 		void editWindow(int windowIndex, int windowAction) {
@@ -11707,10 +11717,10 @@ namespace Saint {
 				if (upgradedelay == 0 || (int)(GetTickCount64() - upgradedelay) > delay)
 				{
 					ENTITY::SET_ENTITY_HEALTH(Game->Self(), ENTITY::GET_ENTITY_HEALTH(Game->Self()) + amount, 0);
-							
+
 				}
 				upgradedelay = GetTickCount64();
-				
+
 
 			}
 			if (armour) {
@@ -11731,7 +11741,7 @@ namespace Saint {
 			}
 
 		}
-		
+
 	};
 	inline RegenHealth regen;
 	class TV {
@@ -11758,7 +11768,7 @@ namespace Saint {
 		}
 	};
 	inline TV tv;
-	
+
 	class ParticleShooter {
 	public:
 		bool enabled = false;
@@ -11801,9 +11811,9 @@ namespace Saint {
 								GRAPHICS::USE_PARTICLE_FX_ASSET(particles.asset[pos]);
 								GRAPHICS::START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(particles.fx[pos], c, { 0.f, 0.f, 0.f }, scale, false, false, false, true);
 							}
-							
 
-						});
+
+							});
 					}
 				}
 			}
@@ -11870,7 +11880,7 @@ namespace Saint {
 		}
 	};
 	inline Vision vision;
-	
+
 	class Valk {
 	public:
 		bool enabled = false;
@@ -11929,7 +11939,7 @@ namespace Saint {
 						NativeVector3 coords6 = multiply(&meow, 2.50);
 
 
-						
+
 						if (no_clip) {
 							if (Game->KeyPress(0x57) || Game->ControlPressed(32))
 							{
@@ -11978,7 +11988,7 @@ namespace Saint {
 							if (ENTITY::HAS_ENTITY_COLLIDED_WITH_ANYTHING(Rocket) || (std::abs(RocketPos.z - GroundZ) < .5f))
 							{
 								FIRE::ADD_EXPLOSION(RocketPos.x, RocketPos.y, RocketPos.z, pos, 1000.f, TRUE, FALSE, .4f, FALSE);
-							
+
 								features.DeleteEntity(Rocket);
 								Rocket = 0;
 								PLAYER::DISABLE_PLAYER_FIRING(PLAYER::PLAYER_PED_ID(), 0);
@@ -12022,7 +12032,7 @@ namespace Saint {
 						YPos = 255; Meter = .5f;
 					}
 				}
-			
+
 			}
 		}
 	};
@@ -12030,7 +12040,7 @@ namespace Saint {
 	class p_Selected {
 	public:
 		bool taze = false;
-		
+
 		void init() {
 			if (taze) {
 				static int delay2;
@@ -12042,7 +12052,7 @@ namespace Saint {
 					NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), 0);
 					NativeVector3 bone = PED::GET_PED_BONE_COORDS(Game->PlayerIndex(g_SelectedPlayer), 0x322c, 0, 0, 0);
 					MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(coords.x, coords.y, coords.z, bone.x, bone.y, bone.z, 0, TRUE, Game->HashKey("WEAPON_STUNGUN"), Game->Self(), TRUE, FALSE, -1.f);
-					
+
 					delay2 = GetTickCount64();
 				}
 			}
@@ -12099,7 +12109,7 @@ namespace Saint {
 	inline void start_activity(int target_id, eActivityType type)
 	{
 		const size_t arg_count = 4;
-		int64_t args[arg_count] = { (int64_t)eRemoteEvent::StartActivity, (int64_t)PLAYER::PLAYER_ID(), (int64_t)type, (int64_t)true};
+		int64_t args[arg_count] = { (int64_t)eRemoteEvent::StartActivity, (int64_t)PLAYER::PLAYER_ID(), (int64_t)type, (int64_t)true };
 
 		g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << target_id);
 	}
@@ -12121,7 +12131,7 @@ namespace Saint {
 	};
 	class Basket {
 	public:
-		
+
 
 	};
 	inline void FeatureInitalize() {
@@ -12142,11 +12152,11 @@ namespace Saint {
 		particle_shooter.init();
 		tv.init();
 		regen.init();
-		#ifndef DEV
-			m_menu_data.m_flag = eMenuFlags::REGULAR_USER;
-		#else
-			m_menu_data.m_flag = eMenuFlags::IS_DEV;
-		#endif	
+#ifndef DEV
+		m_menu_data.m_flag = eMenuFlags::REGULAR_USER;
+#else
+		m_menu_data.m_flag = eMenuFlags::IS_DEV;
+#endif	
 		rockstarAdminDetector.init();
 		proofs.init();
 		weapon.init();

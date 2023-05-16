@@ -466,7 +466,7 @@ namespace Saint
 			src->set_return_value<BOOL>(NETWORK::NETWORK_SESSION_HOST(src->get_arg<int>(0), src->get_arg<int>(1), src->get_arg<BOOL>(2)));
 		}
 	}
-	
+
 	void Hooks::SET_CURRENT_PED_WEAPON(rage::scrNativeCallContext* src)
 	{
 		const auto ped = src->get_arg<Ped>(0);
@@ -605,7 +605,7 @@ namespace Saint
 		if (protections.block_reports) {
 			switch (neteventclass->m_stat)
 			{
-				
+
 			case rage::joaat("MPPLY_BAD_CREW_STATUS"):
 			case rage::joaat("MPPLY_BAD_CREW_MOTTO"):
 			case rage::joaat("MPPLY_BAD_CREW_NAME"):
@@ -727,7 +727,7 @@ namespace Saint
 			char name[64];
 			sprintf(name, ICON_FA_USER_PLUS"  %s is joining slot %i", player->m_player_info->m_net_player_data.m_name, (int)player->m_player_id);
 			if (player->m_player_info->m_net_player_data.m_name == (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_net_player_data.m_name) {
-				
+
 				for (std::uint32_t i = 0; i < 32; ++i) {
 					antiCheat.remove_as_modder(i);
 				}
@@ -828,18 +828,13 @@ namespace Saint
 	}
 	bool scripted_game_event2(CScriptedGameEvent* scripted_game_event, CNetGamePlayer* player)
 	{
-		const auto args = scripted_game_event->m_args;
+		//Optimized
 
+		const auto args = scripted_game_event->m_args;
 		const auto hash = static_cast<int64_t>(args[0]);
 		auto sender_id = static_cast<std::int32_t>(args[1]);
-		if (protections.exclude_friends) {
-			int netHandle[13];
-			NETWORK::NETWORK_HANDLE_FROM_PLAYER(static_cast<std::int32_t>(args[1]), netHandle, 13);
-			if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
-				return false;
-			}
-		}
-		
+
+
 
 		for (auto& m_event : gameEvents) {
 			if (m_event.hash == hash) {
@@ -853,14 +848,14 @@ namespace Saint
 					}
 				}
 				if (m_event.log) {
-					if (hash == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(Game->PlayerIndex(sender_id))) 
+					if (hash == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(Game->PlayerIndex(sender_id)))
 					{
 						//dont spam notifcation when in car
-					} 
+					}
 					else {
 						g_Logger->Info(notification);
 					}
-					
+
 				}
 				if (m_event.notify) {
 					if (hash == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(Game->PlayerIndex(sender_id)))
@@ -870,15 +865,21 @@ namespace Saint
 					else {
 						g_NotificationManager->add(notification, 2000, 0);
 					}
-					
+
 				}
 				if (m_event.block) {
 					return true;
+					break;
 				}
+
+
 			}
 		}
 		return false;
+
 	}
+
+
 	void Hooks::NetworkEventHandler(rage::netEventMgr* networkMgr, CNetGamePlayer* source, CNetGamePlayer* target, uint16_t event_id, int event_index, int event_bitset, int buffer_size, datBitBuffer2* buffer)
 	{
 		if (event_id > 91u)
@@ -895,395 +896,398 @@ namespace Saint
 		}
 		switch (static_cast<eNetworkEvents>(event_id))
 		{
-			case eNetworkEvents::CRemoveAllWeaponsEvent: {
-				if (protections.GameEvents.remove_all_weapons) {
-					char name1[64];
-					sprintf(name1, "Remove weapons from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-					g_NotificationManager->add(name1, 2000, 1);
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-					return;
-					
-				}
-				buffer->Seek(0);
-				break;
+		case eNetworkEvents::CRemoveAllWeaponsEvent: {
+			if (protections.GameEvents.remove_all_weapons) {
+				char name1[64];
+				sprintf(name1, "Remove weapons from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+				g_NotificationManager->add(name1, 2000, 1);
+				g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+				return;
+
 			}
-			case eNetworkEvents::CRequestControlEvent: {
-				if (protections.GameEvents.request_control) {
-					if (source->m_player_id < 32) {
-						int NetworkID = buffer->Read<int>(13);
-						if (Game->CPed() && Game->CVehicle() && Game->CVehicle()->m_net_object && Game->CVehicle()->m_net_object->m_object_id == NetworkID && Game->CVehicle()->m_driver == Game->CPed())
-						{
-							char name2324[64];
-							sprintf(name2324, "Request Control from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-							g_NotificationManager->add(name2324, 2000, 1);
-							g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-							return;
-						}
-					}
-					
-				}
-				buffer->Seek(0);
-				break;
-			}
-			case eNetworkEvents::CNetworkPlaySoundEvent: {
-				if (protections.GameEvents.play_sound) {
-					std::uint32_t sound_hash = buffer->Read<std::uint32_t>(32);
-
-					if (sound_hash == rage::joaat("Remote_Ring"))
-					{
-						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-						return;
-					}
-					
-					return;
-					
-				}
-				buffer->Seek(0);
-				break;
-			}
-			case eNetworkEvents::CScriptWorldStateEvent:
-			{
-				
-				auto type = buffer->Read<WorldStateDataType>(4);
-				buffer->Read<bool>(1);
-				CGameScriptId id;
-				script_id_deserialize(id, *buffer);
-
-				if (type == WorldStateDataType::Rope)
-				{
-					if (protections.Crashes.rope) {
-						buffer->Read<int>(9);
-						buffer->Read<float>(19);
-						buffer->Read<float>(19);
-						buffer->Read<float>(19);
-						buffer->Read<float>(19);
-						buffer->Read<float>(19);
-						buffer->Read<float>(19);
-						buffer->Read<float>(16);
-						int type = buffer->Read<int>(4);
-						float initial_length = buffer->Read<float>(16);
-						float min_length = buffer->Read<float>(16);
-
-						if (type == 0 || initial_length < min_length)
-						{
-
-							char name2324[64];
-							sprintf(name2324, "Rope crash from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-							g_NotificationManager->add(name2324, 2000, 1);
-							g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-							return;
-						}
-					}
-				}
-				else if (type == WorldStateDataType::PopGroupOverride)
-				{
-					if (protections.Crashes.groupoverride) {
-						int pop_schedule = buffer->ReadSigned<int>(8);
-						int pop_group = buffer->Read<int>(32);
-						int percentage = buffer->Read<int>(7);
-
-						if (pop_group == 0 && (percentage == 0 || percentage == 103))
-						{
-							char name2324[64];
-							sprintf(name2324, "Group override from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-							g_NotificationManager->add(name2324, 2000, 1);
-							g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-							return;
-						}
-					}
-				}
-				else if (type > WorldStateDataType::VehiclePlayerLocking || type < WorldStateDataType::CarGen)
-				{
-					if (protections.Crashes.invalidworldstate) {
-						char name2324[64];
-						sprintf(name2324, "Invalid world state from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-						g_NotificationManager->add(name2324, 2000, 1);
-						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-						return;
-					}
-				}
-
-				buffer->Seek(0);
-				break;
-			}
-			case eNetworkEvents::CScriptEntityStateChangeEvent:
-			{
-				
-					std::uint16_t Entity = buffer->Read<std::uint16_t>(13);
-					auto Type = buffer->Read<ScriptEntityChangeType>(4);
-					std::uint32_t Unknown = buffer->Read<std::uint32_t>(32);
-					if (Type == ScriptEntityChangeType::SettingOfTaskVehicleTempAction)
-					{
-						if (protections.Crashes.task) {
-							std::uint16_t ped_id = buffer->Read<std::uint16_t>(13);
-							std::uint32_t action = buffer->Read<std::uint32_t>(8);
-
-							if ((action >= 15 && action <= 18) || action == 33)
-							{
-
-								char name2324[64];
-								sprintf(name2324, "Task crash from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-								g_NotificationManager->add(name2324, 2000, 1);
-								g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-								return;
-							}
-						}
-					}
-					else if (Type > ScriptEntityChangeType::SetVehicleExclusiveDriver || Type < ScriptEntityChangeType::BlockingOfNonTemporaryEvents)
-					{
-						if (protections.Crashes.invalid_script_entity) {
-							char name2324[64];
-							sprintf(name2324, "Invalid script entity from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-							g_NotificationManager->add(name2324, 2000, 1);
-							g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-							return;
-						}
-					}
-					buffer->Seek(0);
-				
-				
-				break;
-			}
-			case eNetworkEvents::CNetworkIncrementStatEvent2:
-			{
-				const auto increment_stat_event = std::make_unique<CNetworkIncrementStatEvent>();
-				buffer->ReadDword(&increment_stat_event->m_stat, 0x20);
-				buffer->ReadDword(&increment_stat_event->m_amount, 0x20);
-				if (IncrementStatEvent(increment_stat_event.get(), source))
-				{
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-					return;
-				}
-				buffer->Seek(0);
-				break;
-			}
-			case eNetworkEvents::CScriptedGameEvent:
-			{
-				const auto scripted_game_event = std::make_unique<CScriptedGameEvent>();
-				buffer->ReadDword(&scripted_game_event->m_args_size, 32);
-				if (scripted_game_event->m_args_size - 1 <= 0x1AF)
-					buffer->ReadArray(&scripted_game_event->m_args, 8 * scripted_game_event->m_args_size);
-
-				if (scripted_game_event2(scripted_game_event.get(), source))
-				{
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-					return;
-				}
-				buffer->Seek(0);
-
-				break;
-			}
-			case eNetworkEvents::CExplosionEvent: {
-				if (protections.GameEvents.explosion) {
-					if (source->m_player_id < 32)
-					{
-						const char* explode_type[81] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare",
-						"Unknown", "Extinguisher", "Unknown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
-						"Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
-						"Bomb (Wide)", "Explosive Ammo (Shotgun)", "Oppressor MK II", "Kinetic Mortar", "Kinetic Vehicle Mine", "EMP Vehicle Mine", "Spike Vehicle Mine", "Slick Vehicle Mine", "Tar Vehicle Mine", "Script Drone", "Up-n-Atomizer", "Burried Mine", "Script Missle", "RC Tank Rocket",
-						"Bomb (Water)", "Bomb (Water 2)", "Flash Grenade", "Stun Grenade", "Script Missle (Large)", "Submarine (Big)", "EMP Launcher" };
-						char name2324[64];
-						if (target->m_player_info->m_net_player_data.m_name == (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_net_player_data.m_name) {
-								sprintf(name2324, "Explosion from %s going to you blocked", source->m_player_info->m_net_player_data.m_name);
-							}
-						else {
-								sprintf(name2324, "Explosion from %s going to %s blocked", source->m_player_info->m_net_player_data.m_name);
-						}
-
-						g_NotificationManager->add(name2324, 2000, 1);
-						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-						return;
-					}
-					
-				}
-				buffer->Seek(0);
-				break;
-			}
-			
-			case eNetworkEvents::CGiveWeaponEvent: {
-				if (protections.GameEvents.give_weapons) {
-					char name2324545645[64];
-					sprintf(name2324545645, "Give weapon from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-					g_NotificationManager->add(name2324545645, 2000, 1);
-					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-					return;
-					
-				}
-				buffer->Seek(0);
-				break;
-			}
-			case eNetworkEvents::CNetworkClearPedTasksEvent: {
-				if (protections.GameEvents.freeze) {
-					int net_id = buffer->Read<int>(13);
-					if (Game->CPed() && Game->CPed()->m_net_object && Game->CPed()->m_net_object->m_object_id == net_id) {
-						char g_Freeze[64];
-						sprintf(g_Freeze, "Freeze from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-						g_NotificationManager->add(g_Freeze, 2000, 1);
-						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-						return;
-						
-					}
-				}
-				buffer->Seek(0);
-				break;
-			}
-			case eNetworkEvents::CGiveControlEvent:
-			{
-				uint32_t timestamp = buffer->Read<uint32_t>(32);
-				int count = buffer->Read<int>(2);
-				bool all_objects_migrate_together = buffer->Read<bool>(1);
-
-				if (count > 3)
-				{
-					count = 3;
-				}
-
-				for (int i = 0; i < count; i++)
-				{
-					int net_id = buffer->Read<int>(13);
-					eNetObjType object_type = buffer->Read<eNetObjType>(4);
-					int migration_type = buffer->Read<int>(3);
-
-					if (object_type < eNetObjType::NET_OBJ_TYPE_AUTOMOBILE || object_type > eNetObjType::NET_OBJ_TYPE_TRAIN)
-					{
-						char g_Freeze[64];
-						sprintf(g_Freeze, "Crash from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-						g_NotificationManager->add(g_Freeze, 2000);
-						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-						return;
-					}
-				}
-
-				buffer->Seek(0);
-				m_syncing_player = source;
-				break;
-			}
-			case eNetworkEvents::CNetworkPtfxEvent: {
-				if (protections.GameEvents.particle_spam) {
+			buffer->Seek(0);
+			break;
+		}
+		case eNetworkEvents::CRequestControlEvent: {
+			if (protections.GameEvents.request_control) {
+				if (source->m_player_id < 32) {
 					int NetworkID = buffer->Read<int>(13);
-					if (GetPed() && GetPed()->m_net_object && GetPed()->m_net_object->m_object_id == NetworkID)
+					if (Game->CPed() && Game->CVehicle() && Game->CVehicle()->m_net_object && Game->CVehicle()->m_net_object->m_object_id == NetworkID && Game->CVehicle()->m_driver == Game->CPed())
 					{
-						char g_PTFX[64];
-						sprintf(g_PTFX, "Particle spam from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-						g_NotificationManager->add(g_PTFX, 2000, 1);
+						char name2324[64];
+						sprintf(name2324, "Request Control from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+						g_NotificationManager->add(name2324, 2000, 1);
 						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
 						return;
-						
 					}
-					
 				}
-				buffer->Seek(0);
-				break;
+
 			}
-			case eNetworkEvents::CRemoveWeaponEvent: {
-				if (protections.GameEvents.remove_weapon) {
-					int net_id = buffer->Read<int>(13);
-					auto Hash = buffer->Read<std::uint32_t>(32);
+			buffer->Seek(0);
+			break;
+		}
+		case eNetworkEvents::CNetworkPlaySoundEvent: {
+			if (protections.GameEvents.play_sound) {
+				std::uint32_t sound_hash = buffer->Read<std::uint32_t>(32);
 
-					if (Hash == rage::joaat("WEAPON_UNARMED"))
+				if (sound_hash == rage::joaat("Remote_Ring"))
+				{
+					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+					return;
+				}
+
+				return;
+
+			}
+			buffer->Seek(0);
+			break;
+		}
+		case eNetworkEvents::CScriptWorldStateEvent:
+		{
+
+			auto type = buffer->Read<WorldStateDataType>(4);
+			buffer->Read<bool>(1);
+			CGameScriptId id;
+			script_id_deserialize(id, *buffer);
+
+			if (type == WorldStateDataType::Rope)
+			{
+				if (protections.Crashes.rope) {
+					buffer->Read<int>(9);
+					buffer->Read<float>(19);
+					buffer->Read<float>(19);
+					buffer->Read<float>(19);
+					buffer->Read<float>(19);
+					buffer->Read<float>(19);
+					buffer->Read<float>(19);
+					buffer->Read<float>(16);
+					int type = buffer->Read<int>(4);
+					float initial_length = buffer->Read<float>(16);
+					float min_length = buffer->Read<float>(16);
+
+					if (type == 0 || initial_length < min_length)
 					{
-						if (protections.Crashes.weapon) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Weapon crash from %s blocked.", source->m_player_info->m_net_player_data.m_name);
 
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
-							g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-							return;
-						}
+						char name2324[64];
+						sprintf(name2324, "Rope crash from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+						g_NotificationManager->add(name2324, 2000, 1);
+						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+						return;
+					}
+				}
+			}
+			else if (type == WorldStateDataType::PopGroupOverride)
+			{
+				if (protections.Crashes.groupoverride) {
+					int pop_schedule = buffer->ReadSigned<int>(8);
+					int pop_group = buffer->Read<int>(32);
+					int percentage = buffer->Read<int>(7);
+
+					if (pop_group == 0 && (percentage == 0 || percentage == 103))
+					{
+						char name2324[64];
+						sprintf(name2324, "Group override from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+						g_NotificationManager->add(name2324, 2000, 1);
+						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+						return;
+					}
+				}
+			}
+			else if (type > WorldStateDataType::VehiclePlayerLocking || type < WorldStateDataType::CarGen)
+			{
+				if (protections.Crashes.invalidworldstate) {
+					char name2324[64];
+					sprintf(name2324, "Invalid world state from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+					g_NotificationManager->add(name2324, 2000, 1);
+					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+					return;
+				}
+			}
+
+			buffer->Seek(0);
+			break;
+		}
+		case eNetworkEvents::CScriptEntityStateChangeEvent:
+		{
+
+			std::uint16_t Entity = buffer->Read<std::uint16_t>(13);
+			auto Type = buffer->Read<ScriptEntityChangeType>(4);
+			std::uint32_t Unknown = buffer->Read<std::uint32_t>(32);
+			if (Type == ScriptEntityChangeType::SettingOfTaskVehicleTempAction)
+			{
+				if (protections.Crashes.task) {
+					std::uint16_t ped_id = buffer->Read<std::uint16_t>(13);
+					std::uint32_t action = buffer->Read<std::uint32_t>(8);
+
+					if ((action >= 15 && action <= 18) || action == 33)
+					{
+
+						char name2324[64];
+						sprintf(name2324, "Task crash from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+						g_NotificationManager->add(name2324, 2000, 1);
+						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+						return;
+					}
+				}
+			}
+			else if (Type > ScriptEntityChangeType::SetVehicleExclusiveDriver || Type < ScriptEntityChangeType::BlockingOfNonTemporaryEvents)
+			{
+				if (protections.Crashes.invalid_script_entity) {
+					char name2324[64];
+					sprintf(name2324, "Invalid script entity from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+					g_NotificationManager->add(name2324, 2000, 1);
+					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+					return;
+				}
+			}
+			buffer->Seek(0);
+
+
+			break;
+		}
+		case eNetworkEvents::CNetworkIncrementStatEvent2:
+		{
+			const auto increment_stat_event = std::make_unique<CNetworkIncrementStatEvent>();
+			buffer->ReadDword(&increment_stat_event->m_stat, 0x20);
+			buffer->ReadDword(&increment_stat_event->m_amount, 0x20);
+			if (IncrementStatEvent(increment_stat_event.get(), source))
+			{
+				g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+				return;
+			}
+			buffer->Seek(0);
+			break;
+		}
+		case eNetworkEvents::CScriptedGameEvent:
+		{
+			const auto scripted_game_event = std::make_unique<CScriptedGameEvent>();
+			buffer->ReadDword(&scripted_game_event->m_args_size, 32);
+			if (scripted_game_event->m_args_size - 1 <= 0x1AF)
+				buffer->ReadArray(&scripted_game_event->m_args, 8 * scripted_game_event->m_args_size);
+
+			if (scripted_game_event2(scripted_game_event.get(), source))
+			{
+				g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+				return;
+			}
+			buffer->Seek(0);
+
+			break;
+		}
+		//The bug in this code is that the if statement is checking if the argument size is less than or equal to 0x1AF, but the argument size is a 32-bit unsigned integer
+		//, so it should be checking if the argument size is less than or equal to 0xFFFFFFFF.
+
+		case eNetworkEvents::CExplosionEvent: {
+			if (protections.GameEvents.explosion) {
+				if (source->m_player_id < 32)
+				{
+					const char* explode_type[81] = { "Grenade", "Grenade (Launcher)", "Sticky Bomb", "Molotov", "Rocket", "Tank Shell", "HI Octane", "Car", "Plane", "Gas Pump", "Bike", "Steam", "Flame", "Water", "Gas", "Boat", "Ship Destroy", "Truck", "Bullet", "Smoke", "Smoke 2", "BZ Gas", "Flare",
+					"Unknown", "Extinguisher", "Unknown", "Train", "Barrel", "Propane", "Blimp", "Flame 2", "Tanker", "Plane Rocket", "Vehicle Bullet", "Gas Tank", "Bird Crap", "Railgun", "Blimp 2", "Firework", "Snowball", "Proximity Mine", "Valkyrie Cannon", "Air Defense", "Pipe Bomb",
+					"Vehicle Mine", "Explosive Ammo", "APC Shell", "Cluster Bomb", "Gas Bomb", "Incendiary Bomb", "Bomb", "Torpedo", "Torpedo (Underwater)", "Bombushka Cannon", "Cluster Bomb 2", "Hunter Barrage", "Hunter Cannon", "Rouge Cannon", "Underwater Mine", "Orbital Cannon",
+					"Bomb (Wide)", "Explosive Ammo (Shotgun)", "Oppressor MK II", "Kinetic Mortar", "Kinetic Vehicle Mine", "EMP Vehicle Mine", "Spike Vehicle Mine", "Slick Vehicle Mine", "Tar Vehicle Mine", "Script Drone", "Up-n-Atomizer", "Burried Mine", "Script Missle", "RC Tank Rocket",
+					"Bomb (Water)", "Bomb (Water 2)", "Flash Grenade", "Stun Grenade", "Script Missle (Large)", "Submarine (Big)", "EMP Launcher" };
+					char name2324[64];
+					if (target->m_player_info->m_net_player_data.m_name == (*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_net_player_data.m_name) {
+						sprintf(name2324, "Explosion from %s going to you blocked", source->m_player_info->m_net_player_data.m_name);
 					}
 					else {
-						if (Game->CPed() && Game->CPed()->m_net_object && Game->CPed()->m_net_object->m_object_id == net_id) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, "Remove weapon from %s blocked.", source->m_player_info->m_net_player_data.m_name);
-
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
-							g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
-							return;
-						}
+						sprintf(name2324, "Explosion from %s going to %s blocked", source->m_player_info->m_net_player_data.m_name);
 					}
-					
-				}
-				buffer->Seek(0);
-				break;
-			}
-			
-			case eNetworkEvents::CKickVotesEvent: {
-				if (protections.GameEvents.vote_kick) {
-					char g_RemoveWeapons[64];
-					sprintf(g_RemoveWeapons, "Vote kick from %s blocked.", source->m_player_info->m_net_player_data.m_name);
 
-					g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+					g_NotificationManager->add(name2324, 2000, 1);
 					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
 					return;
-					
 				}
-				buffer->Seek(0);
-				break;
+
 			}
-			
-			
-														
+			buffer->Seek(0);
+			break;
+		}
+
+		case eNetworkEvents::CGiveWeaponEvent: {
+			if (protections.GameEvents.give_weapons) {
+				char name2324545645[64];
+				sprintf(name2324545645, "Give weapon from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+				g_NotificationManager->add(name2324545645, 2000, 1);
+				g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+				return;
+
+			}
+			buffer->Seek(0);
+			break;
+		}
+		case eNetworkEvents::CNetworkClearPedTasksEvent: {
+			if (protections.GameEvents.freeze) {
+				int net_id = buffer->Read<int>(13);
+				if (Game->CPed() && Game->CPed()->m_net_object && Game->CPed()->m_net_object->m_object_id == net_id) {
+					char g_Freeze[64];
+					sprintf(g_Freeze, "Freeze from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_Freeze, 2000, 1);
+					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+					return;
+
+				}
+			}
+			buffer->Seek(0);
+			break;
+		}
+		case eNetworkEvents::CGiveControlEvent:
+		{
+			uint32_t timestamp = buffer->Read<uint32_t>(32);
+			int count = buffer->Read<int>(2);
+			bool all_objects_migrate_together = buffer->Read<bool>(1);
+
+			if (count > 3)
+			{
+				count = 3;
+			}
+
+			for (int i = 0; i < count; i++)
+			{
+				int net_id = buffer->Read<int>(13);
+				eNetObjType object_type = buffer->Read<eNetObjType>(4);
+				int migration_type = buffer->Read<int>(3);
+
+				if (object_type < eNetObjType::NET_OBJ_TYPE_AUTOMOBILE || object_type > eNetObjType::NET_OBJ_TYPE_TRAIN)
+				{
+					char g_Freeze[64];
+					sprintf(g_Freeze, "Crash from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_Freeze, 2000);
+					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+					return;
+				}
+			}
+
+			buffer->Seek(0);
+			m_syncing_player = source;
+			break;
+		}
+		case eNetworkEvents::CNetworkPtfxEvent: {
+			if (protections.GameEvents.particle_spam) {
+				int NetworkID = buffer->Read<int>(13);
+				if (GetPed() && GetPed()->m_net_object && GetPed()->m_net_object->m_object_id == NetworkID)
+				{
+					char g_PTFX[64];
+					sprintf(g_PTFX, "Particle spam from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+					g_NotificationManager->add(g_PTFX, 2000, 1);
+					g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+					return;
+
+				}
+
+			}
+			buffer->Seek(0);
+			break;
+		}
+		case eNetworkEvents::CRemoveWeaponEvent: {
+			if (protections.GameEvents.remove_weapon) {
+				int net_id = buffer->Read<int>(13);
+				auto Hash = buffer->Read<std::uint32_t>(32);
+
+				if (Hash == rage::joaat("WEAPON_UNARMED"))
+				{
+					if (protections.Crashes.weapon) {
+						char g_RemoveWeapons[64];
+						sprintf(g_RemoveWeapons, "Weapon crash from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+						g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+						return;
+					}
+				}
+				else {
+					if (Game->CPed() && Game->CPed()->m_net_object && Game->CPed()->m_net_object->m_object_id == net_id) {
+						char g_RemoveWeapons[64];
+						sprintf(g_RemoveWeapons, "Remove weapon from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+						g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+						g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+						return;
+					}
+				}
+
+			}
+			buffer->Seek(0);
+			break;
+		}
+
+		case eNetworkEvents::CKickVotesEvent: {
+			if (protections.GameEvents.vote_kick) {
+				char g_RemoveWeapons[64];
+				sprintf(g_RemoveWeapons, "Vote kick from %s blocked.", source->m_player_info->m_net_player_data.m_name);
+
+				g_NotificationManager->add(g_RemoveWeapons, 2000, 1);
+				g_GameFunctions->m_send_event_ack(networkMgr, source, target, event_id, event_bitset);
+				return;
+
+			}
+			buffer->Seek(0);
+			break;
+		}
+
+
+
 		default: break;
 		}
 
 		return static_cast<decltype(&NetworkEventHandler)>(g_Hooking->m_OriginalNetworkHandler)(networkMgr, source, target, event_id, event_index, event_bitset, buffer_size, buffer);
 	}
-	
+
 	bool Hooks::GetEventData(std::int32_t eventGroup, std::int32_t eventIndex, std::int64_t* args, std::uint32_t argCount, int64_t sender)
 	{
 		bool dontreturn = false;
-			auto result = static_cast<decltype(&GetEventData)>(g_Hooking->m_OriginalGetEventData)(eventGroup, eventIndex, args, argCount, sender);
-			auto sender_id = static_cast<std::int32_t>(args[1]);
-			Ped sender_ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(sender_id);
-			const char* sender_name = PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1]));
-			if (protections.exclude_friends) {
-				int netHandle[13];
-				NETWORK::NETWORK_HANDLE_FROM_PLAYER(static_cast<std::int32_t>(args[1]), netHandle, 13);
-				if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
-					return result;
-				}
+		auto result = static_cast<decltype(&GetEventData)>(g_Hooking->m_OriginalGetEventData)(eventGroup, eventIndex, args, argCount, sender);
+		auto sender_id = static_cast<std::int32_t>(args[1]);
+		Ped sender_ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(sender_id);
+		const char* sender_name = PLAYER::GET_PLAYER_NAME(static_cast<std::int32_t>(args[1]));
+		if (protections.exclude_friends) {
+			int netHandle[13];
+			NETWORK::NETWORK_HANDLE_FROM_PLAYER(static_cast<std::int32_t>(args[1]), netHandle, 13);
+			if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
+				return result;
 			}
-			if (protections.exclude_self) {
-				if (PLAYER::PLAYER_ID() == sender_id) {
-					return result;
-				}
+		}
+		if (protections.exclude_self) {
+			if (PLAYER::PLAYER_ID() == sender_id) {
+				return result;
 			}
+		}
 
-			for (auto m_event : gameEvents) {
-				if (args[0] == m_event.hash) {
-					char notification[64];
-					sprintf(notification, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender_name, m_event.name.c_str());
-					if (m_event.allow_from_friends) {
-						int netHandle[13];
-						NETWORK::NETWORK_HANDLE_FROM_PLAYER(sender_ped, netHandle, 13);
-						if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
-							return result;
-						}
-					}
-					if (m_event.log) {
-						if (args[0] == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(sender_ped)) {} //dont spam notifcation when in car
-						else {
-							g_Logger->Info(notification);
-						}
-					}
-					if (m_event.notify) {
-						if (args[0] == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(sender_ped)) {} //dont spam notifcation when in car
-						else {
-							g_NotificationManager->add(notification, 2000, 0);
-						}
-					}
-					if (m_event.block) {
-						return false;
+		for (auto m_event : gameEvents) {
+			if (args[0] == m_event.hash) {
+				char notification[64];
+				sprintf(notification, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender_name, m_event.name.c_str());
+				if (m_event.allow_from_friends) {
+					int netHandle[13];
+					NETWORK::NETWORK_HANDLE_FROM_PLAYER(sender_ped, netHandle, 13);
+					if (NETWORK::NETWORK_IS_FRIEND(&netHandle[0])) {
+						return result;
 					}
 				}
+				if (m_event.log) {
+					if (args[0] == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(sender_ped)) {} //dont spam notifcation when in car
+					else {
+						g_Logger->Info(notification);
+					}
+				}
+				if (m_event.notify) {
+					if (args[0] == (std::int64_t)eRemoteEvent::RemoteOffradar && is_in_car(sender_ped)) {} //dont spam notifcation when in car
+					else {
+						g_NotificationManager->add(notification, 2000, 0);
+					}
+				}
+				if (m_event.block) {
+					return false;
+				}
 			}
-			return result;
-		
-		
+		}
+		return result;
+
+
 	}
 	//crash protection
 	bool Hooks::fragment_physics_crash(uintptr_t a1, uint32_t a2, uintptr_t a3, uintptr_t a4, uintptr_t a5)
@@ -1391,20 +1395,16 @@ namespace Saint
 	}
 	bool Hooks::hk_ped_creation_data_node(CPedCreationDataNode* node)
 	{
-		
+
 		auto result = static_cast<decltype(&hk_ped_creation_data_node)>(g_Hooking->ped_creation)(node);
 		if (protections.Crashes.ped) {
-			if (Lists::crash_model_check(node->m_model)) {
-				protections.push_notification(ICON_FA_SHIELD_ALT"  Prevented crash | Ped");
-				return true;
-			}
-			else if (Lists::crash_model_check(node->m_prop_model)) {
+			if (Lists::crash_model_check(node->m_model) || Lists::crash_model_check(node->m_prop_model)) {
 				protections.push_notification(ICON_FA_SHIELD_ALT"  Prevented crash | Ped");
 				return true;
 			}
 		}
 
-		
+
 
 		return result;
 	}
@@ -1421,7 +1421,7 @@ namespace Saint
 			}
 		}
 
-		
+
 
 		return result;
 	}
@@ -1461,7 +1461,8 @@ namespace Saint
 			sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Turn Into Beast");
 			g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
 		}
-		
+
+
 
 
 		return result;
@@ -1528,7 +1529,7 @@ namespace Saint
 
 		if (node->m_gadget_count > 2)
 		{
-			
+
 			return;
 		}
 
@@ -1554,7 +1555,7 @@ namespace Saint
 #endif
 			if (strstr(lpProcName, "nativePush64")) {
 				return (FARPROC)&ScriptHookV::nativePush64;
-			}
+		}
 			else if (strstr(lpProcName, "createTexture")) {
 				return (FARPROC)&ScriptHookV::createTexture;
 			}
@@ -1612,11 +1613,11 @@ namespace Saint
 			else if (strstr(lpProcName, "worldGetAllPickups")) {
 				return (FARPROC)&ScriptHookV::worldGetAllPickups;
 			}
-		}
+	}
 
 		return OriginalGetProcAddress(hModule, lpProcName);
-	}
-	
+}
+
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
@@ -1624,14 +1625,14 @@ namespace Saint
 		MH_Initialize();
 		MH_CreateHook(g_GameFunctions->m_GetLabelText, &Hooks::GetLabelText, &m_OriginalGetLabelText);
 		MH_CreateHook(g_GameFunctions->m_WndProc, &Hooks::WndProc, &m_OriginalWndProc);
-	
+
 		MH_CreateHook(g_GameFunctions->m_write_player_game_state_data_node, &Hooks::write_player_game_state_data_node, &m_Original_write_player_game_state_data_node);
 		MH_CreateHook(g_GameFunctions->m_write_player_gamer_data_node, &Hooks::write_player_gamer_data_node, &m_Original_write_player_gamer_data_node);
 		MH_CreateHook(g_GameFunctions->m_SendNetInfo, &Hooks::SendNetInfo, &m_OriginalSendNetInfo);
 		MH_CreateHook(g_GameFunctions->m_send_chat_message, &Hooks::send_chat_message, &m_OriginalChatSend);
 		MH_CreateHook(g_GameFunctions->m_AssignPhysicalIndexHandler, &Hooks::AssignNewPhysicalIndexHandler, &m_OriginalAssignPhysicalIndex);
 		MH_CreateHook(g_GameFunctions->crashProtection, &Hooks::InvalidModsCrashPatch, &m_OriginalModCrash);
-	
+
 		MH_CreateHook(g_GameFunctions->m_NetworkEvents, &Hooks::NetworkEventHandler, &m_OriginalNetworkHandler);
 		//crashes
 		MH_CreateHook(g_GameFunctions->m_fragment_physics_crash, &Hooks::fragment_physics_crash, &m_OriginalFragmentCrash);
@@ -1690,4 +1691,4 @@ namespace Saint
 		m_D3DHook.Disable();
 		MH_DisableHook(MH_ALL_HOOKS);
 	}
-}
+	}

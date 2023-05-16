@@ -366,8 +366,8 @@ namespace Saint
 		return ScriptType::Game;
 	}
 
-	
-	
+
+
 	void MainScript::Initialize()
 	{
 		m_Initialized = true;
@@ -439,7 +439,7 @@ namespace Saint
 				}
 				else {
 					sub->draw_option<submenu>("Theme", nullptr, rage::joaat("TutorialSettings"));
-					
+
 					sub->draw_option<Button>(("Save & Loadup On Start"), nullptr, []
 						{
 							showKeyboard("Enter Something", "", 25, &tutorial.path_to_load, [] {
@@ -461,19 +461,19 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Test", rage::joaat("TESTER"), [](sub* sub)
 			{
-				
+
 				sub->draw_option<toggle>(("Enabled"), nullptr, &ped_test);
 				for (int i = 0; i < 457; i++) {
 					sub->draw_option<toggle>((std::format("ped_tester | {}", i).c_str()), nullptr, &ped_tester[i], [=] {
 						if (!ped_tester[i])
 						{
 							PED::SET_PED_CONFIG_FLAG(Game->Self(), i, false);
-									
-								
-							
+
+
+
 						}
-						
-					});
+
+						});
 				}
 				sub->draw_option<Break>("SHV");
 				if (std::filesystem::exists("C:\\Saint\\SHV\\") && std::filesystem::is_directory("C:\\Saint\\SHV\\")) {
@@ -562,7 +562,7 @@ namespace Saint
 					{
 						PED::SET_PED_CONFIG_FLAG(Game->Self(), 223, false);
 					}
-				});
+					});
 				sub->draw_option<toggle>(("Tiny Ped"), "Shrinks you're ped.", &features.tiny_ped, [] {
 					if (!features.tiny_ped)
 					{
@@ -628,7 +628,7 @@ namespace Saint
 						PLAYER::SET_IGNORE_LOW_PRIORITY_SHOCKING_EVENTS(PLAYER::PLAYER_ID(), false);
 
 					}
-				});
+					});
 				sub->draw_option<toggle>(("Drugs"), "Recreates the micheal strangers & things mission.", &features.drugs, [] {
 					if (!features.drugs)
 					{
@@ -684,7 +684,7 @@ namespace Saint
 					{
 						Game->CPed()->m_armor = 0.0;
 					});
-				
+
 
 
 			});
@@ -1531,10 +1531,11 @@ namespace Saint
 					});
 				sub->draw_option<ToggleWithNumber<float, bool>>("Swim Speed", nullptr, &multipliers.swim_run, &multipliers.swim_speed, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
 
-					if (!multipliers.run) {
+					if (!multipliers.swim_run) {
 						(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_swim_speed = 1.0f;
 					}
 					});
+				
 				sub->draw_option<ToggleWithNumber<float, bool>>("Width", nullptr, &get_model_info.width, &get_model_info.widthm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
 
 
@@ -1548,6 +1549,7 @@ namespace Saint
 						Memory::set_value<float>({ 0x08, 0x88 }, 1.0f);
 					}
 					});
+				
 				sub->draw_option<number<float>>("Noise", nullptr, &multipliers.noise, 0.0f, 100.f, 0.1f, 2, true, "", "", [=] {
 					PLAYER::SET_PLAYER_NOISE_MULTIPLIER(Game->Self(), multipliers.noise);
 					});
@@ -1568,7 +1570,7 @@ namespace Saint
 				sub->draw_option<toggle>(("Enabled"), nullptr, &superjump.enabled);
 				sub->draw_option<Scroll<const char*, std::size_t>>("Animation", nullptr, &superjump.Jump_Type, &superjump.Jump_Int);
 				sub->draw_option<Break>(("Settings"));
-				
+
 				sub->draw_option<ToggleWithNumber<float, bool>>("Add Force", nullptr, &superjump.add_force, &superjump.force, 0.1f, 100.f, 0.1f, 2);
 				if (superjump.Jump_Int == 2) {
 					sub->draw_option<toggle>(("Uses Super Jump"), nullptr, &superjump.use_super_jump);
@@ -1644,7 +1646,7 @@ namespace Saint
 					}
 					});
 				sub->draw_option<toggle>(("Explode On Impact"), nullptr, &features.explode_on_impact, [] {
-					
+
 					});
 				sub->draw_option<toggle>(("Sink When Wrecked"), "Only works in boats.", &features.sinks_when_wrecked, [] {
 					if (!features.sinks_when_wrecked) {
@@ -1766,7 +1768,7 @@ namespace Saint
 				sub->draw_option<number<float>>("Rust", "Only works in vehicles like the besra", &features.rust, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
 					VEHICLE::SET_VEHICLE_ENVEFF_SCALE(Game->Vehicle(), features.rust);
 					});
-				
+
 				sub->draw_option<Button>("Delete", nullptr, []
 					{
 						Vehicle veh = Game->Vehicle();
@@ -1789,57 +1791,51 @@ namespace Saint
 					});
 
 			});
-			g_Render->draw_submenu<sub>(("Wheels"), rage::joaat("Wheels2"), [](sub* sub)
-				{
-					if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), NULL))
-						return;
-					static float nigger;
-					sub->draw_option<number<float>>("Size", nullptr, &nigger, 0, 1000.f, 0.1f, 1, true, "", "", [] {
-						Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize = (BYTE)nigger * 10.0f;
-						//nigger = (int)Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize;
-						});
-					sub->draw_option<number<float>>("Width", nullptr, &Game->CVehicle()->m_draw_data->m_vehicleStreamRender->m_tireWidth, 0, 1000.f, 0.1f, 1, false);
-				});
-			g_Render->draw_submenu<sub>(("Entered"), rage::joaat("entered"), [](sub* sub)
-				{
-					sub->draw_option<Button>("Clear", nullptr, []
-						{
-							enter_veh.vehicles.clear();
-							
-						});
-					sub->draw_option<Break>("List");
-					for (auto& model : enter_veh.vehicles) {
-						sub->draw_option<submenu>(model.m_name.c_str(), nullptr, rage::joaat("Fortniteeee4535"), [=]
+		g_Render->draw_submenu<sub>(("Wheels"), rage::joaat("Wheels2"), [](sub* sub)
+			{
+				if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), NULL))
+					return;
+				if (!VEHICLE::GET_VEHICLE_MOD_VARIATION(Game->Vehicle(), 23))
+					return;
+				static float nigger;
+				sub->draw_option<number<float>>("Size", nullptr, &nigger, 0, 1000.f, 1.0f, 1, true, "", "", [] {
+					Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize = (BYTE)nigger * 100.0f;
+					//nigger = (int)Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize;
+					});
+				sub->draw_option<number<float>>("Width", nullptr, &Game->CVehicle()->m_draw_data->m_vehicleStreamRender->m_tireWidth, 0, 1000.f, 0.1f, 1, false);
+
+			});
+		g_Render->draw_submenu<sub>(("Entered"), rage::joaat("entered"), [](sub* sub)
+			{
+				sub->draw_option<Button>("Clear", nullptr, [] { enter_veh.vehicles.clear(); });
+				sub->draw_option<Break>("List");
+				for (auto& model : enter_veh.vehicles) {
+					sub->draw_option<submenu>(model.m_name.c_str(), nullptr, rage::joaat("Fortniteeee4535"), [=] { enter_veh.selected = model.m_id; });
+				}
+			});
+		g_Render->draw_submenu<sub>("Entered", rage::joaat("Fortniteeee4535"), [](sub* sub)
+			{
+				for (auto& model : enter_veh.vehicles) {
+					if (enter_veh.selected == model.m_id) {
+
+						sub->draw_option<Button>("Set Into", nullptr, [=]
 							{
-								enter_veh.selected = model.m_id;
-								
+
+								PED::SET_PED_INTO_VEHICLE(Game->Self(), enter_veh.selected, -1);
+
 							});
+						sub->draw_option<Button>("Teleport To You", nullptr, [=]
+							{
 
+								NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
+								ENTITY::SET_ENTITY_COORDS(enter_veh.selected, coords.x, coords.y, coords.z, 0, 0, 0, 0);
+
+							});
 					}
-				});
-			g_Render->draw_submenu<sub>("Entered", rage::joaat("Fortniteeee4535"), [](sub* sub)
-				{
-					for (auto& model : enter_veh.vehicles) {
-						if (enter_veh.selected == model.m_id) {
-							
-							sub->draw_option<Button>("Set Into", nullptr, [=]
-								{
-
-									PED::SET_PED_INTO_VEHICLE(Game->Self(), enter_veh.selected, -1);
-
-								});
-							sub->draw_option<Button>("Teleport To You", nullptr, [=]
-								{
-
-									NativeVector3 coords = ENTITY::GET_ENTITY_COORDS(Game->Self(), false);
-									ENTITY::SET_ENTITY_COORDS(enter_veh.selected, coords.x, coords.y, coords.z, 0, 0, 0, 0);
-
-								});
-						}
-					}
+				}
 
 
-				});
+			});
 		g_Render->draw_submenu<sub>(("Plate"), rage::joaat("LPlate"), [](sub* sub)
 			{
 				if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false)) {
@@ -2083,46 +2079,6 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Doors"), rage::joaat("DOORS"), [](sub* sub)
 			{
 				sub->draw_option<Scroll<const char*, std::size_t>>("Action", nullptr, &doors.action, &doors.pos);
-				sub->draw_option<Button>("Driver Side (Front)", nullptr, [=]
-					{
-						if (doors.pos == 0) {
-							VEHICLE::SET_VEHICLE_DOOR_OPEN(Game->Vehicle(), 0, true, false);
-						}
-						if (doors.pos == 1) {
-							VEHICLE::SET_VEHICLE_DOOR_SHUT(Game->Vehicle(), 0, false);
-						}
-						if (doors.pos == 2) {
-							VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 0, true);
-						}
-						if (doors.pos == 3) {
-							VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 0, 2);
-						}
-						if (doors.pos == 4) {
-							VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 0, 1);
-						}
-
-					});
-				if (VEHICLE::GET_IS_DOOR_VALID(Game->Vehicle(), 1)) {
-					sub->draw_option<Button>("Driver Side (Rear)", nullptr, [=]
-						{
-							if (doors.pos == 0) {
-								VEHICLE::SET_VEHICLE_DOOR_OPEN(Game->Vehicle(), 1, false, false);
-							}
-							if (doors.pos == 1) {
-								VEHICLE::SET_VEHICLE_DOOR_SHUT(Game->Vehicle(), 1, false);
-							}
-							if (doors.pos == 2) {
-								VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 1, true);
-							}
-							if (doors.pos == 3) {
-								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 1, 2);
-							}
-							if (doors.pos == 4) {
-								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 1, 1);
-							}
-
-						});
-				}
 				if (VEHICLE::GET_IS_DOOR_VALID(Game->Vehicle(), 2)) {
 					sub->draw_option<Button>("Passenger Side (Front)", nullptr, [=]
 						{
@@ -2147,22 +2103,23 @@ namespace Saint
 				if (VEHICLE::GET_IS_DOOR_VALID(Game->Vehicle(), 3)) {
 					sub->draw_option<Button>("Passenger Side (Rear)", nullptr, [=]
 						{
-							if (doors.pos == 0) {
+							switch (doors.pos) {
+							case 0:
 								VEHICLE::SET_VEHICLE_DOOR_OPEN(Game->Vehicle(), 3, false, false);
-							}
-							if (doors.pos == 1) {
+								break;
+							case 1:
 								VEHICLE::SET_VEHICLE_DOOR_SHUT(Game->Vehicle(), 3, false);
-							}
-							if (doors.pos == 2) {
+								break;
+							case 2:
 								VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 3, true);
-							}
-							if (doors.pos == 3) {
+								break;
+							case 3:
 								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 3, 2);
-							}
-							if (doors.pos == 4) {
+								break;
+							case 4:
 								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 3, 1);
+								break;
 							}
-
 						});
 				}
 				if (VEHICLE::GET_IS_DOOR_VALID(Game->Vehicle(), 4)) {
@@ -2643,7 +2600,7 @@ namespace Saint
 						sub->draw_option<toggle>(("Use All Options"), "All options in vehicle will only work on this vehicle", &use_from_anywhere, [=] {
 							use_from_anywhere_veh = model.m_id;
 
-						});
+							});
 						sub->draw_option<Button>("Set Into", nullptr, [=]
 							{
 
@@ -4429,7 +4386,7 @@ namespace Saint
 						Vehicle veh = Game->Vehicle();
 						AUDIO::FORCE_USE_AUDIO_GAME_OBJECT(veh, sound_data[sound_int]);
 					});
-				
+
 				sub->draw_option<Break>(("List"));
 				sub->draw_option<submenu>("Search", nullptr, rage::joaat("EngineSoundSearch"));
 				//sub->draw_option<submenu>("All", nullptr, SubmenuVehicleAll);
@@ -4626,7 +4583,7 @@ namespace Saint
 								break;
 							}
 						}
-					
+
 					}
 				}
 
@@ -4872,7 +4829,7 @@ namespace Saint
 				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Teleport", nullptr, &features.teleport_gun, &features.teleport_gun_type, &features.teleport_gun_int);
 				sub->draw_option<toggle>(("Delete"), nullptr, &features.delete_gun);
 				sub->draw_option<toggle>(("Bypass C4 Limit"), nullptr, &features.bypass_c4_limit);
-				
+
 				sub->draw_option<toggle>(("Gravity"), nullptr, &gravity.enabled);
 				//sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Flags", "", &features.ammo_flag, &features.flag_type, &features.flag_int);
 				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Mark II", "", &weapon.mk2_ammo, &weapon.mk2, &weapon.pos, false, [] {
@@ -4881,7 +4838,7 @@ namespace Saint
 						Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info->m_ammo_special_type = eAmmoSpecialType::None;
 					}
 					});
-				
+
 				sub->draw_option<toggle>(("Aim Tracer"), nullptr, &features.aim_tracer);
 				sub->draw_option<toggle>(("Invisible"), nullptr, &features.invis_weapon, [] {
 					if (!features.invis_weapon) {
@@ -4913,7 +4870,7 @@ namespace Saint
 							e2->m_time_before_homing = 2.0f;
 						}
 					}
-				});
+					});
 
 
 			});
@@ -4929,7 +4886,7 @@ namespace Saint
 						}
 					}
 				}
-				
+
 				auto const e = reinterpret_cast<CAmmoProjectileInfo*>(Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info);
 				auto const e2 = reinterpret_cast<CAmmoRocketInfo*>(e);
 				//sExplosionFX* ExplosionFX = GetExplosionFX(0x8CBD7381); needs to be updated 
@@ -5026,7 +4983,7 @@ namespace Saint
 						valk.Meter = .5f;
 						ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), FALSE);
 					}
-				});
+					});
 				sub->draw_option<Break>("Settings");
 				sub->draw_option<Scroll<const char*, std::size_t>>("Explosion On End", nullptr, &all_weapons.explosion, &valk.pos);
 				sub->draw_option<toggle>(("Only Explode On Impact"), nullptr, &valk.only_explode_on_impact);
@@ -5077,13 +5034,13 @@ namespace Saint
 				sub->draw_option<ToggleWithNumber<float, bool>>("Shadow", nullptr, &paint.shadow, &paint.shadow_value, 0.1f, 50.f, 0.1f);
 				sub->draw_option<number<std::int32_t>>("Red", nullptr, &paint.r, 0, 255, 1, 3, true, "", "", [] {
 
-				});
+					});
 				sub->draw_option<number<std::int32_t>>("Green", nullptr, &paint.g, 0, 255, 1, 3, true, "", "", [] {
 
-				});
+					});
 				sub->draw_option<number<std::int32_t>>("Blue", nullptr, &paint.b, 0, 255, 1, 3, true, "", "", [] {
 
-				});
+					});
 				sub->draw_option<number<float>>("Brightness", nullptr, &paint.brightness, 0.1f, 1000.f, 1.f);
 				sub->draw_option<number<float>>("Range", nullptr, &paint.range, 0.1f, 1000.f, 0.1f);
 			});
@@ -5497,21 +5454,21 @@ namespace Saint
 						sub->draw_option<Button>(weapon.name, nullptr, [=]
 							{
 								if (give_ammo.action_type == 0 || give_ammo.action_type == 2) {
-										WEAPON::GIVE_DELAYED_WEAPON_TO_PED(Game->Self(), weapon.hash, give_weapon.amount, false);
-									}
+									WEAPON::GIVE_DELAYED_WEAPON_TO_PED(Game->Self(), weapon.hash, give_weapon.amount, false);
+								}
 								if (give_ammo.action_type == 1 || give_ammo.action_type == 2) {
-										if (WEAPON::HAS_PED_GOT_WEAPON(Game->Self(), weapon.hash, false)) {
-											for (int Component = 0; Component < 210; Component++) {
-												if (WEAPON::DOES_WEAPON_TAKE_WEAPON_COMPONENT(weapon.hash, weaponUpgrades[Component])) {
-													WEAPON::GIVE_WEAPON_COMPONENT_TO_PED(Game->Self(), weapon.hash, weaponUpgrades[Component]);
-												}
+									if (WEAPON::HAS_PED_GOT_WEAPON(Game->Self(), weapon.hash, false)) {
+										for (int Component = 0; Component < 210; Component++) {
+											if (WEAPON::DOES_WEAPON_TAKE_WEAPON_COMPONENT(weapon.hash, weaponUpgrades[Component])) {
+												WEAPON::GIVE_WEAPON_COMPONENT_TO_PED(Game->Self(), weapon.hash, weaponUpgrades[Component]);
 											}
 										}
+									}
 								}
 								if (give_ammo.action_type == 3) {
 									Game->CPed()->m_weapon_manager->m_selected_weapon_hash = weapon.hash;
 								}
-								
+
 
 							});
 					}
@@ -5675,7 +5632,7 @@ namespace Saint
 							*script_local(criminal_damage->m_stack, am_criminal_damage::score_idx).as<int*>() = 999'999'999;
 					});
 			});
-		
+
 		g_Render->draw_submenu<sub>(g_GameVariables->m_friendRegistry->m_friends[SelectedFriend]->m_name, SubmenuSelectedFriend, [](sub* sub)
 			{
 				sub->draw_option<Button>("Join", "", [] {
@@ -9225,7 +9182,7 @@ namespace Saint
 				sub->draw_option<number<std::int32_t>>("Bounty", nullptr, &boost_power, 0, 10000, 1, 3, false, "", "", [] {
 					g_players.get_selected.bounty(boost_power);
 					});
-			
+
 				sub->draw_option<Button>(("Taze"), nullptr, [=]
 					{
 						g_players.get_selected.taze();
@@ -9347,79 +9304,79 @@ namespace Saint
 
 
 			});
-			g_Render->draw_submenu<sub>(("Activites"), rage::joaat("ACTIVI"), [](sub* sub)
-				{
-					sub->draw_option<Button>(("Tennis"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Tennis);
-						});
-					sub->draw_option<Button>(("Shooting Range"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::ShootingRange);
-						});
-					sub->draw_option<Button>(("Golf"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Golf);
-						});
-					sub->draw_option<Button>(("Flight School"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::PilotSchool);
-						});
-					sub->draw_option<Button>(("Deathmatch"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Deathmatch);
-						});
-					sub->draw_option<Button>(("Arm Wresling"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::ArmWresling);
-						});
-					sub->draw_option<Button>(("Survival"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Survival);
-						});
-					sub->draw_option<Button>(("Skydive"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Skydive);
-						});
-					sub->draw_option<Break>("CEO/MC");
-					sub->draw_option<Button>(("Sightseer"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Sightseer);
-						});
-					sub->draw_option<Button>(("Headhunter"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::HeadHunter);
-						});
-					sub->draw_option<Button>(("Executive Search"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::ExecutiveSearch);
-						});
-					sub->draw_option<Button>(("Asset Recovery"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::AssetRecovery);
-						});
-					sub->draw_option<Button>(("Hostile Takeover"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::HostileTakeover);
-						});
-					sub->draw_option<Button>(("MC Raid"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::BikerDefend);
-						});
-					sub->draw_option<Button>(("Marked For Death"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::MarkedForDeath);
-						});
-					sub->draw_option<Break>("Other");
-					sub->draw_option<Button>(("Heist Prep"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::HeistPrep);
-						});
-					sub->draw_option<Button>(("Resupply"), nullptr, [=]
-						{
-							start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::BusinessResupply);
-						});
-				});
+		g_Render->draw_submenu<sub>(("Activites"), rage::joaat("ACTIVI"), [](sub* sub)
+			{
+				sub->draw_option<Button>(("Tennis"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Tennis);
+					});
+				sub->draw_option<Button>(("Shooting Range"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::ShootingRange);
+					});
+				sub->draw_option<Button>(("Golf"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Golf);
+					});
+				sub->draw_option<Button>(("Flight School"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::PilotSchool);
+					});
+				sub->draw_option<Button>(("Deathmatch"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Deathmatch);
+					});
+				sub->draw_option<Button>(("Arm Wresling"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::ArmWresling);
+					});
+				sub->draw_option<Button>(("Survival"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Survival);
+					});
+				sub->draw_option<Button>(("Skydive"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Skydive);
+					});
+				sub->draw_option<Break>("CEO/MC");
+				sub->draw_option<Button>(("Sightseer"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Sightseer);
+					});
+				sub->draw_option<Button>(("Headhunter"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::HeadHunter);
+					});
+				sub->draw_option<Button>(("Executive Search"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::ExecutiveSearch);
+					});
+				sub->draw_option<Button>(("Asset Recovery"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::AssetRecovery);
+					});
+				sub->draw_option<Button>(("Hostile Takeover"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::HostileTakeover);
+					});
+				sub->draw_option<Button>(("MC Raid"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::BikerDefend);
+					});
+				sub->draw_option<Button>(("Marked For Death"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::MarkedForDeath);
+					});
+				sub->draw_option<Break>("Other");
+				sub->draw_option<Button>(("Heist Prep"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::HeistPrep);
+					});
+				sub->draw_option<Button>(("Resupply"), nullptr, [=]
+					{
+						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::BusinessResupply);
+					});
+			});
 		g_Render->draw_submenu<sub>(("Play Sound"), rage::joaat("SOUND_PLAY"), [](sub* sub)
 			{
 				sub->draw_option<Button>(("Orbital Cannon"), nullptr, [=]
@@ -9976,11 +9933,11 @@ namespace Saint
 
 				}
 
+
 			});
 		g_Render->draw_submenu<sub>(("Reaction"), rage::joaat("ReactionToCockStar"), [](sub* sub)
 			{
-				sub->draw_option<toggle>(("Leave"), nullptr, &rockstarAdminDetector.reaction.leave);
-				sub->draw_option<toggle>(("Notify"), nullptr, &rockstarAdminDetector.reaction.notify);
+				sub->draw_option<toggle>(("Leave"), nullptr, &rockstarAdminDetector.reaction.leave);				sub->draw_option<toggle>(("Notify"), nullptr, &rockstarAdminDetector.reaction.notify);
 			});
 		g_Render->draw_submenu<sub>(("Game Events"), SubmenuGameEvents, [](sub* sub)
 			{
@@ -10049,7 +10006,7 @@ namespace Saint
 							break;
 						}
 					}
-				});
+					});
 				sub->draw_option<Scroll<const char*, std::size_t>>("Disable All", nullptr, &protections.types, &protections.data2, false, -1, [] {
 					for (auto& evnt : gameEvents) {
 						switch (protections.data2) {
@@ -10067,7 +10024,7 @@ namespace Saint
 							break;
 						}
 					}
-				});
+					});
 				sub->draw_option<Break>("List");
 				for (auto& evnt : gameEvents) {
 					sub->draw_option<submenu>(evnt.name.c_str(), nullptr, rage::joaat("ScriptEvents"), [=]
@@ -10088,7 +10045,7 @@ namespace Saint
 					}
 				}
 			});
-		
+
 		g_Render->draw_submenu<sub>(("Teleport"), SubmenuTeleport, [](sub* sub)
 			{
 				sub->draw_option<toggle>(("Automaticly Teleport To Waypoint"), nullptr, &m_teleport.automatic);
@@ -10129,7 +10086,7 @@ namespace Saint
 				if (sub->GetSelectedOption() == sub->GetNumOptions()) {
 					GRAPHICS::DRAW_MARKER(28, Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, 0, 0, 0, 0, 0, 0, tp_nearest_radius, tp_nearest_radius, tp_nearest_radius, g_Render->m_RadiusSphere.r, g_Render->m_RadiusSphere.g, g_Render->m_RadiusSphere.b, g_Render->m_RadiusSphere.a, false, false, 0, false, NULL, NULL, false);
 				}
-				sub->draw_option<number<float>>("Nearest Vehicle", nullptr, &tp_nearest_radius, 0, 1000.0, 1.0, 0, false, "", "m", [] {
+				sub->draw_option<number<float>>("Nearest Vehicle", nullptr, &tp_nearest_radius, 0, 1000.0, 1.0, 0, false, "", "m", [=] {
 					Vehicle veh = VEHICLE::GET_CLOSEST_VEHICLE(Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, tp_nearest_radius, 0, 0);
 					if (!VEHICLE::IS_VEHICLE_SEAT_FREE(veh, -1, FALSE))
 					{
@@ -10138,7 +10095,7 @@ namespace Saint
 						features.DeleteEntity(Ped);
 					}
 					PED::SET_PED_INTO_VEHICLE(Game->Self(), veh, -1);
-				});
+					});
 
 
 			});
@@ -10282,11 +10239,11 @@ namespace Saint
 								if (path.extension() == ".ini")
 								{
 
-									char nigger[64];
-									sprintf(nigger, "%s", path.stem().u8string().c_str());
-									sub->draw_option<Button>(nigger, nullptr, [=]
+									char path_name[64];
+									sprintf(path_name, "%s", path.stem().u8string().c_str());
+									sub->draw_option<Button>(path_name, nullptr, [=]
 										{
-											teleportLoader.load(nigger);
+											teleportLoader.load(path_name);
 										});
 
 								}
@@ -10612,7 +10569,7 @@ namespace Saint
 					}
 					});
 				sub->draw_option<toggle>(("Disable Restricted Areas"), "", &world.dra);
-				
+
 				sub->draw_option<Scroll<const char*, std::size_t>>("Vehicle Density", nullptr, &features.veh_density, &features.vden_pos, true, -1, [] {
 					switch (features.vden_pos) {
 					case 0:
@@ -10669,7 +10626,7 @@ namespace Saint
 						Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Created directory 'map mods'" });
 					}
 				}
-				
+
 			});
 		g_Render->draw_submenu<sub>(("Clear Area"), rage::joaat("ClearArea"), [](sub* sub)
 			{
@@ -10788,34 +10745,34 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Spawned"), rage::joaat("SelectedOBJECT"), [](sub* sub)
 			{
 				sub->draw_option<number<float>>("X", nullptr, &ped_spawner.pos.x, -1000000, 1000000, 0.01, 3, true, "", "", [=] {
-					ENTITY::SET_ENTITY_COORDS( ped_spawner.selected_object, ped_spawner.pos.x, ENTITY::GET_ENTITY_COORDS(ped_spawner.selected_object, 0).y, ENTITY::GET_ENTITY_COORDS(ped_spawner.selected_object, 0).z, false, false, false, false);
-				});
+					ENTITY::SET_ENTITY_COORDS(ped_spawner.selected_object, ped_spawner.pos.x, ENTITY::GET_ENTITY_COORDS(ped_spawner.selected_object, 0).y, ENTITY::GET_ENTITY_COORDS(ped_spawner.selected_object, 0).z, false, false, false, false);
+					});
 				sub->draw_option<number<float>>("Y", nullptr, &ped_spawner.pos.y, -1000000, 1000000, 0.01, 3, true, "", "", [=] {
-					ENTITY::SET_ENTITY_COORDS( ped_spawner.selected_object, ENTITY::GET_ENTITY_COORDS(ped_spawner.selected_object, 0).x, ped_spawner.pos.y, ENTITY::GET_ENTITY_COORDS(ped_spawner.selected_object, 0).z, false, false, false, false);
-				});
+					ENTITY::SET_ENTITY_COORDS(ped_spawner.selected_object, ENTITY::GET_ENTITY_COORDS(ped_spawner.selected_object, 0).x, ped_spawner.pos.y, ENTITY::GET_ENTITY_COORDS(ped_spawner.selected_object, 0).z, false, false, false, false);
+					});
 				sub->draw_option<number<float>>("Z", nullptr, &ped_spawner.pos.z, -1000000, 1000000, 0.01, 3, true, "", "", [=] {
 					ENTITY::SET_ENTITY_COORDS(ped_spawner.selected_object, ENTITY::GET_ENTITY_COORDS(ped_spawner.selected_object, 0).x, ENTITY::GET_ENTITY_COORDS(ped_spawner.selected_object, 0).y, ped_spawner.pos.z, false, false, false, false);
-				});
+					});
 				sub->draw_option<number<float>>("Pitch", nullptr, &ped_spawner.rotation.x, -0, 360, 1, 3, true, "", "", [=] {
 					ENTITY::SET_ENTITY_ROTATION(ped_spawner.selected_object, ped_spawner.rotation.x, ENTITY::GET_ENTITY_ROTATION(ped_spawner.selected_object, 2).y, ENTITY::GET_ENTITY_ROTATION(ped_spawner.selected_object, 2).z, 2, 0);
-				});
+					});
 				sub->draw_option<number<float>>("Roll", nullptr, &ped_spawner.rotation.y, 0, 360, 1, 3, true, "", "", [=] {
-					ENTITY::SET_ENTITY_ROTATION( ped_spawner.selected_object, ENTITY::GET_ENTITY_ROTATION(ped_spawner.selected_object, 2).x, ped_spawner.rotation.y, ENTITY::GET_ENTITY_ROTATION(ped_spawner.selected_object, 2).z, 2, 0 );
-				});
+					ENTITY::SET_ENTITY_ROTATION(ped_spawner.selected_object, ENTITY::GET_ENTITY_ROTATION(ped_spawner.selected_object, 2).x, ped_spawner.rotation.y, ENTITY::GET_ENTITY_ROTATION(ped_spawner.selected_object, 2).z, 2, 0);
+					});
 				sub->draw_option<number<float>>("Yaw", nullptr, &ped_spawner.rotation.z, 0, 360, 1, 3, true, "", "", [=] {
 					ENTITY::SET_ENTITY_ROTATION(ped_spawner.selected_object, ENTITY::GET_ENTITY_ROTATION(ped_spawner.selected_object, 2).x, ENTITY::GET_ENTITY_ROTATION(ped_spawner.selected_object, 2).y, ped_spawner.rotation.z, 2, 0);
-				});
+					});
 				sub->draw_option<Button>("Copy", nullptr, [=]
 					{
 						g_CallbackScript->AddCallback<ModelCallback>(Game->GetHash(ped_spawner.selected_object), [=] {
+							// Get the hash of the selected object
 							Hash hash = Game->GetHash(ped_spawner.selected_object);
 
+							// Create the object at the given coordinates with no offset
 							Object obj = OBJECT::CREATE_OBJECT_NO_OFFSET(hash, Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, true, false, false);
+
+							// Push the object and its model to the spawned objects vector
 							ped_spawner.spawned_objects.push_back({ obj, ped_spawner.selected_model3 });
-
-
-
-
 							});
 
 					});
@@ -10828,7 +10785,6 @@ namespace Saint
 								NativeVector3 me = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER::PLAYER_PED_ID(), 0.f, (length * i), 0.f);
 								Object ramp = OBJECT::CREATE_OBJECT(Game->HashKey("prop_skate_halfpipe_cr"), me.x, me.y, me.z - 1.75f, 1, 1, 1);
 								ENTITY::SET_ENTITY_HEADING(ramp, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()));
-								//ENTITY::SET_ENTITY_ROTATION(ramp, CAM::GET_GAMEPLAY_CAM_ROT(0).x, CAM::GET_GAMEPLAY_CAM_ROT(0).y, CAM::GET_GAMEPLAY_CAM_ROT(0).z,  0, 0);
 								ped_spawner.spawned_objects.push_back({ ramp, "prop_skate_halfpipe_cr" });
 							}
 						});
@@ -11443,6 +11399,7 @@ namespace Saint
 			{
 				sub->draw_option<submenu>("Editor", nullptr, rage::joaat("WEditor"));
 				sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Randomize", nullptr, &weather.randomize, &weather.randomize_delay, 0, 5000, 50, 3, true, "", "ms");
+				sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Lightning", nullptr, &features.light_nin, &features.lightning_delay, 0, 5000, 50, 3, true, "", "ms");
 				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &weather.data, &weather.init);
 				sub->draw_option<Button>(("Apply"), nullptr, []
 					{
@@ -11951,10 +11908,10 @@ namespace Saint
 				sub->draw_option<submenu>("Themes", nullptr, SubmenuThemes);
 				sub->draw_option<submenu>("Hotkeys", nullptr, rage::joaat("Hotkeys"));
 				sub->draw_option<submenu>("Translations", nullptr, SubMenuTranslations);
-				#ifndef DEV
-				#else
-					sub->draw_option<toggle>(("Spoof To Regular"), nullptr, &spoof_as_reg);
-				#endif	
+#ifndef DEV
+#else
+				sub->draw_option<toggle>(("Spoof To Regular"), nullptr, &spoof_as_reg);
+#endif	
 				if (Flags->isDev()) {
 
 					sub->draw_option<Button>("Unload", nullptr, []
