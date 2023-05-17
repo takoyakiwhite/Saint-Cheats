@@ -271,18 +271,6 @@
     <ClInclude Include="json.h">
       <Filter>Core\Script</Filter>
     </ClInclude>
-    <ClInclude Include="ScriptHookV.h">
-      <Filter>Hooking\SHV</Filter>
-    </ClInclude>
-    <ClInclude Include="Required.h">
-      <Filter>Hooking\SHV</Filter>
-    </ClInclude>
-    <ClInclude Include="Loger.h">
-      <Filter>Hooking\SHV</Filter>
-    </ClInclude>
-    <ClInclude Include="PoolManager.h">
-      <Filter>Hooking\SHV</Filter>
-    </ClInclude>
     <ClInclude Include="ScriptEventClasses.h">
       <Filter>Core\Features\Protections</Filter>
     </ClInclude>
@@ -378,9 +366,6 @@
     </ClCompile>
     <ClCompile Include="md5.cpp">
       <Filter>Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="ScriptHookV.cpp">
-      <Filter>Hooking\SHV</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

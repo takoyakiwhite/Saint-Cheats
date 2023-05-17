@@ -8,7 +8,6 @@
 #include "Natives.hpp"
 #include "FiberHelper.hpp"
 #include <MinHook/MinHook.h>
-#include "ScriptHookV.h"
 #include "Chat Commands.h"
 #include "Features.h"
 #include "Spoofing.h"
@@ -1609,77 +1608,7 @@ namespace Saint
 			data->SerializeArray(&node->m_gadget_data[i].m_data, size);
 		}
 	}
-	typedef FARPROC(*pGetProcAddress)(HMODULE hModule, const char* lpProcName);
-	pGetProcAddress OriginalGetProcAddress;
-	FARPROC GetProcAddressHook(HMODULE hModule, const char* lpProcName) {
-		if ((unsigned int)hModule == 0xf9d38c98) { // penis_enlargement_pills
-#ifdef HARD_DEV
-			LOG_DEBUG("ScriptHookV module accessing from EAT -> %s", lpProcName);
-#endif
-			if (strstr(lpProcName, "nativePush64")) {
-				return (FARPROC)&ScriptHookV::nativePush64;
-			}
-			else if (strstr(lpProcName, "createTexture")) {
-				return (FARPROC)&ScriptHookV::createTexture;
-			}
-			else if (strstr(lpProcName, "drawTexture")) {
-				return (FARPROC)&ScriptHookV::drawTexture;
-			}
-			else if (strstr(lpProcName, "getGlobalPtr")) {
-				return (FARPROC)&ScriptHookV::getGlobalPtr;
-			}
-			else if (strstr(lpProcName, "scriptRegister")) {
-				return (FARPROC)&ScriptHookV::scriptRegister;
-			}
-			else if (strstr(lpProcName, "keyboardHandlerRegister")) {
-				return (FARPROC)&ScriptHookV::keyboardHandlerRegister;
-			}
-			else if (strstr(lpProcName, "scriptRegisterAdditionalThread")) {
-				return (FARPROC)&ScriptHookV::scriptRegisterAdditionalThread;
-			}
-			else if (strstr(lpProcName, "keyboardHandlerUnregister")) {
-				return (FARPROC)&ScriptHookV::keyboardHandlerUnregister;
-			}
-			else if (strstr(lpProcName, "scriptUnregister")) {
-				return (FARPROC)&ScriptHookV::scriptUnregister;
-			}
-			else if (strstr(lpProcName, "nativeInit")) {
-				return (FARPROC)&ScriptHookV::nativeInit;
-			}
-			else if (strstr(lpProcName, "getGameVersion")) {
-				return (FARPROC)&ScriptHookV::getGameVersion;
-			}
-			else if (strstr(lpProcName, "scriptWait")) {
-				return (FARPROC)&ScriptHookV::scriptWait;
-			}
-			else if (strstr(lpProcName, "nativeCall")) {
-				return (FARPROC)&ScriptHookV::nativeCall;
-			}
-			else if (strstr(lpProcName, "getScriptHandleBaseAddress")) {
-				return (FARPROC)&ScriptHookV::getScriptHandleBaseAddress;
-			}
-			else if (strstr(lpProcName, "presentCallbackRegister")) {
-				return (FARPROC)&ScriptHookV::presentCallbackRegister;
-			}
-			else if (strstr(lpProcName, "presentCallbackUnregister")) {
-				return (FARPROC)&ScriptHookV::presentCallbackUnregister;
-			}
-			else if (strstr(lpProcName, "worldGetAllVehicles")) {
-				return (FARPROC)&ScriptHookV::worldGetAllVehicles;
-			}
-			else if (strstr(lpProcName, "worldGetAllPeds")) {
-				return (FARPROC)&ScriptHookV::worldGetAllPeds;
-			}
-			else if (strstr(lpProcName, "worldGetAllObjects")) {
-				return (FARPROC)&ScriptHookV::worldGetAllObjects;
-			}
-			else if (strstr(lpProcName, "worldGetAllPickups")) {
-				return (FARPROC)&ScriptHookV::worldGetAllPickups;
-			}
-		}
-
-		return OriginalGetProcAddress(hModule, lpProcName);
-	}
+	
 
 	static auto nodes = std::to_array<std::pair<Hash, uint64_t>>({ {rage::joaat("CAutomobileCreationDataNode"), 0}, {rage::joaat("CBikeGameStateDataNode"), 0}, {rage::joaat("CBoatGameStateDataNode"), 0}, {rage::joaat("CDoorCreationDataNode"), 0}, {rage::joaat("CDoorMovementDataNode"), 0}, {rage::joaat("CDoorScriptGameStateDataNode"), 0}, {rage::joaat("CDoorScriptInfoDataNode"), 0}, {rage::joaat("CDynamicEntityGameStateDataNode"), 0}, {rage::joaat("CEntityOrientationDataNode"), 0}, {rage::joaat("CEntityScriptGameStateDataNode"), 0}, {rage::joaat("CEntityScriptInfoDataNode"), 0}, {rage::joaat("CGlobalFlagsDataNode"), 0}, {rage::joaat("CHeliControlDataNode"), 0}, {rage::joaat("CHeliHealthDataNode"), 0}, {rage::joaat("CMigrationDataNode"), 0}, {rage::joaat("CObjectCreationDataNode"), 0}, {rage::joaat("CObjectGameStateDataNode"), 0}, {rage::joaat("CObjectOrientationNode"), 0}, {rage::joaat("CObjectScriptGameStateDataNode"), 0}, {rage::joaat("CObjectSectorPosNode"), 0}, {rage::joaat("CPedAIDataNode"), 0}, {rage::joaat("CPedAppearanceDataNode"), 0}, {rage::joaat("CPedAttachDataNode"), 0}, {rage::joaat("CPedComponentReservationDataNode"), 0}, {rage::joaat("CPedCreationDataNode"), 0}, {rage::joaat("CPedGameStateDataNode"), 0}, {rage::joaat("CPedHealthDataNode"), 0}, {rage::joaat("CPedInventoryDataNode"), 0}, {rage::joaat("CPedMovementDataNode"), 0}, {rage::joaat("CPedMovementGroupDataNode"), 0}, {rage::joaat("CPedOrientationDataNode"), 0}, {rage::joaat("CPedScriptCreationDataNode"), 0}, {rage::joaat("CPedScriptGameStateDataNode"), 0}, {rage::joaat("CPedSectorPosMapNode"), 0}, {rage::joaat("CPedSectorPosNavMeshNode"), 0}, {rage::joaat("CPedTaskSequenceDataNode"), 0}, {rage::joaat("CPedTaskSpecificDataNode"), 0}, {rage::joaat("CPedTaskTreeDataNode"), 0}, {rage::joaat("CPhysicalAngVelocityDataNode"), 0}, {rage::joaat("CPhysicalAttachDataNode"), 0}, {rage::joaat("CPhysicalGameStateDataNode"), 0}, {rage::joaat("CPhysicalHealthDataNode"), 0}, {rage::joaat("CPhysicalMigrationDataNode"), 0}, {rage::joaat("CPhysicalScriptGameStateDataNode"), 0}, {rage::joaat("CPhysicalScriptMigrationDataNode"), 0}, {rage::joaat("CPhysicalVelocityDataNode"), 0}, {rage::joaat("CPickupCreationDataNode"), 0}, {rage::joaat("CPickupPlacementCreationDataNode"), 0}, {rage::joaat("CPickupPlacementStateDataNode"), 0}, {rage::joaat("CPickupScriptGameStateNode"), 0}, {rage::joaat("CPickupSectorPosNode"), 0}, {rage::joaat("CPlaneControlDataNode"), 0}, {rage::joaat("CPlaneGameStateDataNode"), 0}, {rage::joaat("CPlayerAmbientModelStreamingNode"), 0}, {rage::joaat("CPlayerAppearanceDataNode"), 0}, {rage::joaat("CPlayerCameraDataNode"), 0}, {rage::joaat("CPlayerCreationDataNode"), 0}, {rage::joaat("CPlayerExtendedGameStateNode"), 0}, {rage::joaat("CPlayerGameStateDataNode"), 0}, {rage::joaat("CPlayerGamerDataNode"), 0}, {rage::joaat("CPlayerPedGroupDataNode"), 0}, {rage::joaat("CPlayerSectorPosNode"), 0}, {rage::joaat("CPlayerWantedAndLOSDataNode"), 0}, {rage::joaat("CSectorDataNode"), 0}, {rage::joaat("CSectorPositionDataNode"), 0}, {rage::joaat("CSubmarineControlDataNode"), 0}, {rage::joaat("CSubmarineGameStateDataNode"), 0}, {rage::joaat("CTrainGameStateDataNode"), 0}, {rage::joaat("CVehicleAngVelocityDataNode"), 0}, {rage::joaat("CVehicleAppearanceDataNode"), 0}, {rage::joaat("CVehicleComponentReservationDataNode"), 0}, {rage::joaat("CVehicleControlDataNode"), 0}, {rage::joaat("CVehicleCreationDataNode"), 0}, {rage::joaat("CVehicleDamageStatusDataNode"), 0}, {rage::joaat("CVehicleGadgetDataNode"), 0}, {rage::joaat("CVehicleGameStateDataNode"), 0}, {rage::joaat("CVehicleHealthDataNode"), 0}, {rage::joaat("CVehicleProximityMigrationDataNode"), 0}, {rage::joaat("CVehicleScriptGameStateDataNode"), 0}, {rage::joaat("CVehicleSteeringDataNode"), 0}, {rage::joaat("CVehicleTaskDataNode"), 0} });
 	static void cache_nodes()
