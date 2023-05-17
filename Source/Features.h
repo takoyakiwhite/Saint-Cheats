@@ -21,6 +21,7 @@
 #include <GTAV-Classes/weapon/CAmmoProjectileInfo.hpp>
 #include <GTAV-Classes/weapon/CAmmoRocketInfo.hpp>
 #include <signal.h>
+#include "Features.h"
 namespace Saint {
 	inline std::string handlingBuffer = "";
 	inline std::string VehNameBuffer = "";
@@ -683,6 +684,17 @@ namespace Saint {
 
 		}
 	};
+
+
+
+
+
+
+
+
+
+
+
 	inline NoClip no_clip;
 	class Invisible {
 	public:
@@ -1263,6 +1275,13 @@ namespace Saint {
 		bool police_blip = false;
 		bool use_stunt_jump_camera = false;
 		bool nigthclub300k = false;
+
+
+		bool Y500k = false;
+
+		bool RainbowGl = false;
+
+
 		bool stop_cut = false;
 		bool no_grav_veh = false;
 		bool clean_veh = false;
@@ -1296,6 +1315,11 @@ namespace Saint {
 		bool fake_lag = false;
 		bool drift_on_shift = false;
 		bool block_rid_joins = false;
+
+
+		bool auto_SH = false;
+
+
 		const char* drift_mode[3] = { "Shift", "Space", "RB" };
 		std::size_t drift_pos;
 		void set_tron_index(int index, int gender) {
@@ -1321,6 +1345,33 @@ namespace Saint {
 		bool bike_wheelie = false;
 		bool instant_enter = false;
 		bool recolor = false;
+
+
+
+		bool GlowWorld = false;
+
+
+		int m_Red = 255, m_Green = 0, m_Blue = 0;
+		void RGBFade()
+		{
+			if (m_Red > 0 && m_Blue == 0) {
+				m_Red--;
+				m_Green++;
+			}
+			if (m_Green > 0 && m_Red == 0) {
+				m_Green--;
+				m_Blue++;
+			}
+			if (m_Blue > 0 && m_Green == 0) {
+				m_Red++;
+				m_Blue--;
+			}
+		}
+
+
+
+
+
 		bool steal_gun2 = false;
 		bool max_gun = false;
 		bool repair_gun = false;
@@ -1609,10 +1660,17 @@ namespace Saint {
 			if (disable_towing) {
 				VEHICLE::SET_VEHICLE_DISABLE_TOWING(Game->Vehicle(), TRUE);
 			}
+
+
 			if (block_rid_joins) {
 				NETWORK::NETWORK_SESSION_BLOCK_JOIN_REQUESTS(true);
 				NETWORK::NETWORK_SESSION_CANCEL_INVITE();
 			}
+
+
+		
+		
+
 			if (drift_on_shift) {
 				if (drift_pos == 0) {
 					if (Game->KeyPress(VK_SHIFT)) {
@@ -1766,6 +1824,22 @@ namespace Saint {
 				STATS::STAT_SET_INT(Game->HashKey("MP1_CLUB_PAY_TIME_LEFT"), -1, true);
 				STATS::STAT_SET_INT(Game->HashKey("MP1_CLUB_POPULARITY"), 100000, true);
 			}
+
+
+
+			if (GlowWorld) {
+
+				auto Coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), TRUE);
+				GRAPHICS::DRAW_LIGHT_WITH_RANGE(Coords.x, Coords.y, Coords.z, m_Red, m_Green, m_Blue, 450.f, 100.f);
+
+				if (RainbowGl)
+					RGBFade();
+			}
+		
+
+
+
+
 			if (use_stunt_jump_camera) {
 				CAM::USE_VEHICLE_CAM_STUNT_SETTINGS_THIS_UPDATE();
 			}

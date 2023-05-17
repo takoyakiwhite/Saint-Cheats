@@ -19,7 +19,7 @@
 #include "UI/PlayerSubmenu.hpp"
 #include "PlayerSub.hpp"
 #include "FiberHelper.hpp"
-#include "Features.h"
+
 #include "Enums.h"
 #include "All Players.h"
 #include "Players.h"
@@ -5594,6 +5594,9 @@ namespace Saint
 
 				sub->draw_option<toggle>(("No Idle Kick"), nullptr, &features.no_idle_kick);
 				sub->draw_option<toggle>(("Block RID Joining"), nullptr, &features.block_rid_joins);
+
+				sub->draw_option<toggle>(("Auto Force Script Host"), nullptr, &features.block_rid_joins);
+
 				sub->draw_option<Button>(("Force Script Host"), nullptr, [=]
 					{
 
@@ -6018,7 +6021,6 @@ namespace Saint
 			{
 
 
-
 				sub->draw_option<Button>("In testing atm", "", []
 					{
 
@@ -6053,6 +6055,8 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Misc", SubmenuRMisc, [](sub* sub)
 			{
 
+
+				sub->draw_option<toggle>(("500"), nullptr, &features.Y500k);
 
 				sub->draw_option<Button>("Allow Gender Change", "", [] {
 					statSetBool("MP0_ALLOW_GENDER_CHANGE", 0);
@@ -10672,6 +10676,11 @@ namespace Saint
 				sub->draw_option<submenu>("Spawner", nullptr, rage::joaat("SpawnerW"));
 				sub->draw_option<submenu>("Clear Area", nullptr, rage::joaat("ClearArea"));
 				//sub->draw_option<submenu>("Map Mods", nullptr, rage::joaat("Map Mods"));
+
+				sub->draw_option<submenu>("World Glow", nullptr, rage::joaat("GlowW"));
+
+	
+
 				sub->draw_option<toggle>(("Disable Lights"), "", &features.blackout, [] {
 					if (!features.blackout)
 					{
@@ -10750,6 +10759,31 @@ namespace Saint
 				}
 
 			});
+
+
+
+
+		g_Render->draw_submenu<sub>(("World Glow"), rage::joaat("GlowW"), [](sub* sub)
+			{
+				sub->draw_option<toggle>(("Enabled"), nullptr, &features.GlowWorld);
+
+				sub->draw_option<toggle>(("Rainbow"), nullptr, &features.RainbowGl);
+		sub->draw_option<number<std::int32_t>>("Red", nullptr, &features.m_Red,  0, 255, 1, 3, true, "", "", [] {
+
+			});
+		sub->draw_option<number<std::int32_t>>("Green", nullptr, &features.m_Green,  0, 255, 1, 3, true, "", "", [] {
+
+			});
+		sub->draw_option<number<std::int32_t>>("Blue", nullptr, &features.m_Blue, 0, 255, 1, 3, true, "", "", [] {
+
+			});
+
+
+			});
+
+
+
+
 		g_Render->draw_submenu<sub>(("Clear Area"), rage::joaat("ClearArea"), [](sub* sub)
 			{
 				if (sub->GetSelectedOption() == 0 || world.clear_area.always_show_radius) {
