@@ -1449,6 +1449,7 @@ namespace Saint
 			}
 
 			if (*v8 == v6 || v8 == nullptr || !v8) {
+				protections.push_notification(ICON_FA_SHIELD_ALT"  Prevented Crash | Invalid Arguments");
 				return;
 			}
 		}
