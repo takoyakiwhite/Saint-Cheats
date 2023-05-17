@@ -37,6 +37,39 @@ namespace Saint {
 	inline Vehicle use_from_anywhere_veh;
 	inline float tp_nearest_radius = 150.0f;
 	inline bool alyways_show_info = false;
+	inline GtaThread* find_script_thread(rage::joaat_t hash)
+	{
+		for (auto thread : *g_GameFunctions->m_script_threads)
+		{
+			if (thread && thread->m_context.m_thread_id && thread->m_handler && thread->m_script_hash == hash)
+			{
+				return thread;
+			}
+		}
+
+		return nullptr;
+	}
+	inline bool force_host(rage::joaat_t hash)
+	{
+		uint32_t self = PLAYER::PLAYER_ID();
+		if (auto launcher = find_script_thread(hash); launcher && launcher->m_net_component)
+		{
+			for (int i = 0; !((CGameScriptHandlerNetComponent*)launcher->m_net_component)->is_local_player_host(); i++)
+			{
+				if (i > 200)
+					return false;
+
+				((CGameScriptHandlerNetComponent*)launcher->m_net_component)
+					->send_host_migration_event(g_GameVariables->m_net_game_player(self));
+				fbr::cur()->wait(10ms);
+
+				if (!launcher->m_stack || !launcher->m_net_component)
+					return false;
+			}
+		}
+
+		return true;
+	}
 	inline bool raycast_with_cam(Cam cam, NativeVector3& raycastHitCoords) {
 		bool raycastHit;
 		NativeVector3 surfaceNormal;
@@ -1315,7 +1348,7 @@ namespace Saint {
 		bool fake_lag = false;
 		bool drift_on_shift = false;
 		bool block_rid_joins = false;
-
+		bool force_script_host = false;
 
 		bool auto_SH = false;
 
@@ -1416,9 +1449,35 @@ namespace Saint {
 		float speed_blade = 1.0f;
 		int lightning_delay = 0;
 		int delay2 = 0;
+		int delay3 = 0;
 		bool light_nin = false;
-
+		bool t500k;
+		int money_delay = 30;
+		float glow_range = 450.f;
 		void init() {
+			if (GlowWorld) {
+
+				auto Coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), TRUE);
+				GRAPHICS::DRAW_LIGHT_WITH_RANGE(Coords.x, Coords.y, Coords.z, m_Red, m_Green, m_Blue, glow_range, 100.f);
+
+				if (RainbowGl)
+					RGBFade();
+			}
+			if (t500k) {
+				if (delay3 == 0 || (int)(GetTickCount64() - delay3) > money_delay * 1000)
+				{
+					*script_global(1968313).as<int*>() = 1;
+					delay3 = GetTickCount64();
+				}
+			}
+			if (force_script_host) {
+				g_FiberPool.queue([=] {
+					force_host(rage::joaat("freemode"));
+
+					force_host(rage::joaat("fmmc_launcher"));
+
+					});
+			}
 			if (light_nin) {
 
 				if (delay2 == 0 || (int)(GetTickCount64() - delay2) > lightning_delay)
@@ -1668,8 +1727,8 @@ namespace Saint {
 			}
 
 
-		
-		
+
+
 
 			if (drift_on_shift) {
 				if (drift_pos == 0) {
@@ -1827,15 +1886,8 @@ namespace Saint {
 
 
 
-			if (GlowWorld) {
+			
 
-				auto Coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), TRUE);
-				GRAPHICS::DRAW_LIGHT_WITH_RANGE(Coords.x, Coords.y, Coords.z, m_Red, m_Green, m_Blue, 450.f, 100.f);
-
-				if (RainbowGl)
-					RGBFade();
-			}
-		
 
 
 
@@ -7881,39 +7933,7 @@ namespace Saint {
 		constexpr static auto broadcast_idx = 110;
 		constexpr static auto score_idx = 105;
 	}
-	inline GtaThread* find_script_thread(rage::joaat_t hash)
-	{
-		for (auto thread : *g_GameFunctions->m_script_threads)
-		{
-			if (thread && thread->m_context.m_thread_id && thread->m_handler && thread->m_script_hash == hash)
-			{
-				return thread;
-			}
-		}
 
-		return nullptr;
-	}
-	inline bool force_host(rage::joaat_t hash)
-	{
-		uint32_t self = Game->Id();
-		if (auto launcher = find_script_thread(hash); launcher && launcher->m_net_component)
-		{
-			for (int i = 0; !((CGameScriptHandlerNetComponent*)launcher->m_net_component)->is_local_player_host(); i++)
-			{
-				if (i > 200)
-					return false;
-
-				((CGameScriptHandlerNetComponent*)launcher->m_net_component)
-					->send_host_migration_event(g_GameVariables->m_net_game_player(self));
-				fbr::cur()->wait(10ms);
-
-				if (!launcher->m_stack || !launcher->m_net_component)
-					return false;
-			}
-		}
-
-		return true;
-	}
 
 	class SpectateOptions {
 	public:
@@ -9308,7 +9328,7 @@ namespace Saint {
 				const char* host = PLAYER::GET_PLAYER_NAME(NETWORK::NETWORK_GET_HOST_OF_SCRIPT("freemode", -1, 0));
 				const char* shost = PLAYER::GET_PLAYER_NAME(NETWORK::NETWORK_GET_HOST_OF_SCRIPT("fmmc_launcher", -1, 0));
 				int max = 32 - NETWORK::NETWORK_GET_NUM_CONNECTED_PLAYERS();
-				HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(std::format("Connected Players: {}\nSession Host: {}\nScript Host: {}\nFree Slots: {}", NETWORK::NETWORK_GET_NUM_CONNECTED_PLAYERS(), host, shost, max).c_str());
+				HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(std::format("Connected Players: {}\nSession Host: {}\nScript Host: {}\nFree Slots: {}", NETWORK::NETWORK_GET_NUM_CONNECTED_PLAYERS(), shost, host, max).c_str());
 				HUD::END_TEXT_COMMAND_DISPLAY_TEXT(x, y, 0);
 			}
 		}

@@ -5595,7 +5595,7 @@ namespace Saint
 				sub->draw_option<toggle>(("No Idle Kick"), nullptr, &features.no_idle_kick);
 				sub->draw_option<toggle>(("Block RID Joining"), nullptr, &features.block_rid_joins);
 
-				sub->draw_option<toggle>(("Auto Force Script Host"), nullptr, &features.block_rid_joins);
+				sub->draw_option<toggle>(("Auto Force Script Host"), nullptr, &features.force_script_host);
 
 				sub->draw_option<Button>(("Force Script Host"), nullptr, [=]
 					{
@@ -5836,7 +5836,7 @@ namespace Saint
 				sub->draw_option<submenu>("Misc", nullptr, SubmenuRMisc);
 
 
-				//sub->draw_option<submenu>("Money", nullptr, SubmenuMoney); not finished
+				sub->draw_option<submenu>("Money", nullptr, SubmenuMoney);
 
 
 				//sub->draw_option<submenu>("Arena War", nullptr, SubmenuAWar);
@@ -6019,17 +6019,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Money", SubmenuMoney, [](sub* sub)
 			{
-
-
-				sub->draw_option<Button>("In testing atm", "", []
-					{
-
-
-
-					});
-
-				//sub->draw_option<toggle>(("500k (Loop)"), nullptr, &features.Yes500k);
-
+				sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("500k", nullptr, &features.t500k, &features.money_delay, 0, 120, 1, 3, false, "", "s");
 			});
 
 
@@ -10759,23 +10749,21 @@ namespace Saint
 
 
 
-		g_Render->draw_submenu<sub>(("World Glow"), rage::joaat("GlowW"), [](sub* sub)
+		g_Render->draw_submenu<sub>(("Glow"), rage::joaat("GlowW"), [](sub* sub)
 			{
 				sub->draw_option<toggle>(("Enabled"), nullptr, &features.GlowWorld);
-
+				sub->draw_option<Break>("Settings");
 				sub->draw_option<toggle>(("Rainbow"), nullptr, &features.RainbowGl);
-		sub->draw_option<number<std::int32_t>>("Red", nullptr, &features.m_Red,  0, 255, 1, 3, true, "", "", [] {
-
-			});
-		sub->draw_option<number<std::int32_t>>("Green", nullptr, &features.m_Green,  0, 255, 1, 3, true, "", "", [] {
-
-			});
-		sub->draw_option<number<std::int32_t>>("Blue", nullptr, &features.m_Blue, 0, 255, 1, 3, true, "", "", [] {
-
-			});
+				sub->draw_option<number<std::int32_t>>("Red", nullptr, &features.m_Red,  0, 255, 1, 3);
+				sub->draw_option<number<std::int32_t>>("Green", nullptr, &features.m_Green,  0, 255, 1, 3);
+				sub->draw_option<number<std::int32_t>>("Blue", nullptr, &features.m_Blue, 0, 255, 1, 3);
+				if (sub->GetSelectedOption() == sub->GetNumOptions()) {
+					GRAPHICS::DRAW_MARKER(28, Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, 0, 0, 0, 0, 0, 0, features.glow_range, features.glow_range, features.glow_range, g_Render->m_RadiusSphere.r, g_Render->m_RadiusSphere.g, g_Render->m_RadiusSphere.b, g_Render->m_RadiusSphere.a, false, false, 0, false, NULL, NULL, false);
+				}
+				sub->draw_option<number<float>>("Radius", nullptr, &features.glow_range, 0, 1000.0, 1.0, 0, true, "", "m");
 
 
-			});
+		});
 
 
 

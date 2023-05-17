@@ -549,7 +549,7 @@ namespace Saint::UserInterface
 					m_DrawBaseY + (m_HeaderHeight / 2.f),
 					m_Width,
 					m_HeaderHeight,
-					m_HeaderBackgroundColor,
+					{255, 255, 255, 255},
 					0.f);
 
 			}
