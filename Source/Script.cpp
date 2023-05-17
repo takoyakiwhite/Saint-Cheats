@@ -10675,7 +10675,7 @@ namespace Saint
 				sub->draw_option<submenu>("Black Hole", nullptr, rage::joaat("BlackHole"));
 				sub->draw_option<submenu>("Spawner", nullptr, rage::joaat("SpawnerW"));
 				sub->draw_option<submenu>("Clear Area", nullptr, rage::joaat("ClearArea"));
-				//sub->draw_option<submenu>("Map Mods", nullptr, rage::joaat("Map Mods"));
+				sub->draw_option<submenu>("Map Mods", nullptr, rage::joaat("Map Mods"));
 
 				sub->draw_option<submenu>("World Glow", nullptr, rage::joaat("GlowW"));
 
@@ -10717,10 +10717,10 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Map Mods"), rage::joaat("Map Mods"), [](sub* sub)
 			{
-				if (std::filesystem::exists("C:\\Saint\\Map Mods\\") && std::filesystem::is_directory("C:\\Saint\\Map Mods\\")) {
+				if (std::filesystem::exists("C:\\Saint\\Maps\\") && std::filesystem::is_directory("C:\\Saint\\Maps\\")) {
 
 					namespace fs = std::filesystem;
-					fs::directory_iterator dirIt{ "C:\\Saint\\Map Mods\\" };
+					fs::directory_iterator dirIt{ "C:\\Saint\\Maps\\" };
 					for (auto&& entry : dirIt) {
 						auto const pos = entry.path().filename().string().find_last_of('.');
 						std::string option = entry.path().filename().string().substr(0, pos);
@@ -10752,9 +10752,9 @@ namespace Saint
 					}
 				}
 				else {
-					std::filesystem::create_directory("C:\\Saint\\Map Mods\\");
+					std::filesystem::create_directory("C:\\Saint\\Maps\\");
 					if (Flags->isDev()) {
-						Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Created directory 'map mods'" });
+						Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Created directory 'Maps'" });
 					}
 				}
 
