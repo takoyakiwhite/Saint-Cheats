@@ -1352,7 +1352,7 @@ namespace Saint {
 
 
 		int m_Red = 255, m_Green = 0, m_Blue = 0;
-		void RGBFade()
+		void RGBFade() // skidded dogshit nice one v98
 		{
 			if (m_Red > 0 && m_Blue == 0) {
 				m_Red--;

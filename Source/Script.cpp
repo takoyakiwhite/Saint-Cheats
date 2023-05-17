@@ -10676,11 +10676,7 @@ namespace Saint
 				sub->draw_option<submenu>("Spawner", nullptr, rage::joaat("SpawnerW"));
 				sub->draw_option<submenu>("Clear Area", nullptr, rage::joaat("ClearArea"));
 				sub->draw_option<submenu>("Map Mods", nullptr, rage::joaat("Map Mods"));
-
-				sub->draw_option<submenu>("World Glow", nullptr, rage::joaat("GlowW"));
-
-	
-
+				sub->draw_option<submenu>("Glow", nullptr, rage::joaat("GlowW"));
 				sub->draw_option<toggle>(("Disable Lights"), "", &features.blackout, [] {
 					if (!features.blackout)
 					{
