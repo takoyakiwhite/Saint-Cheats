@@ -1798,15 +1798,8 @@ namespace Saint
 				if (!VEHICLE::GET_VEHICLE_MOD_VARIATION(Game->Vehicle(), 23))
 					return;
 				static float nigger;
-				static float nigger2;
-				sub->draw_option<number<float>>("Size", nullptr, &nigger, 0, 1000.f, 0.1f, 1, true, "", "", [] {
-					Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize = (BYTE)nigger * 20.0f;
-					Game->CVehicle()->m_draw_data->m_vehicleStreamRender->m_tireWidth = nigger;
-					//nigger = (int)Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize;
-					});
-				sub->draw_option<number<float>>("Height", nullptr, &nigger2, 0, 1000.f, 0.1f, 1, true, "", "", [] {
-					Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize = (BYTE)nigger2 * 20.0f;
-					//nigger = (int)Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize;
+				sub->draw_option<number<float>>("Height", nullptr, &nigger, 0, 1000.f, 5.0f, 1, true, "", "", [] {
+					Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize = (BYTE)nigger;
 					});
 				sub->draw_option<number<float>>("Width", nullptr, &Game->CVehicle()->m_draw_data->m_vehicleStreamRender->m_tireWidth, 0, 1000.f, 0.1f, 1, false);
 
@@ -4591,6 +4584,8 @@ namespace Saint
 						}
 
 					}
+				
+					
 				}
 
 
@@ -8239,6 +8234,7 @@ namespace Saint
 			{
 				sub->draw_option<toggle>(("Player Information"), nullptr, &hide_information.all);
 				sub->draw_option<toggle>(("Ped Preview"), nullptr, &hide_information.ped);
+				sub->draw_option<toggle>(("Always Show Information"), nullptr, &alyways_show_info);
 				sub->draw_option<Break>(("Tags"));
 				sub->draw_option<toggle>(("Self"), nullptr, &tags.self);
 				sub->draw_option<toggle>(("Saint"), nullptr, &tags.saint_user);
@@ -8316,6 +8312,9 @@ namespace Saint
 
 		g_Render->draw_submenu<PlayerSubmenu>(&g_SelectedPlayer, SubmenuSelectedPlayer, [](PlayerSubmenu* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<submenu>("Trolling", nullptr, SubmenuTrolling);
 				sub->draw_option<submenu>("Bodyguards", nullptr, SubmenuBodyguards);
 				sub->draw_option<submenu>("Increment", nullptr, SubmenuIncrement);
@@ -8391,6 +8390,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("More Information", rage::joaat("MoreInformation"), [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				if (auto ped = Game->PlayerIndex(g_SelectedPlayer))
 				{
 					script_global globalplayer_bd(2657589);
@@ -8418,10 +8420,16 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Block Actions", rage::joaat("BlockActions"), [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<toggle>(("Shooting"), nullptr, &g_players.get_selected.block_actions.shooting);
 			});
 		g_Render->draw_submenu<sub>("Chat", SubmenuSelectedChat, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<submenu>("Presets", nullptr, SubmenuSelectedChatPresets);
 				sub->draw_option<KeyboardOption>(("Text"), nullptr, p_chat.text.c_str(), []
 					{
@@ -8437,6 +8445,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Presets", SubmenuSelectedChatPresets, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<Button>(("Hello, My IP is {ip}"), nullptr, []
 					{
 						std::string get_ip_text = std::format("Hello, My IP is {0}.{1}.{2}.{3}", g_players.get_ip_address(g_SelectedPlayer).m_field1, g_players.get_ip_address(g_SelectedPlayer).m_field2, g_players.get_ip_address(g_SelectedPlayer).m_field3, g_players.get_ip_address(g_SelectedPlayer).m_field4);
@@ -8446,6 +8457,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Social Club", SubmenuSocialClub, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<KeyboardOption>(("Send Friend Request"), nullptr, messageFriendInput, []
 					{
 
@@ -8465,6 +8479,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Detections", SubmenuSelectedDetections, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<toggle>(("Exclude"), nullptr, &antiCheat.excludethatuck, [] {
 					if (antiCheat.excludethatuck) {
 						antiCheat.exclude_player(all_players.get_id(g_SelectedPlayer));
@@ -8496,6 +8513,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Vehicle", SubmenuSelectedVehicle, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<submenu>("Acrobatics", nullptr, rage::joaat("AcrobaticSelected"));
 				sub->draw_option<number<std::int32_t>>("Boost", nullptr, &features.boost_speed, 0, 300, 10, 3, false, "", "", [] {
 					QUEUE()
@@ -8749,7 +8769,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Acrobatics"), rage::joaat("AcrobaticSelected"), [](sub* sub)
 			{
-
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &acrobatic_type, &acrobatic_int4);
 				sub->draw_option<Button>(("Start"), nullptr, []
 					{
@@ -8790,6 +8812,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Spawner", SubmenuSelectedSpawner, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<submenu>("Settings", nullptr, Submenu::SpawnerSelectedSettings);
 				sub->draw_option<submenu>("Search", nullptr, Submenu::SubmenuSelectedVehicleSearch);
 				sub->draw_option<Break>(("List"));
@@ -8805,7 +8830,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Search"), SubmenuSelectedVehicleSearch, [](sub* sub)
 			{
-
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<KeyboardOption>(("Input"), nullptr, ModelInput, []
 					{
 
@@ -8848,11 +8875,17 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Settings", SpawnerSelectedSettings, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<toggle>(("Fade"), nullptr, &veh_spawner.selected_fade);
 
 			});
 		g_Render->draw_submenu<sub>((get_vehicle_class_name(m_selected_player_vehicle_class)), SubmenuSelectedGet, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {
 					for (std::int32_t i = 0; i < g_GameFunctions->m_vehicle_hash_pool->capacity; i++) {
 						std::uint64_t info = g_GameFunctions->m_vehicle_hash_pool->get(i);
@@ -8892,12 +8925,18 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Weapon", SubmenuSelectedWeapon, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<submenu>("Explosive Ammo", nullptr, SubmenuSelectedExplosiveAmmo);
 				sub->draw_option<toggle>(("Teleport You"), nullptr, &m_impacts.teleport);
 
 			});
 		g_Render->draw_submenu<sub>("Explosive Ammo", SubmenuSelectedExplosiveAmmo, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<toggle>(("Enabled"), nullptr, &g_players.get_selected.explosiveAmmo.enabled);
 				sub->draw_option<toggle>(("Sound"), nullptr, &g_players.get_selected.explosiveAmmo.sound);
 				sub->draw_option<toggle>(("Invisible"), nullptr, &g_players.get_selected.explosiveAmmo.invisible);
@@ -8908,6 +8947,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Increment", SubmenuIncrement, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &incr.type, &incr.data);
 				sub->draw_option<Button>(("Apply"), nullptr, []
 					{
@@ -8917,6 +8959,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Friendly", SubmenuFriendly, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<submenu>("Drops", nullptr, SubmenuDrops);
 				sub->draw_option<submenu>("Give Weapons", nullptr, SubmenuGiveWeapons);
 				sub->draw_option<toggle>(("Flash Blip"), nullptr, &g_players.get_selected.flash_blip.enabled, [] {
@@ -8931,6 +8976,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Give Weapons"), SubmenuGiveWeapons, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				int Maxammo = 0;
 
 				if (give_weapon.type_int != 0) {
@@ -8957,12 +9005,18 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Removals", SubmenuRemoval, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<submenu>("Kick", nullptr, SubmenuKicks);
 				sub->draw_option<submenu>("Crash", nullptr, SubmenuCrashes);
 
 			});
 		g_Render->draw_submenu<sub>("Kick", SubmenuKicks, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<Scroll<const char*, std::size_t>>("Menu", nullptr, &g_players.get_selected.events.Menu, &g_players.get_selected.events.Menu_Data);
 				sub->draw_option<Button>(("Start"), nullptr, []
 					{
@@ -8974,6 +9028,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Crash", SubmenuCrashes, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &g_players.get_selected.events.CrashMenu, &g_players.get_selected.events.Menu_DataCrash);
 				sub->draw_option<Button>(("Start"), nullptr, []
 					{
@@ -9170,6 +9227,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Trolling", SubmenuTrolling, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<submenu>("Send To Interior", nullptr, SubmenuSendToInt);
 				sub->draw_option<submenu>("Fake Drops", nullptr, SubmenuFakeDrops);
 				sub->draw_option<submenu>("Text Spam", nullptr, SubmenuSpamText);
@@ -9312,6 +9372,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Activites"), rage::joaat("ACTIVI"), [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<Button>(("Tennis"), nullptr, [=]
 					{
 						start_activity(all_players.get_id(g_SelectedPlayer), eActivityType::Tennis);
@@ -9385,6 +9448,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Play Sound"), rage::joaat("SOUND_PLAY"), [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<Button>(("Orbital Cannon"), nullptr, [=]
 					{
 						g_players.get_selected.PlaySound22("DLC_XM_Explosions_Orbital_Cannon", 0);
@@ -9404,6 +9470,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Shoot Single Bullet"), rage::joaat("SHOOT_BULLET"), [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<Scroll<const char*, std::size_t>>("Weapon", nullptr, &all_weapons.name, &features.bullet_int);
 				sub->draw_option<Button>(("Shoot"), nullptr, [=]
 					{
@@ -9419,6 +9488,9 @@ namespace Saint
 					});
 			});
 		g_Render->draw_submenu<sub>(("Send To Interior"), SubmenuSendToInt, [](sub* sub) {
+			if (alyways_show_info) {
+				g_players.draw_info(g_SelectedPlayer);
+			}
 			sub->draw_option<Button>(("Casino"), nullptr, [=]
 				{
 					g_players.get_selected.send_to_int({ 123 });
@@ -9436,6 +9508,9 @@ namespace Saint
 				});
 			});
 		g_Render->draw_submenu<sub>(("Cage"), SubmenuCage, [](sub* sub) {
+			if (alyways_show_info) {
+				g_players.draw_info(g_SelectedPlayer);
+			}
 			sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &cage.type, &cage.data);
 			sub->draw_option<toggle>(("Invisible"), nullptr, &cage.is_invisible);
 			sub->draw_option<Button>(("Spawn"), nullptr, []
@@ -9455,6 +9530,9 @@ namespace Saint
 				});
 			});
 		g_Render->draw_submenu<sub>(("Attackers"), SubmenuAttackers, [](sub* sub) {
+			if (alyways_show_info) {
+				g_players.draw_info(g_SelectedPlayer);
+			}
 			sub->draw_option<Scroll<const char*, std::size_t>>("Mode", nullptr, &attackers.mode, &attackers.mode_i);
 			if (attackers.mode_i == 1) {
 				sub->draw_option<Scroll<const char*, std::size_t>>("Model", nullptr, &attackers.cop_models, &attackers.cop_int);
@@ -9477,6 +9555,9 @@ namespace Saint
 				});
 			});
 		g_Render->draw_submenu<sub>(("Explode"), SubmenuExplode, [](sub* sub) {
+			if (alyways_show_info) {
+				g_players.draw_info(g_SelectedPlayer);
+			}
 			sub->draw_option<submenu>("Blame", nullptr, SubmenuExplodeBlame);
 			sub->draw_option<toggle>(("Sound"), nullptr, &owned_explosion.sound);
 			sub->draw_option<toggle>(("Invisible"), nullptr, &owned_explosion.invisible);
@@ -9498,6 +9579,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Blame", SubmenuExplodeBlame, [](sub* sub)
 			{
+
 				sub->draw_option<toggle>(("Enabled"), nullptr, &owned_explosion.blame);
 				sub->draw_option<Break>(("Player List"));
 
@@ -9508,7 +9590,9 @@ namespace Saint
 				{
 					if (auto ped = Game->PlayerIndex(i))
 					{
-
+						if (hide_information.all) {
+							g_players.draw_info(i);
+						}
 						std::string name = PLAYER::GET_PLAYER_NAME(i);
 						if (i == PLAYER::PLAYER_ID())
 							name.append(" ~p~[Self]");
@@ -9526,6 +9610,9 @@ namespace Saint
 				}
 			});
 		g_Render->draw_submenu<sub>(("Fake Drops"), SubmenuFakeDrops, [](sub* sub) {
+			if (alyways_show_info) {
+				g_players.draw_info(g_SelectedPlayer);
+			}
 			sub->draw_option<toggle>(("Money"), nullptr, &Fake_drops.money);
 			sub->draw_option<toggle>(("RP"), nullptr, &Fake_drops.rp);
 			sub->draw_option<number<std::int32_t>>("Height", nullptr, &Fake_drops.height, 0, 100);
@@ -9533,6 +9620,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Text Spam", SubmenuSpamText, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<toggle>(("Enabled"), nullptr, &text_spam.enabled);
 				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &text_spam.delay, 0, 5000, 50, 3, true, "", "ms");
 
@@ -9543,6 +9633,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Teleport", SubmenuPlayerTeleport, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<Button>(("To Player"), nullptr, []
 					{
 						if (PED::IS_PED_IN_ANY_VEHICLE(Game->PlayerIndex(g_SelectedPlayer), false)) {
@@ -9577,6 +9670,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Bodyguards"), SubmenuBodyguards, [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<submenu>("Model", nullptr, rage::joaat("CustomModelB"));
 				sub->draw_option<toggle>(("Godmode"), nullptr, &bodygaurd.godmode);
 				sub->draw_option<Scroll<const char*, std::size_t>>("Weapon", nullptr, &all_weapons.name, &bodygaurd.WeaponInt);
@@ -9652,7 +9748,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("All"), rage::joaat("BodyAll"), [](sub* sub)
 			{
-
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<Button>(("Teleport To Me"), nullptr, [=]
 					{
 						for (auto& guard : bodygaurd.spawned) {
@@ -9710,6 +9808,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Seleced"), rage::joaat("SelectedBodyGuard"), [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				Ped ped = bodygaurd.selected_gaurd;
 				sub->draw_option<submenu>("Outfit Editor", nullptr, rage::joaat("OutfitEditorSelected"));
 				sub->draw_option<Button>(("Teleport To Me"), nullptr, [=]
@@ -9743,6 +9844,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Outfit Editor"), rage::joaat("OutfitEditorSelected"), [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				Ped ped = bodygaurd.selected_gaurd;
 				sub->draw_option<Scroll<const char*, std::size_t>>("Component", nullptr, &Lists::HeaderTypesFrontend2, &Lists::HeaderTypesPosition22, true, -1, [] {
 					g_Render->outfits = Lists::HeaderTypesBackend2[Lists::HeaderTypesPosition22];
@@ -9816,6 +9920,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Model"), rage::joaat("CustomModelB"), [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				for (std::int32_t i = 0; i < m_ModelChanger.size; i++) {
 					sub->draw_option<submenu>(m_ModelChanger.get_class_name[i], nullptr, rage::joaat("FORTNITEISGOOD9992"), [=]
 						{
@@ -9826,6 +9933,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>((m_ModelChanger.get_class_name[bodygaurd.selected_class]), rage::joaat("FORTNITEISGOOD9992"), [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				for (auto& model : m_ModelChanger.m_GetModels) {
 					if (bodygaurd.selected_class == model.m_class) {
 						sub->draw_option<Button>(model.m_name.c_str(), nullptr, [=]
@@ -9840,6 +9950,9 @@ namespace Saint
 
 			});
 		g_Render->draw_submenu<sub>(("Drops"), SubmenuDrops, [](sub* sub) {
+			if (alyways_show_info) {
+				g_players.draw_info(g_SelectedPlayer);
+			}
 			sub->draw_option<submenu>("Custom Location", nullptr, rage::joaat("CLocation"));
 			sub->draw_option<Break>(("Types"));
 			sub->draw_option<toggle>(("Money"), nullptr, &drops.money);
@@ -9860,6 +9973,9 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Custom Location"), rage::joaat("CLocation"), [](sub* sub)
 			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
 				sub->draw_option<toggle>(("Money"), nullptr, &drops.custom.money);
 				sub->draw_option<toggle>(("RP"), nullptr, &drops.custom.rp);
 				sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Randomize RP Model", nullptr, &drops.custom.random_rp_model, &drops.custom.model_delay, 0, 5000, 50, 3, true, "", "ms");

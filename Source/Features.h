@@ -35,6 +35,7 @@ namespace Saint {
 	inline bool use_from_anywhere = false;
 	inline Vehicle use_from_anywhere_veh;
 	inline float tp_nearest_radius = 150.0f;
+	inline bool alyways_show_info = false;
 	inline bool raycast_with_cam(Cam cam, NativeVector3& raycastHitCoords) {
 		bool raycastHit;
 		NativeVector3 surfaceNormal;

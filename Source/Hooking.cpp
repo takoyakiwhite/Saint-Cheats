@@ -1394,13 +1394,13 @@ namespace Saint
 				protections.push_notification2(ICON_FA_SHIELD_ALT"  Prevented crash | Object");
 				return eAckCode::ACKCODE_FAIL;
 			}
-		}
+		}/*
 		int64_t fortnite = buffer->ReadInt64((int64_t*)0x94828921, 64);
 		int64_t fn = buffer->ReadInt64((int64_t*)0x784, 1);
 		if (buffer->ReadArray(nullptr, 0) && fortnite && fn) {
 			protections.push_notification2(ICON_FA_SHIELD_ALT"  Prevented crash | Sync Fuzzer");
 			return eAckCode::ACKCODE_FAIL;
-		}
+		}*/
 		m_syncing_player = src;
 		return static_cast<decltype(&received_clone_sync)>(g_Hooking->InvalidObjectCrash)(mgr, src, dst, object_type, object_id, buffer, unk, timestamp);
 	}
@@ -1415,6 +1415,8 @@ namespace Saint
 
 		return static_cast<decltype(&fragment_physics_crash_2)>(g_Hooking->m_OriginalFragmentCrash2)(a1, a2);
 	}
+	
+	
 	bool Hooks::object_creation_data_node(CObjectCreationDataNode* node, rage::netObject* obj)
 	{
 		auto result = static_cast<decltype(&object_creation_data_node)>(g_Hooking->m_OriginalInvalidPlayer222)(node, obj);
@@ -1427,6 +1429,7 @@ namespace Saint
 			}
 
 		}
+	
 		return result;
 	}
 	//normal
@@ -1807,104 +1810,82 @@ namespace Saint
 			}
 
 			switch (node_hash) {
-				case rage::joaat("CPedAttachDataNode"):
+			case rage::joaat("CPedAttachDataNode"):
+			{
+				const auto attach_node = (CPedAttachDataNode*)(node);
+				if (attach_node->m_attached && attach_node->m_attached_to == object->m_object_id)
 				{
-					const auto attach_node = (CPedAttachDataNode*)(node);
-					if (attach_node->m_attached && attach_node->m_attached_to == object->m_object_id)
-					{
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Crash (Bro Hug)");
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+					return true;
+				}
+				else if (attach_node->m_attached && is_attachment_infinite(get_game_object(object), attach_node->m_attached_to))
+				{
+					return true;
+				}
+
+				break;
+			}
+			case rage::joaat("CPhysicalAttachDataNode"):
+			{
+				const auto attach_node = (CPhysicalAttachDataNode*)(node);
+
+				// TODO: Find a better method to avoid false positives
+				auto model_hash = get_game_object(object) ? get_game_object(object)->m_model_info->m_hash : 0;
+				if (attach_node->m_attached && attach_node->m_attached_to == object->m_object_id && (model_hash != rage::joaat("hauler2") && model_hash != rage::joaat("phantom3")))
+				{
+					// notify::crash_blocked(sender, "infinite physical attachment");
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Crash (Vehicle Attachment)");
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+					return true;
+				}
+				else if (attach_node->m_attached && is_attachment_infinite((rage::CDynamicEntity*)get_game_object(object), attach_node->m_attached_to)) {
+					char g_RemoveWeapons[64];
+					sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Crash (Attachment)");
+					g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+					return true;
+				}
+
+				break;
+			}
+
+			case rage::joaat("CVehicleProximityMigrationDataNode"):
+			{
+				if (object && Game->CPed() && Game->CPed()->m_net_object)
+				{
+					const auto migration_node = (CVehicleProximityMigrationDataNode*)(node);
+					if (is_in_vehicle(Game->CPed(), Game->CPed()->m_vehicle) && Game->CPed()->m_vehicle->m_net_object
+						&& Game->CPed()->m_vehicle->m_net_object->m_object_id == object->m_object_id) {
 						char g_RemoveWeapons[64];
-						sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Crash (Bro Hug)");
+						sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Vehicle Kick");
 						g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-						return true;
-					}
-					else if (attach_node->m_attached && is_attachment_infinite(get_game_object(object), attach_node->m_attached_to))
-					{
-						return true;
+						return false; // vehicle kick?
 					}
 
-					break;
-				}
-				case rage::joaat("CPhysicalAttachDataNode"):
-				{
-					const auto attach_node = (CPhysicalAttachDataNode*)(node);
-
-					// TODO: Find a better method to avoid false positives
-					auto model_hash = get_game_object(object) ? get_game_object(object)->m_model_info->m_hash : 0;
-					if (attach_node->m_attached && attach_node->m_attached_to == object->m_object_id && (model_hash != rage::joaat("hauler2") && model_hash != rage::joaat("phantom3")))
+					if (!Game->CPed()->m_vehicle || !Game->CPed()->m_vehicle->m_net_object
+						|| Game->CPed()->m_vehicle->m_net_object->m_object_id != object->m_object_id
+						|| !is_in_vehicle(Game->CPed(), Game->CPed()->m_vehicle))
 					{
-						// notify::crash_blocked(sender, "infinite physical attachment");
-						char g_RemoveWeapons[64];
-						sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Crash (Attachment)");
-						g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-						return true;
-					}
-					else if (attach_node->m_attached && is_attachment_infinite((rage::CDynamicEntity*)get_game_object(object), attach_node->m_attached_to)) {
-						char g_RemoveWeapons[64];
-						sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Crash (Attachment)");
-						g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-						return true;
-					}
-
-					break;
-				}
-				case rage::joaat("CSectorDataNode"):
-				{
-					const auto sector_node = (CSectorDataNode*)(node);
-					if (sector_node->m_pos_x == 712 || sector_node->m_pos_y == 712 || sector_node->m_pos_z == 712)
-					{
-						char g_RemoveWeapons[64];
-						sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Crash (Sector)");
-						g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-						return true;
-					}
-					break;
-				}
-				case rage::joaat("CPlayerAppearanceDataNode"):
-				{
-					const auto player_appearance_node = (CPlayerAppearanceDataNode*)(node);
-					if (is_crash_ped(player_appearance_node->m_model_hash))
-					{
-						char g_RemoveWeapons[64];
-						sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Crash (Apperance)");
-						g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-						return true;
-					}
-					break;
-				}
-				case rage::joaat("CVehicleProximityMigrationDataNode"):
-				{
-					if (object && Game->CPed() && Game->CPed()->m_net_object)
-					{
-						const auto migration_node = (CVehicleProximityMigrationDataNode*)(node);
-						if (is_in_vehicle(Game->CPed(), Game->CPed()->m_vehicle) && Game->CPed()->m_vehicle->m_net_object
-							&& Game->CPed()->m_vehicle->m_net_object->m_object_id == object->m_object_id) {
-							char g_RemoveWeapons[64];
-							sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Vehicle Kick");
-							g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-							return false; // vehicle kick?
-						}
-
-						if (!Game->CPed()->m_vehicle || !Game->CPed()->m_vehicle->m_net_object
-							|| Game->CPed()->m_vehicle->m_net_object->m_object_id != object->m_object_id
-							|| !is_in_vehicle(Game->CPed(), Game->CPed()->m_vehicle))
+						for (int i = 0; i < 16; i++)
 						{
-							for (int i = 0; i < 16; i++)
-							{
-								if (migration_node->m_has_occupants[i]
-									&& migration_node->m_occupants[i] == Game->CPed()->m_net_object->m_object_id)
-									return true; // remote teleport
-							}
+							if (migration_node->m_has_occupants[i]
+								&& migration_node->m_occupants[i] == Game->CPed()->m_net_object->m_object_id)
+								return true; // remote teleport
 						}
 					}
-
-					break;
 				}
+
+				break;
+			}
 			}
 		}
+		return false;
 	}
 	bool Hooks::can_apply_data(rage::netSyncTree* tree, rage::netObject* object)
 	{
-		//static bool init = ([] { cache_nodes(); }(), true);
+		static bool init = ([] { cache_nodes(); }(), true);
 
 		if (tree->m_child_node_count && check_node(tree->m_next_sync_node, m_syncing_player, object))
 		{
@@ -1943,7 +1924,7 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_task_parachute_object_0x270, &Hooks::task_parachute_object_0x270, &parachute);
 		MH_CreateHook(g_GameFunctions->m_serialize_take_off_ped_variation_task, &Hooks::serialize_take_off_ped_variation_task, &parachute2);
 		MH_CreateHook(g_GameFunctions->m_serialize_vehicle_gadget_data_node, &Hooks::serialize_vehicle_gadget_data_node, &yim_crash);
-		MH_CreateHook(g_GameFunctions->m_can_apply_data, &Hooks::can_apply_data, &can_applydata);
+		//MH_CreateHook(g_GameFunctions->m_can_apply_data, &Hooks::can_apply_data, &can_applydata);
 		m_D3DHook.Hook(&Hooks::Present, Hooks::PresentIndex);
 		m_D3DHook.Hook(&Hooks::ResizeBuffers, Hooks::ResizeBuffersIndex);
 	}
@@ -1973,7 +1954,7 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->m_task_parachute_object_0x270);
 		MH_RemoveHook(g_GameFunctions->m_serialize_take_off_ped_variation_task);
 		MH_RemoveHook(g_GameFunctions->m_serialize_vehicle_gadget_data_node);
-		MH_RemoveHook(g_GameFunctions->m_can_apply_data);
+		//MH_RemoveHook(g_GameFunctions->m_can_apply_data);
 		MH_Uninitialize();
 	}
 

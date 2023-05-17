@@ -1037,4 +1037,5 @@ namespace Saint {
 		float fJumpForce; //0x0058 
 
 	}; //Size=0x005C
+	
 }

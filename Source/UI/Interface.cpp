@@ -186,8 +186,7 @@ namespace Saint::UserInterface
 			m_glare_handle = GRAPHICS::REQUEST_SCALEFORM_MOVIE("MP_MENU_GLARE");
 			NativeVector3 rot = CAM::GET_GAMEPLAY_CAM_ROT(2);
 			float dir = convert_360(rot.z, 0, 360);
-			if ((m_glare_direction == 0 || m_glare_direction - dir > 0.5) || m_glare_direction - dir < -0.5)
-			{
+			if (m_glare_direction != dir) {
 				m_glare_direction = dir;
 				GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(m_glare_handle, "SET_DATA_SLOT");
 				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_FLOAT(m_glare_direction);
@@ -208,7 +207,7 @@ namespace Saint::UserInterface
 
 
 		}
-		
+
 
 		if (g_Render->m_Opened && g_Settings.m_LockMouse)
 		{
@@ -1214,12 +1213,7 @@ namespace Saint::UserInterface
 	{
 		HUD::SET_TEXT_SCALE(size, size);
 		HUD::SET_TEXT_FONT(static_cast<int>(font));
-		if (m_MenuOpeningAnimation) {
-			HUD::SET_TEXT_COLOUR(color.r, color.g, color.b, 255);
-		}
-		else {
-			HUD::SET_TEXT_COLOUR(color.r, color.g, color.b, 255);
-		}
+		HUD::SET_TEXT_COLOUR(color.r, color.g, color.b, 255);
 		if (outline)
 			HUD::SET_TEXT_OUTLINE();
 		if (shadow)
