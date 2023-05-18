@@ -7,10 +7,28 @@
 namespace Saint {
 	class Kicks {
 	public:
-
-		const char* Menu[1]
+		inline CNetworkPlayerMgr* GetNetworkPlayerMgr()
 		{
-			"Kiddions"
+			if (auto NetworkPlayerMgr = *g_GameFunctions->m_NetworkPlayerManager)
+				return NetworkPlayerMgr;
+
+			return nullptr;
+		}
+		std::chrono::system_clock::time_point last{};
+		void DeleteEntity(Entity ent)
+		{
+			ENTITY::DETACH_ENTITY(ent, TRUE, TRUE);
+			ENTITY::SET_ENTITY_VISIBLE(ent, FALSE, FALSE);
+			NETWORK::NETWORK_SET_ENTITY_ONLY_EXISTS_FOR_PARTICIPANTS(ent, TRUE);
+			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ent, 0.f, 0.f, 0.f, FALSE, FALSE, FALSE);
+			ENTITY::SET_ENTITY_AS_MISSION_ENTITY(ent, TRUE, TRUE);
+			ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&ent);
+			ENTITY::DELETE_ENTITY(&ent);
+			OBJECT::DELETE_OBJECT(&ent);
+		}
+		const char* Menu[4]
+		{
+			"Kiddions", "Kiddions 2", "Desync", "Remove Gamer Card"
 		};
 
 		std::size_t Menu_Data = 0;
@@ -62,14 +80,45 @@ namespace Saint {
 				});
 		}
 		void crash() {
-			std::int64_t Args1[] = { (std::int64_t)-992162568, (std::int64_t)PLAYER::PLAYER_ID() };
-			g_GameFunctions->m_trigger_script_event(1, Args1, sizeof(Args1) / sizeof(Args1[0]), 1 << g_SelectedPlayer);
+			if (Menu_DataCrash == 0) {
+				std::int64_t Args1[] = { (std::int64_t)-992162568, (std::int64_t)PLAYER::PLAYER_ID() };
+				g_GameFunctions->m_trigger_script_event(1, Args1, sizeof(Args1) / sizeof(Args1[0]), 1 << g_SelectedPlayer);
 
-			std::int64_t Args2[] = { (std::int64_t)1131623211, (std::int64_t)PLAYER::PLAYER_ID(), rand() % INT64_MAX };
-			g_GameFunctions->m_trigger_script_event(1, Args2, sizeof(Args2) / sizeof(Args2[0]), 1 << g_SelectedPlayer);
+				std::int64_t Args2[] = { (std::int64_t)1131623211, (std::int64_t)PLAYER::PLAYER_ID(), rand() % INT64_MAX };
+				g_GameFunctions->m_trigger_script_event(1, Args2, sizeof(Args2) / sizeof(Args2[0]), 1 << g_SelectedPlayer);
 
-			std::int64_t Args3[] = { (std::int64_t)1556360603, (std::int64_t)PLAYER::PLAYER_ID(), rand() % INT64_MAX, rand() % INT64_MAX };
-			g_GameFunctions->m_trigger_script_event(1, Args3, sizeof(Args3) / sizeof(Args3[0]), 1 << g_SelectedPlayer);
+				std::int64_t Args3[] = { (std::int64_t)1556360603, (std::int64_t)PLAYER::PLAYER_ID(), rand() % INT64_MAX, rand() % INT64_MAX };
+				g_GameFunctions->m_trigger_script_event(1, Args3, sizeof(Args3) / sizeof(Args3[0]), 1 << g_SelectedPlayer);
+			}
+			if (Menu_DataCrash == 1) {
+				WEAPON::REMOVE_WEAPON_FROM_PED(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0xA2719263);
+			}
+			if (Menu_DataCrash == 2) {
+				auto Ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
+				auto Coords = ENTITY::GET_ENTITY_COORDS(Ped, TRUE);
+				auto CrashModel = rage::joaat("prop_fragtest_cnst_04");
+
+				// Freeze them
+				g_CallbackScript->AddCallback<ModelCallback>(CrashModel, [=] {
+					if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+						g_GameFunctions->m_clear_ped_tasks_network(all_players.get_ped(g_SelectedPlayer), true);
+					}
+
+					while (!STREAMING::HAS_MODEL_LOADED(CrashModel)) {
+						STREAMING::REQUEST_MODEL(CrashModel);
+						fbr::cur()->wait(100ms);
+					}
+
+					auto Object = OBJECT::CREATE_OBJECT(CrashModel, Coords.x, Coords.y, Coords.z, TRUE, TRUE, FALSE);
+					OBJECT::BREAK_OBJECT_FRAGMENT_CHILD(Object, NULL, NULL);
+
+					fbr::cur()->wait(1s);
+
+					STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(CrashModel);
+					DeleteEntity(Object);
+					});
+				
+			}
 
 			
 			
@@ -83,11 +132,12 @@ namespace Saint {
 		{
 			return g_GameVariables->m_net_game_player(g_SelectedPlayer) == nullptr ? nullptr : g_GameVariables->m_net_game_player(g_SelectedPlayer)->get_net_data();
 		}
-		rage::snPeer* get_session_peer()
+		
+		inline rage::snPeer* get_session_peer(CNetGamePlayer* target)
 		{
 			for (std::uint32_t i = 0; i < get_network()->m_game_session_ptr->m_peer_count; i++)
 			{
-				if (get_network()->m_game_session_ptr->m_peers[i]->m_peer_data.m_gamer_handle.m_rockstar_id == get_net_data()->m_gamer_handle.m_rockstar_id)
+				if (get_network()->m_game_session_ptr->m_peers[i]->m_peer_data.m_gamer_handle_2.m_rockstar_id == target->get_net_data()->m_gamer_handle_2.m_rockstar_id)
 				{
 					return get_network()->m_game_session_ptr->m_peers[i];
 				}
@@ -103,38 +153,23 @@ namespace Saint {
 		{
 			return  g_GameVariables->m_net_game_player(p) == nullptr ? false : g_GameVariables->m_net_game_player(p)->is_host();
 		}
-		rage::snPlayer* pget_session_player()
+		inline rage::snPlayer* GetSessionPlayer(CNetGamePlayer* target)
 		{
 			for (std::uint32_t i = 0; i < get_network()->m_game_session_ptr->m_player_count; i++)
 			{
-				if (get_network()->m_game_session_ptr->m_players[i]->m_player_data.m_host_token == get_net_data()->m_host_token)
+				if (get_network()->m_game_session_ptr->m_players[i]->m_player_data.m_host_token == target->get_net_data()->m_host_token)
 				{
 					return get_network()->m_game_session_ptr->m_players[i];
 				}
 			}
 
-			if (get_network()->m_game_session_ptr->m_local_player.m_player_data.m_host_token == get_net_data()->m_host_token)
+			if (get_network()->m_game_session_ptr->m_local_player.m_player_data.m_host_token == target->get_net_data()->m_host_token)
 				return &get_network()->m_game_session_ptr->m_local_player;
 
 			return nullptr;
 		}
-		rage::snPlayer* pget_session_player2(int p)
-		{
-			for (std::uint32_t i = 0; i < get_network()->m_game_session_ptr->m_player_count; i++)
-			{
-				if (get_network()->m_game_session_ptr->m_players[p]->m_player_data.m_host_token == get_net_data()->m_host_token)
-				{
-					return get_network()->m_game_session_ptr->m_players[p];
-				}
-			}
-
-			if (get_network()->m_game_session_ptr->m_local_player.m_player_data.m_host_token == get_net_data()->m_host_token)
-				return &get_network()->m_game_session_ptr->m_local_player;
-
-			return nullptr;
-		}
-		void remove() {
-			if (Menu_Data == 0) {
+		void remove(int pos) {
+			if (pos == 0) {
 				const size_t arg_count = 15;
 				int64_t args[arg_count] =
 				{
@@ -147,7 +182,7 @@ namespace Saint {
 
 				m_queue.add(18s, "Removing player..", [] {});
 			}
-			if (Menu_Data == 1) {
+			if (pos == 1) {
 				g_FiberPool.queue([]
 					{
 						const size_t arg_count = 3;
@@ -163,50 +198,103 @@ namespace Saint {
 
 				m_queue.add(18s, "Removing player..", [] {});
 			}
-			if (Menu_Data == 2) {
+			if (pos == 2) {
+				if (std::chrono::system_clock::now() - last < 10s)
+				{
+					return;
+				}
+
+				last = std::chrono::system_clock::now();
+
+				auto PlayerManager = GetNetworkPlayerMgr();
+				if (PlayerManager == nullptr) {
+					return;
+				}
+				auto LocalPlayer = PlayerManager->m_local_net_player;
+				auto target = g_GameFunctions->m_GetNetPlayer(g_SelectedPlayer);
+				if (LocalPlayer == nullptr) {
+					return;
+				}
+				if (target == nullptr) {
+					return;
+				}
+				if (target == LocalPlayer) {
+					return;
+				}
+				if (target->is_host()) {
+					return;
+				}
+
+				PlayerManager->RemovePlayer(target);
+				WEAPON::REMOVE_ALL_PED_WEAPONS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(target->m_player_id), FALSE);
+				PlayerManager->UpdatePlayerListsForPlayer(LocalPlayer);
+			}
+			if (pos == 3) {
+				auto PlayerManager = GetNetworkPlayerMgr();
+				auto target = g_GameFunctions->m_GetNetPlayer(g_SelectedPlayer);
+				if (PlayerManager == nullptr) {
+					return;
+				}
+				auto LocalPlayer = PlayerManager->m_local_net_player;
+				if (LocalPlayer == nullptr) {
+					return;
+				}
+				if (target == nullptr) {
+					return;
+				}
+				if (target == LocalPlayer) {
+					return;
+				}
+
 				rage::snMsgRemoveGamersFromSessionCmd cmd{};
 				cmd.m_session_id = get_network()->m_game_session_ptr->m_rline_session.m_session_id;
 				cmd.m_num_peers = 1;
-				cmd.m_peer_ids[0] = get_session_peer()->m_peer_data.m_peer_id_2;
+				cmd.m_peer_ids[0] = get_session_peer(target)->m_peer_data.m_peer_id_2;
 
-				cmd.m_unk = 19;
+				
 
 				if (get_network()->m_game_session.is_host())
 				{
-					g_GameFunctions->m_handle_remove_gamer_cmd(get_network()->m_game_session_ptr, pget_session_player(), &cmd);
+					g_GameFunctions->m_handle_remove_gamer_cmd(get_network()->m_game_session_ptr, GetSessionPlayer(target), &cmd);
 				}
-				else if (is_host())
+				else if (target->is_host())
 				{
-					for (std::uint32_t i = 0; i < PLAYER::GET_NUMBER_OF_PLAYERS(); ++i) {
-						if (all_players.get_id(i) != all_players.get_id(g_SelectedPlayer))
-							g_GameFunctions->m_send_remove_gamer_cmd(get_network()->m_game_session_ptr->m_net_connection_mgr,
-								g_GameFunctions->m_get_connection_peer(get_network()->m_game_session_ptr->m_net_connection_mgr,
-									(int)pget_session_player2(i)->m_player_data.m_peer_id_2),
-								get_network()->m_game_session_ptr->m_connection_identifier,
-								&cmd,
-								0x1000000);
+					for (auto Player : PlayerManager->m_player_list)
+					{
+						if (Player != nullptr)
+						{
+							if (Player->is_valid())
+							{
+								if (Player->m_player_id != target->m_player_id)
+								{
+									g_GameFunctions->m_send_remove_gamer_cmd(get_network()->m_game_session_ptr->m_net_connection_mgr,
+										g_GameFunctions->m_get_connection_peer(get_network()->m_game_session_ptr->m_net_connection_mgr, (int)GetSessionPlayer(Player)->m_player_data.m_peer_id_2),
+										get_network()->m_game_session_ptr->m_connection_identifier, &cmd, 0x1000000);
+								}
+							}
+						}
 					}
-					
 
-					g_GameFunctions->m_handle_remove_gamer_cmd(get_network()->m_game_session_ptr, pget_session_player(), &cmd);
+					g_GameFunctions->m_handle_remove_gamer_cmd(get_network()->m_game_session_ptr, GetSessionPlayer(target), &cmd);
 				}
 				else
 				{
-					for (std::uint32_t i = 0; i < PLAYER::GET_NUMBER_OF_PLAYERS(); ++i) {
-						if (is_host2(i)) {
-							g_GameFunctions->m_send_remove_gamer_cmd(get_network()->m_game_session_ptr->m_net_connection_mgr,
-								g_GameFunctions->m_get_connection_peer(get_network()->m_game_session_ptr->m_net_connection_mgr,
-									(int)pget_session_player2(i)->m_player_data.m_peer_id_2),
-								get_network()->m_game_session_ptr->m_connection_identifier,
-								&cmd,
-								0x1000000);
-
-							break;
+					for (auto Player : PlayerManager->m_player_list)
+					{
+						if (Player != nullptr)
+						{
+							if (Player->is_host())
+							{
+								g_GameFunctions->m_send_remove_gamer_cmd(get_network()->m_game_session_ptr->m_net_connection_mgr,
+									g_GameFunctions->m_get_connection_peer(get_network()->m_game_session_ptr->m_net_connection_mgr, (int)GetSessionPlayer(Player)->m_player_data.m_peer_id_2),
+									get_network()->m_game_session_ptr->m_connection_identifier, &cmd, 0x1000000);
+							}
 						}
 					}
-					
 				}
+
 				
+
 			}
 		}
 	};

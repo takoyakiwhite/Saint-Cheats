@@ -12158,6 +12158,15 @@ namespace Saint {
 	inline p_Selected* g_Selected() {
 		return &selected;
 	}
+	class SelectedP {
+	public:
+		CNetGamePlayer* m_net_player_data;
+		int m_id;
+	};
+	inline SelectedP m_selected_player;
+	inline SelectedP* getSelectedPlayer() {
+		return &m_selected_player;
+	}
 	class ScriptHookV2 {
 	public:
 		void GetFilesFromDirectory(std::vector<std::string>& buffer, std::string folder, std::string extention) {

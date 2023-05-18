@@ -111,12 +111,13 @@ namespace Saint::UserInterface
 		"stash doesn't like juice wrld ):",
 		"\"is this scooby?\"",
 		"grandrp is goat",
-		"\"play grand with me or im fucking the ui up\" - Kyro"
+		"\"play grand with me or im fucking the ui up\" - Kyro",
+		"Say my name right, its not paytek alright?"
 		};
 
 		if (!g_HasSetToolTip)
 		{
-			g_ToolTip = random(0, 41);
+			g_ToolTip = random(0, 42);
 			g_HasSetToolTip = true;
 		}
 

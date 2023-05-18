@@ -6,10 +6,7 @@
 
 #include <cstdint>
 
-namespace rage
-{
-#pragma pack(push, 8)
-    class netPlayerMgrBase
+class netPlayerMgrBase
     {
     public:
         virtual ~netPlayerMgrBase() = default;
@@ -34,4 +31,4 @@ namespace rage
     }; //Size: 0x08E0
     static_assert(sizeof(netPlayerMgrBase) == 0x8E0);
 #pragma pack(pop)
-}
+

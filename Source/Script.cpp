@@ -2078,6 +2078,46 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Doors"), rage::joaat("DOORS"), [](sub* sub)
 			{
 				sub->draw_option<Scroll<const char*, std::size_t>>("Action", nullptr, &doors.action, &doors.pos);
+				sub->draw_option<Button>("Driver Side (Front)", nullptr, [=]
+					{
+						if (doors.pos == 0) {
+							VEHICLE::SET_VEHICLE_DOOR_OPEN(Game->Vehicle(), 0, true, false);
+						}
+						if (doors.pos == 1) {
+							VEHICLE::SET_VEHICLE_DOOR_SHUT(Game->Vehicle(), 0, false);
+						}
+						if (doors.pos == 2) {
+							VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 0, true);
+						}
+						if (doors.pos == 3) {
+							VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 0, 2);
+						}
+						if (doors.pos == 4) {
+							VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 0, 1);
+						}
+
+					});
+				if (VEHICLE::GET_IS_DOOR_VALID(Game->Vehicle(), 1)) {
+					sub->draw_option<Button>("Driver Side (Rear)", nullptr, [=]
+						{
+							if (doors.pos == 0) {
+								VEHICLE::SET_VEHICLE_DOOR_OPEN(Game->Vehicle(), 1, false, false);
+							}
+							if (doors.pos == 1) {
+								VEHICLE::SET_VEHICLE_DOOR_SHUT(Game->Vehicle(), 1, false);
+							}
+							if (doors.pos == 2) {
+								VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 1, true);
+							}
+							if (doors.pos == 3) {
+								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 1, 2);
+							}
+							if (doors.pos == 4) {
+								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 1, 1);
+							}
+
+						});
+				}
 				if (VEHICLE::GET_IS_DOOR_VALID(Game->Vehicle(), 2)) {
 					sub->draw_option<Button>("Passenger Side (Front)", nullptr, [=]
 						{
@@ -2102,23 +2142,22 @@ namespace Saint
 				if (VEHICLE::GET_IS_DOOR_VALID(Game->Vehicle(), 3)) {
 					sub->draw_option<Button>("Passenger Side (Rear)", nullptr, [=]
 						{
-							switch (doors.pos) {
-							case 0:
+							if (doors.pos == 0) {
 								VEHICLE::SET_VEHICLE_DOOR_OPEN(Game->Vehicle(), 3, false, false);
-								break;
-							case 1:
-								VEHICLE::SET_VEHICLE_DOOR_SHUT(Game->Vehicle(), 3, false);
-								break;
-							case 2:
-								VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 3, true);
-								break;
-							case 3:
-								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 3, 2);
-								break;
-							case 4:
-								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 3, 1);
-								break;
 							}
+							if (doors.pos == 1) {
+								VEHICLE::SET_VEHICLE_DOOR_SHUT(Game->Vehicle(), 3, false);
+							}
+							if (doors.pos == 2) {
+								VEHICLE::SET_VEHICLE_DOOR_BROKEN(Game->Vehicle(), 3, true);
+							}
+							if (doors.pos == 3) {
+								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 3, 2);
+							}
+							if (doors.pos == 4) {
+								VEHICLE::SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Game->Vehicle(), 3, 1);
+							}
+
 						});
 				}
 				if (VEHICLE::GET_IS_DOOR_VALID(Game->Vehicle(), 4)) {
@@ -8256,6 +8295,7 @@ namespace Saint
 
 
 				sub->draw_option<Break>(("List"));
+			
 				for (std::uint32_t i = 0; i < 32; ++i)
 				{
 
@@ -8283,7 +8323,7 @@ namespace Saint
 							name.append(" ~b~[Interior]");
 						}
 						if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
-							if (antiCheat.cheater[g_GameVariables->m_net_game_player(i)->m_player_id] == true && tags.modder) {
+							if (antiCheat.cheater[g_GameVariables->m_net_game_player(i)->m_player_id] && tags.modder) {
 								name.append(" ~r~[Modder]");
 							}
 						}
@@ -8294,6 +8334,8 @@ namespace Saint
 						sub->draw_option<playersubmenu>(name.c_str(), nullptr, SubmenuSelectedPlayer, [=]
 							{
 								g_SelectedPlayer = i;
+								m_selected_player.m_id = i;
+								m_selected_player.m_net_player_data = g_GameFunctions->m_GetNetPlayer(i);
 							});
 
 
@@ -8379,6 +8421,12 @@ namespace Saint
 						m_saved_players.add(g_SelectedPlayer);
 
 					});
+				sub->draw_option<Button>("Kick", nullptr, [=]
+					{
+						g_players.get_selected.events.remove(2);
+
+					});
+				
 
 
 			});
@@ -9015,7 +9063,7 @@ namespace Saint
 				sub->draw_option<Button>(("Start"), nullptr, []
 					{
 
-						g_players.get_selected.events.remove();
+						g_players.get_selected.events.remove(g_players.get_selected.events.Menu_Data);
 					});
 
 

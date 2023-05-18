@@ -25,6 +25,7 @@
 #include <vector>
 #include <list>
 #include <algorithm>
+#include <GTAV-Classes/network/CNetworkPlayerMgr.hpp>
 namespace Saint
 {
 	class datBitBuffer2;
@@ -284,6 +285,9 @@ namespace Saint
 
 		using GetNetPlayer = CNetGamePlayer * (std::uint32_t id);
 		GetNetPlayer* m_GetNetPlayer;
+
+		using GetNetPlayer2 = rage::CNetGamePlayer * (std::uint32_t id);
+		GetNetPlayer2* m_GetNetPlayer2;
 		
 		using get_vehicle_gadget_array_size = int (*)(eVehicleGadgetType type);
 		get_vehicle_gadget_array_size m_get_vehicle_gadget_array_size;
@@ -301,6 +305,8 @@ namespace Saint
 
 
 		PVOID m_can_apply_data;
+
+		CNetworkPlayerMgr** m_NetworkPlayerManager;
 
 		
 		

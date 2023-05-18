@@ -7,7 +7,7 @@
 #include <cstdint>
 
 #pragma pack(push, 2)
-class CNetworkPlayerMgr : public rage::netPlayerMgrBase
+class CNetworkPlayerMgr : public netPlayerMgrBase
 {
 public:
     CNetGamePlayer m_net_players[32]; //0x08E0

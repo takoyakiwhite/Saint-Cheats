@@ -121,12 +121,14 @@ namespace Saint
 		m_ChangeNetworkObjectOwner(Signature("48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 54 41 56 41 57 48 81 EC ? ? ? ? 44 8A 62 4B").Scan().As<decltype(m_ChangeNetworkObjectOwner)>()),
 		m_GetEntityFromScript(Signature("E8 ? ? ? ? 8D 53 01 33 DB").Scan().Add(1).Rip().As<decltype(m_GetEntityFromScript)>()),
 		m_GetNetPlayer(Signature("48 83 EC 28 33 C0 38 05 ? ? ? ? 74 0A").Scan().As<decltype(m_GetNetPlayer)>()),
+		m_GetNetPlayer2(Signature("48 83 EC 28 33 C0 38 05 ? ? ? ? 74 0A").Scan().As<decltype(m_GetNetPlayer2)>()),
 		m_send_clone_sync(Signature("48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 0F B7 42").Scan().As<decltype(m_send_clone_sync)>()),
 		m_get_vehicle_gadget_array_size(Signature("40 53 48 83 EC 40 33 DB E8").Scan().As<decltype(m_get_vehicle_gadget_array_size)>()),
 		m_serialize_vehicle_gadget_data_node(Signature("48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 56 41 57 48 83 EC 30 48 8B 02 48 8D").Scan().Add(0x14).Rip().As<PVOID>()),
 		m_get_sync_tree_for_type(Signature("4C 8B FA 41 0F B7 D1").Scan().Add(0x14).Rip().As<decltype(m_get_sync_tree_for_type)>()),
 		m_network_object_mgr(Signature("48 8B 0D ? ? ? ? 45 33 C0 E8 ? ? ? ? 33 FF 4C 8B F0").Scan().Add(3).Rip().As<CNetworkObjectMgr**>()),
 		m_can_apply_data(Signature("E8 ? ? ? ? 84 C0 0F 84 AF 01 00 00 48 8B 03").Scan().Add(1).Rip().As<PVOID>()),
+		m_NetworkPlayerManager(Signature("48 8B 0D ? ? ? ? 8A D3 48 8B 01 FF 50 ? 4C 8B 07 48 8B CF").Scan().Add(3).Rip().As<decltype(m_NetworkPlayerManager)>()),
 		m_script_threads(Signature("45 33 F6 8B E9 85 C9 B8").Scan().Sub(4).Rip().Sub(8).As<decltype(m_script_threads)>())
 
 	{
