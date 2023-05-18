@@ -26,9 +26,9 @@ namespace Saint {
 			ENTITY::DELETE_ENTITY(&ent);
 			OBJECT::DELETE_OBJECT(&ent);
 		}
-		const char* Menu[4]
+		const char* Menu[3]
 		{
-			"Kiddions", "Kiddions 2", "Desync", "Remove Gamer Card"
+			"Kiddions", "Kiddions 2", "Desync"
 		};
 
 		std::size_t Menu_Data = 0;

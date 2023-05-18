@@ -108,20 +108,16 @@ namespace Saint
 	}
 	void LogScript::Tick()
 	{
+			
 			if (g_Render->m_Opened && g_Render->m_HeaderTextData)
 			{
+				auto m_Hello = ImGui::CalcTextSize("Hello").y;
 				auto m_XPosition = ((g_Render->m_PosX - (g_Render->m_Width / g_Render->m_FooterTextPadding)) * ImGui::GetIO().DisplaySize.x);
 				auto m_YPosition = (g_Render->m_PosY + (g_Render->m_HeaderHeight / 100.f) + ((ImGui::CalcTextSize(g_Render->m_CurrentSubMenuName).y / 1920) / 4.f)) * ImGui::GetIO().DisplaySize.y;
 				if (ImGui::Begin("", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground)) {
-					ImGui::SetWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x * 1000, ImGui::GetIO().DisplaySize.y * 1000));
+					ImGui::SetWindowSize(ImGui::GetIO().DisplaySize);
 					ImGui::PushFont(g_D3DRenderer->m_HeaderFontData);
 					auto DrawList = ImGui::GetWindowDrawList();
-					D3D11_VIEWPORT viewport{};
-					float ScreenCenterX = viewport.Width / 2.0f;
-					float ScreenCenterY = viewport.Height / 2.0f;
-					if (g_Render->fov_circle) {
-						DrawList->AddCircle(ImVec2(ScreenCenterX, ScreenCenterY), float(80.f), RGBtoU32(255, 255, 255), 100.0f, 0.5f);
-					}
 					DrawList->AddText(ImVec2(m_XPosition, m_YPosition), ImColor(g_Render->m_HeaderTextColor.r, g_Render->m_HeaderTextColor.g, g_Render->m_HeaderTextColor.b, g_Render->m_HeaderTextColor.a), g_Render->m_CurrentSubMenuName);
 					ImGui::PopFont();
 				}

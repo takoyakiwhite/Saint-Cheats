@@ -11,7 +11,7 @@ namespace Saint::UserInterface
 	{
 	public:
 		explicit number() = default;
-		explicit number(const char* text, const char* description, NumberType* number, NumberType min, NumberType max, NumberType step = 1, std::size_t precision = 3, bool actionOnHorizontal = true, const char* prefix = "", const char* suffix = "", std::function<void()> action = [] {}):
+		explicit number(const char* text, const char* description, NumberType* number, NumberType min, NumberType max, NumberType step = 1, std::size_t precision = 3, bool actionOnHorizontal = true, const char* prefix = "", const char* suffix = "", std::function<void()> action = [] {}, bool can_be_saved = false):
 			m_ActionOnHorizontal(actionOnHorizontal),
 			m_Number(number),
 			m_Min(min),

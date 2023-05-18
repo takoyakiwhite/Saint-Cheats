@@ -31,7 +31,12 @@
 namespace Saint
 {
 	
-	
+	class JoinedInfo {
+	public:
+		bool join_queued = false;
+		rage::rlSessionInfo information;
+	};
+	inline JoinedInfo session_information;
 	inline bool m_EnableSCIDJoiner;
 	inline __int64 m_SCIDJoiner;
 	inline __int64 m_PlayerListPointer;

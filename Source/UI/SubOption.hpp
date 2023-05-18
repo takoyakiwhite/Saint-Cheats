@@ -27,7 +27,10 @@ namespace Saint::UserInterface
 		{
 			if (action == OptionAction::EnterPress)
 			{
-				g_Render->SwitchToSubmenu(m_SubId);
+				if (m_SubId != rage::joaat("NULL")) {
+					g_Render->SwitchToSubmenu(m_SubId);
+				}
+				
 			}
 
 			BaseOption::HandleAction(action);

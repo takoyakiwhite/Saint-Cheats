@@ -193,7 +193,7 @@ namespace Saint::UserInterface
 				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_FLOAT(m_glare_direction);
 				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
 			}
-			GRAPHICS::DRAW_SCALEFORM_MOVIE(m_glare_handle, (m_PosX + 0.3456f - glare_x_offset), (m_DrawBaseY + (m_HeaderHeight / 2.f) + 0.38f), (m_Width + 0.82700f), (m_HeaderHeight + 0.852f), 255, 255, 255, 255, 0);
+			GRAPHICS::DRAW_SCALEFORM_MOVIE(m_glare_handle, (m_PosX + 0.3456f - glare_x_offset), (m_DrawBaseY + (m_HeaderHeight / 2.f) + 0.38f), (m_Width + 0.82700f), (m_HeaderHeight + 0.852f) + glare.height_offset, 255, 255, 255, 255, 0);
 		}
 	}
 
@@ -870,18 +870,17 @@ namespace Saint::UserInterface
 				if (ToggledOn)
 				{
 					GRAPHICS::DRAW_SPRITE("CommonMenu", "common_medal",
-						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f)
-						, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont
-							, g_Render->m_OptionTextSize) / 1.5f) + 0.014f
-						, res.x, res.y, 0.0, m_ToggleOnColor.r, m_ToggleOnColor.g, m_ToggleOnColor.b, m_ToggleOnColor.a, false, false);
+						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f), 
+						g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont, g_Render->m_OptionTextSize) / 1.5f) + 0.014f - 0.001,
+						res.x, res.y, 0.0, 
+						m_ToggleOnColor.r, m_ToggleOnColor.g, m_ToggleOnColor.b, m_ToggleOnColor.a, false, false);
 				}
 				else if (!ToggledOn)
 				{
 					GRAPHICS::DRAW_SPRITE("CommonMenu", "common_medal",
-						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f)
-						, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont
-							, g_Render->m_OptionTextSize) / 1.5f) + 0.014f
-						, res.x, res.y, 0.0, m_ToggleOffColor.r, m_ToggleOffColor.g, m_ToggleOffColor.b, m_ToggleOffColor.a, false, false);
+						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f),
+						g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont, g_Render->m_OptionTextSize) / 1.5f) + 0.014f - 0.001,
+						res.x, res.y, 0.0, m_ToggleOffColor.r, m_ToggleOffColor.g, m_ToggleOffColor.b, m_ToggleOffColor.a, false, false);
 				}
 			}
 			else if (ToggleIterator == 1)
@@ -937,9 +936,9 @@ namespace Saint::UserInterface
 
 			}
 		}
-		if (opt->GetFlag(OptionFlag::Enterable))
+		if (opt->GetFlag(OptionFlag::Enterable) || opt->GetFlag(OptionFlag::PlayerSub))
 		{
-			if (IndicatorIterator == 0)
+			if (enterable.position == 0)
 			{
 
 
@@ -952,35 +951,15 @@ namespace Saint::UserInterface
 					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
 					false, false);
 			}
-			else if (IndicatorIterator == 1)
+			else if (enterable.position == 1)
 			{
-				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.00355f, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f, m_OptionHeight, { m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, sub_alpha });
+				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.00355f + enterable.x_offset, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f + enterable.width_offset, m_OptionHeight, { m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, sub_alpha });
 			}
 		}
 		if (opt->GetFlag(OptionFlag::ColorSub))
 		{
-			DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.00355f, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f, m_OptionHeight, opt->GetColor());
+			DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.00355f + enterable.x_offset, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f + enterable.width_offset, m_OptionHeight, opt->GetColor());
 
-		}
-		if (opt->GetFlag(OptionFlag::PlayerSub))
-		{
-			if (IndicatorIterator == 0)
-			{
-
-
-				DrawRightText(
-					">",
-					m_PosX + (m_Width / m_OptionPadding),
-					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(Font::Monospace, 0.35) / 1.725f) - 0.001,
-					0.35,
-					Font::Monospace,
-					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
-					false, false);
-			}
-			else if (IndicatorIterator == 1)
-			{
-				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.003f, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f, m_OptionHeight, { m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, sub_alpha });
-			}
 		}
 
 		m_DrawBaseY += m_OptionHeight;

@@ -722,7 +722,7 @@ namespace Saint
 						});
 				}
 				sub->draw_option<Break>(("Other"));
-				sub->draw_option<KeyboardOption>(("Search"), "Note: this is case sensitive.", vision.search, []
+				sub->draw_option<KeyboardOption>(("Search"), "", vision.search, []
 					{
 						showKeyboard("Enter Something", "", 8, &vision.search, [=] {});
 					});
@@ -1183,7 +1183,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Search"), rage::joaat("AllModel"), [](sub* sub)
 			{
-				sub->draw_option<KeyboardOption>(("Value"), "Note: this is case sensitive.", modelsearchresults, []
+				sub->draw_option<KeyboardOption>(("Value"), "", modelsearchresults, []
 					{
 						showKeyboard("Enter Something", "", 8, &modelsearchresults, [=] {});
 					});
@@ -1665,7 +1665,7 @@ namespace Saint
 						ENTITY::SET_ENTITY_RENDER_SCORCHED(Game->Vehicle(), false);
 					}
 					});
-				sub->draw_option<toggle>(("Can Wheelie"), "Works better with vehicles that have higher suspension", &features.can_wheelie, [] {
+				sub->draw_option<toggle>(("Can Wheelie"), "Works better with vehicles that have better torque.", &features.can_wheelie, [] {
 					if (!features.can_wheelie) {
 						if (VEHICLE::IS_THIS_MODEL_A_CAR(Game->GetHash(Game->Vehicle()))) {
 							for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
@@ -1793,16 +1793,70 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Wheels"), rage::joaat("Wheels2"), [](sub* sub)
 			{
+				
+				static float nigger;
+				sub->draw_option<submenu>("Saved", nullptr, rage::joaat("SavedWheel"));
+				sub->draw_option<Break>("Modifiers");
 				if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), NULL))
 					return;
 				if (!VEHICLE::GET_VEHICLE_MOD_VARIATION(Game->Vehicle(), 23))
 					return;
-				static float nigger;
+
 				sub->draw_option<number<float>>("Height", nullptr, &nigger, 0, 1000.f, 5.0f, 1, true, "", "", [] {
 					Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize = (BYTE)nigger;
 					});
 				sub->draw_option<number<float>>("Width", nullptr, &Game->CVehicle()->m_draw_data->m_vehicleStreamRender->m_tireWidth, 0, 1000.f, 0.1f, 1, false);
 
+			});
+		g_Render->draw_submenu<sub>(("Saved"), rage::joaat("SavedWheel"), [](sub* sub)
+			{
+				sub->draw_option<Button>(("Save"), nullptr, []
+					{
+						showKeyboard("Enter Something", "", 25, &g_WheelLoad.buffer, [] {
+								g_WheelLoad.save(g_WheelLoad.buffer);
+								});
+						
+					});
+				sub->draw_option<Break>("List");
+				if (std::filesystem::exists("C:\\Saint\\Wheels\\") && std::filesystem::is_directory("C:\\Saint\\Wheels\\")) {
+					namespace fs = std::filesystem;
+					fs::directory_iterator dirIt{ "C:\\Saint\\Wheels\\" };
+					for (auto&& dirEntry : dirIt)
+					{
+						if (dirEntry.is_regular_file())
+						{
+							auto path = dirEntry.path();
+							if (path.has_filename())
+							{
+								if (path.extension() == ".ini")
+								{
+									
+									char nigger[64];
+									sprintf(nigger, "%s", path.stem().u8string().c_str());
+									sub->draw_option<Button>(nigger, nullptr, [=]
+										{
+											g_WheelLoad.load(nigger);
+										});
+
+								}
+
+							}
+						}
+					}
+				}
+				else {
+					if (std::filesystem::create_directory("C:\\Saint\\Wheels\\")) {
+						if (Flags->isDev()) {
+							Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Created directory 'wheels'" });
+						}
+					}
+					else {
+						std::filesystem::create_directory("C:\\Saint\\Wheels\\");
+						if (Flags->isDev()) {
+							Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Created directory 'wheels'" });
+						}
+					}
+				}
 			});
 		g_Render->draw_submenu<sub>(("Entered"), rage::joaat("entered"), [](sub* sub)
 			{
@@ -2680,7 +2734,7 @@ namespace Saint
 							{
 								if (path.extension() == ".ini")
 								{
-									OutfitList();
+									
 									char nigger[64];
 									sprintf(nigger, "%s", path.stem().u8string().c_str());
 									sub->draw_option<Button>(nigger, nullptr, [=]
@@ -2830,7 +2884,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Search"), SubmenuVehicleSearch, [](sub* sub)
 			{
-				sub->draw_option<KeyboardOption>(("Value"), "Note: this is case sensitive.", modelsearchresults2, []
+				sub->draw_option<KeyboardOption>(("Value"), "", modelsearchresults2, []
 					{
 						showKeyboard("Enter Something", "", 25, &modelsearchresults2, [=] {});
 					});
@@ -4483,7 +4537,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Search"), rage::joaat("EngineSoundSearch"), [](sub* sub)
 			{
-				sub->draw_option<KeyboardOption>(("Value"), "Note: this is case sensitive.", enginesearchresults, []
+				sub->draw_option<KeyboardOption>(("Value"), "", enginesearchresults, []
 					{
 						showKeyboard("Enter Something", "", 25, &enginesearchresults, [=] {});
 					});
@@ -4802,7 +4856,7 @@ namespace Saint
 							{
 								if (path.extension() == ".ini")
 								{
-									OutfitList();
+									
 									char nigger[64];
 									sprintf(nigger, "%s", path.stem().u8string().c_str());
 									sub->draw_option<Button>(nigger, nullptr, [=]
@@ -5622,7 +5676,9 @@ namespace Saint
 				sub->draw_option<submenu>("Requests", nullptr, SubmenuRequests);
 				sub->draw_option<submenu>("Session Starter", nullptr, SubmenuSesStart);
 				sub->draw_option<submenu>("Session Information", nullptr, rage::joaat("SessionINFO"));
-				//sub->draw_option<submenu>("RID Joiner", nullptr, SubmenuRIDJoiner); need to be fixed
+				if (Flags->isDev()) {
+					sub->draw_option<submenu>("RID Joiner", nullptr, SubmenuRIDJoiner);
+				}
 				sub->draw_option<submenu>("Notifications", nullptr, SubmenuNotifcations);
 				sub->draw_option<submenu>("Chat", nullptr, SubmenuChat);
 				sub->draw_option<submenu>("Team", nullptr, SubmenuTeam);
@@ -5679,7 +5735,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(g_GameVariables->m_friendRegistry->m_friends[SelectedFriend]->m_name, SubmenuSelectedFriend, [](sub* sub)
 			{
 				sub->draw_option<Button>("Join", "", [] {
-					rid_toolkit.join(g_GameVariables->m_friendRegistry->m_friends[SelectedFriend]->m_rockstar_id);
+					//rid_toolkit.join(g_GameVariables->m_friendRegistry->m_friends[SelectedFriend]->m_rockstar_id);
 					});
 
 
@@ -8087,25 +8143,19 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("RID Joiner"), SubmenuRIDJoiner, [](sub* sub)
 			{
-				sub->draw_option<Button>(("Join"), nullptr, []
-					{
-						rid_toolkit.join(selected_rid);
-
-					});
-
-				sub->draw_option<Break>(("RID"));
-				if (ridBuffer.c_str() != "") {
-
-					sub->draw_option<KeyboardOption>(("RID"), nullptr, ridBuffer.c_str(), []
+				sub->draw_option<KeyboardOption>(("RID"), nullptr, ridBuffer.c_str(), []
 						{
 							showKeyboard("Enter Something", "", 25, &ridBuffer, [] {
 								selected_rid = atoi(ridBuffer.c_str());
 								});
+					});
+				
+				sub->draw_option<Button>(("Join"), nullptr, []
+					{
+						rid_tool.join_by_rockstar_id(atoi(ridBuffer.c_str()));
 
-
-
-						});
-				}
+					});
+				
 
 
 			});
@@ -8387,7 +8437,7 @@ namespace Saint
 						switch (c_clipboard.data) {
 						case 0:
 							int netHandle[13];
-							NETWORK::NETWORK_HANDLE_FROM_PLAYER(Game->PlayerIndex(g_SelectedPlayer), netHandle, 13);
+							NETWORK::NETWORK_HANDLE_FROM_PLAYER(g_SelectedPlayer, netHandle, 13);
 							copytoclipboard(NETWORK::NETWORK_MEMBER_ID_FROM_GAMER_HANDLE(&netHandle[0]));
 							break;
 						case 1:
@@ -9107,7 +9157,7 @@ namespace Saint
 							{
 								if (path.extension() == ".ini")
 								{
-									OutfitList();
+									
 									char nigger[64];
 									sprintf(nigger, "%s", path.stem().u8string().c_str());
 									sub->draw_option<Button>(nigger, nullptr, [=]
@@ -12259,6 +12309,7 @@ namespace Saint
 				sub->draw_option<number<float>>("X Offset", nullptr, &g_Render->glare_x_offset, -1000.f, 1000.f, 0.001f, 3);
 
 
+
 			});
 		g_Render->draw_submenu<sub>(("Customization"), Customization, [](sub* sub)
 			{
@@ -12316,9 +12367,12 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Submenu"), rage::joaat("SubmenuIndc"), [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>(("Indicators"), nullptr, &g_Render->IndicatorList, &g_Render->IndicatorIterator);
-				if (g_Render->IndicatorIterator == 1) {
+				sub->draw_option<submenu>("Preview", nullptr, rage::joaat("NULL"));
+				sub->draw_option<Scroll<const char*, std::size_t>>(("Indicators"), nullptr, &g_Render->enterable.names, &g_Render->enterable.position);
+				if (g_Render->enterable.position == 1) {
 					sub->draw_option<number<std::int32_t>>("Alpha", nullptr, &g_Render->sub_alpha, 0, 255);
+					sub->draw_option<number<float>>("Width Offset", nullptr, &g_Render->enterable.width_offset, -100.0f, 180.f, 0.001f, 3);
+					sub->draw_option<number<float>>("X Offset", nullptr, &g_Render->enterable.x_offset, -1000.0f, 1000.f, 0.001f, 3);
 				}
 			});
 		g_Render->draw_submenu<sub>(("Break"), rage::joaat("Break"), [](sub* sub)
@@ -12398,6 +12452,7 @@ namespace Saint
 				sub->draw_option<toggle>("Sounds", nullptr, &g_Render->m_Sounds);
 				sub->draw_option<number<float>>("Width", nullptr, &g_Render->m_Width, 0.01f, 1.f, 0.01f, 2);
 				sub->draw_option<number<float>>("Smooth Scroll Speed", nullptr, &g_Render->smooth_scroll_speed, 0.01f, 1.00f, 0.01f, 2);
+				sub->draw_option<number<float>>("Glare Height Offset", nullptr, &g_Render->glare.height_offset, -1000.f, 1000.f, 0.001f, 3);
 			});
 		g_Render->draw_submenu<sub>(("Header"), CustomizationHeader, [](sub* sub)
 			{
@@ -12629,225 +12684,8 @@ namespace Saint
 
 		g_Render->draw_submenu<sub>(("Themes"), SubmenuThemes, [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>(("Themes"), nullptr, &g_Render->ThemeList, &g_Render->ThemeIterator, false, -1, [] {
-					if (g_Render->ThemeIterator == 0)
-					{
-						//Header
-						g_Render->m_HeaderBackgroundColor = { 108, 60, 175, 255 };
-
-						//Footer
-						g_Render->m_FooterBackgroundColor = { 108, 60, 175, 255 };
-
-						//Option
-						g_Render->m_OptionSelectedBackgroundColor = { 108, 60, 175, 255 };
-
-						//Description
-						g_Render->m_DescriptionBackgroundColor = { 108, 60, 175, 255 };
-
-						//Background
-						g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-						//Logger
-						//g_Logger->Theme("Default Theme");
-					}
-
-					if (g_Render->ThemeIterator == 1)
-					{
-						//Header
-						g_Render->m_HeaderBackgroundColor = { 255, 108, 116, 255 };
-
-						//Footer
-						g_Render->m_FooterBackgroundColor = { 255, 108, 116, 255 };
-
-						//Option
-						g_Render->m_OptionSelectedBackgroundColor = { 255, 108, 116, 255 };
-
-						//Description
-						g_Render->m_DescriptionBackgroundColor = { 255, 108, 116, 255 };
-
-						//Background
-						g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-						//Logger
-						//g_Logger->Theme("Salmon Red Theme");
-					}
-
-					if (g_Render->ThemeIterator == 2)
-					{
-						//Header
-						g_Render->m_HeaderBackgroundColor = { 15, 82, 186, 255 };
-
-						//Footer
-						g_Render->m_FooterBackgroundColor = { 15, 82, 186, 255 };
-
-						//Option
-						g_Render->m_OptionSelectedBackgroundColor = { 15, 82, 186, 255 };
-
-						//Description
-						g_Render->m_DescriptionBackgroundColor = { 15, 82, 186, 255 };
-
-						//Background
-						g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-						//Logger
-						//g_Logger->Theme("Sapphire Blue Theme");
-					}
-
-					if (g_Render->ThemeIterator == 3)
-					{
-						//Header
-						g_Render->m_HeaderBackgroundColor = { 24, 26, 24, 255 };
-
-						//Footer
-						g_Render->m_FooterBackgroundColor = { 24, 26, 24, 255 };
-
-						//Option
-						g_Render->m_OptionSelectedBackgroundColor = { 24, 26, 24, 255 };
-
-						//Description
-						g_Render->m_DescriptionBackgroundColor = { 24, 26, 24, 255 };
-
-						//Background
-						g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-						//Logger
-						//g_Logger->Theme("Soft Black Theme");
-					}
-
-					if (g_Render->ThemeIterator == 4)
-					{
-						//Header
-						g_Render->m_HeaderBackgroundColor = { 0, 155, 119, 255 };
-
-						//Footer
-						g_Render->m_FooterBackgroundColor = { 0, 155, 119, 255 };
-
-						//Option
-						g_Render->m_OptionSelectedBackgroundColor = { 0, 155, 119, 255 };
-
-						//Description
-						g_Render->m_DescriptionBackgroundColor = { 0, 155, 119, 255 };
-
-						//Background
-						g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-						//Logger
-						//g_Logger->Theme("Emerald Green Theme");
-					}
-
-					if (g_Render->ThemeIterator == 5)
-					{
-						//Header
-						g_Render->m_HeaderBackgroundColor = { 70, 38, 180, 255 };
-
-						//Footer
-						g_Render->m_FooterBackgroundColor = { 70, 38, 180, 255 };
-
-						//Option
-						g_Render->m_OptionSelectedBackgroundColor = { 70, 38, 180, 255 };
-
-						//Description
-						g_Render->m_DescriptionBackgroundColor = { 70, 38, 180, 255 };
-
-						//Background
-						g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-						//Logger
-						//g_Logger->Theme("Violet Purple Theme");
-					}
-
-					if (g_Render->ThemeIterator == 6)
-					{
-						//Header
-						g_Render->m_HeaderBackgroundColor = { 255, 145, 164, 255 };
-
-						//Footer
-						g_Render->m_FooterBackgroundColor = { 255, 145, 164, 255 };
-
-						//Option
-						g_Render->m_OptionSelectedBackgroundColor = { 255, 145, 164, 255 };
-
-						//Description
-						g_Render->m_DescriptionBackgroundColor = { 255, 145, 164, 255 };
-
-						//Background
-						g_Render->m_OptionUnselectedBackgroundColor = { 0, 0, 0, 160 };
-
-						//Logger
-						//g_Logger->Theme("Salmon Pink Theme");
-					}
-
-					if (g_Render->ThemeIterator == 7)
-					{
-						//Header
-						g_Render->m_HeaderBackgroundColor = { 17, 17, 17, 255 };
-
-						//Footer
-						g_Render->m_FooterBackgroundColor = { 17, 17, 17, 255 };
-						g_Render->m_FooterSpriteColor = { 181,181,181, 255 };
-						g_Render->m_FooterHeight = 0.030f;
-						g_Render->m_FooterSpriteSize = 0.030f;
-
-						//Option
-						g_Render->m_OptionSelectedBackgroundColor = { 65, 60, 60, 255 };
-
-						//Description
-						g_Render->m_DescriptionBackgroundColor = { 0, 0, 0, 120 };
-
-						//Background
-						g_Render->m_OptionUnselectedBackgroundColor = { 30,35,36, 230 };
-
-						//Option Height
-						g_Render->m_OptionHeight = 0.033f;
-
-						//Option Text Size
-						g_Render->m_OptionTextSize = 0.29f;
-
-						//Option Text Color
-						g_Render->m_OptionUnselectedTextColor = { 181,181,181, 255 };
-						g_Render->m_OptionSelectedTextColor = { 181,181,181, 255 };
-
-						//Logger
-						//g_Logger->Theme("Salmon Pink Theme");
-					}
-					if (g_Render->ThemeIterator == 8)
-					{
-						//Header
-						g_Render->m_HeaderBackgroundColor = { 108, 60, 175, 255 };
-
-						//Footer
-
-						//Footer
-						g_Render->m_FooterBackgroundColor = { 0, 0, 0, 255 };
-
-						//Option
-						g_Render->m_OptionSelectedBackgroundColor = { 255, 255, 255, 255 };
-
-						//Description
-						//g_Render->m_DescriptionBackgroundColor = { 234, 90, 81, 255 };
-
-						//Background
-						g_Render->m_OptionSelectedTextColor = { 0, 0, 0, 255 };
-
-						g_Render->header_name = "Saint";
-
-						g_Render->m_HeaderTextData = false;
-						g_Render->m_HeaderNativeText = true;
-
-						g_Render->submenu_enabled = true;
-
-						g_Render->IndicatorIterator = 0;
-
-
-
-						//Logger
-						//g_Logger->Theme("North");
-					}
-					});
-				sub->draw_option<Button>("Random", "", []
-					{
-						g_Render->ThemeIterator = MISC::GET_RANDOM_INT_IN_RANGE(0, 8);
-					});
+				
+				
 			});
 
 		g_Render->draw_submenu<sub>("Footer Text", SubmenuSettingsSubmenuBar, [](sub* sub)

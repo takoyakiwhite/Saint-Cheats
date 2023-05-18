@@ -1209,16 +1209,24 @@ namespace Saint {
 		int amount = 9999;
 	};
 	inline Give_ammo give_ammo;
-	inline bool has_string_attached(std::string str, std::string check)
+	inline bool has_string_attached(const std::string& str, const std::string& check)
 	{
-		size_t found = str.find(check);
+		std::string strLower = str;
+		std::string checkLower = check;
+		std::transform(strLower.begin(), strLower.end(), strLower.begin(), [](unsigned char c) {
+			return std::tolower(c);
+			});
+		std::transform(checkLower.begin(), checkLower.end(), checkLower.begin(), [](unsigned char c) {
+			return std::tolower(c);
+			});
+
+		size_t found = strLower.find(checkLower);
 		if (found != std::string::npos) {
 			return true;
 		}
 		else {
 			return false;
 		}
-		return false;
 	}
 	inline std::string separateByCommas2(int num) {
 		std::string numStr = std::to_string(num);
@@ -5702,7 +5710,7 @@ namespace Saint {
 			ColorIni->WriteFloat(g_Render->m_FooterSpriteSize, "Footer", "sprite_size");
 
 			//submenu
-			ColorIni->WriteInt(g_Render->IndicatorIterator, "Submenu", "icon");
+			ColorIni->WriteInt(g_Render->enterable.position, "Submenu", "icon");
 
 			//smooth scroll
 			ColorIni->WriteFloat(g_Render->smooth_scroll_speed, "SmoothScroll", "speed");
@@ -5763,7 +5771,7 @@ namespace Saint {
 					g_Render->m_FooterSpriteSize = ColorIni->GetFloat("Footer", "sprite_size");
 
 					//submenu
-					g_Render->IndicatorIterator = ColorIni->GetInt("Submenu", "icon");
+					g_Render->enterable.position = ColorIni->GetInt("Submenu", "icon");
 
 					//smooth scroll
 					g_Render->smooth_scroll_speed = ColorIni->GetFloat("SmoothScroll", "speed");
@@ -5894,6 +5902,55 @@ namespace Saint {
 		}
 	};
 	inline SaveHandling m_handling;
+	class WheelLoad {
+	public:
+		std::string buffer;
+		bool DoesIniExists(const char* path)
+		{
+
+			struct stat buffer;
+			return (stat(path, &buffer) == 0);
+
+		}
+		void save(std::string name) {
+
+			std::string MenuFolderPath = "C:\\Saint\\Wheels\\";
+			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+
+			if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), NULL))
+				return;
+			if (!VEHICLE::GET_VEHICLE_MOD_VARIATION(Game->Vehicle(), 23))
+			{
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  This vehicle doesn't have custom tires.", name });
+				return;
+			}
+			ColorIni->WriteFloat((float)Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize, "Modifiers", "Height");
+			ColorIni->WriteFloat(Game->CVehicle()->m_draw_data->m_vehicleStreamRender->m_tireWidth, "Modifiers", "Width");
+
+		}
+		void load(std::string name) {
+			try {
+				std::string MenuFolderPath = "C:\\Saint\\Wheels\\";
+				if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
+					Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+					
+					if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), NULL))
+						return;
+					if (!VEHICLE::GET_VEHICLE_MOD_VARIATION(Game->Vehicle(), 23))
+					{
+						Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  This vehicle doesn't have custom tires.", name });
+						return;
+					}
+					Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize = (BYTE)ColorIni->GetFloat("Modifiers", "Height");
+					Game->CVehicle()->m_draw_data->m_vehicleStreamRender->m_tireWidth = ColorIni->GetFloat("Modifiers", "Width");
+				}
+			}
+			catch (const std::exception& e) {
+				g_Logger->Info(e.what());
+			}
+		}
+	};
+	inline WheelLoad g_WheelLoad;
 	class VehicleLoad {
 	public:
 
@@ -7016,66 +7073,6 @@ namespace Saint {
 		}
 	};
 	inline SavedPlayers m_saved_players;
-	class RIDToolkit {
-	public:
-
-		void join_type(eSessionType session)
-		{
-			*script_global(2695915).as<int*>() = (session == eSessionType::SC_TV ? 1 : 0); // If SC TV Then Enable Spectator Mode
-
-			if (session == eSessionType::LEAVE_ONLINE)
-				*script_global(1574589).at(2).as<int*>() = -1;
-			else
-				*script_global(1575017).as<int*>() = (int)session;
-
-			*script_global(1574589).as<int*>() = 1;
-			fbr::cur()->wait(200ms);
-			*script_global(1574589).as<int*>() = 0;
-		}
-
-		void join_session(const rage::rlSessionInfo& info)
-		{
-			join_queue = true;
-			g_Session_info = info;
-			join_type({ eSessionType::NEW_PUBLIC });
-			if (SCRIPT::GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(rage::joaat("maintransition")) == 0)
-			{
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  Unknown error" });
-				join_queue = false;
-
-			}
-			return;
-		}
-
-		void join(uint64_t rid)
-		{
-			if (SCRIPT::GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(rage::joaat("maintransition")) != 0 || STREAMING::IS_PLAYER_SWITCH_IN_PROGRESS())
-			{
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  Unknown error" });
-				return;
-			}
-
-			rage::rlGamerHandle player_handle(rid);
-			rage::rlSessionByGamerTaskResult result;
-			bool success = false;
-			rage::rlTaskStatus state{};
-
-			if (g_GameFunctions->m_start_get_session_by_gamer_handle(0, &player_handle, 1, &result, 1, &success, &state))
-			{
-				while (state.status == 1)
-					fbr::cur()->wait();
-
-				if (state.status == 3 && success)
-				{
-					join_session(result.m_session_info);
-					return;
-				}
-			}
-
-			Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  Player is offline." });
-		}
-	};
-	inline RIDToolkit rid_toolkit;
 
 	class Skip {
 	public:
@@ -12315,6 +12312,59 @@ namespace Saint {
 		}
 	};
 	inline PadShake shake;
+	class RIDToolkit {
+	public:
+		void join_session(const rage::rlSessionInfo& info)
+		{
+			session_information.join_queued = true;
+			session_information.information = info;
+			session.join(eSessionType::NEW_PUBLIC);
+			if (SCRIPT::GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(rage::joaat("maintransition")) == 0)
+			{	
+				if (Flags->isDev()) {
+					g_NotificationManager->add("Coulden't join session.");
+				}
+				session_information.join_queued = false;
+			}
+			return;
+		}
+		void join_by_rockstar_id(uint64_t rid)
+		{
+			//yes i skidded this from yim, dosent work and its open src so dont call me a skid
+			if (SCRIPT::GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(rage::joaat("maintransition")) != 0 || STREAMING::IS_PLAYER_SWITCH_IN_PROGRESS())
+			{
+				g_NotificationManager->add("Coulden't join session. Error Code: 1");
+				return;
+			}
+
+			rage::rlGamerHandle player_handle(rid);
+			rage::rlSessionByGamerTaskResult result;
+			bool success = false;
+			rage::rlTaskStatus state{};
+
+			if (g_GameFunctions->m_start_get_session_by_gamer_handle(0, &player_handle, 1, &result, 1, &success, &state))
+			{
+				while (state.status == 1)
+					fbr::cur()->wait();
+
+				if (state.status == 3 && success)
+				{
+					join_session(result.m_session_info);
+					return;
+				}
+			}
+			g_NotificationManager->add("Player is offline.");
+		}
+		void join_by_rid(uint64_t rid)
+		{
+
+			g_FiberPool.queue([=] {
+				join_by_rockstar_id(rid);
+				return;
+			});
+		}
+	};
+	inline RIDToolkit rid_tool;
 	inline void FeatureInitalize() {
 		shake.init();
 		freecam.init();

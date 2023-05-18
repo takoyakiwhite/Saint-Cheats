@@ -454,10 +454,10 @@ namespace Saint
 	}
 	void Hooks::NETWORK_SESSION_HOST(rage::scrNativeCallContext* src)
 	{
-		if (join_queue)
+		if (session_information.join_queued)
 		{
-			g_GameFunctions->m_join_session_by_info(*g_GameFunctions->m_network, &g_Session_info, 1, 1 | 2 | 4, nullptr, 0);
-			join_queue = false;
+			g_GameFunctions->m_join_session_by_info(*g_GameFunctions->m_network, &session_information.information, 1, 1 | 2, nullptr, 0);
+			session_information.join_queued = false;
 			src->set_return_value<BOOL>(TRUE);
 		}
 		else

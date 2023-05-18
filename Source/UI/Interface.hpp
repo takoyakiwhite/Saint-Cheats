@@ -83,7 +83,22 @@ namespace Saint::UserInterface
 		RGBA(std::int32_t r, std::int32_t g, std::int32_t b, std::int32_t a)
 			: r(r), g(g), b(b), a(a) {}
 	};
-
+	class SubmenuIndicators {
+	public:
+		float width_offset = -0.001f;
+		float x_offset = 0.0f;
+		const char* names[3]
+		{
+			"Arrows",
+			"Lines",
+			"None"
+		};
+		std::size_t position = 1;
+	};
+	class Glare {
+	public:
+		float height_offset;
+	};
 	class UIManager
 	{
 	public:
@@ -129,7 +144,7 @@ namespace Saint::UserInterface
 		bool m_MouseLocked = false;
 		float m_PosX = 0.18f;
 		float m_PosY = 0.1f;
-		float m_Width = 0.21;
+		float m_Width = 0.20;
 		std::size_t m_OptionsPerPage = 13;
 		bool m_Sounds = true;
 		bool welcomemessage = false;
@@ -190,7 +205,9 @@ namespace Saint::UserInterface
 
 		//enables
 		bool footer_enabled = true;
-		bool lines_enabled = true;
+		bool lines_enabled = false;
+
+		Glare glare;
 
 		// Smooth Scrolling
 		float lerp(float a, float b, float t)
@@ -279,19 +296,14 @@ namespace Saint::UserInterface
 		int m_current_option;
 		int m_previous_option;
 
-		float m_FooterHeight = 0.026000f;
+		float m_FooterHeight = 0.029;
 		float m_FooterSpriteSize = 0.027000f;
 		Color m_FooterBackgroundColor{ 0, 0, 0, 255 };
 		Color m_FooterSpriteColor{ 255,255,255, 255 };
 
 		//Enterable
-		const char* IndicatorList[3]
-		{
-			"Arrows",
-			"Lines",
-			"None"
-		};
-		std::size_t IndicatorIterator = 1;
+		
+		SubmenuIndicators enterable;
 		bool controlsEnabled = true;
 		// Bool Toogles
 		bool ToggledOn = false;
@@ -308,7 +320,7 @@ namespace Saint::UserInterface
 			"Checkmarks",
 			"Custom",
 		};
-		std::size_t ToggleIterator = 3;
+		std::size_t ToggleIterator = 0;
 		std::string custom_toggle_dict_on = "commonmenu";
 		std::string custom_toggle_asset_on = "shop_tick_icon";
 		std::string custom_toggle_dict_off = "commonmenu";
@@ -323,7 +335,7 @@ namespace Saint::UserInterface
 		float toggle_off_rotation = 45.000;
 
 		//Header
-		float header_x_offset = -0.068;
+		float header_x_offset = -0.063;
 		//smooth scroll
 		float smooth_scroll_speed = 0.170000f;
 
@@ -348,7 +360,7 @@ namespace Saint::UserInterface
 		float m_DescriptionPadding = 2.1f;
 		Color m_DescriptionSpriteColor{ 255,255,255, 255 };
 
-		float glare_x_offset = 0.007;
+		float glare_x_offset = 0.014;
 
 		bool fov_circle = false;
 
@@ -368,9 +380,9 @@ namespace Saint::UserInterface
 
 		bool connect_description = false;
 
-		float description_x = 0.22f;
+		float description_x = 0.21f;
 		float description_y = 0.0f;
-		float description_x2 = 0.22f;
+		float description_x2 = 0.21f;
 		float description_y2 = 0.0f;
 
 		bool scrollbar = false;
