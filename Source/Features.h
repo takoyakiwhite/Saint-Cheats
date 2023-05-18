@@ -1923,10 +1923,11 @@ namespace Saint {
 				HUD::HIDE_HUD_COMPONENT_THIS_FRAME(1);
 			}
 			if (move_with_mouse) {
+				float MousePosX = (1.f / ImGui::GetIO().DisplaySize.x) * g_Render->GetMousePos().x;
+				float MousePosY = (1.f / ImGui::GetIO().DisplaySize.y) * g_Render->GetMousePos().y;
 				g_Settings.m_LockMouse = true;
-				Vector2 pos = g_Render->GetMousePos();
-				g_Render->m_PosX = pos.x / 2830;
-				g_Render->m_PosY = pos.y / 2370;
+				g_Render->m_PosX = MousePosX;
+				g_Render->m_PosY = MousePosY - (g_Render->m_HeaderHeight / 2.f);
 			}
 			if (force_gun) {
 				if (Game->Shooting())
@@ -12229,7 +12230,85 @@ namespace Saint {
 
 
 	};
+	class Freecam {
+	public:
+		bool enabled = false;
+		float speed = 0.2f;
+		float fov = 50.f;
+		Cam cam;
+		bool tp_on_end = false;
+		void init() {
+			if (enabled) {
+				ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), true);
+
+
+				if (!CAM::DOES_CAM_EXIST(cam)) {
+					cam = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", true);
+					CAM::SET_CAM_ROT(cam, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+					CAM::SET_CAM_COORD(cam, CAM::GET_GAMEPLAY_CAM_COORD());
+				}
+
+				
+
+				CAM::RENDER_SCRIPT_CAMS(true, true, 700, true, true, true);
+				CAM::SET_CAM_ACTIVE(cam, true);
+				CAM::SET_CAM_ROT(cam, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+				CAM::SET_CAM_FOV(cam, fov);
+
+				PLAYER::DISABLE_PLAYER_FIRING(Game->Self(), true);
+				HUD::HIDE_HUD_AND_RADAR_THIS_FRAME();
+				PAD::DISABLE_CONTROL_ACTION(2, 8, true);
+				PAD::DISABLE_CONTROL_ACTION(2, 32, true);
+				PAD::DISABLE_CONTROL_ACTION(2, 34, true);
+
+				NativeVector3 freecamCoords = CAM::GET_CAM_COORD(cam);
+				NativeVector3 cameraDirection = RotationToDirection(CAM::GET_GAMEPLAY_CAM_ROT(0));
+				NativeVector3 accelerateCoords = multiply(&cameraDirection, speed);
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 8)) {
+
+					NativeVector3 newCoords = addn(&freecamCoords, &accelerateCoords);
+					CAM::SET_CAM_COORD(cam, newCoords);
+				}
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 32)) {
+					NativeVector3 newCoords = addn(&freecamCoords, &accelerateCoords);
+					CAM::SET_CAM_COORD(cam, newCoords);
+				}
+				if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 34)) {
+					CAM::SET_CAM_ROT(cam, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+				}
+
+
+				
+			}
+		}
+	};
+	inline Freecam freecam;
+	class PadShake {
+	public:
+		bool shake = false;
+		bool disable = false;
+		int intensity = 100;
+		int delay = 0;
+		int delay2 = 0;
+		void init() {
+			if (disable) {
+				PAD::STOP_CONTROL_SHAKE(0);
+			}
+			if (shake) {
+				if (delay2 == 0 || (int)(GetTickCount64() - delay2) > delay)
+				{
+
+					PAD::SET_CONTROL_SHAKE(0, 1000, intensity);
+					delay2 = GetTickCount64();
+				}
+				
+			}
+		}
+	};
+	inline PadShake shake;
 	inline void FeatureInitalize() {
+		shake.init();
+		freecam.init();
 		enter_veh.update();
 		if (ped_test) {
 			for (int i = 0; i < 457; i++) {

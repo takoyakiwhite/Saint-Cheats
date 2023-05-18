@@ -10665,8 +10665,9 @@ namespace Saint
 				sub->draw_option<submenu>("Black Hole", nullptr, rage::joaat("BlackHole"));
 				sub->draw_option<submenu>("Spawner", nullptr, rage::joaat("SpawnerW"));
 				sub->draw_option<submenu>("Clear Area", nullptr, rage::joaat("ClearArea"));
-				sub->draw_option<submenu>("Map Mods", nullptr, rage::joaat("Map Mods"));
+				//sub->draw_option<submenu>("Map Mods", nullptr, rage::joaat("Map Mods")); dont work
 				sub->draw_option<submenu>("Glow", nullptr, rage::joaat("GlowW"));
+				sub->draw_option<submenu>("Freecam", nullptr, rage::joaat("FREECAMERA"));
 				sub->draw_option<toggle>(("Disable Lights"), "", &features.blackout, [] {
 					if (!features.blackout)
 					{
@@ -10700,6 +10701,29 @@ namespace Saint
 
 
 
+			});
+		g_Render->draw_submenu<sub>(("Freecam"), rage::joaat("FREECAMERA"), [](sub* sub)
+			{
+				sub->draw_option<toggle>(("Enabled"), "", &freecam.enabled, [] {
+					if (!freecam.enabled)
+					{
+						if (freecam.tp_on_end) {
+							NativeVector3 c = CAM::GET_CAM_COORD(freecam.cam);
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), c.x, c.y, c.z, true, true, true);
+						}
+						CAM::RENDER_SCRIPT_CAMS(false, true, 700, true, true, true);
+						CAM::SET_CAM_ACTIVE(freecam.cam, false);
+						CAM::DESTROY_CAM(freecam.cam, true);
+						PLAYER::DISABLE_PLAYER_FIRING(Game->Self(), true);
+						ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), false);
+
+
+
+					}
+					});
+				sub->draw_option<toggle>("Teleport On End", "", &freecam.tp_on_end);
+				sub->draw_option<number<float>>("Speed", nullptr, &freecam.speed, 0, 1000.0, 0.05, 2, true, "", "");
+				sub->draw_option<number<float>>("FOV", nullptr, &freecam.fov, 0, 130.0f, 1.0, 0, true, "", "");
 			});
 		g_Render->draw_submenu<sub>(("Map Mods"), rage::joaat("Map Mods"), [](sub* sub)
 			{
@@ -10760,7 +10784,7 @@ namespace Saint
 				if (sub->GetSelectedOption() == sub->GetNumOptions()) {
 					GRAPHICS::DRAW_MARKER(28, Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, 0, 0, 0, 0, 0, 0, features.glow_range, features.glow_range, features.glow_range, g_Render->m_RadiusSphere.r, g_Render->m_RadiusSphere.g, g_Render->m_RadiusSphere.b, g_Render->m_RadiusSphere.a, false, false, 0, false, NULL, NULL, false);
 				}
-				sub->draw_option<number<float>>("Radius", nullptr, &features.glow_range, 0, 1000.0, 1.0, 0, true, "", "m");
+				sub->draw_option<number<float>>("Radius", nullptr, &features.glow_range, 0, 1000.0, 50.0, 0, true, "", "m");
 
 
 		});
@@ -11612,7 +11636,7 @@ namespace Saint
 				sub->draw_option<submenu>("Graphics", nullptr, rage::joaat("Graphics"));
 				sub->draw_option<submenu>("Sounds", nullptr, rage::joaat("Music"));
 				sub->draw_option<submenu>("File Explorer", nullptr, rage::joaat("Explorer"));
-				//sub->draw_option<submenu>("TV", nullptr, rage::joaat("TV"));
+				sub->draw_option<submenu>("Vibration", nullptr, rage::joaat("ControlS"));
 				sub->draw_option<toggle>(("Reduce Ped Budget"), nullptr, &misc.reduce_ped_budget, [] {
 					if (!misc.reduce_ped_budget) {
 						STREAMING::SET_REDUCE_PED_MODEL_BUDGET(false);
@@ -11625,6 +11649,15 @@ namespace Saint
 					});
 				sub->draw_option<toggle>(("Instant ALT + F4"), nullptr, &features.instantalt);
 
+			});
+		g_Render->draw_submenu<sub>("Vibration", rage::joaat("ControlS"), [](sub* sub)
+			{
+				sub->draw_option<toggle>(("Disable"), nullptr, &shake.disable);
+				sub->draw_option<Break>("Other");
+				if (!shake.disable) {
+					sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Shake", nullptr, &shake.shake, &shake.intensity, 50, 250, 25, 3, true, "", "");
+					sub->draw_option<number<std::int32_t>>("Delay", nullptr, &shake.delay, 0, 5000, 50, 3, true, "", "ms");
+				}
 			});
 		g_Render->draw_submenu<sub>("TV", rage::joaat("TV"), [](sub* sub)
 			{

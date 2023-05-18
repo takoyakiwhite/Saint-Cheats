@@ -168,8 +168,7 @@ namespace Saint
 		using trigger_script_event = void(*)(int event_group, int64_t* args, int arg_count, int player_bits);
 		trigger_script_event m_trigger_script_event{};
 
-		using CPlayerActionsMenu = void(__int64 a1, unsigned int* a2);
-		CPlayerActionsMenu* m_PlayerGUIOptions;
+		
 
 		using CPlayerWildCard = __int64* (std::int32_t friendindex);
 		CPlayerWildCard* m_PlayerWildcard;

@@ -529,6 +529,17 @@ namespace Saint::UserInterface
 
 	void UIManager::DrawHeader()
 	{
+		float MousePosX = (1.f / ImGui::GetIO().DisplaySize.x) * GetMousePos().x;
+		float MousePosY = (1.f / ImGui::GetIO().DisplaySize.y) * GetMousePos().y;
+		float Top = m_DrawBaseY;
+		float Bottom = m_DrawBaseY + m_HeaderHeight;
+		float Left = m_PosX - (m_Width / 2.f);
+		float Right = m_PosX + (m_Width / 2.f);
+		if (MousePosX > Left && MousePosX < Right && MousePosY > Top && MousePosY < Bottom && g_Settings.m_LockMouse && GetAsyncKeyState(VK_LBUTTON)) {
+			m_PosX = MousePosX;
+			m_PosY = MousePosY - (m_HeaderHeight / 2.f);
+		}
+
 		switch (m_HeaderType)
 		{
 		case HeaderType::Static:
@@ -549,7 +560,7 @@ namespace Saint::UserInterface
 					m_DrawBaseY + (m_HeaderHeight / 2.f),
 					m_Width,
 					m_HeaderHeight,
-					{255, 255, 255, 255},
+					{ 255, 255, 255, 255 },
 					0.f);
 
 			}

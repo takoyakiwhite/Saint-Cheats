@@ -877,7 +877,6 @@ namespace Saint
 		return false;
 
 	}
-	//Bug: The code is missing a return statement at the end of the function.
 
 	void scan_explosion_event(CNetGamePlayer* player, datBitBuffer2* buffer)
 	{
@@ -997,14 +996,12 @@ namespace Saint
 			char notification[64];
 			sprintf(notification, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", reinterpret_cast<CPed*>(entity)->m_player_info->m_net_player_data.m_name, "Explosion");
 			g_NotificationManager->add(notification, 2000, 0);
-			// too many false positives, disabling it
-			//session::add_infraction(g_player_service->get_by_id(player->m_player_id), Infraction::BLAME_EXPLOSION_DETECTED);
 			return;
 		}
 
 		
 
-		// clang-format on
+		
 	}
 	void Hooks::NetworkEventHandler(rage::netEventMgr* event_manager, CNetGamePlayer* source_player, CNetGamePlayer* target_player, uint16_t event_id, int event_index, int event_handled_bitset, int buffer_size, datBitBuffer2* buffer)
 	{
@@ -1020,8 +1017,6 @@ namespace Saint
 			g_GameFunctions->m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
 			return;
 		}
-
-		//auto plyr = g_player_service->get_by_id(source_player->m_player_id);
 
 		switch (static_cast<eNetworkEvents>(event_id))
 		{
@@ -1048,6 +1043,22 @@ namespace Saint
 				g_GameFunctions->m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
 				return;
 			}
+			buffer->Seek(0);
+			break;
+		}
+		case eNetworkEvents::CAlterWantedLevelEvent:
+		{
+			int net_id = buffer->Read<int>(13);
+
+			if (Game->CPed() && Game->CPed()->m_net_object && Game->CPed()->m_net_object->m_object_id == net_id)
+			{
+				g_GameFunctions->m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+				char notification[64];
+				sprintf(notification, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", source_player->get_name(), "Wanted Level");
+				g_NotificationManager->add(notification, 2000, 0);
+				return;
+			}
+
 			buffer->Seek(0);
 			break;
 		}
@@ -1132,10 +1143,6 @@ namespace Saint
 			buffer->Seek(0);
 			break;
 		}
-		// Don't block this event, we still want to report this player
-		// because if we still report others, our account seems less fishy
-		
-		// player sending this event is a modder
 		
 		case eNetworkEvents::CRequestControlEvent:
 		{
@@ -1163,14 +1170,14 @@ namespace Saint
 
 			if (type == WorldStateDataType::Rope)
 			{
-				buffer->Read<int>(9);    // network rope id
-				buffer->Read<float>(19); // pos x
-				buffer->Read<float>(19); // pos y
-				buffer->Read<float>(19); // pos z
-				buffer->Read<float>(19); // rot x
-				buffer->Read<float>(19); // rot y
-				buffer->Read<float>(19); // rot z
-				buffer->Read<float>(16); // length
+				buffer->Read<int>(9);    
+				buffer->Read<float>(19); 
+				buffer->Read<float>(19); 
+				buffer->Read<float>(19); 
+				buffer->Read<float>(19); 
+				buffer->Read<float>(19); 
+				buffer->Read<float>(19);
+				buffer->Read<float>(16);
 				int type = buffer->Read<int>(4);
 				float initial_length = buffer->Read<float>(16);
 				float min_length = buffer->Read<float>(16);
@@ -1187,9 +1194,9 @@ namespace Saint
 			}
 			else if (type == WorldStateDataType::PopGroupOverride)
 			{
-				int pop_schedule = buffer->ReadSigned<int>(8); // Pop Schedule
-				int pop_group = buffer->Read<int>(32);      // Pop Group
-				int percentage = buffer->Read<int>(7);       // Percentage
+				int pop_schedule = buffer->ReadSigned<int>(8); 
+				int pop_group = buffer->Read<int>(32); 
+				int percentage = buffer->Read<int>(7); 
 
 				if (pop_group == 0 && (percentage == 0 || percentage == 103))
 				{
@@ -1448,7 +1455,7 @@ namespace Saint
 			}
 
 			if (*v8 == v6 || v8 == nullptr || !v8) {
-				protections.push_notification(ICON_FA_SHIELD_ALT"  Prevented Crash | Invalid Arguments");
+				//protections.push_notification(ICON_FA_SHIELD_ALT"  Prevented Crash | Invalid Arguments");
 				return;
 			}
 		}
@@ -1659,7 +1666,7 @@ namespace Saint
 
 		return false;
 	}
-	constexpr uint32_t crash_peds[] = { rage::joaat("slod_human"), rage::joaat("slod_small_quadped"), rage::joaat("slod_large_quadped") };
+	
 
 	template<typename T = CBaseModelInfo*>
 	static T get_model(const rage::joaat_t hash)
@@ -1692,15 +1699,7 @@ namespace Saint
 		}
 		return of_type;
 	}
-	bool is_crash_ped(uint32_t model)
-	{
-		if (!is_model_of_type(model, eModelType::Ped, eModelType::OnlineOnlyPed))
-			return true;
-		for (auto iterator : crash_peds)
-			if (iterator == model)
-				return true;
-		return false;
-	}
+	
 	bool is_in_vehicle(CPed* ped, CVehicle* vehicle)
 	{
 		if (!ped || !vehicle)
@@ -1713,6 +1712,43 @@ namespace Saint
 			if (vehicle->m_passengers[i] == ped)
 				return true;
 
+		return false;
+	}
+	constexpr uint32_t crash_peds[] = { rage::joaat("slod_human"), rage::joaat("slod_small_quadped"), rage::joaat("slod_large_quadped") };
+
+	constexpr uint32_t crash_vehicles[] = { rage::joaat("arbitergt"), rage::joaat("astron2"), rage::joaat("cyclone2"), rage::joaat("ignus2"), rage::joaat("s95") };
+
+	constexpr uint32_t crash_objects[] = { rage::joaat("prop_dummy_01"), rage::joaat("prop_dummy_car"), rage::joaat("prop_dummy_light"), rage::joaat("prop_dummy_plane"), rage::joaat("prop_distantcar_night"), rage::joaat("prop_distantcar_day"), rage::joaat("hei_bh1_08_details4_em_night"), rage::joaat("dt1_18_sq_night_slod"), rage::joaat("ss1_12_night_slod"), -1288391198, rage::joaat("h4_prop_bush_bgnvla_med_01"), rage::joaat("h4_prop_bush_bgnvla_lrg_01"), rage::joaat("h4_prop_bush_buddleia_low_01"), rage::joaat("h4_prop_bush_ear_aa"), rage::joaat("h4_prop_bush_ear_ab"), rage::joaat("h4_prop_bush_fern_low_01"), rage::joaat("h4_prop_bush_fern_tall_cc"), rage::joaat("h4_prop_bush_mang_ad"), rage::joaat("h4_prop_bush_mang_low_aa"), rage::joaat("h4_prop_bush_mang_low_ab"), rage::joaat("h4_prop_bush_seagrape_low_01"), rage::joaat("prop_h4_ground_cover"), rage::joaat("h4_prop_weed_groundcover_01"), rage::joaat("h4_prop_grass_med_01"), rage::joaat("h4_prop_grass_tropical_lush_01"), rage::joaat("h4_prop_grass_wiregrass_01"), rage::joaat("h4_prop_weed_01_plant"), rage::joaat("h4_prop_weed_01_row"), rage::joaat("urbanweeds02_l1"), rage::joaat("proc_forest_grass01"), rage::joaat("prop_small_bushyba"), rage::joaat("v_res_d_dildo_a"), rage::joaat("v_res_d_dildo_b"), rage::joaat("v_res_d_dildo_c"), rage::joaat("v_res_d_dildo_d"), rage::joaat("v_res_d_dildo_e"), rage::joaat("v_res_d_dildo_f"), rage::joaat("v_res_skateboard"), rage::joaat("prop_battery_01"), rage::joaat("prop_barbell_01"), rage::joaat("prop_barbell_02"), rage::joaat("prop_bandsaw_01"), rage::joaat("prop_bbq_3"), rage::joaat("v_med_curtainsnewcloth2"), rage::joaat("bh1_07_flagpoles"), 92962485 };
+
+	
+
+	inline bool is_crash_ped(uint32_t model)
+	{
+		if (!is_model_of_type(model, eModelType::Ped, eModelType::OnlineOnlyPed))
+			return true;
+		for (auto iterator : crash_peds)
+			if (iterator == model)
+				return true;
+		return false;
+	}
+
+	inline bool is_crash_vehicle(uint32_t model)
+	{
+		if (!is_model_of_type(model, eModelType::Vehicle, eModelType::Unk133))
+			return true;
+		for (auto iterator : crash_vehicles)
+			if (iterator == model)
+				return true;
+		return false;
+	}
+
+	inline bool is_crash_object(uint32_t model)
+	{
+		if (!is_model_of_type(model, eModelType::Object, eModelType::Time, eModelType::Weapon, eModelType::Destructable, eModelType::WorldObject, eModelType::Sprinkler, eModelType::Unk65, eModelType::Plant, eModelType::LOD, eModelType::Unk132, eModelType::Building))
+			return true;
+		for (auto iterator : crash_objects)
+			if (iterator == model)
+				return true;
 		return false;
 	}
 	bool check_node(rage::netSyncNodeBase* node, CNetGamePlayer* sender, rage::netObject* object)
@@ -1757,30 +1793,9 @@ namespace Saint
 
 				break;
 			}
-			case rage::joaat("CPhysicalAttachDataNode"):
-			{
-				const auto attach_node = (CPhysicalAttachDataNode*)(node);
-
-				// TODO: Find a better method to avoid false positives
-				auto model_hash = get_game_object(object) ? get_game_object(object)->m_model_info->m_hash : 0;
-				if (attach_node->m_attached && attach_node->m_attached_to == object->m_object_id && (model_hash != rage::joaat("hauler2") && model_hash != rage::joaat("phantom3")))
-				{
-					// notify::crash_blocked(sender, "infinite physical attachment");
-					char g_RemoveWeapons[64];
-					sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Crash (Vehicle Attachment)");
-					g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-					return true;
-				}
-				else if (attach_node->m_attached && is_attachment_infinite((rage::CDynamicEntity*)get_game_object(object), attach_node->m_attached_to)) {
-					char g_RemoveWeapons[64];
-					sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Crash (Attachment)");
-					g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
-					return true;
-				}
-
-				break;
-			}
-
+			
+			
+			
 			case rage::joaat("CVehicleProximityMigrationDataNode"):
 			{
 				if (object && Game->CPed() && Game->CPed()->m_net_object)
@@ -1789,7 +1804,7 @@ namespace Saint
 					if (is_in_vehicle(Game->CPed(), Game->CPed()->m_vehicle) && Game->CPed()->m_vehicle->m_net_object
 						&& Game->CPed()->m_vehicle->m_net_object->m_object_id == object->m_object_id) {
 						char g_RemoveWeapons[64];
-						sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Vehicle Kick");
+						sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Vehicle Kick 2");
 						g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
 						return false; // vehicle kick?
 					}
@@ -1800,9 +1815,12 @@ namespace Saint
 					{
 						for (int i = 0; i < 16; i++)
 						{
-							if (migration_node->m_has_occupants[i]
-								&& migration_node->m_occupants[i] == Game->CPed()->m_net_object->m_object_id)
-								return true; // remote teleport
+							if (migration_node->m_has_occupants[i] && migration_node->m_occupants[i] == Game->CPed()->m_net_object->m_object_id) {
+								char g_RemoveWeapons[64];
+								sprintf(g_RemoveWeapons, ICON_FA_SHIELD_ALT"  %s tried to send the event '%s'", sender->m_player_info->m_net_player_data.m_name, "Vehicle Migration");
+								g_NotificationManager->add(g_RemoveWeapons, 2000, 0);
+								return true;
+							}
 						}
 					}
 				}
@@ -1854,7 +1872,7 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_task_parachute_object_0x270, &Hooks::task_parachute_object_0x270, &parachute);
 		MH_CreateHook(g_GameFunctions->m_serialize_take_off_ped_variation_task, &Hooks::serialize_take_off_ped_variation_task, &parachute2);
 		MH_CreateHook(g_GameFunctions->m_serialize_vehicle_gadget_data_node, &Hooks::serialize_vehicle_gadget_data_node, &yim_crash);
-		//MH_CreateHook(g_GameFunctions->m_can_apply_data, &Hooks::can_apply_data, &can_applydata);
+		MH_CreateHook(g_GameFunctions->m_can_apply_data, &Hooks::can_apply_data, &can_applydata);
 		m_D3DHook.Hook(&Hooks::Present, Hooks::PresentIndex);
 		m_D3DHook.Hook(&Hooks::ResizeBuffers, Hooks::ResizeBuffersIndex);
 	}
@@ -1884,7 +1902,7 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->m_task_parachute_object_0x270);
 		MH_RemoveHook(g_GameFunctions->m_serialize_take_off_ped_variation_task);
 		MH_RemoveHook(g_GameFunctions->m_serialize_vehicle_gadget_data_node);
-		//MH_RemoveHook(g_GameFunctions->m_can_apply_data);
+		MH_RemoveHook(g_GameFunctions->m_can_apply_data);
 		MH_Uninitialize();
 	}
 
