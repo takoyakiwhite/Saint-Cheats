@@ -537,7 +537,7 @@ namespace Saint
 					}
 					});
 
-				sub->draw_option<ToggleWithNumber<float, bool>>("Slide Run", nullptr, &features.slide_run, &features.slide_run_speed, 0.1f, 100.f, 0.1f, 2);
+				sub->draw_option<ToggleWithNumber<float>>("Slide Run", nullptr, &features.slide_run, &features.slide_run_speed, 0.1f, 100.f, 0.1f, 2);
 				sub->draw_option<toggle>(("Glitch"), "Disables the wanted level system.", &features.naruto_run, [] {
 					if (!features.naruto_run) {
 						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
@@ -570,7 +570,7 @@ namespace Saint
 					}
 					});
 
-				sub->draw_option<ToggleWithNumber<float, bool>>("Slow Motion", nullptr, &features.time_scale_edit, &features.time_scale, 0.0f, 1.f, 0.05f, 2, true, "", "", [] {
+				sub->draw_option<ToggleWithNumber<float>>("Slow Motion", nullptr, &features.time_scale_edit, &features.time_scale, 0.0f, 1.f, 0.05f, 2, true, "", "", [] {
 					if (!features.time_scale_edit)
 					{
 						MISC::SET_TIME_SCALE(1.0f);
@@ -771,12 +771,12 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Face Editor"), rage::joaat("FaceEditor"), [](sub* sub)
 			{
 				sub->draw_option<submenu>("Head Overlay", nullptr, rage::joaat("HeadO"));
-				sub->draw_option<Scroll<const char*, int>>("Shape First", nullptr, &parents, &face_editor.shapeFirstID);
-				sub->draw_option<Scroll<const char*, int>>("Shape Second", nullptr, &parents, &face_editor.shapeSecondID);
-				sub->draw_option<Scroll<const char*, int>>("Shape Third", nullptr, &parents, &face_editor.shapeThirdID);
-				sub->draw_option<Scroll<const char*, int>>("Skin First", nullptr, &parents, &face_editor.skinFirstID);
-				sub->draw_option<Scroll<const char*, int>>("Skin Second", nullptr, &parents, &face_editor.skinSecondID);
-				sub->draw_option<Scroll<const char*, int>>("Skin Third", nullptr, &parents, &face_editor.skinThirdID);
+				sub->draw_option<Scroll>("Shape First", nullptr, &parents, &face_editor.shapeFirstID);
+				sub->draw_option<Scroll>("Shape Second", nullptr, &parents, &face_editor.shapeSecondID);
+				sub->draw_option<Scroll>("Shape Third", nullptr, &parents, &face_editor.shapeThirdID);
+				sub->draw_option<Scroll>("Skin First", nullptr, &parents, &face_editor.skinFirstID);
+				sub->draw_option<Scroll>("Skin Second", nullptr, &parents, &face_editor.skinSecondID);
+				sub->draw_option<Scroll>("Skin Third", nullptr, &parents, &face_editor.skinThirdID);
 
 				sub->draw_option<number<float>>("Shape Mix", nullptr, &face_editor.shapeMix, 0, 1.0, 0.1, 3);
 				sub->draw_option<number<float>>("Skin Mix", nullptr, &face_editor.skinMix, 0, 1.0, 0.1, 3);
@@ -798,7 +798,7 @@ namespace Saint
 						);
 					});
 				sub->draw_option<Break>(("Features"));
-				sub->draw_option<Scroll<const char*, std::size_t>>("Index", nullptr, &face_editor.faceFeatures, &face_editor.index);
+				sub->draw_option<Scroll>("Index", nullptr, &face_editor.faceFeatures, &face_editor.index);
 				sub->draw_option<number<float>>("Scale", nullptr, &face_editor.featureScale, -1.0, 1.0, 0.1, 3);
 				sub->draw_option<Button>(("Apply"), nullptr, []
 					{
@@ -808,7 +808,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Head Overlay"), rage::joaat("HeadO"), [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("ID", nullptr, &face_editor.headOverlay.names, &face_editor.headOverlay.index);
+				sub->draw_option<Scroll>("ID", nullptr, &face_editor.headOverlay.names, &face_editor.headOverlay.index);
 				sub->draw_option<number<float>>("Opacity", nullptr, &face_editor.headOverlay.opacity, 0, 1.0, 0.1, 3);
 				sub->draw_option<number<std::int32_t>>("Index", nullptr, &face_editor.headOverlay.indexValue, 0, PED::GET_PED_HEAD_OVERLAY_NUM(face_editor.headOverlay.index));
 				sub->draw_option<Button>(("Apply"), nullptr, []
@@ -922,8 +922,8 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Speech"), rage::joaat("Speech"), [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Voice Actor", nullptr, &speech.voices, &speech.pos);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Flags", nullptr, &speech.params, &speech.pos2);
+				sub->draw_option<Scroll>("Voice Actor", nullptr, &speech.voices, &speech.pos);
+				sub->draw_option<Scroll>("Flags", nullptr, &speech.params, &speech.pos2);
 				sub->draw_option<Break>(("Lines"));
 				if (speech.pos == 0) {
 					sub->draw_option<Button>(("Hi"), nullptr, []
@@ -1035,7 +1035,7 @@ namespace Saint
 						}
 						});
 					sub->draw_option<Break>(("Custom"));
-					sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &ragdoll.TypeName, &ragdoll.pos);
+					sub->draw_option<Scroll>("Type", nullptr, &ragdoll.TypeName, &ragdoll.pos);
 					sub->draw_option<Button>(("Start"), nullptr, []
 						{
 							NativeVector3 v = ENTITY::GET_ENTITY_FORWARD_VECTOR(Game->Self());
@@ -1213,7 +1213,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Hand Trails"), HandTrails, [](sub* sub)
 			{
 				sub->draw_option<toggle>(("Enabled"), nullptr, &g_HandTrails.enabled);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &g_HandTrails.type, &g_HandTrails.size);
+				sub->draw_option<Scroll>("Type", nullptr, &g_HandTrails.type, &g_HandTrails.size);
 				sub->draw_option<Break>(("Color"));
 				sub->draw_option<toggle>(("Rainbow"), nullptr, &g_HandTrails.rainbow);
 				sub->draw_option<number<std::int32_t>>("Red", nullptr, &g_HandTrails.r, 0, 255, 1, 3, true, "", "", [] {
@@ -1231,7 +1231,7 @@ namespace Saint
 
 					}
 					});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Component", nullptr, &Lists::HeaderTypesFrontend2, &Lists::HeaderTypesPosition2, true, -1, [] {
+				sub->draw_option<Scroll>("Component", nullptr, &Lists::HeaderTypesFrontend2, &Lists::HeaderTypesPosition2, true, -1, [] {
 					g_Render->outfits = Lists::HeaderTypesBackend2[Lists::HeaderTypesPosition2];
 					});
 				switch (g_Render->outfits) {
@@ -1275,7 +1275,7 @@ namespace Saint
 					sub->draw_option<number<std::int32_t>>("Drawable", "Sets texture variation.", &testk, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Game->Self(), 10), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 10, testk, 0, 0); });
 					sub->draw_option<number<std::int32_t>>("Texture", "Sets decals texture variation.", &facetexture11, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(Game->Self(), 10, testk), 1, 3, true, "", "", [] { PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 10, testk, facetexture11, 0); }); break;
 				}
-				sub->draw_option<Scroll<const char*, std::size_t>>("Props", nullptr, &Lists::HeaderTypesFrontend3, &Lists::HeaderTypesPosition3, true, -1, [] {
+				sub->draw_option<Scroll>("Props", nullptr, &Lists::HeaderTypesFrontend3, &Lists::HeaderTypesPosition3, true, -1, [] {
 					g_Render->props = Lists::HeaderTypesBackend3[Lists::HeaderTypesPosition3];
 					});
 				switch (g_Render->props) {
@@ -1332,7 +1332,7 @@ namespace Saint
 						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
 
 					});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Flags", nullptr, &animation.flags, &animation.pos);
+				sub->draw_option<Scroll>("Flags", nullptr, &animation.flags, &animation.pos);
 				sub->draw_option<Break>(("List"));
 				sub->draw_option<Button>(("Pole Dance"), nullptr, [=]
 					{
@@ -1348,7 +1348,7 @@ namespace Saint
 						animation.start("amb@world_human_push_ups@male@base", "base");
 
 					});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Suicide", nullptr, &animation.suc, &animation.suc_data, false, -1, [] {
+				sub->draw_option<Scroll>("Suicide", nullptr, &animation.suc, &animation.suc_data, false, -1, [] {
 					switch (animation.suc_data) {
 					case 0:
 						animation.start("mp_suicide", "pistol");
@@ -1517,39 +1517,47 @@ namespace Saint
 				}
 
 				if (!PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), 0)) {
-					sub->draw_option<Scroll<const char*, std::size_t>>("Animation", nullptr, &no_clip.FlyType, &no_clip.FlyInt);
+					sub->draw_option<Scroll>("Animation", nullptr, &no_clip.FlyType, &no_clip.FlyInt);
 				}
 				sub->draw_option<number<float>>("Speed", nullptr, &no_clip.speed, 0.1f, 50.f, 0.01f, 2);
 			});
 		g_Render->draw_submenu<sub>(("Multipliers"), SubmenuMultipliers, [](sub* sub)
 			{
 
-				sub->draw_option<ToggleWithNumber<float, bool>>("Run Speed", nullptr, &multipliers.run, &multipliers.run_speed, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
+				sub->draw_option<ToggleWithNumber<float>>("Run Speed", nullptr, &multipliers.run, &multipliers.run_speed, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
 					if (!multipliers.run) {
+
 						(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_run_speed = 1.0f;
+
 					}
 					});
-				sub->draw_option<ToggleWithNumber<float, bool>>("Swim Speed", nullptr, &multipliers.swim_run, &multipliers.swim_speed, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
+				sub->draw_option<ToggleWithNumber<float>>("Swim Speed", nullptr, &multipliers.swim_run, &multipliers.swim_speed, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
 
 					if (!multipliers.swim_run) {
+
 						(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_swim_speed = 1.0f;
+
 					}
 					});
-				
-				sub->draw_option<ToggleWithNumber<float, bool>>("Width", nullptr, &get_model_info.width, &get_model_info.widthm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
+
+				sub->draw_option<ToggleWithNumber<float>>("Width", nullptr, &get_model_info.width, &get_model_info.widthm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
 
 
 					if (!get_model_info.width) {
-						Memory::set_value<float>({ 0x08, 0x0064 }, 1.0f);
+						if (Game->Input("ENTER", "A")) {
+							Memory::set_value<float>({ 0x08, 0x0064 }, 1.0f);
+						}
 					}
 					});
-				sub->draw_option<ToggleWithNumber<float, bool>>("Height", nullptr, &get_model_info.height, &get_model_info.heightm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
+				sub->draw_option<ToggleWithNumber<float>>("Height", nullptr, &get_model_info.height, &get_model_info.heightm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
 
 					if (!get_model_info.height) {
-						Memory::set_value<float>({ 0x08, 0x88 }, 1.0f);
+						if (Game->Input("ENTER", "A")) {
+							Memory::set_value<float>({ 0x08, 0x88 }, 1.0f);
+						}
 					}
 					});
-				
+
 				sub->draw_option<number<float>>("Noise", nullptr, &multipliers.noise, 0.0f, 100.f, 0.1f, 2, true, "", "", [=] {
 					PLAYER::SET_PLAYER_NOISE_MULTIPLIER(Game->Self(), multipliers.noise);
 					});
@@ -1568,13 +1576,13 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Super Jump"), SubmenuSuperjump, [](sub* sub)
 			{
 				sub->draw_option<toggle>(("Enabled"), nullptr, &superjump.enabled);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Animation", nullptr, &superjump.Jump_Type, &superjump.Jump_Int);
+				sub->draw_option<Scroll>("Animation", nullptr, &superjump.Jump_Type, &superjump.Jump_Int);
 				sub->draw_option<Break>(("Settings"));
 
-				sub->draw_option<ToggleWithNumber<float, bool>>("Add Force", nullptr, &superjump.add_force, &superjump.force, 0.1f, 100.f, 0.1f, 2);
+				sub->draw_option<ToggleWithNumber<float>>("Add Force", nullptr, &superjump.add_force, &superjump.force, 0.1f, 100.f, 0.1f, 2);
 				if (superjump.Jump_Int == 2) {
 					sub->draw_option<toggle>(("Uses Super Jump"), nullptr, &superjump.use_super_jump);
-					sub->draw_option<Scroll<const char*, std::size_t>>("Direction", nullptr, &superjump.flip_type, &superjump.flip_int);
+					sub->draw_option<Scroll>("Direction", nullptr, &superjump.flip_type, &superjump.flip_int);
 					sub->draw_option<number<std::int32_t>>("Speed", nullptr, &superjump.speed, 0, 100);
 				}
 			});
@@ -1638,7 +1646,7 @@ namespace Saint
 				sub->draw_option<toggle>(("Keep Engine On"), "Prevents your vehicle's engine from being turned off when exiting.", &features.keep_engine_on);
 				sub->draw_option<toggle>(("Infinite Countermeasures"), "", &features.inf_c);
 				sub->draw_option<toggle>(("No Plane Turbulence"), "Removes your plane's turbulance. When turning off, it can make turbulance levels a little messed up.", &NoPlaneTurbulance);
-				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>(auto_repair.name, "Automaticly repairs you're vehicle.", &features.auto_repair, &features.auto_repair_type, &features.get_repair_type);
+				sub->draw_option<ToggleWithScroller>(auto_repair.name, "Automaticly repairs you're vehicle.", &features.auto_repair, &features.auto_repair_type, &features.get_repair_type);
 				sub->draw_option<toggle>(("Auto Flip"), "", &features.auto_flip);
 				sub->draw_option<toggle>(("Can Be Used By Fleeing Peds"), nullptr, &features.can_be_used_by_peds, [] {
 					if (!features.can_be_used_by_peds) {
@@ -1735,7 +1743,7 @@ namespace Saint
 						VEHICLE::SET_INVERT_VEHICLE_CONTROLS(Game->Vehicle(), FALSE);
 					}
 					});
-				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Drift", "", &features.drift_on_shift, &features.drift_mode, &features.drift_pos);
+				sub->draw_option<ToggleWithScroller>("Drift", "", &features.drift_on_shift, &features.drift_mode, &features.drift_pos);
 				sub->draw_option<toggle>(("No Gravity"), nullptr, &features.no_grav_veh, [] {
 					if (!features.no_grav_veh) {
 						VEHICLE::SET_VEHICLE_GRAVITY(Game->Vehicle(), true);
@@ -1754,7 +1762,7 @@ namespace Saint
 					});
 
 				sub->draw_option<toggle>(("Auto Clean"), "", &features.clean_veh);
-				sub->draw_option<ToggleWithNumber<float, bool>>("Helicopter Blade Speed", nullptr, &features.blade_speeder, &features.speed_blade, 0.1f, 1.f, 0.1f, 1, false, "", "");
+				sub->draw_option<ToggleWithNumber<float>>("Helicopter Blade Speed", nullptr, &features.blade_speeder, &features.speed_blade, 0.1f, 1.f, 0.1f, 1, false, "", "");
 
 				sub->draw_option<number<float>>("Forklift Height", nullptr, &features.forklight_height, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
 					VEHICLE::SET_FORKLIFT_FORK_HEIGHT(Game->Vehicle(), features.forklight_height);
@@ -1793,7 +1801,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Wheels"), rage::joaat("Wheels2"), [](sub* sub)
 			{
-				
+
 				static float nigger;
 				sub->draw_option<submenu>("Saved", nullptr, rage::joaat("SavedWheel"));
 				sub->draw_option<Break>("Modifiers");
@@ -1813,9 +1821,9 @@ namespace Saint
 				sub->draw_option<Button>(("Save"), nullptr, []
 					{
 						showKeyboard("Enter Something", "", 25, &g_WheelLoad.buffer, [] {
-								g_WheelLoad.save(g_WheelLoad.buffer);
-								});
-						
+							g_WheelLoad.save(g_WheelLoad.buffer);
+							});
+
 					});
 				sub->draw_option<Break>("List");
 				if (std::filesystem::exists("C:\\Saint\\Wheels\\") && std::filesystem::is_directory("C:\\Saint\\Wheels\\")) {
@@ -1830,7 +1838,7 @@ namespace Saint
 							{
 								if (path.extension() == ".ini")
 								{
-									
+
 									char nigger[64];
 									sprintf(nigger, "%s", path.stem().u8string().c_str());
 									sub->draw_option<Button>(nigger, nullptr, [=]
@@ -1902,7 +1910,7 @@ namespace Saint
 				}
 				sub->draw_option<Break>(("Moving"));
 				sub->draw_option<toggle>(("Enabled"), "", &features.plate_test);
-				//sub->draw_option<Scroll<const char*, std::size_t>>("Direction", nullptr, &features.plate_test_direction, &features.plate_test_pos);
+				//sub->draw_option<Scroll>("Direction", nullptr, &features.plate_test_direction, &features.plate_test_pos);
 				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &features.plate_test_delay, 0, 5000, 50, 3, true, "", "ms");
 				sub->draw_option<KeyboardOption>(("Text"), nullptr, features.plate_test_text, []
 					{
@@ -1913,7 +1921,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Windows"), rage::joaat("Windows"), [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Action", nullptr, &windows.action, &windows.pos);
+				sub->draw_option<Scroll>("Action", nullptr, &windows.action, &windows.pos);
 				sub->draw_option<Break>(("List"));
 				for (int i = 0; i < 8; i++) {
 					sub->draw_option<Button>(windows.windowNames[i], nullptr, [=]
@@ -1928,7 +1936,7 @@ namespace Saint
 				sub->draw_option<toggle>(("Rapid Fire"), "Allows you to shoot the in-game rockets faster.", &features.rapid_fire_veh);
 				sub->draw_option<Break>(("Settings"));
 				sub->draw_option<toggle>(("Prediction"), "", &v_weapons.predict);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Weapon", nullptr, &all_weapons.name, &v_weapons.weapon);
+				sub->draw_option<Scroll>("Weapon", nullptr, &all_weapons.name, &v_weapons.weapon);
 				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &v_weapons.delay, 0, 5000, 50, 3, true, "", "ms");
 				sub->draw_option<number<std::int32_t>>("Damage", nullptr, &v_weapons.damage, 0, 1000, 10);
 				sub->draw_option<Break>(("Location"));
@@ -1938,8 +1946,8 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Tuning"), rage::joaat("Tuning"), [](sub* sub)
 			{
-				sub->draw_option<ToggleWithNumber<float, bool>>("Acceleration", nullptr, &acceleration.enabled, &acceleration.speed, 0.1f, 10000.f, 0.1f, 2);
-				sub->draw_option<ToggleWithNumber<float, bool>>("Torque", nullptr, &acceleration.torque, &acceleration.value, 1.f, 10000.f, 1.0f, 2, true, "", "", [] {
+				sub->draw_option<ToggleWithNumber<float>>("Acceleration", nullptr, &acceleration.enabled, &acceleration.speed, 0.1f, 10000.f, 0.1f, 2);
+				sub->draw_option<ToggleWithNumber<float>>("Torque", nullptr, &acceleration.torque, &acceleration.value, 1.f, 10000.f, 1.0f, 2, true, "", "", [] {
 					if (!acceleration.torque) {
 						VEHICLE::SET_VEHICLE_CHEAT_POWER_INCREASE(Game->Vehicle(), 1.0);
 					}
@@ -1987,7 +1995,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Compatible Vehicles"), rage::joaat("COMPVEHICLES2"), [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Action", nullptr, &jump_force.action, &jump_force.pos);
+				sub->draw_option<Scroll>("Action", nullptr, &jump_force.action, &jump_force.pos);
 				sub->draw_option<Break>(("List"));
 
 				sub->draw_option<Button>((HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Game->HashKey("ruiner2")))), nullptr, [=]
@@ -2131,7 +2139,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Doors"), rage::joaat("DOORS"), [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Action", nullptr, &doors.action, &doors.pos);
+				sub->draw_option<Scroll>("Action", nullptr, &doors.action, &doors.pos);
 				sub->draw_option<Button>("Driver Side (Front)", nullptr, [=]
 					{
 						if (doors.pos == 0) {
@@ -2256,7 +2264,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Compatible Vehicles"), rage::joaat("COMP_VEHICLES"), [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Action", nullptr, &rocket_boost.action, &rocket_boost.pos);
+				sub->draw_option<Scroll>("Action", nullptr, &rocket_boost.action, &rocket_boost.pos);
 				sub->draw_option<Break>(("List"));
 
 				sub->draw_option<Button>(Game->VehicleName("voltic2"), nullptr, [=]
@@ -2479,7 +2487,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Personal"), SubmenuPersonalVehicle, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Garage", nullptr, Submenu::SubmenuPersonalVehicles);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Teleport To You", nullptr, &personal_vehicle.type, &personal_vehicle.size, false, -1, [] {
+				sub->draw_option<Scroll>("Teleport To You", nullptr, &personal_vehicle.type, &personal_vehicle.size, false, -1, [] {
 
 					if (personal_vehicle.size == 0) {
 						Vehicle veh = personal_vehicle.get();
@@ -2528,7 +2536,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Particles"), SubmenuVehParticles, [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Particle", nullptr, &particles.type, &m_fx.size);
+				sub->draw_option<Scroll>("Particle", nullptr, &particles.type, &m_fx.size);
 				sub->draw_option<number<float>>("Scale", nullptr, &m_fx.vscale, 0.01f, 1000.f, 0.05f, 2);
 				sub->draw_option<Break>(("Bones"));
 				sub->draw_option<toggle>(("Front Left Wheel"), nullptr, &m_fx.lf);
@@ -2546,7 +2554,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Ramps"), SubmenuVehicleRamps, [](sub* sub)
 			{
-				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Transparent", nullptr, &m_vehicle_ramps.m_is_trasparent, &m_vehicle_ramps.m_ramp_trasparency, &m_vehicle_ramps.m_ramp_transparency_data, false, [] {
+				sub->draw_option<ToggleWithScroller>("Transparent", nullptr, &m_vehicle_ramps.m_is_trasparent, &m_vehicle_ramps.m_ramp_trasparency, &m_vehicle_ramps.m_ramp_transparency_data, false, [] {
 					if (!m_vehicle_ramps.m_is_trasparent) {
 						if (ENTITY::DOES_ENTITY_EXIST(m_vehicle_ramps.m_ramp_location.back)) {
 							ENTITY::SET_ENTITY_ALPHA(m_vehicle_ramps.m_ramp_location.back, 255, false);
@@ -2566,7 +2574,7 @@ namespace Saint
 						}
 					}
 					});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Model", nullptr, &m_vehicle_ramps.m_ramp_type, &m_vehicle_ramps.m_ramp_type_data);
+				sub->draw_option<Scroll>("Model", nullptr, &m_vehicle_ramps.m_ramp_type, &m_vehicle_ramps.m_ramp_type_data);
 				sub->draw_option<toggle>(("Front"), nullptr, &m_vehicle_ramps.m_ramp_location.m_front);
 				sub->draw_option<toggle>(("Back"), nullptr, &m_vehicle_ramps.m_ramp_location.m_back);
 				sub->draw_option<toggle>(("Left"), nullptr, &m_vehicle_ramps.m_ramp_location.m_left);
@@ -2576,7 +2584,7 @@ namespace Saint
 						m_vehicle_ramps.m_add_ramp();
 
 					});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Remove", nullptr, &m_vehicle_ramps.m_remove_type, &m_vehicle_ramps.m_remove_data, false, -1, [] {
+				sub->draw_option<Scroll>("Remove", nullptr, &m_vehicle_ramps.m_remove_type, &m_vehicle_ramps.m_remove_data, false, -1, [] {
 					switch (m_vehicle_ramps.m_remove_data) {
 					case 0:
 						m_vehicle_ramps.m_remove();
@@ -2611,8 +2619,8 @@ namespace Saint
 					VEHICLE::SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(Game->Vehicle(), changeVehicleColor.r, changeVehicleColor.g, changeVehicleColor.b);
 					});
 				sub->draw_option<Break>(("Game"));
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &TypeName2, &pos2);
-				sub->draw_option<Scroll<const char*, std::size_t>>("View", nullptr, &get_by, &pos3);
+				sub->draw_option<Scroll>("Type", nullptr, &TypeName2, &pos2);
+				sub->draw_option<Scroll>("View", nullptr, &get_by, &pos3);
 
 				if (pos3 == 0) {
 					sub->draw_option<Button>("Black", "", []
@@ -2734,7 +2742,7 @@ namespace Saint
 							{
 								if (path.extension() == ".ini")
 								{
-									
+
 									char nigger[64];
 									sprintf(nigger, "%s", path.stem().u8string().c_str());
 									sub->draw_option<Button>(nigger, nullptr, [=]
@@ -2809,7 +2817,7 @@ namespace Saint
 				sub->draw_option<submenu>("Forward Speed", nullptr, Submenu::SpawnerSettingsSetForwardSpeed);
 				sub->draw_option<submenu>("Spawn In Air", nullptr, Submenu::SpawnerSettingsSpawnInAir);
 				sub->draw_option<toggle>(("Set Engine On"), nullptr, &veh_spawner.setengineon);
-				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Fade", nullptr, &veh_spawner.fade_in, &veh_spawner.fade_speed, &veh_spawner.fade_speed_i);
+				sub->draw_option<ToggleWithScroller>("Fade", nullptr, &veh_spawner.fade_in, &veh_spawner.fade_speed, &veh_spawner.fade_speed_i);
 				sub->draw_option<toggle>(("Spawn Into"), nullptr, &veh_spawner.spawn_in);
 				sub->draw_option<toggle>(("Delete Last"), nullptr, &veh_spawner.dellast);
 				sub->draw_option<toggle>(("Max"), nullptr, &veh_spawner.max);
@@ -2982,7 +2990,7 @@ namespace Saint
 				if (autopilot.wreckless) {
 					sub->draw_option<toggle>((autopilot.avoid_roads_name.c_str()), nullptr, &autopilot.avoid_roads);
 				}
-				sub->draw_option<Scroll<const char*, std::size_t>>("Destination", nullptr, &autopilot.destination, &autopilot.destination_i);
+				sub->draw_option<Scroll>("Destination", nullptr, &autopilot.destination, &autopilot.destination_i);
 				sub->draw_option<number<float>>("Speed", nullptr, &autopilot.speed, 1.0f, 200.f, 1.0f, 2);
 				sub->draw_option<number<float>>("Stop Range", nullptr, &autopilot.stop_range, 0.f, 1000.f, 0.50f, 2);
 				sub->draw_option<Button>(("Start"), nullptr, []
@@ -3074,7 +3082,7 @@ namespace Saint
 
 
 				sub->draw_option<toggle>(("Automaticly Save"), nullptr, &flag_creator.auto_save);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Save", nullptr, &flag_creator.direction, &flag_creator.data, false, -1, []
+				sub->draw_option<Scroll>("Save", nullptr, &flag_creator.direction, &flag_creator.data, false, -1, []
 					{
 						m_queue.add(2s, "Saving...", [] {
 							switch (flag_creator.data) {
@@ -3264,7 +3272,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Acrobatics"), SubmenuAcrobatics, [](sub* sub)
 			{
 
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &acrobatic_type, &acrobatic_int);
+				sub->draw_option<Scroll>("Type", nullptr, &acrobatic_type, &acrobatic_int);
 				sub->draw_option<Button>(("Start"), nullptr, []
 					{
 						if (acrobatic_int == 0) {
@@ -3306,10 +3314,10 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Speedometer"), SubmenuSpeedo, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Custom", "", rage::joaat("CustomSpeedo"));
-				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Enabled", nullptr, &speedo.enabled, &speedo.type, &speedo.type_i);
+				sub->draw_option<ToggleWithScroller>("Enabled", nullptr, &speedo.enabled, &speedo.type, &speedo.type_i);
 				sub->draw_option<Break>(("Settings"));
 				sub->draw_option<toggle>(("License Plate"), nullptr, &speedo.plate);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Font", nullptr, &g_Render->HeaderFont, &speedo.font2);
+				sub->draw_option<Scroll>("Font", nullptr, &g_Render->HeaderFont, &speedo.font2);
 				sub->draw_option<number<float>>("X Offset", nullptr, &speedo.x_offset, -100.f, 100.f, 0.01f, 2);
 				sub->draw_option<number<float>>("Y Offset", nullptr, &speedo.y_offset, -100.f, 100.f, 0.01f, 2);
 				sub->draw_option<number<float>>("Scale", nullptr, &speedo.scale, 0.f, 100.f, 0.01f, 2);
@@ -3339,7 +3347,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("LSC"), SubmenuCustomize, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Settings", "", rage::joaat("SetitngsForLsc"));
-				sub->draw_option<Scroll<const char*, std::size_t>>("Upgrades", nullptr, &m_upgrades.types, &m_upgrades.data, false, SubmenuMaxThatFucker, [] {
+				sub->draw_option<Scroll>("Upgrades", nullptr, &m_upgrades.types, &m_upgrades.data, false, SubmenuMaxThatFucker, [] {
 
 					m_upgrades.apply(m_upgrades.data);
 					});
@@ -3583,7 +3591,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Wheels", rage::joaat("Wheels"), [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &lsc.TypeName, &lsc.pos, true, -1, [] {
+				sub->draw_option<Scroll>("Type", nullptr, &lsc.TypeName, &lsc.pos, true, -1, [] {
 					lsc.set_wheel_type(lsc.pos);
 					});
 				sub->draw_option<number<std::int32_t>>("Index", nullptr, &lsc.wheel_type, 0, VEHICLE::GET_NUM_VEHICLE_MODS(Game->Vehicle(), 23), 1, 3, true, "", "", [] {
@@ -4472,7 +4480,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Engine Sound"), SubmenuEngineSound, [](sub* sub)
 			{
 
-				sub->draw_option<Scroll<const char*, std::size_t>>("Preset", nullptr, &sound_type, &sound_int);
+				sub->draw_option<Scroll>("Preset", nullptr, &sound_type, &sound_int);
 				sub->draw_option<Button>(("Apply"), nullptr, []
 					{
 						Vehicle veh = Game->Vehicle();
@@ -4677,8 +4685,8 @@ namespace Saint
 						}
 
 					}
-				
-					
+
+
 				}
 
 
@@ -4856,7 +4864,7 @@ namespace Saint
 							{
 								if (path.extension() == ".ini")
 								{
-									
+
 									char nigger[64];
 									sprintf(nigger, "%s", path.stem().u8string().c_str());
 									sub->draw_option<Button>(nigger, nullptr, [=]
@@ -4884,7 +4892,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Horn Boost"), SubmenuHornBoost, [](sub* sub)
 			{
-				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Enabled", nullptr, &hornboost.enabled, &hornboost.Boost_Type, &hornboost.Boost_Int);
+				sub->draw_option<ToggleWithScroller>("Enabled", nullptr, &hornboost.enabled, &hornboost.Boost_Type, &hornboost.Boost_Int);
 
 				sub->draw_option<toggle>(("Smooth"), nullptr, &hornboost.smooth);
 				sub->draw_option<toggle>(("Only On Ground"), nullptr, &hornboost.onlyOnGround);
@@ -4920,13 +4928,13 @@ namespace Saint
 						WEAPON::SET_PED_INFINITE_AMMO_CLIP(Game->Self(), false);
 					}
 					});
-				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Teleport", nullptr, &features.teleport_gun, &features.teleport_gun_type, &features.teleport_gun_int);
+				sub->draw_option<ToggleWithScroller>("Teleport", nullptr, &features.teleport_gun, &features.teleport_gun_type, &features.teleport_gun_int);
 				sub->draw_option<toggle>(("Delete"), nullptr, &features.delete_gun);
 				sub->draw_option<toggle>(("Bypass C4 Limit"), nullptr, &features.bypass_c4_limit);
 
 				sub->draw_option<toggle>(("Gravity"), nullptr, &gravity.enabled);
-				//sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Flags", "", &features.ammo_flag, &features.flag_type, &features.flag_int);
-				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Mark II", "", &weapon.mk2_ammo, &weapon.mk2, &weapon.pos, false, [] {
+				//sub->draw_option<ToggleWithScroller>("Flags", "", &features.ammo_flag, &features.flag_type, &features.flag_int);
+				sub->draw_option<ToggleWithScroller>("Mark II", "", &weapon.mk2_ammo, &weapon.mk2, &weapon.pos, false, [] {
 					if (!weapon.mk2_ammo) {
 
 						Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info->m_ammo_special_type = eAmmoSpecialType::None;
@@ -4940,17 +4948,17 @@ namespace Saint
 					}
 					});
 
-				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Rope", nullptr, &rope_gun.enabled, &rope_gun.type, &rope_gun.pos);
+				sub->draw_option<ToggleWithScroller>("Rope", nullptr, &rope_gun.enabled, &rope_gun.type, &rope_gun.pos);
 				//sub->draw_option<toggle>(("Steal"), nullptr, &features.steal_gun);
-				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Money", nullptr, &wdrop.money, &wdrop.money_model, &wdrop.money_model_data);
-				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("RP", nullptr, &wdrop.rp, &wdrop.rp_model, &wdrop.rp_model_data);
+				sub->draw_option<ToggleWithScroller>("Money", nullptr, &wdrop.money, &wdrop.money_model, &wdrop.money_model_data);
+				sub->draw_option<ToggleWithScroller>("RP", nullptr, &wdrop.rp, &wdrop.rp_model, &wdrop.rp_model_data);
 				sub->draw_option<toggle>(("Shotgun"), nullptr, &m_shotgun.enabled, [] {
 					if (!m_shotgun.enabled) {
 						m_shotgun.onDisable();
 					}
 					});
-				sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Force", nullptr, &features.force_gun, &features.force_gun_mult, 0, 300, 10);
-				sub->draw_option<ToggleWithNumber<float, bool>>("Grapple Hook", nullptr, &ghook.enabled, &ghook.speed, 0.1f, 50.f, 0.1f);
+				sub->draw_option<ToggleWithNumber<std::int32_t>>("Force", nullptr, &features.force_gun, &features.force_gun_mult, 0, 300, 10);
+				sub->draw_option<ToggleWithNumber<float>>("Grapple Hook", nullptr, &ghook.enabled, &ghook.speed, 0.1f, 50.f, 0.1f);
 				sub->draw_option<toggle>(("Max"), nullptr, &features.max_gun);
 				sub->draw_option<toggle>(("Recolor"), nullptr, &features.recolor);
 				sub->draw_option<toggle>(("Hijack"), nullptr, &features.steal_gun2);
@@ -5079,23 +5087,23 @@ namespace Saint
 					}
 					});
 				sub->draw_option<Break>("Settings");
-				sub->draw_option<Scroll<const char*, std::size_t>>("Explosion On End", nullptr, &all_weapons.explosion, &valk.pos);
-				sub->draw_option<toggle>(("Only Explode On Impact"), nullptr, &valk.only_explode_on_impact);
+				sub->draw_option<Scroll>("Explosion On End", nullptr, &all_weapons.explosion, &valk.pos);
+				sub->draw_option<toggle>("Only Explode On Impact", nullptr, &valk.only_explode_on_impact);
 				sub->draw_option<toggle>(("No-Clip"), nullptr, &valk.no_clip);
 				//sub->draw_option<toggle>(("Nuke"), nullptr, &valk.nuke);
-				sub->draw_option<number<float>>("X", nullptr, &valk.offset.x, -1000000, 1000000, 0.1, 3);
-				sub->draw_option<number<float>>("Y", nullptr, &valk.offset.y, -1000000, 1000000, 0.1, 3);
-				sub->draw_option<number<float>>("Z", nullptr, &valk.offset.z, -1000000, 1000000, 0.1, 3);
+				sub->draw_option<number<float>>("X", &valk.offset.x, -1000000, 1000000, 0.1, 3);
+				sub->draw_option<number<float>>("Y", &valk.offset.y, -1000000, 1000000, 0.1, 3);
+				draw_option2<number<float>>("Z", &valk.offset.z, -1000000, 1000000, 0.1, 3);
 				//sub->draw_option<toggle>(("Restart On End"), nullptr, &valk.restart);
 				sub->draw_option<Break>("Elements");
-				sub->draw_option<toggle>(("Crosshair"), nullptr, &valk.hud);
-				sub->draw_option<toggle>(("Meter"), nullptr, &valk.meter);
-				sub->draw_option<toggle>(("Screen Effect"), nullptr, &valk.vision);
+				sub->draw_option<toggle>("Crosshair", &valk.hud);
+				sub->draw_option<toggle>("Meter", &valk.meter);
+				sub->draw_option<toggle>("Screen Effect", &valk.vision);
 			});
 		g_Render->draw_submenu<sub>(("Particle"), rage::joaat("ParticleS"), [](sub* sub)
 			{
 				sub->draw_option<toggle>(("Enabled"), nullptr, &particle_shooter.enabled);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &particles.type, &particle_shooter.pos);
+				sub->draw_option<Scroll>("Type", nullptr, &particles.type, &particle_shooter.pos);
 				sub->draw_option<number<float>>("Scale", nullptr, &bullet_changer.velocity, 0.1f, 1000.f, 1.f);
 				sub->draw_option<Break>("Color");
 				sub->draw_option<toggle>(("Enabled"), nullptr, &particle_shooter.color);
@@ -5114,7 +5122,7 @@ namespace Saint
 			{
 				sub->draw_option<toggle>(("Enabled"), nullptr, &bullet_changer.enabled);
 				//sub->draw_option<toggle>(("Show Trajectory"), nullptr, &bullet_changer.trajectory);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &all_weapons.name, &bullet_changer.weapon_pos);
+				sub->draw_option<Scroll>("Type", nullptr, &all_weapons.name, &bullet_changer.weapon_pos);
 				sub->draw_option<Break>("Attributes");
 				sub->draw_option<toggle>(("Audible"), nullptr, &bullet_changer.Audible);
 				sub->draw_option<toggle>(("Invisible"), nullptr, &bullet_changer.Invisible);
@@ -5125,7 +5133,7 @@ namespace Saint
 				sub->draw_option<toggle>(("Enabled"), nullptr, &paint.enabled);
 				sub->draw_option<Break>("Attributes");
 				sub->draw_option<toggle>(("Rainbow"), nullptr, &paint.rainbow);
-				sub->draw_option<ToggleWithNumber<float, bool>>("Shadow", nullptr, &paint.shadow, &paint.shadow_value, 0.1f, 50.f, 0.1f);
+				sub->draw_option<ToggleWithNumber<float>>("Shadow", nullptr, &paint.shadow, &paint.shadow_value, 0.1f, 50.f, 0.1f);
 				sub->draw_option<number<std::int32_t>>("Red", nullptr, &paint.r, 0, 255, 1, 3, true, "", "", [] {
 
 					});
@@ -5235,8 +5243,8 @@ namespace Saint
 				sub->draw_option<Break>("Settings");
 				sub->draw_option<toggle>(("Shoot Through Walls"), nullptr, &aimbot.through_walls);
 				sub->draw_option<toggle>(("Only Players"), nullptr, &aimbot.only_players);
-				sub->draw_option<ToggleWithNumber<float, bool>>("Distance", nullptr, &aimbot.distance_check, &aimbot.distance_to_check, 0.1f, 100000.f, 5.0f, 2);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Bone", nullptr, &aimbot.bone, &aimbot.data);
+				sub->draw_option<ToggleWithNumber<float>>("Distance", nullptr, &aimbot.distance_check, &aimbot.distance_to_check, 0.1f, 100000.f, 5.0f, 2);
+				sub->draw_option<Scroll>("Bone", nullptr, &aimbot.bone, &aimbot.data);
 
 
 
@@ -5255,8 +5263,8 @@ namespace Saint
 				sub->draw_option<toggle>(("Disable When Ragdolling"), nullptr, &triggerbot.d1);
 				sub->draw_option<toggle>(("Disable When Reloading"), nullptr, &triggerbot.d2);
 				sub->draw_option<toggle>(("Exclude Friends"), nullptr, &triggerbot.exclude_friends);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Filter", nullptr, &triggerbot.filter, &triggerbot.filter_i);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Redirect To Bone", nullptr, &triggerbot.shoot_coords, &triggerbot.scoords_i);
+				sub->draw_option<Scroll>("Filter", nullptr, &triggerbot.filter, &triggerbot.filter_i);
+				sub->draw_option<Scroll>("Redirect To Bone", nullptr, &triggerbot.shoot_coords, &triggerbot.scoords_i);
 				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &triggerbot.delay, 0, 5000, 50, 3, true, "", "ms");
 
 
@@ -5281,7 +5289,7 @@ namespace Saint
 
 		g_Render->draw_submenu<sub>(("Targeting Mode"), SubmenuTargetingMode, [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &t_mode.data, &t_mode.init, false, SubmenuTargetMode);
+				sub->draw_option<Scroll>("Type", nullptr, &t_mode.data, &t_mode.init, false, SubmenuTargetMode);
 				sub->draw_option<Button>(("Apply"), nullptr, []
 					{
 						PLAYER::SET_PLAYER_TARGETING_MODE(t_mode.init);
@@ -5322,7 +5330,7 @@ namespace Saint
 				auto weapon = (*g_GameFunctions->m_pedFactory)->m_local_ped->m_weapon_manager->m_weapon_info;
 
 				sub->draw_option<toggle>(("No Recoil"), nullptr, &features.no_recoil);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Damage Type", nullptr, &Lists::DamageList, &Lists::DamagePos, true, SubmenuDamageTest, []
+				sub->draw_option<Scroll>("Damage Type", nullptr, &Lists::DamageList, &Lists::DamagePos, true, SubmenuDamageTest, []
 					{
 						eDamageType type;
 						switch (Lists::DamagePos) {
@@ -5525,13 +5533,37 @@ namespace Saint
 
 					});
 				sub->draw_option<Break>(("Category"));
-				sub->draw_option<Scroll<const char*, std::size_t>>("Action", nullptr, &give_ammo.action, &give_ammo.action_type);
-				for (std::int32_t i = 0; i < 10; i++) {
+				sub->draw_option<Scroll>("Type", nullptr, &give_ammo.type2, &give_ammo.type_int2);
+				if (give_ammo.type_int2 == 0) {
+					sub->draw_option<Scroll>("Action", nullptr, &give_ammo.action, &give_ammo.action_type);
+					for (std::int32_t i = 0; i < 10; i++) {
 
-					sub->draw_option<submenu>(all_weapons.weapon_class_names[i], nullptr, rage::joaat("GunLockerGive"), [=]
-						{
-							give_weapon.selected_class = all_weapons.weapon_class_names[i];
-						});
+						sub->draw_option<submenu>(all_weapons.weapon_class_names[i], nullptr, rage::joaat("GunLockerGive"), [=]
+							{
+								give_weapon.selected_class = all_weapons.weapon_class_names[i];
+							});
+
+					}
+				}
+				if (give_ammo.type_int2 == 1) {
+					Hash weaponhash;
+					WEAPON::GET_CURRENT_PED_WEAPON(Game->Self(), &weaponhash, 1);
+					for (auto& comp : components) {
+
+						if (WEAPON::DOES_WEAPON_TAKE_WEAPON_COMPONENT(weaponhash, comp.component)) {
+							sub->draw_option<Button>(comp.name, nullptr, [=]
+								{
+									if (WEAPON::HAS_PED_GOT_WEAPON_COMPONENT(Game->Self(), weaponhash, comp.component)) {
+										WEAPON::REMOVE_WEAPON_COMPONENT_FROM_PED(Game->Self(), weaponhash, comp.component);
+									}
+									else {
+										WEAPON::GIVE_WEAPON_COMPONENT_TO_PED(Game->Self(), weaponhash, comp.component);
+									}
+								});
+
+						}
+					}
+
 
 				}
 
@@ -5572,7 +5604,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Ammo"), SubmenuGunLockerAmmo, [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &give_ammo.type, &give_ammo.type_int);
+				sub->draw_option<Scroll>("Type", nullptr, &give_ammo.type, &give_ammo.type_int);
 				if (give_ammo.type_int == 1) {
 					Hash weaponhash;
 					int Maxammo = 0;
@@ -5607,7 +5639,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Animation"), SubmenuWeaponAnimation, [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &animation_type, &animation_int);
+				sub->draw_option<Scroll>("Type", nullptr, &animation_type, &animation_int);
 				sub->draw_option<Button>(("Apply"), nullptr, []
 					{
 						WEAPON::SET_WEAPON_ANIMATION_OVERRIDE(Game->Self(), Game->HashKey(animation_data[animation_int]));
@@ -5633,7 +5665,7 @@ namespace Saint
 				sub->draw_option<toggle>(("Enabled"), nullptr, &explosiveAmmo.enabled);
 				sub->draw_option<toggle>(("Sound"), nullptr, &explosiveAmmo.sound);
 				sub->draw_option<toggle>(("Invisible"), nullptr, &explosiveAmmo.invisible);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &all_weapons.explosion, &explosiveAmmo.explode_int);
+				sub->draw_option<Scroll>("Type", nullptr, &all_weapons.explosion, &explosiveAmmo.explode_int);
 				sub->draw_option<number<float>>("Damage", nullptr, &explosiveAmmo.damage, 0.0f, 150.f, 0.10f, 2);
 				sub->draw_option<number<float>>("Camera Shake", nullptr, &explosiveAmmo.camera_shake, 0.0f, 150.f, 0.10f, 2);
 
@@ -5749,7 +5781,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Cayo Perico", rage::joaat("CayoPerico"), [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Target", nullptr, &Aproach3, &Opreracogh223, false, -1, [=] {
+				sub->draw_option<Scroll>("Target", nullptr, &Aproach3, &Opreracogh223, false, -1, [=] {
 					switch (Opreracogh223) {
 					case 0:
 						STATS::STAT_SET_INT(Game->HashKey("MP0_H4CNF_TARGET"), 0, true);
@@ -5773,7 +5805,7 @@ namespace Saint
 						break;
 					}
 					});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Approach Vehicle", nullptr, &AproachVeh, &Opreracogh2232, false, -1, [=] {
+				sub->draw_option<Scroll>("Approach Vehicle", nullptr, &AproachVeh, &Opreracogh2232, false, -1, [=] {
 					switch (Opreracogh223) {
 					case 0:
 						STATS::STAT_SET_INT(Game->HashKey("MP0_H4_MISSIONS"), 65283, true);
@@ -5842,7 +5874,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Diamond Casino", DiamondCasino, [](sub* sub)
 			{
 
-				sub->draw_option<Scroll<const char*, std::size_t>>("Driver", nullptr, &Aproach2, &Opreracogh22, false, -1, [=] {
+				sub->draw_option<Scroll>("Driver", nullptr, &Aproach2, &Opreracogh22, false, -1, [=] {
 					switch (Opreracogh22) {
 					case 0:
 						STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_CREWDRIVER"), 5, true);
@@ -5861,7 +5893,7 @@ namespace Saint
 						break;
 					}
 					});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Target", nullptr, &Aproach, &Opreracogh2, true, -1, [=] {
+				sub->draw_option<Scroll>("Target", nullptr, &Aproach, &Opreracogh2, true, -1, [=] {
 					switch (Opreracogh2) {
 					case 0:
 						STATS::STAT_SET_INT(Game->HashKey("MP0_H3OPT_TARGET"), 3, true);
@@ -5877,7 +5909,7 @@ namespace Saint
 						break;
 					}
 					});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Teleport", nullptr, &casino_teleport, &casino_tp, false, -1, [=] {
+				sub->draw_option<Scroll>("Teleport", nullptr, &casino_teleport, &casino_tp, false, -1, [=] {
 					switch (casino_tp) {
 					case 0:
 						PED::SET_PED_COORDS_KEEP_VEHICLE(Game->Self(), 2465.4746, -279.2276, -70.694145);
@@ -5917,7 +5949,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Recovery", SubmenuRecovery, [](sub* sub)
 			{
 
-				sub->draw_option<Scroll<const char*, std::size_t>>("Character", nullptr, &g_RecoveryManager.get_char_name, &g_RecoveryManager.selected, false, -1, [] {});
+				sub->draw_option<Scroll>("Character", nullptr, &g_RecoveryManager.get_char_name, &g_RecoveryManager.selected, false, -1, [] {});
 				sub->draw_option<submenu>("Level", nullptr, SubmenuRP);
 				sub->draw_option<submenu>("Unlocks", nullptr, SubmenuUnlocks);
 
@@ -6114,7 +6146,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Money", SubmenuMoney, [](sub* sub)
 			{
-				sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("500k", nullptr, &features.t500k, &features.money_delay, 0, 120, 1, 3, false, "", "s");
+				sub->draw_option<ToggleWithNumber<std::int32_t>>("500k", nullptr, &features.t500k, &features.money_delay, 0, 120, 1, 3, false, "", "s");
 			});
 
 
@@ -7914,7 +7946,7 @@ namespace Saint
 				if (m_recovery.m_level.m_level < 1) {
 					m_recovery.m_level.m_level = 1;
 				}
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &m_recovery.level_type, &m_recovery.pos);
+				sub->draw_option<Scroll>("Type", nullptr, &m_recovery.level_type, &m_recovery.pos);
 				sub->draw_option<KeyboardOption>(("Value"), nullptr, std::to_string(m_recovery.m_level.m_level), []
 					{
 						showKeyboard("Enter Something", "", 4, &m_recovery.m_level.m_level_buffer, [] {
@@ -8038,7 +8070,7 @@ namespace Saint
 						NETWORK::USE_PLAYER_COLOUR_INSTEAD_OF_TEAM_COLOUR(false);
 					}
 					});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Team", nullptr, &team.type, &team.data, true, -1, [] {
+				sub->draw_option<Scroll>("Team", nullptr, &team.type, &team.data, true, -1, [] {
 					PLAYER::SET_PLAYER_TEAM(Game->Self(), team.data);
 					});
 				sub->draw_option<Break>(("Players"));
@@ -8138,30 +8170,30 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Off The Radar"), SubmenuOffRadar, [](sub* sub)
 			{
 				sub->draw_option<toggle>(("Enabled"), nullptr, &m_radar.enabled);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Time", nullptr, &m_radar.time, &m_radar.data);
+				sub->draw_option<Scroll>("Time", nullptr, &m_radar.time, &m_radar.data);
 
 			});
 		g_Render->draw_submenu<sub>(("RID Joiner"), SubmenuRIDJoiner, [](sub* sub)
 			{
 				sub->draw_option<KeyboardOption>(("RID"), nullptr, ridBuffer.c_str(), []
-						{
-							showKeyboard("Enter Something", "", 25, &ridBuffer, [] {
-								selected_rid = atoi(ridBuffer.c_str());
-								});
+					{
+						showKeyboard("Enter Something", "", 25, &ridBuffer, [] {
+							selected_rid = atoi(ridBuffer.c_str());
+							});
 					});
-				
+
 				sub->draw_option<Button>(("Join"), nullptr, []
 					{
 						rid_tool.join_by_rockstar_id(atoi(ridBuffer.c_str()));
 
 					});
-				
+
 
 
 			});
 		g_Render->draw_submenu<sub>(("Requests"), SubmenuRequests, [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &requests.data, &requests.data_i);
+				sub->draw_option<Scroll>("Type", nullptr, &requests.data, &requests.data_i);
 				sub->draw_option<Button>(("Apply"), nullptr, []
 					{
 						switch (requests.data_i) {
@@ -8240,8 +8272,8 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Session Starter"), SubmenuSesStart, [](sub* sub)
 			{
-				sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Start Once Below Count", nullptr, &autostart.enabled, &autostart.max, 0, 32);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &session.name, &session.data);
+				sub->draw_option<ToggleWithNumber<std::int32_t>>("Start Once Below Count", nullptr, &autostart.enabled, &autostart.max, 0, 32);
+				sub->draw_option<Scroll>("Type", nullptr, &session.name, &session.data);
 				sub->draw_option<Button>(("Join"), nullptr, []
 					{
 						switch (session.data) {
@@ -8332,7 +8364,7 @@ namespace Saint
 				sub->draw_option<submenu>("Saved", nullptr, SubmenuSavedPlayers);
 				sub->draw_option<submenu>("Hide Information", nullptr, rage::joaat("HideINFO"));
 				sub->draw_option<submenu>("Settings", nullptr, rage::joaat("PlayerInfoSettings"));
-				sub->draw_option<Scroll<const char*, std::size_t>>("Spectate", nullptr, &spectateo.type, &spectateo.pos, false, -1, []
+				sub->draw_option<Scroll>("Spectate", nullptr, &spectateo.type, &spectateo.pos, false, -1, []
 					{
 						if (spectateo.pos == 0) {
 							spectateo.stop();
@@ -8345,7 +8377,7 @@ namespace Saint
 
 
 				sub->draw_option<Break>(("List"));
-			
+
 				for (std::uint32_t i = 0; i < 32; ++i)
 				{
 
@@ -8432,7 +8464,7 @@ namespace Saint
 						}
 						});
 				}
-				sub->draw_option<Scroll<const char*, std::size_t>>("Copy To Clipboard", nullptr, &c_clipboard.to_copy, &c_clipboard.data, false, -1, []
+				sub->draw_option<Scroll>("Copy To Clipboard", nullptr, &c_clipboard.to_copy, &c_clipboard.data, false, -1, []
 					{
 						switch (c_clipboard.data) {
 						case 0:
@@ -8476,7 +8508,7 @@ namespace Saint
 						g_players.get_selected.events.remove(2);
 
 					});
-				
+
 
 
 			});
@@ -8494,20 +8526,20 @@ namespace Saint
 					auto& stats1 = gpbd_fm_1.as<GPBD_FM*>()->Entries[all_players.get_id(g_SelectedPlayer)];
 					auto& stats2 = gpbd_fm_3.as<GPBD_FM_3*>()->Entries[all_players.get_id(g_SelectedPlayer)];
 					auto& stats3 = globalplayer_bd.as<GlobalPlayerBD*>()->Entries[all_players.get_id(g_SelectedPlayer)];
-					sub->draw_option<KeyboardOption>(("Races Won"), nullptr, std::to_string(stats.TotalRacesWon), [] {});
-					sub->draw_option<KeyboardOption>(("Races Lost"), nullptr, std::to_string(stats.TotalRacesLost), [] {});
-					sub->draw_option<KeyboardOption>(("Killstreak"), nullptr, std::to_string(stats1.KillStreak), [] {});
-					sub->draw_option<KeyboardOption>(("Arcade Safe Cash"), nullptr, std::to_string(stats1.PropertyData.ArcadeData.SafeCashValue), [] {});
-					sub->draw_option<KeyboardOption>(("Time Trial Active"), nullptr, stats3.TimeTrialActive ? "Yes" : "No", [] {});
-					sub->draw_option<KeyboardOption>(("Badsport"), nullptr, stats3.IsBadsport ? "Yes" : "No", [] {});
-					sub->draw_option<KeyboardOption>(("Invisible"), nullptr, stats3.IsInvisible ? "Yes" : "No", [] {});
-					sub->draw_option<KeyboardOption>(("Off Radar"), nullptr, stats3.OffRadarActive ? "Yes" : "No", [] {});
-					sub->draw_option<KeyboardOption>(("Yacht Name"), nullptr, stats3.YachtData.Appearance.Name.Data, [] {});
-					sub->draw_option<KeyboardOption>(("Nightclub Safe Cash"), nullptr, separateByCommas2(stats1.PropertyData.NightclubData.SafeCashValue), [] {});
-					sub->draw_option<KeyboardOption>(("Nightclub Entry Cost"), nullptr, std::to_string(stats1.PropertyData.NightclubData.EntryCost), [] {});
-					sub->draw_option<KeyboardOption>(("Nightclub Popularity"), nullptr, std::to_string((int)stats1.PropertyData.NightclubData.Popularity), [] {});
-					sub->draw_option<KeyboardOption>(("Bunker Research"), nullptr, std::to_string(stats1.PropertyData.TotalBunkerResearch), [] {});
-					sub->draw_option<KeyboardOption>(("Current Research Progress"), nullptr, std::to_string(stats1.PropertyData.CurrentBunkerResearchProgress), [] {});
+					sub->draw_option<KeyboardOption>(("Races Won"), nullptr, std::to_string(stats.TotalRacesWon), [] {}, false);
+					sub->draw_option<KeyboardOption>(("Races Lost"), nullptr, std::to_string(stats.TotalRacesLost), [] {}, false);
+					sub->draw_option<KeyboardOption>(("Killstreak"), nullptr, std::to_string(stats1.KillStreak), [] {}, false);
+					sub->draw_option<KeyboardOption>(("Arcade Safe Cash"), nullptr, std::to_string(stats1.PropertyData.ArcadeData.SafeCashValue), [] {}, false);
+					sub->draw_option<KeyboardOption>(("Time Trial Active"), nullptr, stats3.TimeTrialActive ? "Yes" : "No", [] {}, false);
+					sub->draw_option<KeyboardOption>(("Badsport"), nullptr, stats3.IsBadsport ? "Yes" : "No", [] {}, false);
+					sub->draw_option<KeyboardOption>(("Invisible"), nullptr, stats3.IsInvisible ? "Yes" : "No", [] {}, false);
+					sub->draw_option<KeyboardOption>(("Off Radar"), nullptr, stats3.OffRadarActive ? "Yes" : "No", [] {}, false);
+					sub->draw_option<KeyboardOption>(("Yacht Name"), nullptr, stats3.YachtData.Appearance.Name.Data, [] {}, false);
+					sub->draw_option<KeyboardOption>(("Nightclub Safe Cash"), nullptr, separateByCommas2(stats1.PropertyData.NightclubData.SafeCashValue), [] {}, false);
+					sub->draw_option<KeyboardOption>(("Nightclub Entry Cost"), nullptr, std::to_string(stats1.PropertyData.NightclubData.EntryCost), [] {}, false);
+					sub->draw_option<KeyboardOption>(("Nightclub Popularity"), nullptr, std::to_string((int)stats1.PropertyData.NightclubData.Popularity), [] {}, false);
+					sub->draw_option<KeyboardOption>(("Bunker Research"), nullptr, std::to_string(stats1.PropertyData.TotalBunkerResearch), [] {}, false);
+					sub->draw_option<KeyboardOption>(("Current Research Progress"), nullptr, std::to_string(stats1.PropertyData.CurrentBunkerResearchProgress), [] {}, false);
 				}
 			});
 		g_Render->draw_submenu<sub>("Block Actions", rage::joaat("BlockActions"), [](sub* sub)
@@ -8864,7 +8896,7 @@ namespace Saint
 				if (alyways_show_info) {
 					g_players.draw_info(g_SelectedPlayer);
 				}
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &acrobatic_type, &acrobatic_int4);
+				sub->draw_option<Scroll>("Type", nullptr, &acrobatic_type, &acrobatic_int4);
 				sub->draw_option<Button>(("Start"), nullptr, []
 					{
 						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false))) {
@@ -9032,7 +9064,7 @@ namespace Saint
 				sub->draw_option<toggle>(("Enabled"), nullptr, &g_players.get_selected.explosiveAmmo.enabled);
 				sub->draw_option<toggle>(("Sound"), nullptr, &g_players.get_selected.explosiveAmmo.sound);
 				sub->draw_option<toggle>(("Invisible"), nullptr, &g_players.get_selected.explosiveAmmo.invisible);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &all_weapons.explosion, &g_players.get_selected.explosiveAmmo.explode_int);
+				sub->draw_option<Scroll>("Type", nullptr, &all_weapons.explosion, &g_players.get_selected.explosiveAmmo.explode_int);
 				sub->draw_option<number<float>>("Damage", nullptr, &g_players.get_selected.explosiveAmmo.damage, 0.0f, 150.f, 0.10f, 2);
 				sub->draw_option<number<float>>("Camera Shake", nullptr, &g_players.get_selected.explosiveAmmo.camera_shake, 0.0f, 150.f, 0.10f, 2);
 
@@ -9042,7 +9074,7 @@ namespace Saint
 				if (alyways_show_info) {
 					g_players.draw_info(g_SelectedPlayer);
 				}
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &incr.type, &incr.data);
+				sub->draw_option<Scroll>("Type", nullptr, &incr.type, &incr.data);
 				sub->draw_option<Button>(("Apply"), nullptr, []
 					{
 						incr.add();
@@ -9079,7 +9111,7 @@ namespace Saint
 				if (give_weapon.type_int == 0) {
 					Maxammo = 9999;
 				}
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &all_weapons.name_all, &give_weapon.type_int);
+				sub->draw_option<Scroll>("Type", nullptr, &all_weapons.name_all, &give_weapon.type_int);
 				sub->draw_option<number<std::int32_t>>("Ammo", nullptr, &give_weapon.amount, 1, Maxammo);
 				sub->draw_option<Button>(("Apply"), nullptr, []
 					{
@@ -9109,7 +9141,7 @@ namespace Saint
 				if (alyways_show_info) {
 					g_players.draw_info(g_SelectedPlayer);
 				}
-				sub->draw_option<Scroll<const char*, std::size_t>>("Menu", nullptr, &g_players.get_selected.events.Menu, &g_players.get_selected.events.Menu_Data);
+				sub->draw_option<Scroll>("Menu", nullptr, &g_players.get_selected.events.Menu, &g_players.get_selected.events.Menu_Data);
 				sub->draw_option<Button>(("Start"), nullptr, []
 					{
 
@@ -9123,7 +9155,7 @@ namespace Saint
 				if (alyways_show_info) {
 					g_players.draw_info(g_SelectedPlayer);
 				}
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &g_players.get_selected.events.CrashMenu, &g_players.get_selected.events.Menu_DataCrash);
+				sub->draw_option<Scroll>("Type", nullptr, &g_players.get_selected.events.CrashMenu, &g_players.get_selected.events.Menu_DataCrash);
 				sub->draw_option<Button>(("Start"), nullptr, []
 					{
 
@@ -9157,7 +9189,7 @@ namespace Saint
 							{
 								if (path.extension() == ".ini")
 								{
-									
+
 									char nigger[64];
 									sprintf(nigger, "%s", path.stem().u8string().c_str());
 									sub->draw_option<Button>(nigger, nullptr, [=]
@@ -9262,7 +9294,7 @@ namespace Saint
 				sub->draw_option<submenu>("Blame", nullptr, SubmenuAllExplodeBlame);
 				sub->draw_option<toggle>(("Sound"), nullptr, &all_players.m_explode.settings.sound);
 				sub->draw_option<toggle>(("Invisible"), nullptr, &all_players.m_explode.settings.invisible);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &all_weapons.explosion, &all_players.m_explode.settings.data);
+				sub->draw_option<Scroll>("Type", nullptr, &all_weapons.explosion, &all_players.m_explode.settings.data);
 				sub->draw_option<number<float>>("Damage", nullptr, &all_players.m_explode.settings.damage_scale, 0.0f, 150.f, 0.10f, 2);
 				sub->draw_option<number<float>>("Camera Shake", nullptr, &all_players.m_explode.settings.camera_shake, 0.0f, 150.f, 0.10f, 2);
 				sub->draw_option<toggle>(("Looped"), nullptr, &all_players.m_explode.settings.looped);
@@ -9347,7 +9379,7 @@ namespace Saint
 
 
 					});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Kick From Vehicle", nullptr, &g_players.get_selected.kick_type, &g_players.get_selected.pos, false, -1, [] {
+				sub->draw_option<Scroll>("Kick From Vehicle", nullptr, &g_players.get_selected.kick_type, &g_players.get_selected.pos, false, -1, [] {
 					g_players.get_selected.kick_from_vehicle(g_players.get_selected.pos);
 
 					});
@@ -9565,7 +9597,7 @@ namespace Saint
 				if (alyways_show_info) {
 					g_players.draw_info(g_SelectedPlayer);
 				}
-				sub->draw_option<Scroll<const char*, std::size_t>>("Weapon", nullptr, &all_weapons.name, &features.bullet_int);
+				sub->draw_option<Scroll>("Weapon", nullptr, &all_weapons.name, &features.bullet_int);
 				sub->draw_option<Button>(("Shoot"), nullptr, [=]
 					{
 						std::int32_t hash = all_weapons.hash[features.bullet_int];
@@ -9603,7 +9635,7 @@ namespace Saint
 			if (alyways_show_info) {
 				g_players.draw_info(g_SelectedPlayer);
 			}
-			sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &cage.type, &cage.data);
+			sub->draw_option<Scroll>("Type", nullptr, &cage.type, &cage.data);
 			sub->draw_option<toggle>(("Invisible"), nullptr, &cage.is_invisible);
 			sub->draw_option<Button>(("Spawn"), nullptr, []
 				{
@@ -9625,15 +9657,15 @@ namespace Saint
 			if (alyways_show_info) {
 				g_players.draw_info(g_SelectedPlayer);
 			}
-			sub->draw_option<Scroll<const char*, std::size_t>>("Mode", nullptr, &attackers.mode, &attackers.mode_i);
+			sub->draw_option<Scroll>("Mode", nullptr, &attackers.mode, &attackers.mode_i);
 			if (attackers.mode_i == 1) {
-				sub->draw_option<Scroll<const char*, std::size_t>>("Model", nullptr, &attackers.cop_models, &attackers.cop_int);
+				sub->draw_option<Scroll>("Model", nullptr, &attackers.cop_models, &attackers.cop_int);
 			}
 			if (attackers.mode_i != 2) {
-				sub->draw_option<Scroll<const char*, std::size_t>>("Weapon", nullptr, &attackers.data, &attackers.data_i);
+				sub->draw_option<Scroll>("Weapon", nullptr, &attackers.data, &attackers.data_i);
 			}
 			if (attackers.mode_i == 2) {
-				sub->draw_option<Scroll<const char*, std::size_t>>("Vehicle", nullptr, &attackers.veh, &attackers.veh_int);
+				sub->draw_option<Scroll>("Vehicle", nullptr, &attackers.veh, &attackers.veh_int);
 				sub->draw_option<number<std::int32_t>>("Amount", nullptr, &attackers.how_many_planes, 0, 100);
 			}
 
@@ -9653,7 +9685,7 @@ namespace Saint
 			sub->draw_option<submenu>("Blame", nullptr, SubmenuExplodeBlame);
 			sub->draw_option<toggle>(("Sound"), nullptr, &owned_explosion.sound);
 			sub->draw_option<toggle>(("Invisible"), nullptr, &owned_explosion.invisible);
-			sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &all_weapons.explosion, &owned_explosion.data_i);
+			sub->draw_option<Scroll>("Type", nullptr, &all_weapons.explosion, &owned_explosion.data_i);
 			sub->draw_option<number<float>>("Damage", nullptr, &owned_explosion.damage_scale, 0.0f, 150.f, 0.10f, 2);
 			sub->draw_option<number<float>>("Camera Shake", nullptr, &owned_explosion.cameraShake, 0.0f, 150.f, 0.10f, 2);
 			sub->draw_option<toggle>(("Looped"), nullptr, &owned_explosion.looped);
@@ -9767,8 +9799,8 @@ namespace Saint
 				}
 				sub->draw_option<submenu>("Model", nullptr, rage::joaat("CustomModelB"));
 				sub->draw_option<toggle>(("Godmode"), nullptr, &bodygaurd.godmode);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Weapon", nullptr, &all_weapons.name, &bodygaurd.WeaponInt);
-				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Custom Firing Pattern", nullptr, &bodygaurd.FiringPatternEnabled, &bodygaurd.FiringPattern, &bodygaurd.FiringPatternInt);
+				sub->draw_option<Scroll>("Weapon", nullptr, &all_weapons.name, &bodygaurd.WeaponInt);
+				sub->draw_option<ToggleWithScroller>("Custom Firing Pattern", nullptr, &bodygaurd.FiringPatternEnabled, &bodygaurd.FiringPattern, &bodygaurd.FiringPatternInt);
 				sub->draw_option<number<std::int32_t>>("Accuracy", nullptr, &bodygaurd.accuary, 0, 100);
 				sub->draw_option<number<float>>("Damage Multiplier", nullptr, &bodygaurd.damagemultiplier, 0.0f, 150.f, 0.10f, 2);
 				sub->draw_option<KeyboardOption>(("Selected"), nullptr, bodygaurd.selected_name, []
@@ -9940,7 +9972,7 @@ namespace Saint
 					g_players.draw_info(g_SelectedPlayer);
 				}
 				Ped ped = bodygaurd.selected_gaurd;
-				sub->draw_option<Scroll<const char*, std::size_t>>("Component", nullptr, &Lists::HeaderTypesFrontend2, &Lists::HeaderTypesPosition22, true, -1, [] {
+				sub->draw_option<Scroll>("Component", nullptr, &Lists::HeaderTypesFrontend2, &Lists::HeaderTypesPosition22, true, -1, [] {
 					g_Render->outfits = Lists::HeaderTypesBackend2[Lists::HeaderTypesPosition22];
 					});
 				switch (g_Render->outfits) {
@@ -9984,7 +10016,7 @@ namespace Saint
 					sub->draw_option<number<std::int32_t>>("Drawable", "Sets texture variation.", &testk2, 0, PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(ped, 10), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 10, testk, 0, 0); });
 					sub->draw_option<number<std::int32_t>>("Texture", "Sets decals texture variation.", &facetexture112, 0, PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(ped, 10, testk2), 1, 3, true, "", "", [=] { PED::SET_PED_COMPONENT_VARIATION(ped, 10, testk2, facetexture112, 0); }); break;
 				}
-				sub->draw_option<Scroll<const char*, std::size_t>>("Props", nullptr, &Lists::HeaderTypesFrontend3, &Lists::HeaderTypesPosition32, true, -1, [] {
+				sub->draw_option<Scroll>("Props", nullptr, &Lists::HeaderTypesFrontend3, &Lists::HeaderTypesPosition32, true, -1, [] {
 					g_Render->props = Lists::HeaderTypesBackend3[Lists::HeaderTypesPosition32];
 					});
 				switch (g_Render->props) {
@@ -10055,11 +10087,11 @@ namespace Saint
 			sub->draw_option<toggle>(("Ammo"), nullptr, &drops.ammo);
 			sub->draw_option<toggle>(("Snacks"), nullptr, &drops.snacks);
 			sub->draw_option<Break>(("Settings"));
-			sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Randomize RP Model", nullptr, &drops.random_rp_model, &drops.model_delay, 0, 5000, 50, 3, true, "", "ms");
-			sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Randomize Money Model", nullptr, &drops.random_money_model, &drops.model_delay2, 0, 5000, 50, 3, true, "", "ms");
-			sub->draw_option<Scroll<const char*, std::size_t>>("Location", nullptr, &drops.location, &drops.data);
-			sub->draw_option<Scroll<const char*, std::size_t>>("RP Model", nullptr, &drops.rp_model, &drops.rp_model_data);
-			sub->draw_option<Scroll<const char*, std::size_t>>("Money Model", nullptr, &drops.money_model, &drops.money_model_data);
+			sub->draw_option<ToggleWithNumber<std::int32_t>>("Randomize RP Model", nullptr, &drops.random_rp_model, &drops.model_delay, 0, 5000, 50, 3, true, "", "ms");
+			sub->draw_option<ToggleWithNumber<std::int32_t>>("Randomize Money Model", nullptr, &drops.random_money_model, &drops.model_delay2, 0, 5000, 50, 3, true, "", "ms");
+			sub->draw_option<Scroll>("Location", nullptr, &drops.location, &drops.data);
+			sub->draw_option<Scroll>("RP Model", nullptr, &drops.rp_model, &drops.rp_model_data);
+			sub->draw_option<Scroll>("Money Model", nullptr, &drops.money_model, &drops.money_model_data);
 			sub->draw_option<number<std::int32_t>>("Height", nullptr, &drops.height, 0, 100);
 			sub->draw_option<number<std::int32_t>>("Delay", nullptr, &drops.delay, 0, 5000, 50, 3, true, "", "ms");
 			});
@@ -10070,11 +10102,11 @@ namespace Saint
 				}
 				sub->draw_option<toggle>(("Money"), nullptr, &drops.custom.money);
 				sub->draw_option<toggle>(("RP"), nullptr, &drops.custom.rp);
-				sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Randomize RP Model", nullptr, &drops.custom.random_rp_model, &drops.custom.model_delay, 0, 5000, 50, 3, true, "", "ms");
-				sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Randomize Money Model", nullptr, &drops.custom.random_money_model, &drops.custom.model_delay2, 0, 5000, 50, 3, true, "", "ms");
-				sub->draw_option<Scroll<const char*, std::size_t>>("Location", nullptr, &drops.custom.location, &drops.custom.data);
-				sub->draw_option<Scroll<const char*, std::size_t>>("RP Model", nullptr, &drops.custom.rp_model, &drops.custom.rp_model_data);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Money Model", nullptr, &drops.custom.money_model, &drops.custom.money_model_data);
+				sub->draw_option<ToggleWithNumber<std::int32_t>>("Randomize RP Model", nullptr, &drops.custom.random_rp_model, &drops.custom.model_delay, 0, 5000, 50, 3, true, "", "ms");
+				sub->draw_option<ToggleWithNumber<std::int32_t>>("Randomize Money Model", nullptr, &drops.custom.random_money_model, &drops.custom.model_delay2, 0, 5000, 50, 3, true, "", "ms");
+				sub->draw_option<Scroll>("Location", nullptr, &drops.custom.location, &drops.custom.data);
+				sub->draw_option<Scroll>("RP Model", nullptr, &drops.custom.rp_model, &drops.custom.rp_model_data);
+				sub->draw_option<Scroll>("Money Model", nullptr, &drops.custom.money_model, &drops.custom.money_model_data);
 				sub->draw_option<number<std::int32_t>>("Height", nullptr, &drops.custom.height, 0, 100);
 				sub->draw_option<number<std::int32_t>>("Delay", nullptr, &drops.custom.delay, 0, 5000, 50, 3, true, "", "ms");
 				sub->draw_option<Button>(("Add"), nullptr, []
@@ -10202,7 +10234,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Script Events"), SubmenuScriptEvents, [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Enable All", nullptr, &protections.types, &protections.data, false, -1, [] {
+				sub->draw_option<Scroll>("Enable All", nullptr, &protections.types, &protections.data, false, -1, [] {
 
 					for (auto& evnt : gameEvents) {
 						switch (protections.data) {
@@ -10221,7 +10253,7 @@ namespace Saint
 						}
 					}
 					});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Disable All", nullptr, &protections.types, &protections.data2, false, -1, [] {
+				sub->draw_option<Scroll>("Disable All", nullptr, &protections.types, &protections.data2, false, -1, [] {
 					for (auto& evnt : gameEvents) {
 						switch (protections.data2) {
 						case 0:
@@ -10786,7 +10818,7 @@ namespace Saint
 					});
 				sub->draw_option<toggle>(("Disable Restricted Areas"), "", &world.dra);
 
-				sub->draw_option<Scroll<const char*, std::size_t>>("Vehicle Density", nullptr, &features.veh_density, &features.vden_pos, true, -1, [] {
+				sub->draw_option<Scroll>("Vehicle Density", nullptr, &features.veh_density, &features.vden_pos, true, -1, [] {
 					switch (features.vden_pos) {
 					case 0:
 						VEHICLE::SET_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME(0.0f);
@@ -10876,8 +10908,8 @@ namespace Saint
 				sub->draw_option<toggle>(("Enabled"), nullptr, &features.GlowWorld);
 				sub->draw_option<Break>("Settings");
 				sub->draw_option<toggle>(("Rainbow"), nullptr, &features.RainbowGl);
-				sub->draw_option<number<std::int32_t>>("Red", nullptr, &features.m_Red,  0, 255, 1, 3);
-				sub->draw_option<number<std::int32_t>>("Green", nullptr, &features.m_Green,  0, 255, 1, 3);
+				sub->draw_option<number<std::int32_t>>("Red", nullptr, &features.m_Red, 0, 255, 1, 3);
+				sub->draw_option<number<std::int32_t>>("Green", nullptr, &features.m_Green, 0, 255, 1, 3);
 				sub->draw_option<number<std::int32_t>>("Blue", nullptr, &features.m_Blue, 0, 255, 1, 3);
 				if (sub->GetSelectedOption() == sub->GetNumOptions()) {
 					GRAPHICS::DRAW_MARKER(28, Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, 0, 0, 0, 0, 0, 0, features.glow_range, features.glow_range, features.glow_range, g_Render->m_RadiusSphere.r, g_Render->m_RadiusSphere.g, g_Render->m_RadiusSphere.b, g_Render->m_RadiusSphere.a, false, false, 0, false, NULL, NULL, false);
@@ -10885,7 +10917,7 @@ namespace Saint
 				sub->draw_option<number<float>>("Radius", nullptr, &features.glow_range, 0, 1000.0, 50.0, 0, true, "", "m");
 
 
-		});
+			});
 
 
 
@@ -11190,7 +11222,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Ocean"), rage::joaat("Ocean"), [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Visual Effect", "put this as smooth and wave intensity at 0 for a cool effect", &ocean.type, &ocean.pos, true, -1, [] {
+				sub->draw_option<Scroll>("Visual Effect", "put this as smooth and wave intensity at 0 for a cool effect", &ocean.type, &ocean.pos, true, -1, [] {
 
 					switch (ocean.pos) {
 					case 0:
@@ -11358,7 +11390,7 @@ namespace Saint
 			{
 				sub->draw_option<toggle>(("Freeze"), "", &freeze_time, [] {});
 				sub->draw_option<toggle>(("Sync"), "", &time_gta.sync, [] {});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Unit", nullptr, &time_gta.type, &time_gta.pos);
+				sub->draw_option<Scroll>("Unit", nullptr, &time_gta.type, &time_gta.pos);
 				sub->draw_option<Break>(("List"));
 
 				if (time_gta.pos == 0) {
@@ -11507,7 +11539,7 @@ namespace Saint
 						}
 						delete peds;
 					});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Jump", nullptr, &jump_type, &jump_int, false, -1, [] {
+				sub->draw_option<Scroll>("Jump", nullptr, &jump_type, &jump_int, false, -1, [] {
 					Ped* peds = new Ped[(10 * 2 + 2)];
 					peds[0] = 10;
 					for (int i = 0; i < PED::GET_PED_NEARBY_PEDS(Game->Self(), peds, 0); i++)
@@ -11537,8 +11569,8 @@ namespace Saint
 			{
 				sub->draw_option<toggle>(("Horn"), nullptr, &m_nearby.m_traffic.horn);
 				sub->draw_option<toggle>(("Max Loop"), nullptr, &m_nearby.m_traffic.max_loop);
-				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Rainbow", nullptr, &m_nearby.m_traffic.rainbow, &m_nearby.m_traffic.rainbow_type, &m_nearby.m_traffic.rainbow_int);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Acrobatics", nullptr, &acrobatic_type, &m_nearby.m_traffic.acrobatic, false, -1, [] {
+				sub->draw_option<ToggleWithScroller>("Rainbow", nullptr, &m_nearby.m_traffic.rainbow, &m_nearby.m_traffic.rainbow_type, &m_nearby.m_traffic.rainbow_int);
+				sub->draw_option<Scroll>("Acrobatics", nullptr, &acrobatic_type, &m_nearby.m_traffic.acrobatic, false, -1, [] {
 					if (m_nearby.m_traffic.acrobatic == 0) {
 						Vehicle* vehicles = new Vehicle[(10 * 2 + 2)];
 						vehicles[0] = 10;
@@ -11660,9 +11692,9 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Weather"), SubmeuWeather, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Editor", nullptr, rage::joaat("WEditor"));
-				sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Randomize", nullptr, &weather.randomize, &weather.randomize_delay, 0, 5000, 50, 3, true, "", "ms");
-				sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Lightning", nullptr, &features.light_nin, &features.lightning_delay, 0, 5000, 50, 3, true, "", "ms");
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &weather.data, &weather.init);
+				sub->draw_option<ToggleWithNumber<std::int32_t>>("Randomize", nullptr, &weather.randomize, &weather.randomize_delay, 0, 5000, 50, 3, true, "", "ms");
+				sub->draw_option<ToggleWithNumber<std::int32_t>>("Lightning", nullptr, &features.light_nin, &features.lightning_delay, 0, 5000, 50, 3, true, "", "ms");
+				sub->draw_option<Scroll>("Type", nullptr, &weather.data, &weather.init);
 				sub->draw_option<Button>(("Apply"), nullptr, []
 					{
 						if (weather.init == 0) {
@@ -11753,7 +11785,7 @@ namespace Saint
 				sub->draw_option<toggle>(("Disable"), nullptr, &shake.disable);
 				sub->draw_option<Break>("Other");
 				if (!shake.disable) {
-					sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Shake", nullptr, &shake.shake, &shake.intensity, 50, 250, 25, 3, true, "", "");
+					sub->draw_option<ToggleWithNumber<std::int32_t>>("Shake", nullptr, &shake.shake, &shake.intensity, 50, 250, 25, 3, true, "", "");
 					sub->draw_option<number<std::int32_t>>("Delay", nullptr, &shake.delay, 0, 5000, 50, 3, true, "", "ms");
 				}
 			});
@@ -11771,7 +11803,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("File Explorer", rage::joaat("Explorer"), [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Action", nullptr, &fileExplorer.action, &fileExplorer.pos);
+				sub->draw_option<Scroll>("Action", nullptr, &fileExplorer.action, &fileExplorer.pos);
 
 				sub->draw_option<KeyboardOption>("Path", nullptr, fileExplorer.path, []
 					{
@@ -11926,7 +11958,7 @@ namespace Saint
 				MOBILE::GET_MOBILE_PHONE_POSITION(&coords);
 				sub->draw_option<toggle>(("Disable"), nullptr, &phone.disable);
 				sub->draw_option<Break>(("Attributes"));
-				sub->draw_option<ToggleWithNumber<float, bool>>("Scale", nullptr, &phone.scaler, &phone.scale, 1.f, 10000.f, 1.0f, 2, false, "", "", [] {
+				sub->draw_option<ToggleWithNumber<float>>("Scale", nullptr, &phone.scaler, &phone.scale, 1.f, 10000.f, 1.0f, 2, false, "", "", [] {
 					if (!phone.scaler) {
 						MOBILE::SET_MOBILE_PHONE_SCALE(500.0f);
 					}
@@ -11949,7 +11981,7 @@ namespace Saint
 				sub->draw_option<number<std::int32_t>>("Yaw", nullptr, &phone.rotz, -1000, 1000, 1, 3, true, "", "", [=] {
 					MOBILE::SET_MOBILE_PHONE_ROTATION(phone.rotx, phone.roty, phone.rotz, 0);
 					});
-				sub->draw_option<Scroll<const char*, std::size_t>>("Get Older Versions", nullptr, &phone.type, &phone.pos, false, -1, [=] {
+				sub->draw_option<Scroll>("Get Older Versions", nullptr, &phone.type, &phone.pos, false, -1, [=] {
 					switch (phone.pos) {
 					case 0:
 						MOBILE::CREATE_MOBILE_PHONE(0);
@@ -12135,7 +12167,7 @@ namespace Saint
 				static std::int32_t int32Test{ 1337 };
 				static std::int32_t in32Test22{ 1337 };
 				static bool in32Test2 = false;
-				sub->draw_option<ToggleWithNumber<std::int32_t, bool>>("Hey", nullptr, &in32Test2, &int32Test, 0, 1337);
+				sub->draw_option<ToggleWithNumber<std::int32_t>>("Hey", nullptr, &in32Test2, &int32Test, 0, 1337);
 				sub->draw_option<number<std::int32_t>>("Int32", nullptr, &int32Test, 0, 1337);
 
 				static std::int64_t int64Test{ 1337 };
@@ -12147,9 +12179,9 @@ namespace Saint
 				static std::vector<std::uint64_t> vector{ 1, 2, 3 };
 				static std::size_t vectorPos{};
 				static bool arraytest = false;
-				sub->draw_option<Scroll<const char*, std::size_t>>("Array", nullptr, &Lists::DemoList, &Lists::DemoListPos);
-				sub->draw_option<ToggleWithScroller<const char*, std::size_t, bool>>("Array", nullptr, &arraytest, &Lists::DemoList, &Lists::DemoListPos);
-				sub->draw_option<Scroll<std::uint64_t, std::size_t>>("Vector", nullptr, &vector, &vectorPos);
+				sub->draw_option<Scroll>("Array", nullptr, &Lists::DemoList, &Lists::DemoListPos);
+				sub->draw_option<ToggleWithScroller>("Array", nullptr, &arraytest, &Lists::DemoList, &Lists::DemoListPos);
+
 			});
 		g_Render->draw_submenu<sub>("Translations", SubMenuTranslations, [](sub* sub)
 			{
@@ -12325,7 +12357,7 @@ namespace Saint
 				sub->draw_option<submenu>("Tooltips", nullptr, rage::joaat("Tooltips"));
 				sub->draw_option<toggle>("Lines", nullptr, &g_Render->lines_enabled);
 				sub->draw_option<number<float>>("Text Size", nullptr, &g_Render->m_OptionTextSize, 0.01f, 1.f, 0.01f, 2);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Font", nullptr, &g_Render->HeaderFont, &g_Render->option_font_it, true, -1, []
+				sub->draw_option<Scroll>("Font", nullptr, &g_Render->HeaderFont, &g_Render->option_font_it, true, -1, []
 					{
 						if (g_Render->option_font_it == 0) {
 							g_Render->m_OptionFont = Font::ChaletLondon;
@@ -12347,7 +12379,7 @@ namespace Saint
 						}
 
 					});
-				//sub->draw_option<Scroll<const char*, std::size_t>>("Resolution", nullptr, &g_Render->Resolution, &g_Render->reso);
+				//sub->draw_option<Scroll>("Resolution", nullptr, &g_Render->Resolution, &g_Render->reso);
 
 
 			});
@@ -12368,7 +12400,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Submenu"), rage::joaat("SubmenuIndc"), [](sub* sub)
 			{
 				sub->draw_option<submenu>("Preview", nullptr, rage::joaat("NULL"));
-				sub->draw_option<Scroll<const char*, std::size_t>>(("Indicators"), nullptr, &g_Render->enterable.names, &g_Render->enterable.position);
+				sub->draw_option<Scroll>(("Indicators"), nullptr, &g_Render->enterable.names, &g_Render->enterable.position);
 				if (g_Render->enterable.position == 1) {
 					sub->draw_option<number<std::int32_t>>("Alpha", nullptr, &g_Render->sub_alpha, 0, 255);
 					sub->draw_option<number<float>>("Width Offset", nullptr, &g_Render->enterable.width_offset, -100.0f, 180.f, 0.001f, 3);
@@ -12377,7 +12409,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Break"), rage::joaat("Break"), [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Font", nullptr, &g_Render->HeaderFont, &g_Render->HeaderFontIterator2, true, -1, []
+				sub->draw_option<Scroll>("Font", nullptr, &g_Render->HeaderFont, &g_Render->HeaderFontIterator2, true, -1, []
 					{
 						if (g_Render->HeaderFontIterator2 == 0) {
 							g_Render->m_SeperatorFont = Font::ChaletLondon;
@@ -12404,7 +12436,7 @@ namespace Saint
 			{
 				g_Render->toggle_show_on = true;
 				g_Render->toggle_show_off = false;
-				sub->draw_option<Scroll<const char*, std::size_t>>(("Icon"), nullptr, &g_Render->ToggleList, &g_Render->ToggleIterator);
+				sub->draw_option<Scroll>(("Icon"), nullptr, &g_Render->ToggleList, &g_Render->ToggleIterator);
 				sub->draw_option<Break>(("On"));
 				sub->draw_option<number<float>>("Height", nullptr, &g_Render->toggle_height, -1000.f, 1000.f, 0.001f);
 				sub->draw_option<number<float>>("Width", nullptr, &g_Render->toggle_width, -1000.f, 1000.f, 0.001f);
@@ -12456,13 +12488,13 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Header"), CustomizationHeader, [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &Lists::HeaderTypesFrontend, &Lists::HeaderTypesPosition, true, -1, []
+				sub->draw_option<Scroll>("Type", nullptr, &Lists::HeaderTypesFrontend, &Lists::HeaderTypesPosition, true, -1, []
 					{
 						g_Render->m_HeaderType = Lists::HeaderTypesBackend[Lists::HeaderTypesPosition];
 					});
 				sub->draw_option<toggle>("Center", nullptr, &g_Render->center_head);
 				sub->draw_option<toggle>("Dynamic", nullptr, &g_Render->dynamic_text);
-				sub->draw_option<Scroll<const char*, std::size_t>>("Font", nullptr, &g_Render->HeaderFont2, &g_Render->HeaderFontIterator, true, -1, []
+				sub->draw_option<Scroll>("Font", nullptr, &g_Render->HeaderFont2, &g_Render->HeaderFontIterator, true, -1, []
 					{
 						if (g_Render->HeaderFontIterator == 0) {
 							g_Render->m_HeaderTextData = false;
@@ -12631,14 +12663,14 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Toggles"), SubmenuToggles, [](sub* sub)
 			{
 				sub->draw_option<submenu>("Color", nullptr, SubmenuTogglesColor);
-				sub->draw_option<Scroll<const char*, std::size_t>>(("Icon"), nullptr, &g_Render->ToggleList, &g_Render->ToggleIterator);
+				sub->draw_option<Scroll>(("Icon"), nullptr, &g_Render->ToggleList, &g_Render->ToggleIterator);
 
 			});
 		g_Render->draw_submenu<sub>(("Color"), SubmenuTogglesColor, [](sub* sub)
 			{
 				sub->draw_option<toggle>("Automaticly Match", nullptr, &features.match);
 
-				sub->draw_option<Scroll<const char*, std::size_t>>("Toggled (Match)", nullptr, &g_Render->ThemeList, &Lists::MatchPos, true, -1, []
+				sub->draw_option<Scroll>("Toggled (Match)", nullptr, &g_Render->ThemeList, &Lists::MatchPos, true, -1, []
 					{
 						switch (Lists::MatchPos) {
 						case 0:
@@ -12684,8 +12716,8 @@ namespace Saint
 
 		g_Render->draw_submenu<sub>(("Themes"), SubmenuThemes, [](sub* sub)
 			{
-				
-				
+
+
 			});
 
 		g_Render->draw_submenu<sub>("Footer Text", SubmenuSettingsSubmenuBar, [](sub* sub)
@@ -12735,7 +12767,7 @@ namespace Saint
 
 		g_Render->draw_submenu<sub>("Header", SubmenuSettingsHeader, [](sub* sub)
 			{
-				sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &Lists::HeaderTypesFrontend, &Lists::HeaderTypesPosition, true, -1, []
+				sub->draw_option<Scroll>("Type", nullptr, &Lists::HeaderTypesFrontend, &Lists::HeaderTypesPosition, true, -1, []
 					{
 						g_Render->m_HeaderType = Lists::HeaderTypesBackend[Lists::HeaderTypesPosition];
 					});
@@ -12789,7 +12821,7 @@ namespace Saint
 				sub->draw_option<toggle>("DX Header Text", "Disable native text if going to use dx", &g_Render->m_HeaderTextData);
 				sub->draw_option<toggle>("Native Header Text", "Disable dx text if going to use native ", &g_Render->m_HeaderNativeText);
 				if (g_Render->m_HeaderNativeText) {
-					sub->draw_option<Scroll<const char*, std::size_t>>("Type", nullptr, &g_Render->HeaderFont, &g_Render->HeaderFontIterator, true, -1, []
+					sub->draw_option<Scroll>("Type", nullptr, &g_Render->HeaderFont, &g_Render->HeaderFontIterator, true, -1, []
 						{
 							if (g_Render->HeaderFontIterator == 0) {
 								g_Render->m_HeaderFont = Font::ChaletLondon;

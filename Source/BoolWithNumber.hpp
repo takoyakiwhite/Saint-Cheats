@@ -3,12 +3,12 @@
 #include "UI/Interface.hpp"
 
 namespace Saint::UserInterface {
-    template <typename NumberType, typename BoolType = bool>
-    class ToggleWithNumber : public BaseOption<ToggleWithNumber<NumberType, BoolType>>
+    template <typename NumberType>
+    class ToggleWithNumber : public BaseOption<ToggleWithNumber<NumberType>>
     {
     public:
         explicit ToggleWithNumber() = default;
-        explicit ToggleWithNumber(const char* text, const char* description, BoolType* b00l, NumberType* number, NumberType min, NumberType max, NumberType step = 1, std::size_t precision = 3, bool actionOnHorizontal = true, const char* prefix = "", const char* suffix = "", std::function<void()> action = [] {}) :
+        explicit ToggleWithNumber(const char* text, const char* description, bool* b00l, NumberType* number, NumberType min, NumberType max, NumberType step = 1, std::size_t precision = 3, bool actionOnHorizontal = true, const char* prefix = "", const char* suffix = "", std::function<void()> action = [] {}) :
             m_ActionOnHorizontal(actionOnHorizontal),
             m_Bool(b00l),
             m_Number(number),
@@ -90,7 +90,7 @@ namespace Saint::UserInterface {
         char m_Prefix[32] = {};
         char m_Suffix[32] = {};
         bool m_ActionOnHorizontal{};
-        BoolType* m_Bool;
+        bool* m_Bool;
         NumberType* m_Number{};
         NumberType m_Min{};
         NumberType m_Max{};
@@ -98,7 +98,7 @@ namespace Saint::UserInterface {
         std::size_t m_Precision{};
 
 
-        using Base = BaseOption<ToggleWithNumber<NumberType, BoolType>>;
+        using Base = BaseOption<ToggleWithNumber<NumberType>>;
         using DisplayType = std::conditional_t<sizeof(NumberType) == 1, std::uint32_t, NumberType>;
     };
 }

@@ -1,6 +1,5 @@
 ﻿#include "Interface.hpp"
 #include "../Timer.hpp"
-#include "../Natives.hpp"
 #include "../FiberHelper.hpp"
 #include "UnclickOption.hpp"
 #include "../Enums.h"
@@ -23,6 +22,7 @@
 #define VERSION_TYPE "RELEASE"
 namespace Saint::UserInterface
 {
+
 	bool FileExists(const std::string& fileName)
 	{
 		struct stat buffer;
@@ -125,31 +125,16 @@ namespace Saint::UserInterface
 		if (tooltips_enabled) {
 			if (PAD::IS_USING_KEYBOARD_AND_MOUSE(2)) {
 				sprintf_s(text, "%s\n~u~%s", names[g_ToolTip], "~b~F4");
-				RenderText(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
+				drawingFunctions()->Text(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
 			}
 			else {
 				sprintf_s(text, "%s\n~b~RB + RIGHT", names[g_ToolTip]);
-				RenderText(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
+				drawingFunctions()->Text(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
 			}
 		}
 	}
 
-	void UIManager::RenderText(std::string text, std::float_t x, std::float_t y, Font font, std::float_t scale, RGBA color, bool centered, bool right_justified, bool outlined)
-	{
-		HUD::SET_TEXT_FONT(static_cast<int>(font));
-		HUD::SET_TEXT_SCALE(0.f, scale);
-		HUD::SET_TEXT_COLOUR(color.r, color.g, color.b, color.a);
-		if (right_justified)
-			HUD::SET_TEXT_WRAP(0.f, x);
-		else HUD::SET_TEXT_WRAP(0.f, 1.f);
-		HUD::SET_TEXT_CENTRE(centered);
-		if (outlined)
-			HUD::SET_TEXT_OUTLINE();
-		HUD::SET_TEXT_RIGHT_JUSTIFY(right_justified);
-		HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
-		HUD::ADD_TEXT_COMPONENT_SUBSTRING_WEBSITE(text.c_str());
-		HUD::END_TEXT_COMMAND_DISPLAY_TEXT(x, y, NULL);
-	}
+
 
 	float convert_360(float base, float min, float max) {
 		float fVar0;
@@ -231,7 +216,8 @@ namespace Saint::UserInterface
 
 		if (m_Opened)
 		{
-			// Drawing order
+			// Optimized code
+
 			HUD::DISPLAY_HUD_WHEN_PAUSED_THIS_FRAME();
 			GRAPHICS::FORCE_RENDER_IN_GAME_UI(true);
 			GRAPHICS::SET_SCRIPT_GFX_DRAW_BEHIND_PAUSEMENU(true);
@@ -239,6 +225,7 @@ namespace Saint::UserInterface
 
 			m_DrawBaseY = m_PosY;
 			DrawHeader();
+
 			if (!m_SubmenuStack.empty())
 			{
 				auto sub = m_SubmenuStack.top();
@@ -259,11 +246,10 @@ namespace Saint::UserInterface
 					for (std::size_t i = startPoint, j = 0; i < endPoint; ++i, ++j)
 					{
 						DrawOption(sub->GetOption(i), i == sub->GetSelectedOption());
-						float tmp_point = m_DrawBaseY + ((m_OptionHeight) / 2.f);
-
 					}
 				}
 			}
+
 			DrawFooter();
 			DrawDescription();
 		}
@@ -544,7 +530,7 @@ namespace Saint::UserInterface
 		switch (m_HeaderType)
 		{
 		case HeaderType::Static:
-			DrawRect(
+			drawingFunctions()->Rectangle(
 				m_PosX,
 				m_DrawBaseY + (m_HeaderHeight / 2.f), m_Width,
 				m_HeaderHeight,
@@ -554,7 +540,7 @@ namespace Saint::UserInterface
 		case HeaderType::YTD:
 			for (std::size_t i = 0; i < (m_HeaderGradientTransparent ? 1 : 20); ++i)
 			{
-				DrawSprite(
+				drawingFunctions()->Sprite(
 					"Textures",
 					"Header",
 					m_PosX,
@@ -572,24 +558,24 @@ namespace Saint::UserInterface
 		if (m_HeaderNativeText)
 		{
 			if (center_head) {
-				DrawCenteredText(
+				drawingFunctions()->Text(TextPosition::Center,
 					m_CurrentSubMenuName,
 					m_PosX - (m_Width / 2.1f) - header_x_offset - 0.005f,
-					m_DrawBaseY + (m_HeaderHeight / 2.f) - (GetTextHeight(m_HeaderFont, m_HeaderTextSize) / 2.f),
+					m_DrawBaseY + (m_HeaderHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_HeaderFont, m_HeaderTextSize) / 2.f),
 					m_HeaderTextSize,
 					m_HeaderFont,
 					m_HeaderTextColor,
-					false, true);
+					false, true, false);
 			}
 			else {
-				DrawLeftText(
+				drawingFunctions()->Text(TextPosition::Left,
 					m_CurrentSubMenuName,
 					m_PosX - (m_Width / 2.1f) - header_x_offset,
-					m_DrawBaseY + (m_HeaderHeight / 2.f) - (GetTextHeight(m_HeaderFont, m_HeaderTextSize) / 2.f),
+					m_DrawBaseY + (m_HeaderHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_HeaderFont, m_HeaderTextSize) / 2.f),
 					m_HeaderTextSize,
 					m_HeaderFont,
 					m_HeaderTextColor,
-					false, true);
+					false, true, false);
 			}
 		}
 		draw_glare();
@@ -607,30 +593,30 @@ namespace Saint::UserInterface
 
 
 
-			DrawRect(
+			drawingFunctions()->Rectangle(
 				m_PosX,
 				m_DrawBaseY + (m_SubheaderHeight / 2.f),
 				m_Width, m_SubheaderHeight,
 				m_SubheaderBackground);
 
 
-			DrawLeftText(
+			drawingFunctions()->Text(TextPosition::Left,
 				&leftText[0],
 				m_PosX - (m_Width / m_OptionPadding) - 0.002f,
-				m_DrawBaseY + (0.03f / 2.f) - (GetTextHeight(Font::ChaletLondon, 0.25f) / 1.5f),
+				m_DrawBaseY + (0.03f / 2.f) - (drawingFunctions()->GetTextHeight(Font::ChaletLondon, 0.25f) / 1.5f),
 				0.25f, Font::ChaletLondon,
 				m_SubheaderText,
-				false, true);
-			DrawRightText(
+				false, true, false);
+			drawingFunctions()->Text(TextPosition::Right,
 				&rightText[0],
 				m_PosX + (m_Width / 2.1f),
-				m_DrawBaseY + (0.03f / 2.f) - (GetTextHeight(Font::ChaletLondon, 0.25f) / 1.5f),
+				m_DrawBaseY + (0.03f / 2.f) - (drawingFunctions()->GetTextHeight(Font::ChaletLondon, 0.25f) / 1.5f),
 				0.25f, Font::ChaletLondon,
 				m_SubheaderTextRight,
-				false, true);
+				false, true, false);
 
 			if (lines_enabled) {
-				GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (0.0005f / 2.0f) + 0.031, m_Width, 0.0018f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
+				drawingFunctions()->Rectangle(m_PosX, m_DrawBaseY + (0.0005f / 2.0f) + 0.031, m_Width, 0.0018f, m_HeaderBackgroundColor);
 			}
 
 
@@ -642,17 +628,7 @@ namespace Saint::UserInterface
 
 
 	}
-	void drawSprite(const char* dict, const char* texture, float x, float y, float width, float height, Color color, float rotation)
-	{
-		if (GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(dict))
-		{
-			GRAPHICS::DRAW_SPRITE(dict, texture, x, y, width, height, rotation, color.r, color.g, color.b, color.a, 0, -1);
-		}
-		else
-		{
-			GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(dict, false);
-		}
-	}
+
 
 	void UIManager::DrawOption(AbstractOption* opt, bool selected)
 	{
@@ -660,21 +636,18 @@ namespace Saint::UserInterface
 		std::string s2 = Translations::GetTranslation(opt->GetRightText());
 		const char* lefttext = s1.c_str();
 		const char* righttext = s2.c_str();
-		GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(1);
-		DrawRect(
+		drawingFunctions()->SetDrawOrder(1);
+		drawingFunctions()->Rectangle(
 			m_PosX,
 			m_DrawBaseY + (m_OptionHeight / 2.f),
 			m_Width,
 			m_OptionHeight,
 			m_OptionUnselectedBackgroundColor);
-		if (selected) {
-
-		}
 		if (selected)
 		{
-			m_CurrentCoord = lerp(m_CurrentCoord, m_DrawBaseY + (m_OptionHeight / 2.f), smooth_scroll_speed); m_OptionSelectedTextColor;
-			GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(2);
-			DrawRect(
+			m_CurrentCoord = lerp(m_CurrentCoord, m_DrawBaseY + (m_OptionHeight / 2.f), smooth_scroll_speed);
+			drawingFunctions()->SetDrawOrder(2);
+			drawingFunctions()->Rectangle(
 				m_PosX,
 				m_CurrentCoord,
 				m_Width,
@@ -682,13 +655,13 @@ namespace Saint::UserInterface
 				m_OptionSelectedBackgroundColor);
 
 			if (scrollbar) {
-				DrawRect(
+				drawingFunctions()->Rectangle(
 					m_PosX,
 					m_CurrentCoord - 0.016,
 					m_Width,
 					0.0020f,
 					m_HeaderBackgroundColor);
-				DrawRect(
+				drawingFunctions()->Rectangle(
 					m_PosX,
 					m_CurrentCoord + 0.016,
 					m_Width,
@@ -697,165 +670,129 @@ namespace Saint::UserInterface
 			}
 
 		}
-		GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(3);
-		if (opt->GetFlag(OptionFlag::PlayerSub)) {
+		drawingFunctions()->SetDrawOrder(3);
+		drawingFunctions()->Text(TextPosition::Left,
+			lefttext,
+			m_PosX - (m_Width / m_OptionPadding) - 0.002f,
+			m_DrawBaseY + (m_OptionHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
+			m_OptionTextSize,
+			m_OptionFont,
+			selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+			false, false
+		);
+		
 
-			DrawLeftText(
-				lefttext,
-				m_PosX - (m_Width / m_OptionPadding) - 0.002f,
-				m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
+		if (opt->GetFlag(OptionFlag::BoolWithNumber)) {
+
+			auto res = drawingFunctions()->GetSpriteScale(0.030);
+			auto res2 = drawingFunctions()->GetSpriteScale(0.033);
+			if (selected) {
+				drawingFunctions()->Sprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.016f, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
+			}
+
+			drawingFunctions()->Text(TextPosition::Right,
+				righttext,
+				selected ? m_PosX + (m_Width / m_OptionPadding) - 0.022 : m_PosX + (m_Width / m_OptionPadding) - 0.01,
+				m_DrawBaseY + (m_OptionHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
 				m_OptionTextSize,
 				m_OptionFont,
 				selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
 				false, false
 			);
-		}
-		else {
-			DrawLeftText(
-				lefttext,
-				m_PosX - (m_Width / m_OptionPadding) - 0.002f,
-				m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
-				m_OptionTextSize,
-				m_OptionFont,
-				selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
-				false, false);
-		}
-
-		if (opt->GetFlag(OptionFlag::BoolWithNumber)) {
-			if (selected) {
-
-				auto res = GetSpriteScale(0.030);
-				auto res2 = GetSpriteScale(0.033);
-				DrawSprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.016f, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
-
-				DrawRightText(
-					righttext,
-					m_PosX + (m_Width / m_OptionPadding) - 0.022,
-					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
-					m_OptionTextSize,
-					m_OptionFont,
-					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
-					false, false);
-			}
-			else {
-				DrawRightText(
-					righttext,
-					m_PosX + (m_Width / m_OptionPadding) - 0.01,
-					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
-					m_OptionTextSize,
-					m_OptionFont,
-					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
-					false, false);
-			}
+			
+			
 		}
 		else if (opt->GetFlag(OptionFlag::Horizontal)) {
-			if (selected) {
+			
 
-				auto res = GetSpriteScale(0.030);
-				auto res2 = GetSpriteScale(0.033);
-				DrawSprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.005f, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
+				auto res = drawingFunctions()->GetSpriteScale(0.030);
+				auto res2 = drawingFunctions()->GetSpriteScale(0.033);
+				if (selected) {
+					drawingFunctions()->Sprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.005f, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
+				}
 
-				DrawRightText(
+				drawingFunctions()->Text(TextPosition::Right,
 					righttext,
-					m_PosX + (m_Width / m_OptionPadding) - 0.012,
-					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
+					selected ? m_PosX + (m_Width / m_OptionPadding) - 0.012 : m_PosX + (m_Width / m_OptionPadding),
+					m_DrawBaseY + (m_OptionHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
 					m_OptionTextSize,
 					m_OptionFont,
 					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
 					false, false);
-			}
-			else {
-				DrawRightText(
-					righttext,
-					m_PosX + (m_Width / m_OptionPadding),
-					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
-					m_OptionTextSize,
-					m_OptionFont,
-					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
-					false, false);
-			}
 		}
 		else if (opt->GetFlag(OptionFlag::ChooseBool)) {
-			if (selected) {
 
-				auto res = GetSpriteScale(0.030);
-				auto res2 = GetSpriteScale(0.033);
-				DrawSprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.015, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
+				auto res = drawingFunctions()->GetSpriteScale(0.030);
+				auto res2 = drawingFunctions()->GetSpriteScale(0.033);
+				if (selected) {
+					drawingFunctions()->Sprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.015, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
+				}
 
-				DrawRightText(
+				drawingFunctions()->Text(TextPosition::Right,
 					righttext,
-					m_PosX + (m_Width / m_OptionPadding) - 0.020,
-					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
+					selected ? m_PosX + (m_Width / m_OptionPadding) - 0.020 : m_PosX + (m_Width / m_OptionPadding) - 0.01,
+					m_DrawBaseY + (m_OptionHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
 					m_OptionTextSize,
 					m_OptionFont,
 					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
 					false, false);
-			}
-			else {
-				DrawRightText(
-					righttext,
-					m_PosX + (m_Width / m_OptionPadding) - 0.01,
-					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f) - 0.001,
-					m_OptionTextSize,
-					m_OptionFont,
-					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
-					false, false);
-			}
+			
 		}
 		else if (opt->GetFlag(OptionFlag::Choose)) {
-			if (selected) {
-				auto res = GetSpriteScale(0.030);
-				auto res2 = GetSpriteScale(0.033);
-				DrawSprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding - 0.005f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
+				auto res = drawingFunctions()->GetSpriteScale(0.030);
+				auto res2 = drawingFunctions()->GetSpriteScale(0.033);
+				if (selected) {
+					drawingFunctions()->Sprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding - 0.005f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
+				}
 
-				DrawRightText(
+				drawingFunctions()->Text(TextPosition::Right,
 					righttext,
-					m_PosX + (m_Width / m_OptionPadding) - 0.012,
-					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
+					selected ? m_PosX + (m_Width / m_OptionPadding) - 0.012 : m_PosX + (m_Width / m_OptionPadding),
+					m_DrawBaseY + (m_OptionHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
 					m_OptionTextSize,
 					m_OptionFont,
 					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
 					false, false);
-			}
-			else {
-				DrawRightText(
-					righttext,
-					m_PosX + (m_Width / m_OptionPadding),
-					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
-					m_OptionTextSize,
-					m_OptionFont,
-					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
-					false, false);
-			}
+			
 		}
 		else if (opt->GetFlag(OptionFlag::Keyboard)) {
-			auto res = GetSpriteScale(0.0185);
-			auto res2 = GetSpriteScale(0.0185);
-			DrawRightText(
+			auto res = drawingFunctions()->GetSpriteScale(0.0185);
+			auto res2 = drawingFunctions()->GetSpriteScale(0.0185);
+			drawingFunctions()->Text(TextPosition::Right,
 				righttext,
 				m_PosX + (m_Width / m_OptionPadding - 0.01f),
-				m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
+				m_DrawBaseY + (m_OptionHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
 				m_OptionTextSize,
 				m_OptionFont,
 				selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
 				false, false);
-			DrawSprite("Textures", "Pen", m_PosX + (m_Width / m_OptionPadding - 0.004f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 0.0);
+			drawingFunctions()->Sprite("Textures", "Pen", m_PosX + (m_Width / m_OptionPadding - 0.004f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 0.0);
+		}
+		else if (opt->GetFlag(OptionFlag::KeyboardNoPen)) {
+			drawingFunctions()->Text(TextPosition::Right,
+				righttext,
+				m_PosX + (m_Width / m_OptionPadding),
+				m_DrawBaseY + (m_OptionHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
+				m_OptionTextSize,
+				m_OptionFont,
+				selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
+				false, false);
 		}
 
 		else {
-			DrawRightText(
+			drawingFunctions()->Text(TextPosition::Right,
 				righttext,
 				m_PosX + (m_Width / m_OptionPadding),
-				m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
+				m_DrawBaseY + (m_OptionHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_OptionFont, m_OptionTextSize) / 1.5f),
 				m_OptionTextSize,
 				m_OptionFont,
 				selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
 				false, false);
 		}
-		DrawCenteredText(
+		drawingFunctions()->Text(TextPosition::Center,
 			opt->GetCenteredText(),
 			m_PosX,
-			m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(m_SeperatorFont, m_OptionTextSize) / 1.5f),
+			m_DrawBaseY + (m_OptionHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_SeperatorFont, m_OptionTextSize) / 1.5f),
 			m_OptionTextSize + 0.02f,
 			m_SeperatorFont,
 			selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
@@ -863,119 +800,45 @@ namespace Saint::UserInterface
 
 		if (opt->GetFlag(OptionFlag::BoolWithNumber) || opt->GetFlag(OptionFlag::ChooseBool) || opt->GetFlag(OptionFlag::BoolOption))
 		{
-			auto res = GetSpriteScale(0.025f);
-			auto res2 = GetSpriteScale(0.032f);
-			if (ToggleIterator == 0)
-			{
-				if (ToggledOn)
-				{
-					GRAPHICS::DRAW_SPRITE("CommonMenu", "common_medal",
-						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f), 
-						g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont, g_Render->m_OptionTextSize) / 1.5f) + 0.014f - 0.001,
-						res.x, res.y, 0.0, 
-						m_ToggleOnColor.r, m_ToggleOnColor.g, m_ToggleOnColor.b, m_ToggleOnColor.a, false, false);
-				}
-				else if (!ToggledOn)
-				{
-					GRAPHICS::DRAW_SPRITE("CommonMenu", "common_medal",
-						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f),
-						g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont, g_Render->m_OptionTextSize) / 1.5f) + 0.014f - 0.001,
-						res.x, res.y, 0.0, m_ToggleOffColor.r, m_ToggleOffColor.g, m_ToggleOffColor.b, m_ToggleOffColor.a, false, false);
-				}
+			auto res = drawingFunctions()->GetSpriteScale(0.025f);
+			auto res2 = drawingFunctions()->GetSpriteScale(0.032f);
+			switch (ToggleIterator) {
+			case 0:
+				drawingFunctions()->Sprite("CommonMenu", "common_medal", g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f), g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (drawingFunctions()->GetTextHeight(g_Render->m_OptionFont, g_Render->m_OptionTextSize) / 1.5f) + 0.014f - 0.001, res.x, res.y, ToggledOn ? m_ToggleOnColor : m_ToggleOffColor, 0.0);
+				break;
+			case 1:
+				drawingFunctions()->Sprite("CommonMenu", ToggledOn ? "shop_box_tick" : "shop_box_blank", g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f), g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (drawingFunctions()->GetTextHeight(g_Render->m_OptionFont, g_Render->m_OptionTextSize) / 1.5f) + 0.014f, res2.x, res2.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 0.0f);
+				break;
+			case 3:
+				drawingFunctions()->Sprite(ToggledOn ? "commonmenu" : "shared", ToggledOn ? "shop_tick_icon" : "menuplus_32", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), ToggledOn ? toggle_width : toggle_width_off, ToggledOn ? toggle_height : toggle_height_off, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, ToggledOn ? toggle_on_rotation : toggle_off_rotation);
+				break;
+			case 4:
+				drawingFunctions()->Sprite(ToggledOn ? custom_toggle_dict_on.c_str() : custom_toggle_dict_off.c_str(), ToggledOn ? custom_toggle_asset_on.c_str() : custom_toggle_asset_off.c_str(), (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), ToggledOn ? toggle_width : toggle_width_off, ToggledOn ? toggle_height : toggle_height_off, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, ToggledOn ? toggle_on_rotation : toggle_off_rotation);
+				break;
 			}
-			else if (ToggleIterator == 1)
-			{
-				if (ToggledOn)
-				{
-					GRAPHICS::DRAW_SPRITE("CommonMenu", "shop_box_tick",
-						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f)
-						, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont
-							, g_Render->m_OptionTextSize) / 1.5f) + 0.014f
-						, res2.x, res2.y, 0.0, m_ToggleCheckColor.r, m_ToggleCheckColor.g, m_ToggleCheckColor.b, m_ToggleCheckColor.a, false, false);
 
-				}
-				else if (!ToggledOn)
-				{
-					GRAPHICS::DRAW_SPRITE("CommonMenu", "shop_box_blank",
-						g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f)
-						, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (g_Render->GetTextHeight(g_Render->m_OptionFont
-							, g_Render->m_OptionTextSize) / 1.5f) + 0.014f
-						, res2.x, res2.y, 0.0, m_ToggleCheckColor.r, m_ToggleCheckColor.g, m_ToggleCheckColor.b, m_ToggleCheckColor.a, false, false);
-				}
-			}
-			else if (ToggleIterator == 3) {
-				if (ToggledOn)
-				{
-					drawSprite("commonmenu", "shop_tick_icon", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), toggle_width, toggle_height, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, toggle_on_rotation);
-
-				}
-				else if (!ToggledOn)
-				{
-
-
-					drawSprite("shared", "menuplus_32", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), toggle_width_off, toggle_height_off, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, toggle_off_rotation);
-
-
-				}
-
-			}
-			else if (ToggleIterator == 4) {
-				if (ToggledOn)
-				{
-					drawSprite(custom_toggle_dict_on.c_str(), custom_toggle_asset_on.c_str(), (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), toggle_width, toggle_height, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, toggle_on_rotation);
-
-				}
-				else if (!ToggledOn)
-				{
-
-
-					drawSprite(custom_toggle_dict_off.c_str(), custom_toggle_asset_off.c_str(), (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), toggle_width_off, toggle_height_off, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, toggle_off_rotation);
-
-
-				}
-
-			}
 		}
 		if (opt->GetFlag(OptionFlag::Enterable) || opt->GetFlag(OptionFlag::PlayerSub))
 		{
-			if (enterable.position == 0)
-			{
-
-
-				DrawRightText(
-					">",
-					m_PosX + (m_Width / m_OptionPadding),
-					m_DrawBaseY + (m_OptionHeight / 2.f) - (GetTextHeight(Font::Monospace, 0.35) / 1.725f) - 0.001,
-					0.35,
-					Font::Monospace,
-					selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor,
-					false, false);
-			}
-			else if (enterable.position == 1)
-			{
-				DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.00355f + enterable.x_offset, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f + enterable.width_offset, m_OptionHeight, { m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, sub_alpha });
+			switch (enterable.position) {
+				case 0:
+					drawingFunctions()->Text(TextPosition::Right, ">", m_PosX + (m_Width / m_OptionPadding), m_DrawBaseY + (m_OptionHeight / 2.f) - (drawingFunctions()->GetTextHeight(Font::Monospace, 0.35) / 1.725f) - 0.001, 0.35, Font::Monospace, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, false, false);
+					break;
+				case 1:
+					drawingFunctions()->Rectangle(m_PosX + (m_Width / m_OptionPadding) + 0.00355f + enterable.x_offset, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f + enterable.width_offset, m_OptionHeight, { m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, sub_alpha });
+					break;
 			}
 		}
 		if (opt->GetFlag(OptionFlag::ColorSub))
 		{
-			DrawRect(m_PosX + (m_Width / m_OptionPadding) + 0.00355f + enterable.x_offset, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f + enterable.width_offset, m_OptionHeight, opt->GetColor());
+			drawingFunctions()->Rectangle(m_PosX + (m_Width / m_OptionPadding) + 0.00355f + enterable.x_offset, m_DrawBaseY + ((m_OptionHeight) / 2.f), 0.0035f + enterable.width_offset, m_OptionHeight, opt->GetColor());
 
 		}
 
 		m_DrawBaseY += m_OptionHeight;
 	}
 
-	void UIManager::DrawSprite1(const char* textureDict, const char* textureName, float screenX, float screenY, float width, float height, float heading, int red, int green, int blue, int alpha)
-	{
-		if (GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(textureDict))
-		{
-			GRAPHICS::DRAW_SPRITE1(textureDict, textureName, screenX, screenY, width, height, heading, red, green, blue, alpha, 0);
-		}
-		else
-		{
-			GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(textureDict, false);
-		}
-	}
+
 
 	void UIManager::DrawFooter()
 	{
@@ -1005,16 +868,16 @@ namespace Saint::UserInterface
 
 			if (sub->GetNumOptions() >= m_OptionsPerPage && m_dynamic_footer) {
 
-				auto sizee = GetSpriteScale(size);
+				auto sizee = drawingFunctions()->GetSpriteScale(size);
 
-				DrawRect(
+				drawingFunctions()->Rectangle(
 					m_PosX,
 					m_DrawBaseY + (m_FooterHeight / 2.f),
 					m_Width,
 					m_FooterHeight,
 					m_FooterBackgroundColor);
 
-				DrawSprite(
+				drawingFunctions()->Sprite(
 					"commonmenu",
 					texture,
 					m_PosX,
@@ -1028,37 +891,37 @@ namespace Saint::UserInterface
 				std::snprintf(rightText, sizeof(rightText) - 1, "%zu ~s~&#8226; %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
 
 				if (LeftFooterText) {
-					DrawLeftText(
+					drawingFunctions()->Text(TextPosition::Left,
 						VERSION_TYPE,
 						m_PosX - (m_Width / m_FooterTextPadding),
-						m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
+						m_DrawBaseY + (m_FooterHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
 						m_FooterTextSize, m_FooterTextFont,
 						m_FooterTextColor,
-						false, true);
+						false, true, false);
 				}
 				if (RightFooterText) {
-					DrawRightText(
+					drawingFunctions()->Text(TextPosition::Right,
 						g_GameVariables->m_version,
 						m_PosX + (m_Width / m_FooterTextPadding),
-						m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
+						m_DrawBaseY + (m_FooterHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
 						m_FooterTextSize, m_FooterTextFont,
 						m_FooterTextColor,
-						false, true);
+						false, true, false);
 				}
 
 				m_DrawBaseY += m_FooterHeight;
 			}
 			else if (!m_dynamic_footer) {
-				auto sizee = GetSpriteScale(size);
+				auto sizee = drawingFunctions()->GetSpriteScale(size);
 
-				DrawRect(
+				drawingFunctions()->Rectangle(
 					m_PosX,
 					m_DrawBaseY + (m_FooterHeight / 2.f),
 					m_Width,
 					m_FooterHeight,
 					m_FooterBackgroundColor);
 
-				DrawSprite(
+				drawingFunctions()->Sprite(
 					"commonmenu",
 					texture,
 					m_PosX,
@@ -1072,38 +935,27 @@ namespace Saint::UserInterface
 				std::snprintf(rightText, sizeof(rightText) - 1, "%zu ~s~&#8226; %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
 
 				if (LeftFooterText) {
-					DrawLeftText(
+					drawingFunctions()->Text(TextPosition::Left,
 						"Saint Paid",
 						m_PosX - (m_Width / m_FooterTextPadding),
-						m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
+						m_DrawBaseY + (m_FooterHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
 						m_FooterTextSize, m_FooterTextFont,
 						m_FooterTextColor,
-						false, true);
+						false, true, false);
 				}
 				if (RightFooterText) {
-					if (Flags->isDev())
-					{
-						DrawRightText(
-							"Developer",
-							m_PosX + (m_Width / m_FooterTextPadding),
-							m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
-							m_FooterTextSize, m_FooterTextFont,
-							m_FooterTextColor,
-							false, true);
-					}
-					else
-					{
-						DrawRightText(
-							g_GameVariables->m_version,
-							m_PosX + (m_Width / m_FooterTextPadding),
-							m_DrawBaseY + (m_FooterHeight / 2.f) - (GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
-							m_FooterTextSize, m_FooterTextFont,
-							m_FooterTextColor,
-							false, true);
-					}
+					drawingFunctions()->Text(TextPosition::Right,
+						Flags->isDev() ? "Developer" : g_GameVariables->m_version,
+						m_PosX + (m_Width / m_FooterTextPadding),
+						m_DrawBaseY + (m_FooterHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_FooterTextFont, m_FooterTextSize) / 1.5f),
+						m_FooterTextSize, m_FooterTextFont,
+						m_FooterTextColor,
+						false, true
+					);
+
 				}
 				if (lines_enabled) {
-					GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (0.001f / 2.0f), m_Width, 0.0018f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
+					drawingFunctions()->Rectangle(m_PosX, m_DrawBaseY + (0.001f / 2.0f), m_Width, 0.0018f, m_HeaderBackgroundColor);
 				}
 				m_DrawBaseY += m_FooterHeight;
 			}
@@ -1134,34 +986,34 @@ namespace Saint::UserInterface
 		}
 
 		if (connect_description) {
-			GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (m_DescriptionHeight / 2.f), m_Width, m_DescriptionHeight, m_OptionUnselectedBackgroundColor.r, m_OptionUnselectedBackgroundColor.g, m_OptionUnselectedBackgroundColor.b, m_OptionUnselectedBackgroundColor.a, 0);
-			GRAPHICS::DRAW_RECT(m_PosX, m_DrawBaseY + (m_DescriptionHeight / 2.f) - 0.029, m_Width, 0.003f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
+			drawingFunctions()->Rectangle(m_PosX, m_DrawBaseY + (m_DescriptionHeight / 2.f), m_Width, m_DescriptionHeight, m_OptionUnselectedBackgroundColor);
+			drawingFunctions()->Rectangle(m_PosX, m_DrawBaseY + (m_DescriptionHeight / 2.f) - 0.029, m_Width, 0.003f, m_HeaderBackgroundColor);
 		}
 		else {
-			GRAPHICS::DRAW_RECT(m_PosX + description_x, m_PosY + description_y + (m_DescriptionHeight / 2.f), m_Width, m_DescriptionHeight, m_OptionUnselectedBackgroundColor.r, m_OptionUnselectedBackgroundColor.g, m_OptionUnselectedBackgroundColor.b, m_OptionUnselectedBackgroundColor.a, 0);
-			GRAPHICS::DRAW_RECT(m_PosX + description_x, m_PosY + description_y + (m_DescriptionHeight / 2.f) - 0.029, m_Width, 0.003f, m_HeaderBackgroundColor.r, m_HeaderBackgroundColor.g, m_HeaderBackgroundColor.b, m_HeaderBackgroundColor.a, 0);
+			drawingFunctions()->Rectangle(m_PosX + description_x, m_PosY + description_y + (m_DescriptionHeight / 2.f), m_Width, m_DescriptionHeight, m_OptionUnselectedBackgroundColor);
+			drawingFunctions()->Rectangle(m_PosX + description_x, m_PosY + description_y + (m_DescriptionHeight / 2.f) - 0.029, m_Width, 0.003f, m_HeaderBackgroundColor);
 		}
 		if (connect_description) {
-			HUD::SET_TEXT_WRAP(m_PosX, m_PosX + m_Width / 2);
+			drawingFunctions()->Wrap(m_PosX, m_PosX + m_Width / 2);
 		}
 		else {
-			HUD::SET_TEXT_WRAP(m_PosX + description_x2, m_PosX + description_x2 + m_Width / 2);
+			drawingFunctions()->Wrap(m_PosX + description_x2, m_PosX + description_x2 + m_Width / 2);
 		}
 		if (connect_description) {
-			DrawLeftText(
+			drawingFunctions()->Text(TextPosition::Left,
 				description,
 				m_PosX - (m_Width / m_DescriptionPadding),
-				m_DrawBaseY + (m_DescriptionHeight / 2.f) - (GetTextHeight(m_DescriptionFont, m_DescriptionTextSize) / 1.5f) - 0.015,
+				m_DrawBaseY + (m_DescriptionHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_DescriptionFont, m_DescriptionTextSize) / 1.5f) - 0.015,
 				m_DescriptionTextSize,
 				m_DescriptionFont,
 				m_DescriptionTextColor,
 				false, false, false);
 		}
 		else {
-			DrawLeftText(
+			drawingFunctions()->Text(TextPosition::Left,
 				description,
 				m_PosX + description_x2 - (m_Width / m_DescriptionPadding),
-				m_PosY + description_y2 + (m_DescriptionHeight / 2.f) - (GetTextHeight(m_DescriptionFont, m_DescriptionTextSize) / 1.5f) - 0.015,
+				m_PosY + description_y2 + (m_DescriptionHeight / 2.f) - (drawingFunctions()->GetTextHeight(m_DescriptionFont, m_DescriptionTextSize) / 1.5f) - 0.015,
 				m_DescriptionTextSize,
 				m_DescriptionFont,
 				m_DescriptionTextColor,
@@ -1173,75 +1025,13 @@ namespace Saint::UserInterface
 		}
 	}
 
-	void UIManager::DrawRect(float x, float y, float width, float height, Color color)
-	{
-		if (m_MenuOpeningAnimation) {
-			GRAPHICS::DRAW_RECT(x, y, width, height, color.r, color.g, color.b, 255, 0);
-		}
-		else {
-			GRAPHICS::DRAW_RECT(x, y, width, height, color.r, color.g, color.b, color.a, 0);
-		}
-	}
 
-	void UIManager::DrawSprite(const char* dict, const char* texture, float x, float y, float width, float height, Color color, float rotation)
-	{
-		if (GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(dict))
-		{
-			if (m_MenuOpeningAnimation) {
-				GRAPHICS::DRAW_SPRITE(dict, texture, x, y, width, height, rotation, color.r, color.g, color.b, 255, NULL, NULL);
-			}
-			else {
-				GRAPHICS::DRAW_SPRITE(dict, texture, x, y, width, height, rotation, color.r, color.g, color.b, color.a, NULL, NULL);
-			}
-		}
-		else
-		{
-			GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(dict, false);
-		}
-	}
 
-	void UIManager::DrawLeftText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow, bool wrap)
-	{
-		HUD::SET_TEXT_SCALE(size, size);
-		HUD::SET_TEXT_FONT(static_cast<int>(font));
-		HUD::SET_TEXT_COLOUR(color.r, color.g, color.b, 255);
-		if (outline)
-			HUD::SET_TEXT_OUTLINE();
-		if (shadow)
-			HUD::SET_TEXT_DROP_SHADOW();
-		if (wrap) {
 
-		}
-		HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
-		HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text);
-		HUD::END_TEXT_COMMAND_DISPLAY_TEXT(x, y, 0);
-	}
 
-	void UIManager::DrawCenteredText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow)
-	{
-		HUD::SET_TEXT_CENTRE(true);
-		DrawLeftText(text, x, y, size, font, color, outline, shadow);
-	}
 
-	void UIManager::DrawRightText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow)
-	{
-		HUD::SET_TEXT_WRAP(0.f, x);
-		HUD::SET_TEXT_RIGHT_JUSTIFY(true);
-		DrawLeftText(text, x, y, size, font, color, outline, shadow);
-	}
 
-	float UIManager::GetTextHeight(Font font, float size)
-	{
-		return HUD::GET_RENDERED_CHARACTER_HEIGHT(size, static_cast<int>(font));
-	}
 
-	Vector2 UIManager::GetSpriteScale(float size)
-	{
-		int x;
-		int y;
-		GRAPHICS::GET_ACTUAL_SCREEN_RESOLUTION(&x, &y);
-		return { (static_cast<float>(y) / static_cast<float>(x)) * size, size };
-	}
 
 	bool UIManager::IsMouseLocked()
 	{
@@ -1277,4 +1067,6 @@ namespace Saint::UserInterface
 	{
 		SetCursorPos(x, y);
 	}
+
+
 }

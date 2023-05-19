@@ -84,6 +84,7 @@ namespace Saint::UserInterface
 			
 #endif
 			m_Options.push_back(std::make_unique<OptionType>(std::forward<TArgs>(args)...));
+			
 		}
 
 		T& SetName(const char* name)
@@ -95,6 +96,7 @@ namespace Saint::UserInterface
 		T& SetId(std::uint32_t id)
 		{
 			m_Id = id;
+			selected_sub2 = id;
 			return static_cast<T&>(*this);
 		}
 
@@ -116,7 +118,7 @@ namespace Saint::UserInterface
 		std::uint32_t m_Id{};
 		std::function<void(T*)> m_Action;
 
-		std::vector<std::unique_ptr<AbstractOption>> m_Options;
+		
 		std::size_t m_SelectedOption{};
 
 		Color m_color{};

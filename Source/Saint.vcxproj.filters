@@ -277,6 +277,9 @@
     <ClInclude Include="EntityPool.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="drawingFunctions2.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Interface.cpp">

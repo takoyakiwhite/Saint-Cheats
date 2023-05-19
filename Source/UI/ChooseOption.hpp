@@ -3,14 +3,13 @@
 
 namespace Saint::UserInterface
 {
-	template <typename DataType, typename PositionType>
-	class Scroll : public BaseOption<Scroll<DataType, PositionType>>
+	class Scroll : public BaseOption<Scroll>
 	{
 	public:
 		explicit Scroll() = default;
 
-		template <PositionType N>
-		explicit Scroll(const char* text, const char* description, DataType(*array)[N], PositionType* position, bool actionOnHorizontal = false, std::uint32_t subId2 = -1, std::function<void()> action = [] {}):
+		template <std::size_t N>
+		explicit Scroll(const char* text, const char* description, const char*(*array)[N], std::size_t* position, bool actionOnHorizontal = false, std::uint32_t subId2 = -1, std::function<void()> action = [] {}):
 			m_Data(&(*array)[0]),
 			m_DataSize(N),
 			m_Position(position),
@@ -24,7 +23,7 @@ namespace Saint::UserInterface
 		}
 
 		template <typename VectorType>
-		explicit Scroll(const char* text, const char* description, const VectorType* v, PositionType* position, bool actionOnHorizontal = false, std::uint32_t subId2 = -1, std::function<void()> action = [] {}) :
+		explicit Scroll(const char* text, const char* description, const VectorType* v, std::size_t* position, bool actionOnHorizontal = false, std::uint32_t subId2 = -1, std::function<void()> action = [] {}) :
 			m_Data(v->data()),
 			m_DataSize(v->size()),
 			m_Position(position),
@@ -79,7 +78,7 @@ namespace Saint::UserInterface
 					if (*m_Position > 0)
 						--(*m_Position);
 					else
-						*m_Position = static_cast<PositionType>(m_DataSize - 1);
+						*m_Position = static_cast<std::size_t>(m_DataSize - 1);
 
 					if (m_ActionOnHorizontal && Base::m_Action)
 						std::invoke(Base::m_Action);
@@ -109,12 +108,12 @@ namespace Saint::UserInterface
 		Scroll(Scroll&&) = default;
 		Scroll& operator=(Scroll&&) = default;
 	private:
-		const DataType* m_Data{};
-		PositionType m_DataSize{};
-		PositionType* m_Position{};
+		const const char** m_Data{};
+		std::size_t m_DataSize{};
+		std::size_t* m_Position{};
 		bool m_ActionOnHorizontal{};
 		std::uint32_t m_SubId2{};
 
-		using Base = BaseOption<Scroll<DataType, PositionType>>;
+		using Base = BaseOption<Scroll>;
 	};
 }

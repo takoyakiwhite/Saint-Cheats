@@ -26,6 +26,20 @@ namespace Saint::UserInterface
 			std::strncpy(&m_Prefix[0], prefix, sizeof(m_Prefix) - 1);
 			std::strncpy(&m_Suffix[0], suffix, sizeof(m_Suffix) - 1);
 		}
+		explicit number(const char* text, NumberType* number, NumberType min, NumberType max, NumberType step = 1, std::size_t precision = 3, bool actionOnHorizontal = true, const char* prefix = "", const char* suffix = "", std::function<void()> action = [] {}, bool can_be_saved = false) :
+			m_ActionOnHorizontal(actionOnHorizontal),
+			m_Number(number),
+			m_Min(min),
+			m_Max(max),
+			m_Step(step),
+			m_Precision(precision)
+		{
+			Base::SetLeftText(text);
+			Base::SetDescription("");
+			Base::SetAction(std::move(action));
+			std::strncpy(&m_Prefix[0], prefix, sizeof(m_Prefix) - 1);
+			std::strncpy(&m_Suffix[0], suffix, sizeof(m_Suffix) - 1);
+		}
 
 		~number() noexcept = default;
 		number(number const&) = default;

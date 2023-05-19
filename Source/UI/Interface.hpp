@@ -3,6 +3,7 @@
 #include "../Types.hpp"
 #include "TextBox.hpp"
 #include "AbstractSubmenu.hpp"
+
 namespace Saint::UserInterface
 {
 	
@@ -14,6 +15,7 @@ namespace Saint::UserInterface
 	public:
 		const char* name;
 	};
+	
 	enum class Font : std::int32_t
 	{
 		ChaletLondon = 0,
@@ -102,6 +104,7 @@ namespace Saint::UserInterface
 	class UIManager
 	{
 	public:
+		int selected_submenu;
 		explicit UIManager() = default;
 		~UIManager() noexcept = default;
 		UIManager(UIManager const&) = delete;
@@ -128,6 +131,7 @@ namespace Saint::UserInterface
 				if (sub->GetId() == id)
 				{
 					m_SubmenuStack.push(sub.get());
+					selected_submenu = id;
 					return;
 				}
 			}
@@ -137,7 +141,6 @@ namespace Saint::UserInterface
 
 		void OnTick();
 	public:
-		
 		std::mutex m_Mutex;
 
 		bool m_Opened = false;
@@ -157,12 +160,6 @@ namespace Saint::UserInterface
 
 		int y_test = 70;
 
-		// Input
-		std::int32_t m_OpenDelay = 200;
-		std::int32_t m_BackDelay = 300;
-		std::int32_t m_EnterDelay = 300;
-		std::int32_t m_VerticalDelay = 120;
-		std::int32_t m_HorizontalDelay = 120;
 
 		int open_key = 0x73;
 		//ToolTip
@@ -183,8 +180,7 @@ namespace Saint::UserInterface
 		bool m_HeaderNativeText = true;
 		float m_HeaderTextSize = 1.f;
 		Font m_HeaderFont = Font::HouseScript;
-		Color m_HeaderBackgroundColor{ 255, 150, 184, 255 };
-		Color m_HeaderTextColor{ 255, 255, 255, 255 };
+		
 		HeaderType m_HeaderType = HeaderType::Static;
 		HeaderType m_HeaderType2 = HeaderType::Static;
 
@@ -192,8 +188,6 @@ namespace Saint::UserInterface
 		bool m_HeaderGradientFlip = false;
 		float m_HeaderGradientStretch = 0.f;
 		float m_HeaderGradientFiller = 0.f;
-		Color m_HeaderGradientColorLeft{ 0, 0, 0, 255 };
-		Color m_HeaderGradientColorRight{ 255, 255, 255, 255 };
 
 		// Footer Text
 		bool LeftFooterText = false;
@@ -201,7 +195,7 @@ namespace Saint::UserInterface
 		float m_FooterTextSize = 0.27f;
 		Font m_FooterTextFont = Font::ChaletLondon;
 		float m_FooterTextPadding = 2.1f;
-		Color m_FooterTextColor{ 255,255,255, 255 };
+		
 
 		//enables
 		bool footer_enabled = true;
@@ -265,10 +259,6 @@ namespace Saint::UserInterface
 		Font m_OptionFont = Font::ChaletLondon;
 		Font m_SeperatorFont = Font::HouseScript;
 		float m_OptionPadding = 2.1f;
-		Color m_OptionSelectedTextColor{ 0,0,0, 255 };
-		Color m_OptionUnselectedTextColor{ 255,255,255, 255 };
-		Color m_OptionSelectedBackgroundColor{ 255, 255, 255, 255 };
-		Color m_OptionUnselectedBackgroundColor{ 0, 0, 0, 160 };
 		std::size_t option_font_it = 0;
 
 		//submenubar
@@ -278,13 +268,11 @@ namespace Saint::UserInterface
 
 		bool ytd_header = false;
 
-		Color m_SubheaderBackground{ 0, 0, 0, 255 };
-		Color m_SubheaderText{ 255,255,255, 255 };
-		Color m_SubheaderTextRight{ 255,255,255, 255 };
+		
 		float m_SubheaderHeight = 0.03f;
 
 		//misc
-		Color m_RadiusSphere{ 255, 0, 0, 160 };
+		
 
 		bool animation_enabled = false;
 
@@ -298,8 +286,7 @@ namespace Saint::UserInterface
 
 		float m_FooterHeight = 0.029;
 		float m_FooterSpriteSize = 0.027000f;
-		Color m_FooterBackgroundColor{ 0, 0, 0, 255 };
-		Color m_FooterSpriteColor{ 255,255,255, 255 };
+		
 
 		//Enterable
 		
@@ -309,9 +296,6 @@ namespace Saint::UserInterface
 		bool ToggledOn = false;
 		bool ToggledOff = false;
 		float m_ToggleSize = { 0.028f };
-		Color m_ToggleOnColor{ 130, 214, 157, 255 };
-		Color m_ToggleOffColor{ 200, 55, 80, 255 };
-		Color m_ToggleCheckColor{ 255,255,255, 255 };
 		const char* ToggleList[5]
 		{
 			"Circles",
@@ -354,11 +338,8 @@ namespace Saint::UserInterface
 		float m_DescriptionHeight2 = 0.033f;
 		float m_DescriptionTextSize = 0.28f;
 		Font m_DescriptionFont = Font::ChaletLondon;
-		Color m_DescriptionBackgroundColor{ 0, 0, 0, 160 };
-		Color m_DescriptionTextColor{ 255,255,255, 255 };
 		float m_DescriptionSpriteSize = 0.025f;
 		float m_DescriptionPadding = 2.1f;
-		Color m_DescriptionSpriteColor{ 255,255,255, 255 };
 
 		float glare_x_offset = 0.014;
 
@@ -368,8 +349,6 @@ namespace Saint::UserInterface
 		int g_MenuAlpha = 255;
 		const char* m_CurrentSubMenuName = "Hello";
 		bool m_AnimationCheck = false;
-		void DrawRect(float x, float y, float width, float height, Color color);
-		void DrawRightText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow);
 		float m_DrawBaseY{};
 		Vector2 GetMousePos();
 		void SetMousePos(int x, int y);
@@ -391,7 +370,40 @@ namespace Saint::UserInterface
 		std::vector<std::unique_ptr<AbstractSubmenu>> m_AllSubmenus;
 		
 		
-
+	public:
+		Color m_DescriptionBackgroundColor{ 0, 0, 0, 160 };
+		Color m_DescriptionTextColor{ 255,255,255, 255 };
+		Color m_DescriptionSpriteColor{ 255,255,255, 255 };
+		//toggles
+		Color m_ToggleOnColor{ 130, 214, 157, 255 };
+		Color m_ToggleOffColor{ 200, 55, 80, 255 };
+		Color m_ToggleCheckColor{ 255,255,255, 255 };
+		//footer
+		Color m_FooterBackgroundColor{ 0, 0, 0, 255 };
+		Color m_FooterSpriteColor{ 255,255,255, 255 };
+		Color m_FooterTextColor{ 255,255,255, 255 };
+		//subheader
+		Color m_SubheaderBackground{ 0, 0, 0, 255 };
+		Color m_SubheaderText{ 255,255,255, 255 };
+		Color m_SubheaderTextRight{ 255,255,255, 255 };
+		//misc
+		Color m_RadiusSphere{ 255, 0, 0, 160 };
+		//option selected/off
+		Color m_OptionSelectedTextColor{ 0,0,0, 255 };
+		Color m_OptionUnselectedTextColor{ 255,255,255, 255 };
+		Color m_OptionSelectedBackgroundColor{ 255, 255, 255, 255 };
+		Color m_OptionUnselectedBackgroundColor{ 0, 0, 0, 160 };
+		//header
+		Color m_HeaderBackgroundColor{ 255, 150, 184, 255 };
+		Color m_HeaderTextColor{ 255, 255, 255, 255 };
+		Color m_HeaderGradientColorLeft{ 0, 0, 0, 255 };
+		Color m_HeaderGradientColorRight{ 255, 255, 255, 255 };
+	public:
+		std::int32_t m_OpenDelay = 200;
+		std::int32_t m_BackDelay = 300;
+		std::int32_t m_EnterDelay = 300;
+		std::int32_t m_VerticalDelay = 120;
+		std::int32_t m_HorizontalDelay = 120;
 	private:
 		bool m_OpenKeyPressed = false;
 		bool m_OpenKeyPressed2 = false;
@@ -410,18 +422,11 @@ namespace Saint::UserInterface
 		void drawstring(char* text, float X, float Y);
 		void setupdraw(bool outline);
 
-		void RenderText(std::string text, std::float_t x, std::float_t y, Font font, std::float_t scale, RGBA color, bool centered, bool right_justified, bool outlined);
+
 		void DrawOption(AbstractOption* opt, bool selected);
 		void DrawFooter();
 		void DrawDescription();
-		void DrawSprite1(const char* textureDict, const char* textureName, float screenX, float screenY, float width, float height, float heading, int red, int green, int blue, int alpha);
-
-		void DrawSprite(const char* dict, const char* texture, float x, float y, float width, float height, Color color, float rotation);
-		void DrawLeftText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow, bool wrap = false);
-		void DrawCenteredText(const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow);
 		void DrawSubmenuBar(AbstractSubmenu* sub);
-		float GetTextHeight(Font font, float size);
-		Vector2 GetSpriteScale(float size);
 
 		bool IsMouseLocked();
 		Rectangle GetMenuRect();
@@ -431,9 +436,36 @@ namespace Saint::UserInterface
 		
 
 	};
+
 }
 
 namespace Saint
 {
 	inline std::unique_ptr<UserInterface::UIManager> g_Render;
+	template <typename OptionType, typename ...TArgs>
+	inline void draw_option(TArgs&&... args)
+	{
+#ifdef logoptions
+		std::string soos = std::string(std::get<0>(std::tie(args...)));
+		bool found = false;
+		for (int i = 0; i < s.size(); i++) {
+			if (s[i] == soos) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			s.push_back(soos);
+			soos = soos + "\n";
+			std::ofstream o("C:\\Users\\Tim\\sainttranslation.txt", std::ios_base::app);
+			o.write(soos.c_str(), soos.size());
+			o.close();
+		}
+
+#endif
+		
+		UserInterface::m_Options.push_back(std::make_unique<OptionType>(std::forward<TArgs>(args)...));
+		
+		
+	}
 }

@@ -2,6 +2,7 @@
 
 namespace Saint::UserInterface
 {
+	
 	enum class OptionAction
 	{
 		LeftPress,
@@ -22,6 +23,7 @@ namespace Saint::UserInterface
 		Keyboard = (1 << 7),
 		PlayerSub = (1 << 8),
 		ColorSub = (1 << 9),
+		KeyboardNoPen = (1 << 10),
 	};
 
 	class AbstractOption
@@ -43,4 +45,7 @@ namespace Saint::UserInterface
 		AbstractOption(AbstractOption&&) = default;
 		AbstractOption& operator=(AbstractOption&&) = default;
 	};
+
+	inline std::vector<std::unique_ptr<AbstractOption>> m_Options;
+	inline int selected_sub2;
 }
