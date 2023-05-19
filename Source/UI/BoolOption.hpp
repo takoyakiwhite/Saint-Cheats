@@ -25,6 +25,7 @@ namespace Saint::UserInterface
 				Base::SetDescription("Hold V and any key to set a hotkey.");
 			}
 			Base::SetAction(std::move(action));
+			Base::SetBool(b00l);
 		}
 		explicit toggle(const char* text, bool* b00l, std::function<void()> action = [] {}) :
 			m_Text(text),

@@ -36,6 +36,7 @@ namespace Saint::UserInterface
 		virtual const char* GetCenteredText() = 0;
 		virtual const char* GetDescription() = 0;
 		virtual Color GetColor() = 0;
+		virtual bool* GetBool() = 0;
 		virtual void HandleAction(OptionAction action) = 0;
 		virtual bool GetFlag(OptionFlag flag) = 0;
 	protected:

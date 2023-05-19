@@ -7,6 +7,15 @@ namespace Saint::UserInterface
 		Right = 1,
 		Center = 2,
 	};
+	struct MenuTextures {
+		const char* dictionary;
+		const char* asset;
+	};
+	MenuTextures getTexture(const char* name) {
+		if (name == "arrows") {
+			return { "commonmenu", "shop_arrows_upanddown" };
+		}
+	}
 	class DrawingFunctions2 {
 	public:
 		void SetDrawOrder(int order) {
@@ -40,6 +49,30 @@ namespace Saint::UserInterface
 			else
 			{
 				GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(dict, false);
+			}
+		}
+		void Sprite(MenuTextures texture, float x, float y, float width, float height, Color color, float rotation)
+		{
+			if (GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(texture.dictionary))
+			{
+				GRAPHICS::DRAW_SPRITE(texture.dictionary, texture.asset, x, y, width, height, rotation, color.r, color.g, color.b, color.a, 0, -1);
+			}
+			else
+			{
+				GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(texture.dictionary, false);
+			}
+		}
+		void Arrows(bool* selected)
+		{
+			if (selected) {
+				if (GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(getTexture("arrows").dictionary))
+				{
+					Sprite(getTexture("arrows"), g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding) - 0.016f, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.f), GetSpriteScale(0.033).x, GetSpriteScale(0.030).y, selected ? g_Render->m_OptionSelectedTextColor : g_Render->m_OptionUnselectedTextColor, 90.0);
+				}
+				else
+				{
+					Sprite(getTexture("arrows"), g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding) - 0.016f, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.f), GetSpriteScale(0.033).x, GetSpriteScale(0.030).y, selected ? g_Render->m_OptionSelectedTextColor : g_Render->m_OptionUnselectedTextColor, 90.0);
+				}
 			}
 		}
 		void Text(TextPosition position, const char* text, float x, float y, float size, Font font, Color color, bool outline, bool shadow, bool wrap = false)

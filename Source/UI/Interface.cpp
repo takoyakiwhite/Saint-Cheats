@@ -684,11 +684,7 @@ namespace Saint::UserInterface
 
 		if (opt->GetFlag(OptionFlag::BoolWithNumber)) {
 
-			auto res = drawingFunctions()->GetSpriteScale(0.030);
-			auto res2 = drawingFunctions()->GetSpriteScale(0.033);
-			if (selected) {
-				drawingFunctions()->Sprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.016f, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
-			}
+			drawingFunctions()->Arrows(&selected);
 
 			drawingFunctions()->Text(TextPosition::Right,
 				righttext,
@@ -705,11 +701,7 @@ namespace Saint::UserInterface
 		else if (opt->GetFlag(OptionFlag::Horizontal)) {
 			
 
-				auto res = drawingFunctions()->GetSpriteScale(0.030);
-				auto res2 = drawingFunctions()->GetSpriteScale(0.033);
-				if (selected) {
-					drawingFunctions()->Sprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.005f, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
-				}
+				drawingFunctions()->Arrows(&selected);
 
 				drawingFunctions()->Text(TextPosition::Right,
 					righttext,
@@ -722,11 +714,7 @@ namespace Saint::UserInterface
 		}
 		else if (opt->GetFlag(OptionFlag::ChooseBool)) {
 
-				auto res = drawingFunctions()->GetSpriteScale(0.030);
-				auto res2 = drawingFunctions()->GetSpriteScale(0.033);
-				if (selected) {
-					drawingFunctions()->Sprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding) - 0.015, m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
-				}
+				drawingFunctions()->Arrows(&selected);
 
 				drawingFunctions()->Text(TextPosition::Right,
 					righttext,
@@ -739,11 +727,7 @@ namespace Saint::UserInterface
 			
 		}
 		else if (opt->GetFlag(OptionFlag::Choose)) {
-				auto res = drawingFunctions()->GetSpriteScale(0.030);
-				auto res2 = drawingFunctions()->GetSpriteScale(0.033);
-				if (selected) {
-					drawingFunctions()->Sprite("commonmenu", "shop_arrows_upanddown", m_PosX + (m_Width / m_OptionPadding - 0.005f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 90.0);
-				}
+			drawingFunctions()->Arrows(&selected);
 
 				drawingFunctions()->Text(TextPosition::Right,
 					righttext,

@@ -18,6 +18,10 @@ namespace Saint::UserInterface
 			return &m_RightText[0];
 		}
 
+		bool* GetBool() override {
+			return m_Bool;
+		}
+
 		Color GetColor() override
 		{
 			return m_Color;
@@ -60,7 +64,11 @@ namespace Saint::UserInterface
 			m_Color = color;
 			return static_cast<T&>(*this);
 		}
-
+		T& SetBool(bool* color)
+		{
+			m_Bool = color;
+			return static_cast<T&>(*this);
+		}
 		T& SetRightText(const char* text)
 		{
 			std::strncpy(&m_RightText[0], text, sizeof(m_RightText) - 1);
@@ -85,6 +93,7 @@ namespace Saint::UserInterface
 			m_Action = std::move(action);
 			return static_cast<T&>(*this);
 		}
+
 	protected:
 		explicit BaseOption() = default;
 		~BaseOption() noexcept = default;
@@ -100,5 +109,6 @@ namespace Saint::UserInterface
 		char m_Description[64] = {};
 		std::function<void()> m_Action;
 		Color m_Color = {};
+		bool* m_Bool;
 	};
 }
