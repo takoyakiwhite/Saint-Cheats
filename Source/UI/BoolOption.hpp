@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseOption.hpp"
+#include "optionGetters.hpp"
 #include "Interface.hpp"
 #include "../Hotkeys.h"
 namespace Saint::UserInterface
@@ -10,7 +10,7 @@ namespace Saint::UserInterface
 		YesNo
 	};
 
-	class toggle : public BaseOption<toggle>
+	class toggle : public OptionGetters<toggle>
 	{
 	public:
 		explicit toggle(const char* text, const char* description, bool* b00l, std::function<void()> action = [] {}) :
@@ -51,15 +51,13 @@ namespace Saint::UserInterface
 			return Base::GetRightText();
 		}
 
-		bool GetFlag(OptionFlag flag) override
+		bool GetFlag(const char* flag, const char* secondary) override
 		{
-			if (flag == OptionFlag::BoolOption)
-			{
+			if (flag == "none" && secondary == "bool") {
 				g_Render->ToggledOn = *m_Bool;
 				return true;
 			}
-
-			return Base::GetFlag(flag);
+			return Base::GetFlag(flag, secondary);
 		}
 		const char* get_name(int vk) {
 			TCHAR keyName[32];
@@ -69,7 +67,7 @@ namespace Saint::UserInterface
 		void HandleAction(OptionAction action) override
 		{
 			for (int i = 0; i < 256; i++) {
-				if (action == OptionAction::HotkeyPress) {
+				if (action == OptionAction::Hotkey) {
 					if (g_Render->m_Opened) {
 						if (Game->KeyPress(0xA0, true)) {
 							for (auto& keys : m_Hotkeys) {
@@ -160,17 +158,17 @@ namespace Saint::UserInterface
 				}
 				
 			}
-			if (action == OptionAction::EnterPress)
+			if (action == OptionAction::Enter)
 			{
 				*m_Bool = !*m_Bool;
 			}
 
-			Base::HandleAction(action);
+			OptionGetters::HandleAction(action);
 		}
 	private:
 		bool* m_Bool;
 		const char* m_Text;
 
-		using Base = BaseOption<toggle>;
+		using Base = OptionGetters<toggle>;
 	};
 }

@@ -4,6 +4,47 @@
 
 namespace Saint
 {
+	inline std::string capitalize(const std::string& word) {
+		if (word.empty()) {
+			return word;
+		}
+		std::string capitalized = word;
+		capitalized[0] = std::toupper(capitalized[0]);
+		return capitalized;
+	}
+
+	inline std::string correctGrammar(const std::string& text) {
+		std::istringstream iss(text);
+		std::ostringstream oss;
+		std::string word;
+
+		std::vector<std::string> specialCases = { "dont", "cant", "wont" };
+
+		bool capitalizeNextWord = true;
+
+		while (iss >> word) {
+			if (capitalizeNextWord) {
+				word = capitalize(word);
+			}
+			else {
+				std::transform(word.begin(), word.end(), word.begin(), ::tolower);
+				if (std::find(specialCases.begin(), specialCases.end(), word) != specialCases.end()) {
+					word = capitalize(word);
+				}
+			}
+
+			oss << word << " ";
+
+			if (word.find_first_of(".!?") != std::string::npos) {
+				capitalizeNextWord = true;
+			}
+			else {
+				capitalizeNextWord = false;
+			}
+		}
+
+		return oss.str();
+	}
 	class SimpleTimer
 	{
 	public:

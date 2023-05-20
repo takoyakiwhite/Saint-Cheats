@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseOption.hpp"
+#include "optionGetters.hpp"
 #include "Interface.hpp"
 #include "../Features.h"
 
@@ -7,7 +7,7 @@ namespace Saint::UserInterface
 {
 	std::string sliderKeyboardBuffer;
 	template <typename NumberType>
-	class number : public BaseOption<number<NumberType>>
+	class number : public OptionGetters<number<NumberType>>
 	{
 	public:
 		explicit number() = default;
@@ -19,10 +19,10 @@ namespace Saint::UserInterface
 			m_Step(step),
 			m_Precision(precision)
 		{
-			Base::SetLeftText(text);
+			OptionGetters::SetLeftText(text);
 			if (description)
-				Base::SetDescription(description);
-			Base::SetAction(std::move(action));
+				OptionGetters::SetDescription(description);
+			OptionGetters::SetAction(std::move(action));
 			std::strncpy(&m_Prefix[0], prefix, sizeof(m_Prefix) - 1);
 			std::strncpy(&m_Suffix[0], suffix, sizeof(m_Suffix) - 1);
 		}
@@ -34,9 +34,9 @@ namespace Saint::UserInterface
 			m_Step(step),
 			m_Precision(precision)
 		{
-			Base::SetLeftText(text);
-			Base::SetDescription("");
-			Base::SetAction(std::move(action));
+			OptionGetters::SetLeftText(text);
+			OptionGetters::SetDescription("");
+			OptionGetters::SetAction(std::move(action));
 			std::strncpy(&m_Prefix[0], prefix, sizeof(m_Prefix) - 1);
 			std::strncpy(&m_Suffix[0], suffix, sizeof(m_Suffix) - 1);
 		}
@@ -49,55 +49,52 @@ namespace Saint::UserInterface
 
 
 
-		bool GetFlag(OptionFlag flag) override
+		bool GetFlag(const char* flag, const char* secondary) override
 		{
-			if (flag == OptionFlag::Horizontal)
-			{
-
+			if (flag == "number" && secondary == "none") {
 				return true;
 			}
-
-			return Base::GetFlag(flag);
+			return OptionGetters::GetFlag(flag, secondary);
 		}
 		const char* GetRightText() override
 		{
 			
 			
-			MemoryStringStream stream(Base::m_RightText);
+			MemoryStringStream stream(OptionGetters::m_RightText);
 				stream
 					<< std::setprecision(m_Precision)
 					<< std::fixed
 					<< m_Prefix
 					<< static_cast<DisplayType>(*m_Number)
 					<< m_Suffix;
-				return Base::GetRightText();
+				return OptionGetters::GetRightText();
 		}
 
 		void HandleAction(OptionAction action) override
 		{
 			
-			if (action == OptionAction::LeftPress)
+			if (action == OptionAction::Left)
 			{
 				if (*m_Number - m_Step < m_Min)
 					*m_Number = m_Max;
 				else
 					*m_Number -= m_Step;
 
-				if (m_ActionOnHorizontal && Base::m_Action)
-					std::invoke(Base::m_Action);
+				if (m_ActionOnHorizontal && OptionGetters::m_Action)
+					std::invoke(OptionGetters::m_Action);
 			}
-			else if (action == OptionAction::RightPress)
+			else if (action == OptionAction::Right)
 			{
 				if (*m_Number + m_Step > m_Max)
 					*m_Number = m_Min;
 				else
 					*m_Number += m_Step;
 
-				if (m_ActionOnHorizontal && Base::m_Action)
-					std::invoke(Base::m_Action);
+				if (m_ActionOnHorizontal && OptionGetters::m_Action)
+					std::invoke(OptionGetters::m_Action);
 			}
 
-			Base::HandleAction(action);
+			OptionGetters::HandleAction(action);
 		}
 	private:
 		char m_Prefix[32] = {};
@@ -111,7 +108,7 @@ namespace Saint::UserInterface
 		std::size_t m_Precision{};
 
 
-		using Base = BaseOption<number<NumberType>>;
+		using OptionGetters = OptionGetters<number<NumberType>>;
 		using DisplayType = std::conditional_t<sizeof(NumberType) == 1, std::uint32_t, NumberType>;
 	};
 }

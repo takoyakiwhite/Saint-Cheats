@@ -1,10 +1,10 @@
 #pragma once
-#include "BaseOption.hpp"
+#include "OptionGetters.hpp"
 #include "Interface.hpp"
 #include "../FiberHelper.hpp"
 namespace Saint::UserInterface
 {
-	class submenu : public BaseOption<submenu>
+	class submenu : public OptionGetters<submenu>
 	{
 	public:
 		explicit submenu() = default;
@@ -25,7 +25,7 @@ namespace Saint::UserInterface
 
 		void HandleAction(OptionAction action) override
 		{
-			if (action == OptionAction::EnterPress)
+			if (action == OptionAction::Enter)
 			{
 				if (m_SubId != rage::joaat("NULL")) {
 					g_Render->SwitchToSubmenu(m_SubId);
@@ -33,17 +33,14 @@ namespace Saint::UserInterface
 				
 			}
 
-			BaseOption::HandleAction(action);
+			OptionGetters::HandleAction(action);
 		}
-
-		bool GetFlag(OptionFlag flag) override
+		bool GetFlag(const char* flag, const char* secondary) override
 		{
-			if (flag == OptionFlag::Enterable)
-			{
+			if (flag == "submenu" && secondary == "none") {
 				return true;
 			}
-
-			return BaseOption::GetFlag(flag);
+			return OptionGetters::GetFlag(flag, secondary);
 		}
 	private:
 		std::uint32_t m_SubId{};

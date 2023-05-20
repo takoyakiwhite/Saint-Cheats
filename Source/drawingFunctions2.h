@@ -11,13 +11,50 @@ namespace Saint::UserInterface
 		const char* dictionary;
 		const char* asset;
 	};
-	MenuTextures getTexture(const char* name) {
+	inline MenuTextures getTexture(const char* name) {
 		if (name == "arrows") {
 			return { "commonmenu", "shop_arrows_upanddown" };
 		}
+		else if (name == "mainToggles") {
+			return { "commonmenu", "common_medal" };
+		}
+		else if (name == "pen") {
+			return { "Textures", "pen" };
+		}
 	}
+	inline MenuTextures getTexture(const char* name, const char* name2) {
+		return { name, name2 };
+	}
+	inline bool isInBounds(float first, float second, float top, float bottom, float left, float right) {
+		if (first > left && first < right && second > top && second < bottom) {
+			return true;
+		}
+	}
+	inline Vector2 getMousePos() {
+		POINT point;
+		GetCursorPos(&point);
+
+		Vector2 GetMousePos = { static_cast<float>(point.x), static_cast<float>(point.y) };
+		return { (1.f / ImGui::GetIO().DisplaySize.x) * GetMousePos.x, (1.f / ImGui::GetIO().DisplaySize.x) * GetMousePos.y };
+	}
+	
 	class DrawingFunctions2 {
 	public:
+		void RadiusSphere(int pos, float radiusHandle, bool always_show, SubmenuBase* sub) {
+			if (sub->GetSelectedOption() == pos || always_show) {
+				GRAPHICS::DRAW_MARKER(28, ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 0).x, ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 0).y, ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 0).z, 0, 0, 0, 0, 0, 0, radiusHandle, radiusHandle, radiusHandle, g_Render->m_RadiusSphere.r, g_Render->m_RadiusSphere.g, g_Render->m_RadiusSphere.b, g_Render->m_RadiusSphere.a, false, false, 0, false, NULL, NULL, false);
+			}
+		}
+		void RadiusSphere(int pos, float radiusHandle, SubmenuBase* sub) {
+			if (sub->GetSelectedOption() == pos) {
+				GRAPHICS::DRAW_MARKER(28, ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 0).x, ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 0).y, ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 0).z, 0, 0, 0, 0, 0, 0, radiusHandle, radiusHandle, radiusHandle, g_Render->m_RadiusSphere.r, g_Render->m_RadiusSphere.g, g_Render->m_RadiusSphere.b, g_Render->m_RadiusSphere.a, false, false, 0, false, NULL, NULL, false);
+			}
+		}
+		void RadiusSphere(float radiusHandle, SubmenuBase* sub) {
+			if (sub->GetSelectedOption() == sub->GetNumOptions()) {
+				GRAPHICS::DRAW_MARKER(28, ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 0).x, ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 0).y, ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 0).z, 0, 0, 0, 0, 0, 0, radiusHandle, radiusHandle, radiusHandle, g_Render->m_RadiusSphere.r, g_Render->m_RadiusSphere.g, g_Render->m_RadiusSphere.b, g_Render->m_RadiusSphere.a, false, false, 0, false, NULL, NULL, false);
+			}
+		}
 		void SetDrawOrder(int order) {
 			GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(order);
 		}
@@ -62,16 +99,16 @@ namespace Saint::UserInterface
 				GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(texture.dictionary, false);
 			}
 		}
-		void Arrows(bool* selected)
+		void Arrows(bool selected, float offset)
 		{
 			if (selected) {
 				if (GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(getTexture("arrows").dictionary))
 				{
-					Sprite(getTexture("arrows"), g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding) - 0.016f, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.f), GetSpriteScale(0.033).x, GetSpriteScale(0.030).y, selected ? g_Render->m_OptionSelectedTextColor : g_Render->m_OptionUnselectedTextColor, 90.0);
+					Sprite(getTexture("arrows"), g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding) - offset, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.f), GetSpriteScale(0.033).x, GetSpriteScale(0.030).y, selected ? g_Render->m_OptionSelectedTextColor : g_Render->m_OptionUnselectedTextColor, 90.0);
 				}
 				else
 				{
-					Sprite(getTexture("arrows"), g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding) - 0.016f, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.f), GetSpriteScale(0.033).x, GetSpriteScale(0.030).y, selected ? g_Render->m_OptionSelectedTextColor : g_Render->m_OptionUnselectedTextColor, 90.0);
+					Sprite(getTexture("arrows"), g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding) - offset, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.f), GetSpriteScale(0.033).x, GetSpriteScale(0.030).y, selected ? g_Render->m_OptionSelectedTextColor : g_Render->m_OptionUnselectedTextColor, 90.0);
 				}
 			}
 		}
@@ -156,9 +193,9 @@ namespace Saint::UserInterface
 		}
 	};
 
-	inline DrawingFunctions2* drawingFunctions2;
-	inline DrawingFunctions2* drawingFunctions() {
-		return drawingFunctions2;
+	inline DrawingFunctions2* DrawingFunctions22;
+	inline DrawingFunctions2* DrawingFunctions() {
+		return DrawingFunctions22;
 	}
 
 }

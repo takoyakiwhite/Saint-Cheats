@@ -2,11 +2,14 @@
 #include "../Common.hpp"
 #include "../Types.hpp"
 #include "TextBox.hpp"
-#include "AbstractSubmenu.hpp"
+#include "SubmenuBase.hpp"
 
 namespace Saint::UserInterface
 {
-	
+	enum FooterPosition {
+		DOWN = 90,
+		UP = 270,
+	};
 	class tooltipHandler {
 	public:
 		tooltipHandler(const char* m_name) {
@@ -101,6 +104,7 @@ namespace Saint::UserInterface
 	public:
 		float height_offset;
 	};
+	
 	class UIManager
 	{
 	public:
@@ -124,6 +128,7 @@ namespace Saint::UserInterface
 			m_AllSubmenus.push_back(std::move(sub));
 		}
 
+
 		void SwitchToSubmenu(std::uint32_t id)
 		{
 			for (auto&& sub : m_AllSubmenus)
@@ -132,17 +137,18 @@ namespace Saint::UserInterface
 				{
 					m_SubmenuStack.push(sub.get());
 					selected_submenu = id;
+					get_selected_sub = sub.get();
 					return;
 				}
 			}
 		}
 
-		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> GetSubmenus() { return m_SubmenuStack; }
+		std::stack<SubmenuBase*, std::vector<SubmenuBase*>> GetSubmenus() { return m_SubmenuStack; }
 
 		void OnTick();
 	public:
 		std::mutex m_Mutex;
-
+		SubmenuBase* get_selected_sub;
 		bool m_Opened = false;
 		bool m_MouseLocked = false;
 		float m_PosX = 0.18f;
@@ -365,9 +371,22 @@ namespace Saint::UserInterface
 		float description_y2 = 0.0f;
 
 		bool scrollbar = false;
+		bool show_positions = true;
+		const char* getAmountOfOptions(SubmenuBase* sub) {
+			char rightText[32] = {};
+			std::snprintf(rightText, sizeof(rightText) - 1, "%zu / %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
+			return rightText;
+		}
+		int getOptionPosition(const char* name, SubmenuBase* sub) {
+			for (std::int32_t i = 0; i < sub->GetNumOptions(); i++) {
+				if (sub->GetOption(i)->GetLeftText() == name) {
+					return i;
+				}
+			}
+		}
 
-		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
-		std::vector<std::unique_ptr<AbstractSubmenu>> m_AllSubmenus;
+		std::stack<SubmenuBase*, std::vector<SubmenuBase*>> m_SubmenuStack;
+		std::vector<std::unique_ptr<SubmenuBase>> m_AllSubmenus;
 		
 		
 	public:
@@ -389,10 +408,14 @@ namespace Saint::UserInterface
 		//misc
 		Color m_RadiusSphere{ 255, 0, 0, 160 };
 		//option selected/off
+		Color m_OptionSelected{ 0,0,0, 255 };
 		Color m_OptionSelectedTextColor{ 0,0,0, 255 };
 		Color m_OptionUnselectedTextColor{ 255,255,255, 255 };
 		Color m_OptionSelectedBackgroundColor{ 255, 255, 255, 255 };
 		Color m_OptionUnselectedBackgroundColor{ 0, 0, 0, 160 };
+		Color getSelectedColor() {
+			return m_OptionSelected;
+		}
 		//header
 		Color m_HeaderBackgroundColor{ 255, 150, 184, 255 };
 		Color m_HeaderTextColor{ 255, 255, 255, 255 };
@@ -423,10 +446,10 @@ namespace Saint::UserInterface
 		void setupdraw(bool outline);
 
 
-		void DrawOption(AbstractOption* opt, bool selected);
+		void DrawOption(OptionBase* opt, bool selected);
 		void DrawFooter();
 		void DrawDescription();
-		void DrawSubmenuBar(AbstractSubmenu* sub);
+		void DrawSubmenuBar(SubmenuBase* sub);
 
 		bool IsMouseLocked();
 		Rectangle GetMenuRect();
@@ -436,14 +459,42 @@ namespace Saint::UserInterface
 		
 
 	};
+	class Mouse {
+	public:
+		Vector2 Position() {
+			POINT point;
+			GetCursorPos(&point);
+
+			Vector2 GetMousePos = { static_cast<float>(point.x), static_cast<float>(point.y) };
+			return { (1.f / ImGui::GetIO().DisplaySize.x) * GetMousePos.x, (1.f / ImGui::GetIO().DisplaySize.x) * GetMousePos.y };
+		}
+		bool Locked() {
+			return g_Settings.m_LockMouse;
+		}
+	};
+	inline Mouse mouseGetter;
+	inline Mouse* getMouse() {
+		return &mouseGetter;
+	}
+
+	
 
 }
 
 namespace Saint
 {
+
 	inline std::unique_ptr<UserInterface::UIManager> g_Render;
+	
+	inline UserInterface::UIManager renderManager;
+	inline UserInterface::UIManager* getRenderer() {
+		return &renderManager;
+	}
+#ifdef logoptions
+	std::vector<std::string> s;
+#endif
 	template <typename OptionType, typename ...TArgs>
-	inline void draw_option(TArgs&&... args)
+	void draw_option(TArgs&&... args)
 	{
 #ifdef logoptions
 		std::string soos = std::string(std::get<0>(std::tie(args...)));

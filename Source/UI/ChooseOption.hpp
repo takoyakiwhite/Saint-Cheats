@@ -1,9 +1,9 @@
 #pragma once
-#include "BaseOption.hpp"
+#include "optionGetters.hpp"
 
 namespace Saint::UserInterface
 {
-	class Scroll : public BaseOption<Scroll>
+	class Scroll : public OptionGetters<Scroll>
 	{
 	public:
 		explicit Scroll() = default;
@@ -35,27 +35,31 @@ namespace Saint::UserInterface
 				Base::SetDescription(description);
 			Base::SetAction(std::move(action));
 		}
-		bool GetFlag(OptionFlag flag) override
+		bool GetFlag(const char* flag, const char* secondary) override
 		{
-			if (flag == OptionFlag::Choose)
-			{
+			if (flag == "choose" && secondary == "none") {
 				return true;
 			}
-
-			return Base::GetFlag(flag);
+			return Base::GetFlag(flag, secondary);
 		}
 		const char* GetRightText() override
 		{
-			MemoryStringStream stream(Base::m_RightText);
+			MemoryStringStream stream(OptionGetters::m_RightText);
 
 			if (m_Data)
 			{
-				stream << m_Data[*m_Position];
-				stream << " ~c~[" << *m_Position + 1 << "/" << m_DataSize << "]";
+				if (g_Render->show_positions) {
+					stream << m_Data[*m_Position];
+					stream << " ~c~[" << *m_Position + 1 << "/" << m_DataSize << "]";
+				}
+				else {
+					stream << m_Data[*m_Position];
+				}
+				
 			}
 			else
 			{
-				stream << "Unknown ~c~[0 / 0]";
+				stream << "N/A";
 			}
 
 			return Base::GetRightText();
@@ -63,7 +67,7 @@ namespace Saint::UserInterface
 
 		void HandleAction(OptionAction action) override
 		{
-			if (action == OptionAction::EnterPress) {
+			if (action == OptionAction::Enter) {
 				if (m_SubId2 == -1) {
 
 				}
@@ -71,7 +75,7 @@ namespace Saint::UserInterface
 					g_Render->SwitchToSubmenu(m_SubId2);
 				}
 			}
-			if (action == OptionAction::LeftPress)
+			if (action == OptionAction::Left)
 			{
 				if (m_Data)
 				{
@@ -80,11 +84,11 @@ namespace Saint::UserInterface
 					else
 						*m_Position = static_cast<std::size_t>(m_DataSize - 1);
 
-					if (m_ActionOnHorizontal && Base::m_Action)
-						std::invoke(Base::m_Action);
+					if (m_ActionOnHorizontal && OptionGetters::m_Action)
+						std::invoke(OptionGetters::m_Action);
 				}
 			}
-			else if (action == OptionAction::RightPress)
+			else if (action == OptionAction::Right)
 			{
 				if (m_Data)
 				{
@@ -93,13 +97,13 @@ namespace Saint::UserInterface
 					else
 						*m_Position = 0;
 
-					if (m_ActionOnHorizontal && Base::m_Action)
-						std::invoke(Base::m_Action);
+					if (m_ActionOnHorizontal && OptionGetters::m_Action)
+						std::invoke(OptionGetters::m_Action);
 				}
 			}
 
 			if (m_Data)
-				Base::HandleAction(action);
+				OptionGetters::HandleAction(action);
 		}
 
 		~Scroll() noexcept = default;
@@ -114,6 +118,6 @@ namespace Saint::UserInterface
 		bool m_ActionOnHorizontal{};
 		std::uint32_t m_SubId2{};
 
-		using Base = BaseOption<Scroll>;
+		using Base = OptionGetters<Scroll>;
 	};
 }

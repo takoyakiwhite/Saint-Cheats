@@ -1,10 +1,10 @@
 #pragma once
-#include "BaseSubmenu.hpp"
+#include "submenuGetters.hpp"
 #include "../Natives.hpp"
 
 namespace Saint::UserInterface
 {
-	class PlayerSubmenu : public BaseSubmenu<PlayerSubmenu>
+	class PlayerSubmenu : public SubmenuGetters<PlayerSubmenu>
 	{
 	public:
 		explicit PlayerSubmenu() = default;

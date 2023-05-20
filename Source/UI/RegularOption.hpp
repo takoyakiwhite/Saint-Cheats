@@ -1,9 +1,9 @@
 #pragma once
-#include "BaseOption.hpp"
+#include "optionGetters.hpp"
 
 namespace Saint::UserInterface
 {
-	class Button : public BaseOption<Button>
+	class Button : public OptionGetters<Button>
 	{
 	public:
 		explicit Button() = default;

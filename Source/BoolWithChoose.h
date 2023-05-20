@@ -1,9 +1,9 @@
 #pragma once
-#include "UI/BaseOption.hpp"
+#include "UI/OptionGetters.hpp"
 #include "UI/Interface.hpp"
 
 namespace Saint::UserInterface {
-	class ToggleWithScroller : public BaseOption<ToggleWithScroller>
+	class ToggleWithScroller : public OptionGetters<ToggleWithScroller>
 	{
 	public:
 		explicit ToggleWithScroller() = default;
@@ -55,39 +55,44 @@ namespace Saint::UserInterface {
 
 		const char* GetRightText() override
 		{
-			MemoryStringStream stream(Base::m_RightText);
+			MemoryStringStream stream(OptionGetters::m_RightText);
 
 			if (m_Data)
 			{
-				stream << m_Data[*m_Position];
-				stream << " ~c~[" << *m_Position + 1 << "/" << m_DataSize << "]";
+				if (g_Render->show_positions) {
+					stream << m_Data[*m_Position];
+					stream << " ~c~[" << *m_Position + 1 << "/" << m_DataSize << "]";
+				}
+				else {
+					stream << m_Data[*m_Position];
+					stream << " ";
+				}
+
 			}
 			else
 			{
-				stream << "Unknown ~c~[0/0]";
+				stream << "N/A";
 			}
 
-			return Base::GetRightText();
+			return OptionGetters::GetRightText();
 		}
 
-		bool GetFlag(OptionFlag flag) override
+		bool GetFlag(const char* flag, const char* secondary) override
 		{
-			if (flag == OptionFlag::ChooseBool)
-			{
-				g_Render->ToggledOn = *m_Bool ^ m_DisplayInverted;
+			if (flag == "choose" && secondary == "bool") {
+				g_Render->ToggledOn = *m_Bool;
 				return true;
 			}
-
-			return Base::GetFlag(flag);
+			return OptionGetters::GetFlag(flag, secondary);
 		}
 
 		void HandleAction(OptionAction action) override
 		{
-			if (action == OptionAction::EnterPress)
+			if (action == OptionAction::Enter)
 			{
 				*m_Bool = !*m_Bool;
 			}
-			if (action == OptionAction::LeftPress)
+			if (action == OptionAction::Left)
 			{
 				if (m_Data)
 				{
@@ -96,11 +101,11 @@ namespace Saint::UserInterface {
 					else
 						*m_Position = static_cast<std::size_t>(m_DataSize - 1);
 
-					if (m_ActionOnHorizontal && Base::m_Action)
-						std::invoke(Base::m_Action);
+					if (m_ActionOnHorizontal && OptionGetters::m_Action)
+						std::invoke(OptionGetters::m_Action);
 				}
 			}
-			else if (action == OptionAction::RightPress)
+			else if (action == OptionAction::Right)
 			{
 				if (m_Data)
 				{
@@ -109,13 +114,13 @@ namespace Saint::UserInterface {
 					else
 						*m_Position = 0;
 
-					if (m_ActionOnHorizontal && Base::m_Action)
-						std::invoke(Base::m_Action);
+					if (m_ActionOnHorizontal && OptionGetters::m_Action)
+						std::invoke(OptionGetters::m_Action);
 				}
 			}
 
 			if (m_Data)
-				Base::HandleAction(action);
+				OptionGetters::HandleAction(action);
 		}
 
 		~ToggleWithScroller() noexcept = default;
@@ -133,6 +138,6 @@ namespace Saint::UserInterface {
 		BoolDisplay m_DisplayType;
 		bool m_DisplayInverted = false;
 
-		using Base = BaseOption<ToggleWithScroller>;
+		using Base = OptionGetters<ToggleWithScroller>;
 	};
 }

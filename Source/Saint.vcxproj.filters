@@ -52,10 +52,10 @@
     <ClInclude Include="Invoker.hpp">
       <Filter>Utility\Invoker</Filter>
     </ClInclude>
-    <ClInclude Include="UI\AbstractSubmenu.hpp">
+    <ClInclude Include="UI\SubmenuBase.hpp">
       <Filter>Interface\Submenu</Filter>
     </ClInclude>
-    <ClInclude Include="UI\BaseSubmenu.hpp">
+    <ClInclude Include="UI\SubmenuGetters.hpp">
       <Filter>Interface\Submenu</Filter>
     </ClInclude>
     <ClInclude Include="UI\RegularSubmenu.hpp">
@@ -64,31 +64,13 @@
     <ClInclude Include="UI\PlayerSubmenu.hpp">
       <Filter>Interface\Submenu</Filter>
     </ClInclude>
-    <ClInclude Include="UI\RegularOption.hpp">
+    <ClInclude Include="UI\OptionBase.hpp">
       <Filter>Interface\Option</Filter>
     </ClInclude>
-    <ClInclude Include="UI\NumberOption.hpp">
-      <Filter>Interface\Option</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\AbstractOption.hpp">
-      <Filter>Interface\Option</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\BaseOption.hpp">
-      <Filter>Interface\Option</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\BoolOption.hpp">
-      <Filter>Interface\Option</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\ChooseOption.hpp">
-      <Filter>Interface\Option</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\SubOption.hpp">
+    <ClInclude Include="UI\OptionGetters.hpp">
       <Filter>Interface\Option</Filter>
     </ClInclude>
     <ClInclude Include="UI\TextBox.hpp">
-      <Filter>Interface\Option</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\UnclickOption.hpp">
       <Filter>Interface\Option</Filter>
     </ClInclude>
     <ClInclude Include="Logger.hpp">
@@ -190,15 +172,6 @@
     <ClInclude Include="Spoofing.h">
       <Filter>Core\Spoofing</Filter>
     </ClInclude>
-    <ClInclude Include="BoolWithNumber.hpp">
-      <Filter>Interface\Option</Filter>
-    </ClInclude>
-    <ClInclude Include="BoolWithChoose.h">
-      <Filter>Interface\Option</Filter>
-    </ClInclude>
-    <ClInclude Include="KeyboardOption.h">
-      <Filter>Interface\Option</Filter>
-    </ClInclude>
     <ClInclude Include="Notifications.h">
       <Filter>Core\Features</Filter>
     </ClInclude>
@@ -235,9 +208,6 @@
     <ClInclude Include="ClassHelper.h">
       <Filter>Hooking\ClassHelper</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerSub.hpp">
-      <Filter>Interface\Option</Filter>
-    </ClInclude>
     <ClInclude Include="Protections.h">
       <Filter>Core\Features\Protections</Filter>
     </ClInclude>
@@ -255,9 +225,6 @@
     </ClInclude>
     <ClInclude Include="font_awesome.h">
       <Filter>Core\Notifications</Filter>
-    </ClInclude>
-    <ClInclude Include="ColorSubmenu.hpp">
-      <Filter>Interface\Option</Filter>
     </ClInclude>
     <ClInclude Include="Vehicle.h">
       <Filter>Core\Features\Vehicle\Features</Filter>
@@ -279,6 +246,39 @@
     </ClInclude>
     <ClInclude Include="drawingFunctions2.h">
       <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\BoolOption.hpp">
+      <Filter>Interface\Option\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="BoolWithChoose.h">
+      <Filter>Interface\Option\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="BoolWithNumber.hpp">
+      <Filter>Interface\Option\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\ChooseOption.hpp">
+      <Filter>Interface\Option\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorSubmenu.hpp">
+      <Filter>Interface\Option\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Keyboard.hpp">
+      <Filter>Interface\Option\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\NumberOption.hpp">
+      <Filter>Interface\Option\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerSub.hpp">
+      <Filter>Interface\Option\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\RegularOption.hpp">
+      <Filter>Interface\Option\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\SubOption.hpp">
+      <Filter>Interface\Option\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UnclickOption.hpp">
+      <Filter>Interface\Option\Types</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -503,6 +503,9 @@
     </Filter>
     <Filter Include="Hooking\SHV">
       <UniqueIdentifier>{ee2d41a1-2168-49ac-a834-9629e4fabf18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Option\Types">
+      <UniqueIdentifier>{1f525f7a-419f-427f-8e0f-1a1061a4530f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

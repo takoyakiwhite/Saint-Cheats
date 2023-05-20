@@ -80,7 +80,7 @@ namespace Saint
 		}
 		std::va_list args{};
 		va_start(args, format);
-		Log(title, format, args);
+		Log("Info", title, args);
 		va_end(args);
 	}
 

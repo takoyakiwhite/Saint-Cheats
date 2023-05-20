@@ -27,7 +27,7 @@
 #include "Protections.h"
 #include "Queue.h"
 #include "Spoofing.h"
-#include "KeyboardOption.h"
+#include "Keyboard.hpp"
 #include "Render.h"
 #include "Notifications.h"
 #include "Discord/DiscordHandler.hpp"
@@ -462,7 +462,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Test", rage::joaat("TESTER"), [](sub* sub)
 			{
 				draw_option<submenu>("TEST", nullptr, rage::joaat("TESTER2"));
-				draw_option<toggle>(("Enabled"), nullptr, &ped_test);
+				draw_option<toggle>(("Enabled"), correctGrammar("your cat is gay not dont").c_str(), &ped_test);
 				for (int i = 0; i < 457; i++) {
 					draw_option<toggle>((std::format("ped_tester | {}", i).c_str()), nullptr, &ped_tester[i], [=] {
 						if (!ped_tester[i])
@@ -726,7 +726,7 @@ namespace Saint
 						});
 				}
 				draw_option<Break>(("Other"));
-				draw_option<KeyboardOption>(("Search"), "", vision.search, []
+				draw_option<Keyboard>(("Search"), "", vision.search, []
 					{
 						showKeyboard("Enter Something", "", 8, &vision.search, [=] {});
 					});
@@ -755,10 +755,10 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Regeneration"), rage::joaat("Regen"), [](sub* sub)
 			{
-				draw_option<toggle>(("Health"), "", &regen.health);
-				draw_option<toggle>(("Armour"), "", &regen.armour);
+				draw_option<toggle>("Health", "", &regen.health);
+				draw_option<toggle>("Armour", "", &regen.armour);
 				draw_option<Break>("Settings");
-				draw_option<toggle>(("In Cover"), "", &regen.inCover);
+				draw_option<toggle>("In Cover", "", &regen.inCover);
 				draw_option<number<std::int32_t>>("Delay", nullptr, &regen.delay, 0, 5000, 50, 3, true, "", "ms");
 				draw_option<number<std::int32_t>>("Amount", nullptr, &regen.amount, 0, ENTITY::GET_ENTITY_MAX_HEALTH(Game->Self()));
 			});
@@ -1187,7 +1187,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Search"), rage::joaat("AllModel"), [](sub* sub)
 			{
-				draw_option<KeyboardOption>(("Value"), "", modelsearchresults, []
+				draw_option<Keyboard>(("Value"), "", modelsearchresults, []
 					{
 						showKeyboard("Enter Something", "", 8, &modelsearchresults, [=] {});
 					});
@@ -1399,7 +1399,7 @@ namespace Saint
 			{
 
 
-				draw_option<KeyboardOption>("Search", nullptr, animation.results, []
+				draw_option<Keyboard>("Search", nullptr, animation.results, []
 					{
 						showKeyboard("Enter Something", "", 25, &animation.results, [] {
 
@@ -1583,7 +1583,7 @@ namespace Saint
 				draw_option<Scroll>("Animation", nullptr, &superjump.Jump_Type, &superjump.Jump_Int);
 				draw_option<Break>(("Settings"));
 
-				draw_option<ToggleWithNumber<float>>("Add Force", nullptr, &superjump.add_force, &superjump.force, 0.1f, 100.f, 0.1f, 2);
+				draw_option<ToggleWithNumber<float>>("Add Force", nullptr, &superjump.add_force, &superjump.force, 0.1f, 100.f, 0.1f, 1);
 				if (superjump.Jump_Int == 2) {
 					draw_option<toggle>(("Uses Super Jump"), nullptr, &superjump.use_super_jump);
 					draw_option<Scroll>("Direction", nullptr, &superjump.flip_type, &superjump.flip_int);
@@ -1643,7 +1643,7 @@ namespace Saint
 							VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVehicle, !false);
 							VEHICLE::SET_VEHICLE_WHEELS_CAN_BREAK(playerVehicle, !false);
 
-							//cool
+							//dogshit
 						}
 					}
 					});
@@ -1904,7 +1904,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Plate"), rage::joaat("LPlate"), [](sub* sub)
 			{
 				if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false)) {
-					draw_option<KeyboardOption>(("Text"), nullptr, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle()), []
+					draw_option<Keyboard>(("Text"), nullptr, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(Game->Vehicle()), []
 						{
 
 							showKeyboard("Enter Something", "", 8, &Bufferfrrrr, [=] {
@@ -1916,7 +1916,7 @@ namespace Saint
 				draw_option<toggle>(("Enabled"), "", &features.plate_test);
 				//draw_option<Scroll>("Direction", nullptr, &features.plate_test_direction, &features.plate_test_pos);
 				draw_option<number<std::int32_t>>("Delay", nullptr, &features.plate_test_delay, 0, 5000, 50, 3, true, "", "ms");
-				draw_option<KeyboardOption>(("Text"), nullptr, features.plate_test_text, []
+				draw_option<Keyboard>(("Text"), nullptr, features.plate_test_text, []
 					{
 
 						showKeyboard2("Enter Something", "", 25, &features.plate_test_text, [] {});
@@ -2896,7 +2896,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Search"), SubmenuVehicleSearch, [](sub* sub)
 			{
-				draw_option<KeyboardOption>(("Value"), "", modelsearchresults2, []
+				draw_option<Keyboard>(("Value"), "", modelsearchresults2, []
 					{
 						showKeyboard("Enter Something", "", 25, &modelsearchresults2, [=] {});
 					});
@@ -3045,7 +3045,7 @@ namespace Saint
 				draw_option<Break>(("Current Flags"));
 				char wreckless[64];
 				sprintf(wreckless, "%i", autopilot.wreckless_flag);
-				draw_option<KeyboardOption>(("Reckless"), nullptr, wreckless, []
+				draw_option<Keyboard>(("Reckless"), nullptr, wreckless, []
 					{
 						showKeyboard("Enter Something", "", 25, &autopilot.wreckless_buffer, [] {
 							autopilot.wreckless_flag = atoi(autopilot.wreckless_buffer.c_str());
@@ -3056,7 +3056,7 @@ namespace Saint
 					});
 				char nonwreckless[64];
 				sprintf(nonwreckless, "%i", autopilot.nonwreckless_flag);
-				draw_option<KeyboardOption>(("Non-Reckless"), nullptr, nonwreckless, []
+				draw_option<Keyboard>(("Non-Reckless"), nullptr, nonwreckless, []
 					{
 						showKeyboard("Enter Something", "", 25, &autopilot.nonwreckless_flag_buffer, [] {
 							autopilot.nonwreckless_flag = atoi(autopilot.nonwreckless_flag_buffer.c_str());
@@ -3067,7 +3067,7 @@ namespace Saint
 					});
 				char nonwreckless2[64];
 				sprintf(nonwreckless2, "%i", autopilot.avoid_roads_flag);
-				draw_option<KeyboardOption>((autopilot.avoid_roads_name.c_str()), nullptr, nonwreckless2, []
+				draw_option<Keyboard>((autopilot.avoid_roads_name.c_str()), nullptr, nonwreckless2, []
 					{
 						showKeyboard("Enter Something", "", 25, &autopilot.avoid_roads_buffer, [] {
 							autopilot.avoid_roads_flag = atoi(autopilot.avoid_roads_buffer.c_str());
@@ -3114,7 +3114,7 @@ namespace Saint
 					});
 				draw_option<Break>(("Names"));
 
-				draw_option<KeyboardOption>(("Slot 3"), nullptr, autopilot.avoid_roads_name.c_str(), []
+				draw_option<Keyboard>(("Slot 3"), nullptr, autopilot.avoid_roads_name.c_str(), []
 					{
 						showKeyboard("Enter Something", "", 25, &autopilot.avoid_roads_name, [] {});
 
@@ -3335,7 +3335,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Custom"), rage::joaat("CustomSpeedo"), [](sub* sub)
 			{
-				draw_option<KeyboardOption>(("Name"), nullptr, speedo.custom_name, []
+				draw_option<Keyboard>(("Name"), nullptr, speedo.custom_name, []
 					{
 						showKeyboard("Enter Something", "", 25, &speedo.custom_name, [] {});
 
@@ -4549,7 +4549,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Search"), rage::joaat("EngineSoundSearch"), [](sub* sub)
 			{
-				draw_option<KeyboardOption>(("Value"), "", enginesearchresults, []
+				draw_option<Keyboard>(("Value"), "", enginesearchresults, []
 					{
 						showKeyboard("Enter Something", "", 25, &enginesearchresults, [=] {});
 					});
@@ -5176,7 +5176,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Entity"), EntityShooterVehicle, [](sub* sub)
 			{
-				draw_option<KeyboardOption>(("Selected"), nullptr, Game->VehicleNameHash(m_entity_shooter.selected_hash), []
+				draw_option<Keyboard>(("Selected"), nullptr, Game->VehicleNameHash(m_entity_shooter.selected_hash), []
 					{
 
 
@@ -5978,7 +5978,7 @@ namespace Saint
 
 				draw_option<submenu>("Detected Methods", nullptr, SubmenuDEmeth);
 				if (g_RecoveryManager.selected == 0) {
-					draw_option<KeyboardOption>(("Change Name"), nullptr, STATS::STAT_GET_STRING(0x4A211FC8, -1), []
+					draw_option<Keyboard>(("Change Name"), nullptr, STATS::STAT_GET_STRING(0x4A211FC8, -1), []
 						{
 
 							showKeyboard2("Enter Something", "", 8, &features.name_buffer, [=] {
@@ -5987,7 +5987,7 @@ namespace Saint
 						});
 				}
 				if (g_RecoveryManager.selected == 1) {
-					draw_option<KeyboardOption>(("Change Name"), nullptr, STATS::STAT_GET_STRING(0xD2AB0EC6, -1), []
+					draw_option<Keyboard>(("Change Name"), nullptr, STATS::STAT_GET_STRING(0xD2AB0EC6, -1), []
 						{
 
 							showKeyboard2("Enter Something", "", 8, &features.name_buffer, [=] {
@@ -7951,7 +7951,7 @@ namespace Saint
 					m_recovery.m_level.m_level = 1;
 				}
 				draw_option<Scroll>("Type", nullptr, &m_recovery.level_type, &m_recovery.pos);
-				draw_option<KeyboardOption>(("Value"), nullptr, std::to_string(m_recovery.m_level.m_level), []
+				draw_option<Keyboard>(("Value"), nullptr, std::to_string(m_recovery.m_level.m_level), []
 					{
 						showKeyboard("Enter Something", "", 4, &m_recovery.m_level.m_level_buffer, [] {
 
@@ -8037,7 +8037,7 @@ namespace Saint
 				draw_option<number<std::int32_t>>("Members", nullptr, &spoofing.m_crew.member_count, 0, 5000);
 				draw_option<Break>(("Values"));
 
-				draw_option<KeyboardOption>(("Name"), nullptr, spoofing.m_crew.name, []
+				draw_option<Keyboard>(("Name"), nullptr, spoofing.m_crew.name, []
 					{
 						showKeyboard("Enter Something", "", 10, &spoofing.m_crew.nameBuffer, [] {
 							spoofing.m_crew.name = spoofing.m_crew.nameBuffer.c_str();
@@ -8045,7 +8045,7 @@ namespace Saint
 
 
 					});
-				draw_option<KeyboardOption>(("Tag"), nullptr, spoofing.m_crew.tag.c_str(), []
+				draw_option<Keyboard>(("Tag"), nullptr, spoofing.m_crew.tag.c_str(), []
 					{
 						showKeyboard("Enter Something", "", 4, &spoofing.m_crew.tag, [] {});
 
@@ -8127,7 +8127,7 @@ namespace Saint
 				//draw_option<submenu>("Spoof Sender", nullptr, SubmenuSpoofSpammer);
 				draw_option<toggle>(("Enabled"), nullptr, &chat.spammer);
 				draw_option<number<std::int32_t>>("Delay", nullptr, &chat.delay, 0, 5000, 50, 3, true, "", "ms");
-				draw_option<KeyboardOption>(("Text"), nullptr, chat.text.c_str(), []
+				draw_option<Keyboard>(("Text"), nullptr, chat.text.c_str(), []
 					{
 						showKeyboard("Enter Something", "", 35, &chat.text, [] {});
 
@@ -8179,7 +8179,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("RID Joiner"), SubmenuRIDJoiner, [](sub* sub)
 			{
-				draw_option<KeyboardOption>(("RID"), nullptr, ridBuffer.c_str(), []
+				draw_option<Keyboard>(("RID"), nullptr, ridBuffer.c_str(), []
 					{
 						showKeyboard("Enter Something", "", 25, &ridBuffer, [] {
 							selected_rid = atoi(ridBuffer.c_str());
@@ -8530,20 +8530,20 @@ namespace Saint
 					auto& stats1 = gpbd_fm_1.as<GPBD_FM*>()->Entries[all_players.get_id(g_SelectedPlayer)];
 					auto& stats2 = gpbd_fm_3.as<GPBD_FM_3*>()->Entries[all_players.get_id(g_SelectedPlayer)];
 					auto& stats3 = globalplayer_bd.as<GlobalPlayerBD*>()->Entries[all_players.get_id(g_SelectedPlayer)];
-					draw_option<KeyboardOption>(("Races Won"), nullptr, std::to_string(stats.TotalRacesWon), [] {}, false);
-					draw_option<KeyboardOption>(("Races Lost"), nullptr, std::to_string(stats.TotalRacesLost), [] {}, false);
-					draw_option<KeyboardOption>(("Killstreak"), nullptr, std::to_string(stats1.KillStreak), [] {}, false);
-					draw_option<KeyboardOption>(("Arcade Safe Cash"), nullptr, std::to_string(stats1.PropertyData.ArcadeData.SafeCashValue), [] {}, false);
-					draw_option<KeyboardOption>(("Time Trial Active"), nullptr, stats3.TimeTrialActive ? "Yes" : "No", [] {}, false);
-					draw_option<KeyboardOption>(("Badsport"), nullptr, stats3.IsBadsport ? "Yes" : "No", [] {}, false);
-					draw_option<KeyboardOption>(("Invisible"), nullptr, stats3.IsInvisible ? "Yes" : "No", [] {}, false);
-					draw_option<KeyboardOption>(("Off Radar"), nullptr, stats3.OffRadarActive ? "Yes" : "No", [] {}, false);
-					draw_option<KeyboardOption>(("Yacht Name"), nullptr, stats3.YachtData.Appearance.Name.Data, [] {}, false);
-					draw_option<KeyboardOption>(("Nightclub Safe Cash"), nullptr, separateByCommas2(stats1.PropertyData.NightclubData.SafeCashValue), [] {}, false);
-					draw_option<KeyboardOption>(("Nightclub Entry Cost"), nullptr, std::to_string(stats1.PropertyData.NightclubData.EntryCost), [] {}, false);
-					draw_option<KeyboardOption>(("Nightclub Popularity"), nullptr, std::to_string((int)stats1.PropertyData.NightclubData.Popularity), [] {}, false);
-					draw_option<KeyboardOption>(("Bunker Research"), nullptr, std::to_string(stats1.PropertyData.TotalBunkerResearch), [] {}, false);
-					draw_option<KeyboardOption>(("Current Research Progress"), nullptr, std::to_string(stats1.PropertyData.CurrentBunkerResearchProgress), [] {}, false);
+					draw_option<Keyboard>(("Races Won"), nullptr, std::to_string(stats.TotalRacesWon), [] {}, false);
+					draw_option<Keyboard>(("Races Lost"), nullptr, std::to_string(stats.TotalRacesLost), [] {}, false);
+					draw_option<Keyboard>(("Killstreak"), nullptr, std::to_string(stats1.KillStreak), [] {}, false);
+					draw_option<Keyboard>(("Arcade Safe Cash"), nullptr, std::to_string(stats1.PropertyData.ArcadeData.SafeCashValue), [] {}, false);
+					draw_option<Keyboard>(("Time Trial Active"), nullptr, stats3.TimeTrialActive ? "Yes" : "No", [] {}, false);
+					draw_option<Keyboard>(("Badsport"), nullptr, stats3.IsBadsport ? "Yes" : "No", [] {}, false);
+					draw_option<Keyboard>(("Invisible"), nullptr, stats3.IsInvisible ? "Yes" : "No", [] {}, false);
+					draw_option<Keyboard>(("Off Radar"), nullptr, stats3.OffRadarActive ? "Yes" : "No", [] {}, false);
+					draw_option<Keyboard>(("Yacht Name"), nullptr, stats3.YachtData.Appearance.Name.Data, [] {}, false);
+					draw_option<Keyboard>(("Nightclub Safe Cash"), nullptr, separateByCommas2(stats1.PropertyData.NightclubData.SafeCashValue), [] {}, false);
+					draw_option<Keyboard>(("Nightclub Entry Cost"), nullptr, std::to_string(stats1.PropertyData.NightclubData.EntryCost), [] {}, false);
+					draw_option<Keyboard>(("Nightclub Popularity"), nullptr, std::to_string((int)stats1.PropertyData.NightclubData.Popularity), [] {}, false);
+					draw_option<Keyboard>(("Bunker Research"), nullptr, std::to_string(stats1.PropertyData.TotalBunkerResearch), [] {}, false);
+					draw_option<Keyboard>(("Current Research Progress"), nullptr, std::to_string(stats1.PropertyData.CurrentBunkerResearchProgress), [] {}, false);
 				}
 			});
 		g_Render->draw_submenu<sub>("Block Actions", rage::joaat("BlockActions"), [](sub* sub)
@@ -8559,7 +8559,7 @@ namespace Saint
 					g_players.draw_info(g_SelectedPlayer);
 				}
 				draw_option<submenu>("Presets", nullptr, SubmenuSelectedChatPresets);
-				draw_option<KeyboardOption>(("Text"), nullptr, p_chat.text.c_str(), []
+				draw_option<Keyboard>(("Text"), nullptr, p_chat.text.c_str(), []
 					{
 						showKeyboard("Enter Something", "", 35, &p_chat.text, [] {});
 
@@ -8588,7 +8588,7 @@ namespace Saint
 				if (alyways_show_info) {
 					g_players.draw_info(g_SelectedPlayer);
 				}
-				draw_option<KeyboardOption>(("Send Friend Request"), nullptr, messageFriendInput, []
+				draw_option<Keyboard>(("Send Friend Request"), nullptr, messageFriendInput, []
 					{
 
 						showKeyboard("Enter Something", "", 25, &messageFriendInput, [] {
@@ -8961,7 +8961,7 @@ namespace Saint
 				if (alyways_show_info) {
 					g_players.draw_info(g_SelectedPlayer);
 				}
-				draw_option<KeyboardOption>(("Input"), nullptr, ModelInput, []
+				draw_option<Keyboard>(("Input"), nullptr, ModelInput, []
 					{
 
 						showKeyboard("Enter Something", "", 25, &ModelInput, [] {
@@ -9624,7 +9624,7 @@ namespace Saint
 					g_players.get_selected.send_to_int({ 123 });
 				});
 			draw_option<Break>(("Custom"));
-			draw_option<KeyboardOption>(("ID"), nullptr, std::to_string(g_players.get_selected.int_id), []
+			draw_option<Keyboard>(("ID"), nullptr, std::to_string(g_players.get_selected.int_id), []
 				{
 					showKeyboard("Enter Message", "", 50, &g_players.get_selected.buffer, [] {
 						g_players.get_selected.int_id = atoi(g_players.get_selected.buffer.c_str());
@@ -9754,7 +9754,7 @@ namespace Saint
 				draw_option<toggle>(("Enabled"), nullptr, &text_spam.enabled);
 				draw_option<number<std::int32_t>>("Delay", nullptr, &text_spam.delay, 0, 5000, 50, 3, true, "", "ms");
 
-				draw_option<KeyboardOption>(("Text"), nullptr, text_spam.text.c_str(), []
+				draw_option<Keyboard>(("Text"), nullptr, text_spam.text.c_str(), []
 					{
 						showKeyboard("Enter Message", "", 50, &text_spam.text, [] {});
 					});
@@ -9807,7 +9807,7 @@ namespace Saint
 				draw_option<ToggleWithScroller>("Custom Firing Pattern", nullptr, &bodygaurd.FiringPatternEnabled, &bodygaurd.FiringPattern, &bodygaurd.FiringPatternInt);
 				draw_option<number<std::int32_t>>("Accuracy", nullptr, &bodygaurd.accuary, 0, 100);
 				draw_option<number<float>>("Damage Multiplier", nullptr, &bodygaurd.damagemultiplier, 0.0f, 150.f, 0.10f, 2);
-				draw_option<KeyboardOption>(("Selected"), nullptr, bodygaurd.selected_name, []
+				draw_option<Keyboard>(("Selected"), nullptr, bodygaurd.selected_name, []
 					{
 
 					});
@@ -10333,9 +10333,7 @@ namespace Saint
 				draw_option<submenu>("Clubhouse & Warehouses", nullptr, rage::joaat("warhouse"));
 				draw_option<submenu>("Indoors", nullptr, rage::joaat("indoors"));
 				draw_option<submenu>("IPLs", nullptr, rage::joaat("IPLS"));
-				if (sub->GetSelectedOption() == sub->GetNumOptions()) {
-					GRAPHICS::DRAW_MARKER(28, Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, 0, 0, 0, 0, 0, 0, tp_nearest_radius, tp_nearest_radius, tp_nearest_radius, g_Render->m_RadiusSphere.r, g_Render->m_RadiusSphere.g, g_Render->m_RadiusSphere.b, g_Render->m_RadiusSphere.a, false, false, 0, false, NULL, NULL, false);
-				}
+				UserInterface::DrawingFunctions()->RadiusSphere(tp_nearest_radius, sub);
 				draw_option<number<float>>("Nearest Vehicle", nullptr, &tp_nearest_radius, 0, 1000.0, 1.0, 0, false, "", "m", [=] {
 					Vehicle veh = VEHICLE::GET_CLOSEST_VEHICLE(Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, tp_nearest_radius, 0, 0);
 					if (!VEHICLE::IS_VEHICLE_SEAT_FREE(veh, -1, FALSE))
@@ -10915,9 +10913,7 @@ namespace Saint
 				draw_option<number<std::int32_t>>("Red", nullptr, &features.m_Red, 0, 255, 1, 3);
 				draw_option<number<std::int32_t>>("Green", nullptr, &features.m_Green, 0, 255, 1, 3);
 				draw_option<number<std::int32_t>>("Blue", nullptr, &features.m_Blue, 0, 255, 1, 3);
-				if (sub->GetSelectedOption() == sub->GetNumOptions()) {
-					GRAPHICS::DRAW_MARKER(28, Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, 0, 0, 0, 0, 0, 0, features.glow_range, features.glow_range, features.glow_range, g_Render->m_RadiusSphere.r, g_Render->m_RadiusSphere.g, g_Render->m_RadiusSphere.b, g_Render->m_RadiusSphere.a, false, false, 0, false, NULL, NULL, false);
-				}
+				UserInterface::DrawingFunctions()->RadiusSphere(features.glow_range, sub);
 				draw_option<number<float>>("Radius", nullptr, &features.glow_range, 0, 1000.0, 50.0, 0, true, "", "m");
 
 
@@ -10928,9 +10924,7 @@ namespace Saint
 
 		g_Render->draw_submenu<sub>(("Clear Area"), rage::joaat("ClearArea"), [](sub* sub)
 			{
-				if (sub->GetSelectedOption() == 0 || world.clear_area.always_show_radius) {
-					GRAPHICS::DRAW_MARKER(28, Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, 0, 0, 0, 0, 0, 0, world.clear_area.radius, world.clear_area.radius, world.clear_area.radius, g_Render->m_RadiusSphere.r, g_Render->m_RadiusSphere.g, g_Render->m_RadiusSphere.b, g_Render->m_RadiusSphere.a, false, false, 0, false, NULL, NULL, false);
-				}
+				UserInterface::DrawingFunctions()->RadiusSphere(0, world.clear_area.radius, world.clear_area.always_show_radius, sub);
 				draw_option<number<float>>("Radius", nullptr, &world.clear_area.radius, 0, 1000.0, 1.0, 0, true, "", "m", [] {
 
 					});
@@ -10976,7 +10970,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Object"), rage::joaat("SpawnerWObject"), [](sub* sub)
 			{
 				draw_option<submenu>("Spawned", nullptr, rage::joaat("SpawnedObjects"));
-				draw_option<KeyboardOption>("Search", nullptr, search_objects, []
+				draw_option<Keyboard>("Search", nullptr, search_objects, []
 					{
 						showKeyboard("Enter Something", "", 25, &search_objects, [] {
 
@@ -11011,11 +11005,7 @@ namespace Saint
 
 									Object obj = OBJECT::CREATE_OBJECT_NO_OFFSET(hash, Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, true, false, false);
 									ped_spawner.spawned_objects.push_back({ obj, m_objectmodels[i] });
-
-
-
-
-									});
+								});
 
 
 							});
@@ -11454,7 +11444,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Object"), rage::joaat("Objects"), [](sub* sub)
 			{
 
-				draw_option<KeyboardOption>(("Add To List"), nullptr, m_creator.selected_object_name, []
+				draw_option<Keyboard>(("Add To List"), nullptr, m_creator.selected_object_name, []
 					{
 						showKeyboard("Enter Something", "", 25, &m_creator.selected_buffer, [] {
 							Hash hash = Game->HashKey(m_creator.selected_buffer.c_str());
@@ -11809,14 +11799,14 @@ namespace Saint
 			{
 				draw_option<Scroll>("Action", nullptr, &fileExplorer.action, &fileExplorer.pos);
 
-				draw_option<KeyboardOption>("Path", nullptr, fileExplorer.path, []
+				draw_option<Keyboard>("Path", nullptr, fileExplorer.path, []
 					{
 						showKeyboard("Enter Something, Example: C:\\Saint\\Sounds\\", "", 25, &fileExplorer.path, [] {
 
 							});
 					});
 				if (fileExplorer.pos == 2) {
-					draw_option<KeyboardOption>("New Path", nullptr, fileExplorer.path2, []
+					draw_option<Keyboard>("New Path", nullptr, fileExplorer.path2, []
 						{
 							showKeyboard("Enter Something, Example: C:\\Saint\\Teleports\\", "", 25, &fileExplorer.path2, [] {
 
@@ -11824,14 +11814,14 @@ namespace Saint
 						});
 				}
 				if (fileExplorer.pos == 3) {
-					draw_option<KeyboardOption>("Extension", nullptr, fileExplorer.extension, []
+					draw_option<Keyboard>("Extension", nullptr, fileExplorer.extension, []
 						{
 							showKeyboard("Enter Something, .mp3", "", 25, &fileExplorer.extension, [] {
 
 								});
 						});
 				}
-				draw_option<KeyboardOption>("Command", "Example: saint", fileExplorer.command, []
+				draw_option<Keyboard>("Command", "Example: saint", fileExplorer.command, []
 					{
 						showKeyboard("Enter Something", "", 25, &fileExplorer.command, [] {
 							if (fileExplorer.command == "saint") {
@@ -11875,7 +11865,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Sounds", rage::joaat("Music"), [](sub* sub)
 			{
 				draw_option<toggle>(("Looped"), nullptr, &loop_sound);
-				draw_option<KeyboardOption>("Search", nullptr, search_sounds, []
+				draw_option<Keyboard>("Search", nullptr, search_sounds, []
 					{
 						showKeyboard("Enter Something", "", 25, &search_sounds, [] {
 
@@ -12031,7 +12021,7 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Search", rage::joaat("SearchHud"), [](sub* sub)
 			{
 
-				draw_option<KeyboardOption>("Value", nullptr, hud_color.search, []
+				draw_option<Keyboard>("Value", nullptr, hud_color.search, []
 					{
 						showKeyboard("Enter Something", "", 25, &hud_color.search, [] {
 
@@ -12240,7 +12230,7 @@ namespace Saint
 					});
 				draw_option<Break>(("List"));
 				for (auto& hotkey : m_Hotkeys) {
-					draw_option<KeyboardOption>((hotkey.name.c_str()), nullptr, hotkey.key_name, []
+					draw_option<Keyboard>((hotkey.name.c_str()), nullptr, hotkey.key_name, []
 						{
 
 						});
@@ -12455,19 +12445,19 @@ namespace Saint
 				draw_option<toggle>("Off", nullptr, &g_Render->toggle_show_off);
 				if (g_Render->ToggleIterator == 4) {
 					draw_option<Break>(("Custom"));
-					draw_option<KeyboardOption>(("Directory"), nullptr, g_Render->custom_toggle_dict_on, []
+					draw_option<Keyboard>(("Directory"), nullptr, g_Render->custom_toggle_dict_on, []
 						{
 							showKeyboard("Enter Something", "", 25, &g_Render->custom_toggle_dict_on, [] {});
 						});
-					draw_option<KeyboardOption>(("Asset"), nullptr, g_Render->custom_toggle_asset_on, []
+					draw_option<Keyboard>(("Asset"), nullptr, g_Render->custom_toggle_asset_on, []
 						{
 							showKeyboard("Enter Something", "", 25, &g_Render->custom_toggle_asset_on, [] {});
 						});
-					draw_option<KeyboardOption>(("Directory Off"), nullptr, g_Render->custom_toggle_dict_off, []
+					draw_option<Keyboard>(("Directory Off"), nullptr, g_Render->custom_toggle_dict_off, []
 						{
 							showKeyboard("Enter Something", "", 25, &g_Render->custom_toggle_dict_off, [] {});
 						});
-					draw_option<KeyboardOption>(("Asset Off"), nullptr, g_Render->custom_toggle_asset_off, []
+					draw_option<Keyboard>(("Asset Off"), nullptr, g_Render->custom_toggle_asset_off, []
 						{
 							showKeyboard("Enter Something", "", 25, &g_Render->custom_toggle_asset_off, [] {});
 						});
@@ -12486,6 +12476,7 @@ namespace Saint
 			{
 				draw_option<toggle>("Glare", nullptr, &g_Render->m_render_glare);
 				draw_option<toggle>("Sounds", nullptr, &g_Render->m_Sounds);
+				draw_option<toggle>("Show Positions", nullptr, &g_Render->show_positions);
 				draw_option<number<float>>("Width", nullptr, &g_Render->m_Width, 0.01f, 1.f, 0.01f, 2);
 				draw_option<number<float>>("Smooth Scroll Speed", nullptr, &g_Render->smooth_scroll_speed, 0.01f, 1.00f, 0.01f, 2);
 				draw_option<number<float>>("Glare Height Offset", nullptr, &g_Render->glare.height_offset, -1000.f, 1000.f, 0.001f, 3);
@@ -12528,7 +12519,7 @@ namespace Saint
 						}
 					});
 
-				draw_option<KeyboardOption>(("Text"), nullptr, g_Render->header_name, []
+				draw_option<Keyboard>(("Text"), nullptr, g_Render->header_name, []
 					{
 						showKeyboard("Enter Something", "", 25, &g_Render->header_name, [] {});
 					});
@@ -12788,7 +12779,7 @@ namespace Saint
 
 				draw_option<submenu>("Text", nullptr, SubmenuSettingsHeaderText);
 				draw_option<number<float>>("Height", nullptr, &g_Render->m_HeaderHeight, 0.01f, 0.2f, 0.001f, 3);
-				draw_option<KeyboardOption>(("Name"), nullptr, g_Render->header_name, []
+				draw_option<Keyboard>(("Name"), nullptr, g_Render->header_name, []
 					{
 						showKeyboard("Enter Something", "", 25, &g_Render->header_name, [] {});
 

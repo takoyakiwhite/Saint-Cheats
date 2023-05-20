@@ -60,4 +60,8 @@ namespace Saint
 	};
 
 	inline std::unique_ptr<Logger> g_Logger;
+	inline Logger loggerGetter;
+	inline Logger* getLogger() {
+		return &loggerGetter;
+	}
 }

@@ -308,6 +308,8 @@ namespace Saint
 
 		CNetworkPlayerMgr** m_NetworkPlayerManager;
 
+		PVOID test222;
+
 		
 		
 

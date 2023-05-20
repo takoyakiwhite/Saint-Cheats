@@ -1,13 +1,14 @@
 #pragma once
 #include "../Common.hpp"
-#include "AbstractOption.hpp"
+#include "OptionBase.hpp"
 
 namespace Saint::UserInterface
 {
 	template <typename T>
-	class BaseOption : public AbstractOption
+	class OptionGetters : public OptionBase
 	{
 	public:
+	
 		const char* GetLeftText() override
 		{
 			return &m_LeftText[0];
@@ -39,7 +40,7 @@ namespace Saint::UserInterface
 
 		void HandleAction(OptionAction action) override
 		{
-			if (action == OptionAction::EnterPress)
+			if (action == OptionAction::Enter)
 			{
 				if (m_Action)
 				{
@@ -48,7 +49,7 @@ namespace Saint::UserInterface
 			}
 		}
 
-		bool GetFlag(OptionFlag) override
+		bool GetFlag(const char*, const char*) override
 		{
 			return false;
 		}
@@ -95,13 +96,13 @@ namespace Saint::UserInterface
 		}
 
 	protected:
-		explicit BaseOption() = default;
-		~BaseOption() noexcept = default;
+		explicit OptionGetters() = default;
+		~OptionGetters() noexcept = default;
 
-		BaseOption(BaseOption const&) = default;
-		BaseOption& operator=(BaseOption const&) = default;
-		BaseOption(BaseOption&&) = default;
-		BaseOption& operator=(BaseOption&&) = default;
+		OptionGetters(OptionGetters const&) = default;
+		OptionGetters& operator=(OptionGetters const&) = default;
+		OptionGetters(OptionGetters&&) = default;
+		OptionGetters& operator=(OptionGetters&&) = default;
 
 		char m_LeftText[64] = {};
 		char m_RightText[64] = {};

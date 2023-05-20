@@ -6270,12 +6270,15 @@ namespace Saint {
 
 			ColorIni->WriteInt(g_Render->HeaderFontIterator, "Header", "Font");
 
+			ColorIni->WriteBool(g_Render->show_positions, "Positions", "Enabled");
+
 		}
 		void load(std::string name) {
 			try {
 				std::string MenuFolderPath = "C:\\Saint\\Themes\\";
 				if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
 					Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+					g_Render->show_positions = ColorIni->GetBool("Positions", "Enabled");
 					g_Render->HeaderFontIterator = ColorIni->GetInt("Header", "Font");
 					g_Render->header_name = ColorIni->GetString("Header", "text");
 					g_Render->ToggleIterator = ColorIni->GetInt("Toggles", "icon");
@@ -6382,6 +6385,11 @@ namespace Saint {
 			ColorIni->WriteFloat(handling->m_traction_spring_delta_max, "Handling", "m_traction_spring_delta_max");
 			ColorIni->WriteFloat(handling->m_traction_spring_delta_max_ratio, "Handling", "m_traction_spring_delta_max_ratio");
 			ColorIni->WriteFloat(handling->m_suspension_raise, "Handling", "m_suspension_raise");
+			ColorIni->WriteFloat(handling->m_suspension_comp_damp, "Handling", "m_suspension_comp_damp");
+			ColorIni->WriteFloat(handling->m_suspension_rebound_damp, "Handling", "m_suspension_rebound_damp");
+			ColorIni->WriteFloat(handling->m_suspension_force, "Handling", "m_suspension_force");
+			ColorIni->WriteFloat(handling->m_suspension_lower_limit, "Handling", "m_suspension_lower_limit");
+			ColorIni->WriteFloat(handling->m_suspension_upper_limit, "Handling", "m_suspension_upper_limit");
 			for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
 			{
 				if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
@@ -6395,52 +6403,62 @@ namespace Saint {
 			ColorIni->WriteString(MENU_VERSION, "Other", "Version");
 		}
 		void load(std::string name) {
-			std::string MenuFolderPath = "C:\\Saint\\Handling\\";
-			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
+			try {
+				std::string MenuFolderPath = "C:\\Saint\\Handling\\";
+				if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
 
-				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
-				std::string version = ColorIni->GetString("Other", "Version");
+					Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+					std::string version = ColorIni->GetString("Other", "Version");
 
-				auto handling = Game->CPed()->m_vehicle->m_handling_data;
-				handling->m_acceleration = ColorIni->GetFloat("Handling", "m_acceleration");
-				handling->m_mass = ColorIni->GetFloat("Handling", "m_mass");
-				handling->m_buoyancy = ColorIni->GetFloat("Handling", "m_buoyancy");
-				handling->m_brake_force = ColorIni->GetFloat("Handling", "m_brake_force");
-				handling->m_traction_bias_front = ColorIni->GetFloat("Handling", "m_traction_bias_front");
-				handling->m_traction_bias_rear = ColorIni->GetFloat("Handling", "m_traction_bias_rear");
-				handling->m_traction_curve_min = ColorIni->GetFloat("Handling", "m_traction_curve_min");
-				handling->m_traction_curve_max = ColorIni->GetFloat("Handling", "m_traction_curve_max");
-				handling->m_centre_of_mass.x = ColorIni->GetFloat("Handling", "m_centre_of_mass_x");
-				handling->m_centre_of_mass.y = ColorIni->GetFloat("Handling", "m_centre_of_mass_y");
-				handling->m_centre_of_mass.z = ColorIni->GetFloat("Handling", "m_centre_of_mass_z");
-				handling->m_drive_bias_front = ColorIni->GetFloat("Handling", "m_drive_bias_front");
-				handling->m_drive_bias_rear = ColorIni->GetFloat("Handling", "m_drive_bias_rear");
-				handling->m_drive_inertia = ColorIni->GetFloat("Handling", "m_drive_inertia");
-				handling->m_inertia_mult.x = ColorIni->GetFloat("Handling", "m_inertia_mult_x");
-				handling->m_inertia_mult.y = ColorIni->GetFloat("Handling", "m_inertia_mult_y");
-				handling->m_inertia_mult.z = ColorIni->GetFloat("Handling", "m_inertia_mult_z");
-				handling->m_steering_lock = ColorIni->GetFloat("Handling", "m_steering_lock");
-				handling->m_traction_curve_lateral = ColorIni->GetFloat("Handling", "m_traction_curve_lateral");
-				handling->m_traction_curve_ratio = ColorIni->GetFloat("Handling", "m_traction_curve_ratio");
-				handling->m_low_speed_traction_loss_mult = ColorIni->GetFloat("Handling", "m_low_speed_traction_loss_mult");
-				handling->m_traction_spring_delta_max = ColorIni->GetFloat("Handling", "m_traction_spring_delta_max");
-				handling->m_traction_spring_delta_max_ratio = ColorIni->GetFloat("Handling", "m_traction_spring_delta_max_ratio");
-				handling->m_suspension_raise = ColorIni->GetFloat("Handling", "m_suspension_raise");
-				for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
-				{
-					if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
+					auto handling = Game->CPed()->m_vehicle->m_handling_data;
+					handling->m_suspension_upper_limit = ColorIni->GetFloat("Handling", "m_suspension_upper_limit");
+					handling->m_suspension_comp_damp = ColorIni->GetFloat("Handling", "m_suspension_comp_damp");
+					handling->m_suspension_rebound_damp = ColorIni->GetFloat("Handling", "m_suspension_rebound_damp");
+					handling->m_suspension_force = ColorIni->GetFloat("Handling", "m_suspension_force");
+					handling->m_suspension_lower_limit = ColorIni->GetFloat("Handling", "m_suspension_lower_limit");
+					handling->m_acceleration = ColorIni->GetFloat("Handling", "m_acceleration");
+					handling->m_mass = ColorIni->GetFloat("Handling", "m_mass");
+					handling->m_buoyancy = ColorIni->GetFloat("Handling", "m_buoyancy");
+					handling->m_brake_force = ColorIni->GetFloat("Handling", "m_brake_force");
+					handling->m_traction_bias_front = ColorIni->GetFloat("Handling", "m_traction_bias_front");
+					handling->m_traction_bias_rear = ColorIni->GetFloat("Handling", "m_traction_bias_rear");
+					handling->m_traction_curve_min = ColorIni->GetFloat("Handling", "m_traction_curve_min");
+					handling->m_traction_curve_max = ColorIni->GetFloat("Handling", "m_traction_curve_max");
+					handling->m_centre_of_mass.x = ColorIni->GetFloat("Handling", "m_centre_of_mass_x");
+					handling->m_centre_of_mass.y = ColorIni->GetFloat("Handling", "m_centre_of_mass_y");
+					handling->m_centre_of_mass.z = ColorIni->GetFloat("Handling", "m_centre_of_mass_z");
+					handling->m_drive_bias_front = ColorIni->GetFloat("Handling", "m_drive_bias_front");
+					handling->m_drive_bias_rear = ColorIni->GetFloat("Handling", "m_drive_bias_rear");
+					handling->m_drive_inertia = ColorIni->GetFloat("Handling", "m_drive_inertia");
+					handling->m_inertia_mult.x = ColorIni->GetFloat("Handling", "m_inertia_mult_x");
+					handling->m_inertia_mult.y = ColorIni->GetFloat("Handling", "m_inertia_mult_y");
+					handling->m_inertia_mult.z = ColorIni->GetFloat("Handling", "m_inertia_mult_z");
+					handling->m_steering_lock = ColorIni->GetFloat("Handling", "m_steering_lock");
+					handling->m_traction_curve_lateral = ColorIni->GetFloat("Handling", "m_traction_curve_lateral");
+					handling->m_traction_curve_ratio = ColorIni->GetFloat("Handling", "m_traction_curve_ratio");
+					handling->m_low_speed_traction_loss_mult = ColorIni->GetFloat("Handling", "m_low_speed_traction_loss_mult");
+					handling->m_traction_spring_delta_max = ColorIni->GetFloat("Handling", "m_traction_spring_delta_max");
+					handling->m_traction_spring_delta_max_ratio = ColorIni->GetFloat("Handling", "m_traction_spring_delta_max_ratio");
+					handling->m_suspension_raise = ColorIni->GetFloat("Handling", "m_suspension_raise");
+					for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
 					{
-						auto const dc = reinterpret_cast<CCarHandlingData*>(d);
-						dc->m_camber_front = ColorIni->GetFloat("Handling", "m_camber_front");
-						dc->m_camber_rear = ColorIni->GetFloat("Handling", "m_camber_rear");
-						break;
+						if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
+						{
+							auto const dc = reinterpret_cast<CCarHandlingData*>(d);
+							dc->m_camber_front = ColorIni->GetFloat("Handling", "m_camber_front");
+							dc->m_camber_rear = ColorIni->GetFloat("Handling", "m_camber_rear");
+							break;
+						}
 					}
+					Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Loaded '%s'", name });
+
+
+
+
 				}
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Loaded '%s'", name });
-
-
-
-
+			}
+			catch (const std::exception& e) {
+				getLogger()->Push(e.what(), LogFlag::Info, "");
 			}
 		}
 	};

@@ -1,11 +1,11 @@
 #pragma once
-#include "AbstractSubmenu.hpp"
-#include "AbstractOption.hpp"
+#include "SubmenuBase.hpp"
+#include "OptionBase.hpp"
 
 namespace Saint::UserInterface
 {
 	template <typename T>
-	class BaseSubmenu : public AbstractSubmenu
+	class SubmenuGetters : public SubmenuBase
 	{
 	public:
 		const char* GetName() override
@@ -31,7 +31,7 @@ namespace Saint::UserInterface
 			m_Options.clear();
 		}
 
-		AbstractOption* GetOption(std::size_t i) override
+		OptionBase* GetOption(std::size_t i) override
 		{
 			if (i > m_Options.size())
 				return nullptr;
@@ -59,33 +59,6 @@ namespace Saint::UserInterface
 		{
 			m_SelectedOption = n;
 		}
-#ifdef logoptions
-		std::vector<std::string> s;
-#endif
-		template <typename OptionType, typename ...TArgs>
-		void draw_option(TArgs&&... args)
-		{
-#ifdef logoptions
-			std::string soos = std::string(std::get<0>(std::tie(args...)));
-			bool found = false;
-			for (int i = 0; i < s.size(); i++) {
-				if (s[i] == soos) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				s.push_back(soos);
-				soos = soos + "\n";
-				std::ofstream o("C:\\Users\\Tim\\sainttranslation.txt", std::ios_base::app);
-				o.write(soos.c_str(), soos.size());
-				o.close();
-			}
-			
-#endif
-			m_Options.push_back(std::make_unique<OptionType>(std::forward<TArgs>(args)...));
-			
-		}
 
 		T& SetName(const char* name)
 		{
@@ -106,13 +79,13 @@ namespace Saint::UserInterface
 			return static_cast<T&>(*this);
 		}
 	protected:
-		explicit BaseSubmenu() = default;
-		~BaseSubmenu() noexcept = default;
+		explicit SubmenuGetters() = default;
+		~SubmenuGetters() noexcept = default;
 
-		BaseSubmenu(BaseSubmenu const&) = default;
-		BaseSubmenu& operator=(BaseSubmenu const&) = default;
-		BaseSubmenu(BaseSubmenu&&) = default;
-		BaseSubmenu& operator=(BaseSubmenu&&) = default;
+		SubmenuGetters(SubmenuGetters const&) = default;
+		SubmenuGetters& operator=(SubmenuGetters const&) = default;
+		SubmenuGetters(SubmenuGetters&&) = default;
+		SubmenuGetters& operator=(SubmenuGetters&&) = default;
 
 		char m_Name[64] = {};
 		std::uint32_t m_Id{};

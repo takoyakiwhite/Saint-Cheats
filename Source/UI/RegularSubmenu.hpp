@@ -1,9 +1,9 @@
 #pragma once
-#include "BaseSubmenu.hpp"
+#include "submenuGetters.hpp"
 
 namespace Saint::UserInterface
 {
-	class sub : public BaseSubmenu<sub>
+	class sub : public SubmenuGetters<sub>
 	{
 	public:
 		explicit sub() = default;

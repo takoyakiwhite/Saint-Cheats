@@ -1,10 +1,10 @@
 #pragma once
-#include "UI/BaseOption.hpp"
+#include "UI/OptionGetters.hpp"
 #include "UI/Interface.hpp"
 
 namespace Saint::UserInterface {
     template <typename NumberType>
-    class ToggleWithNumber : public BaseOption<ToggleWithNumber<NumberType>>
+    class ToggleWithNumber : public OptionGetters<ToggleWithNumber<NumberType>>
     {
     public:
         explicit ToggleWithNumber() = default;
@@ -21,7 +21,7 @@ namespace Saint::UserInterface {
             if (description)
                 Base::SetDescription(description);
             Base::SetAction(std::move(action));
-            Base::HandleAction(*m_Bool ? OptionAction::EnterPress : OptionAction::EnterPress);
+            Base::HandleAction(*m_Bool ? OptionAction::Enter : OptionAction::Enter);
             std::strncpy(&m_Prefix[0], prefix, sizeof(m_Prefix) - 1);
             std::strncpy(&m_Suffix[0], suffix, sizeof(m_Suffix) - 1);
         }
@@ -32,15 +32,13 @@ namespace Saint::UserInterface {
         ToggleWithNumber(ToggleWithNumber&&) = default;
         ToggleWithNumber& operator=(ToggleWithNumber&&) = default;
 
-        bool GetFlag(OptionFlag flag) override
+        bool GetFlag(const char* flag, const char* secondary) override
         {
-            if (flag == OptionFlag::BoolWithNumber)
-            {
+            if (flag == "number" && secondary == "bool") {
                 g_Render->ToggledOn = *m_Bool;
                 return true;
             }
-
-            return Base::GetFlag(flag);
+            return Base::GetFlag(flag, secondary);
         }
         const char* GetRightText() override
         {
@@ -58,11 +56,11 @@ namespace Saint::UserInterface {
 
         void HandleAction(OptionAction action) override
         {
-            if (action == OptionAction::EnterPress)
+            if (action == OptionAction::Enter)
             {
                 *m_Bool = !*m_Bool;
             }
-            if (action == OptionAction::LeftPress)
+            if (action == OptionAction::Left)
             {
                 if (*m_Number - m_Step < m_Min)
                     *m_Number = m_Max;
@@ -72,7 +70,7 @@ namespace Saint::UserInterface {
                 if (m_ActionOnHorizontal && Base::m_Action)
                     std::invoke(Base::m_Action);
             }
-            else if (action == OptionAction::RightPress)
+            else if (action == OptionAction::Right)
             {
                 if (*m_Number + m_Step > m_Max)
                     *m_Number = m_Min;
@@ -98,7 +96,7 @@ namespace Saint::UserInterface {
         std::size_t m_Precision{};
 
 
-        using Base = BaseOption<ToggleWithNumber<NumberType>>;
+        using Base = OptionGetters<ToggleWithNumber<NumberType>>;
         using DisplayType = std::conditional_t<sizeof(NumberType) == 1, std::uint32_t, NumberType>;
     };
 }

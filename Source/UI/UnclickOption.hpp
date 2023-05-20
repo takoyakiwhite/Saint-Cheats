@@ -1,10 +1,10 @@
 #pragma once
-#include "BaseOption.hpp"
+#include "optionGetters.hpp"
 #include "Interface.hpp"
 
 namespace Saint::UserInterface
 {
-	class Break : public BaseOption<Break>
+	class Break : public OptionGetters<Break>
 	{
 	public:
 		explicit Break() = default;
@@ -15,14 +15,12 @@ namespace Saint::UserInterface
 			SetCenteredText(textfinal);
 		}
 
-		bool GetFlag(OptionFlag flag) override
+		bool GetFlag(const char* flag, const char* secondary) override
 		{
-			if (flag == OptionFlag::UnclickOption)
-			{
+			if (flag == "break" && secondary == "none") {
 				return true;
 			}
-
-			return BaseOption::GetFlag(flag);
+			return OptionGetters::GetFlag(flag, secondary);
 		}
 
 		~Break() noexcept = default;
