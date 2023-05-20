@@ -42,15 +42,27 @@ namespace Saint::UserInterface {
         }
         const char* GetRightText() override
         {
-            MemoryStringStream stream(Base::m_RightText);
-            stream
-                << std::setprecision(m_Precision)
-                << std::fixed
-                << m_Prefix
-                << static_cast<DisplayType>(*m_Number)
-                << "/"
-                << static_cast<DisplayType>(m_Max)
-                << m_Suffix;
+            
+            if (g_Render->show_max) {
+                MemoryStringStream stream(Base::m_RightText);
+                stream
+                    << std::setprecision(m_Precision)
+                    << std::fixed
+                    << m_Prefix
+                    << static_cast<DisplayType>(*m_Number)
+                    << "/"
+                    << static_cast<DisplayType>(m_Max)
+                    << m_Suffix;
+            }
+            else {
+                MemoryStringStream stream(Base::m_RightText);
+                stream
+                    << std::setprecision(m_Precision)
+                    << std::fixed
+                    << m_Prefix
+                    << static_cast<DisplayType>(*m_Number)
+                    << m_Suffix;
+            }
             return Base::GetRightText();
         }
 

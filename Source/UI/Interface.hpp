@@ -371,7 +371,8 @@ namespace Saint::UserInterface
 		float description_y2 = 0.0f;
 
 		bool scrollbar = false;
-		bool show_positions = true;
+		bool show_positions = false;
+		bool show_max = false;
 		const char* getAmountOfOptions(SubmenuBase* sub) {
 			char rightText[32] = {};
 			std::snprintf(rightText, sizeof(rightText) - 1, "%zu / %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());

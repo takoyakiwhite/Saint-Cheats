@@ -7,12 +7,25 @@ namespace Saint {
 		bool friends = false;
 		bool self = true;
 	};
+	class jetHandler {
+	public:
+		jetHandler(Vehicle m_veh, Ped m_ped) {
+			veh = m_veh;
+			ped = m_ped;
+
+		}
+	public:
+		Vehicle veh;
+		Ped ped;
+	};
 	class m_Jets {
 	public:
 		Vehicle angryPlanesPlane;
 		Ped angryPlanesPed;
 		Excludes excludes;
+		std::vector<jetHandler> spawned = {
 
+		};
 		void add_jet(std::uint32_t buffer) {
 			Entity playerEntity = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(buffer);
 			NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(playerEntity, true);
@@ -50,6 +63,7 @@ namespace Saint {
 					ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPed, 1);
 					TASK::TASK_COMBAT_PED(angryPlanesPed, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(buffer), 0, 16);
 				});
+			spawned.push_back({ angryPlanesPlane, angryPlanesPed });
 		}
 		void spawn() {
 

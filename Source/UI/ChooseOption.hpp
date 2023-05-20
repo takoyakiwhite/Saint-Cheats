@@ -84,8 +84,8 @@ namespace Saint::UserInterface
 					else
 						*m_Position = static_cast<std::size_t>(m_DataSize - 1);
 
-					if (m_ActionOnHorizontal && OptionGetters::m_Action)
-						std::invoke(OptionGetters::m_Action);
+					if (m_ActionOnHorizontal && Base::m_Action)
+						std::invoke(Base::m_Action);
 				}
 			}
 			else if (action == OptionAction::Right)
@@ -97,13 +97,13 @@ namespace Saint::UserInterface
 					else
 						*m_Position = 0;
 
-					if (m_ActionOnHorizontal && OptionGetters::m_Action)
-						std::invoke(OptionGetters::m_Action);
+					if (m_ActionOnHorizontal && Base::m_Action)
+						std::invoke(Base::m_Action);
 				}
 			}
 
 			if (m_Data)
-				OptionGetters::HandleAction(action);
+				Base::HandleAction(action);
 		}
 
 		~Scroll() noexcept = default;

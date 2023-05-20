@@ -159,8 +159,8 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				}
 #endif
 				g_Logger = std::make_unique<Logger>();
-				g_Logger->Info("Saint Version %s", MENU_VERSION);
-				g_Logger->Info("This build was compiled at " __DATE__ ", " __TIME__ ".");
+				g_Logger->Info("Version: %s", MENU_VERSION);
+				g_Logger->Info("This build was compiled on " __DATE__ ". ");
 			//	PlaySound(TEXT("C:\\Saint\\Sounds\\Intro.wav"), NULL, SND_FILENAME | SND_ASYNC);
 				g_FiberPool.registerFbrPool();
 

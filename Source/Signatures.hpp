@@ -310,6 +310,9 @@ namespace Saint
 
 		PVOID test222;
 
+		using reset_network_complaints = void (*)(CNetComplaintMgr* mgr);
+		reset_network_complaints m_reset_network_complaints{};
+
 		
 		
 

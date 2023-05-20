@@ -187,9 +187,11 @@ namespace Saint::UserInterface
 		std::lock_guard lock(m_Mutex);
 		if (IsMouseLocked())
 		{
-			PAD::DISABLE_ALL_CONTROL_ACTIONS(0);
-			ShowCursor(true);
-			SetCursor(LoadCursorA(NULL, IDC_ARROW));
+			if (g_Render->controlsEnabled) {
+				PAD::DISABLE_ALL_CONTROL_ACTIONS(0);
+				ShowCursor(true);
+				SetCursor(LoadCursorA(NULL, IDC_ARROW));
+			}
 
 
 		}
@@ -720,28 +722,20 @@ namespace Saint::UserInterface
 					false, false);
 			
 		}
-		else if (opt->GetFlag("keyboard", "none")) {
+		else if (opt->GetFlag("keyboard", "none") || opt->GetFlag("keyboard", "no_pen")) {
 			auto res = DrawingFunctions()->GetSpriteScale(0.0185);
 			auto res2 = DrawingFunctions()->GetSpriteScale(0.0185);
 			DrawingFunctions()->Text(TextPosition::Right,
 				righttext,
-				m_PosX + (m_Width / m_OptionPadding - 0.01f),
+				opt->GetFlag("keyboard", "none") ? m_PosX + (m_Width / m_OptionPadding - 0.01f) : m_PosX + (m_Width / m_OptionPadding),
 				m_DrawBaseY + (m_OptionHeight / 2.f) - (DrawingFunctions()->GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
 				m_OptionTextSize,
 				m_OptionFont,
 				getSelectedColor(),
 				false, false);
-			DrawingFunctions()->Sprite(getTexture("pen"), m_PosX + (m_Width / m_OptionPadding - 0.004f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 0.0);
-		}
-		else if (opt->GetFlag("keyboard", "no_pen")) {
-			DrawingFunctions()->Text(TextPosition::Right,
-				righttext,
-				m_PosX + (m_Width / m_OptionPadding),
-				m_DrawBaseY + (m_OptionHeight / 2.f) - (DrawingFunctions()->GetTextHeight(m_OptionFont, m_OptionTextSize) / 2) - 0.003,
-				m_OptionTextSize,
-				m_OptionFont,
-				getSelectedColor(),
-				false, false);
+			if (opt->GetFlag("keyboard", "none")) {
+				DrawingFunctions()->Sprite(getTexture("pen"), m_PosX + (m_Width / m_OptionPadding - 0.004f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 0.0);
+			}
 		}
 
 		else {

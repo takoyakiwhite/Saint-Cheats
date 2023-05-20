@@ -4,6 +4,7 @@
 #include "Jets.h"
 #include "Explode.h"
 namespace Saint {
+	inline CNetGamePlayer* m_player_to_use_complaint_kick;
 	class Notifications {
 	public:
 		bool leaving_and_joining = true;

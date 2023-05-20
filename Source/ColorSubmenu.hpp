@@ -31,7 +31,7 @@ namespace Saint::UserInterface
 				g_Render->SwitchToSubmenu(m_SubId);
 			}
 
-			OptionGetters::HandleAction(action);
+			Base::HandleAction(action);
 		}
 
 		
@@ -41,9 +41,10 @@ namespace Saint::UserInterface
 			if (flag == "submenu" && secondary == "color") {
 				return true;
 			}
-			return OptionGetters::GetFlag(flag, secondary);
+			return Base::GetFlag(flag, secondary);
 		}
 	private:
+		using Base = OptionGetters<color_submenu>;
 		std::uint32_t m_SubId{};
 	};
 }

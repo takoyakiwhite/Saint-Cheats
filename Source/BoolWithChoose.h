@@ -55,7 +55,7 @@ namespace Saint::UserInterface {
 
 		const char* GetRightText() override
 		{
-			MemoryStringStream stream(OptionGetters::m_RightText);
+			MemoryStringStream stream(Base::m_RightText);
 
 			if (m_Data)
 			{
@@ -83,7 +83,7 @@ namespace Saint::UserInterface {
 				g_Render->ToggledOn = *m_Bool;
 				return true;
 			}
-			return OptionGetters::GetFlag(flag, secondary);
+			return Base::GetFlag(flag, secondary);
 		}
 
 		void HandleAction(OptionAction action) override
@@ -101,8 +101,8 @@ namespace Saint::UserInterface {
 					else
 						*m_Position = static_cast<std::size_t>(m_DataSize - 1);
 
-					if (m_ActionOnHorizontal && OptionGetters::m_Action)
-						std::invoke(OptionGetters::m_Action);
+					if (m_ActionOnHorizontal && Base::m_Action)
+						std::invoke(Base::m_Action);
 				}
 			}
 			else if (action == OptionAction::Right)
@@ -114,13 +114,13 @@ namespace Saint::UserInterface {
 					else
 						*m_Position = 0;
 
-					if (m_ActionOnHorizontal && OptionGetters::m_Action)
-						std::invoke(OptionGetters::m_Action);
+					if (m_ActionOnHorizontal && Base::m_Action)
+						std::invoke(Base::m_Action);
 				}
 			}
 
 			if (m_Data)
-				OptionGetters::HandleAction(action);
+				Base::HandleAction(action);
 		}
 
 		~ToggleWithScroller() noexcept = default;

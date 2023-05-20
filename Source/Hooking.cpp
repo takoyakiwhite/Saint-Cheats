@@ -1426,7 +1426,14 @@ namespace Saint
 	bool Hooks::object_creation_data_node(CObjectCreationDataNode* node, rage::netObject* obj)
 	{
 		auto result = static_cast<decltype(&object_creation_data_node)>(g_Hooking->m_OriginalInvalidPlayer222)(node, obj);
-
+		if (Flags->isDev()) {
+			char notification2[64];
+			sprintf(notification2, "model spawned | %s", std::to_string(node->m_model));
+			std::string soos = notification2;
+			std::ofstream o("C:\\Saint\\Saint\\log2.txt", std::ios_base::app);
+			o.write(soos.c_str(), soos.size());
+			o.close();
+		}
 		if (protections.Crashes.object) {
 
 			if (Lists::crash_model_check(node->m_model)) {
@@ -1463,9 +1470,30 @@ namespace Saint
 	{
 
 		auto result = static_cast<decltype(&hk_ped_creation_data_node)>(g_Hooking->ped_creation)(node);
+		if (Flags->isDev()) {
+			char notification2[64];
+			sprintf(notification2, "model spawned | %s", std::to_string(node->m_model));
+			std::string soos = notification2;
+			std::ofstream o("C:\\Saint\\Saint\\log2.txt", std::ios_base::app);
+			o.write(soos.c_str(), soos.size());
+			o.close();
+		}
 		if (protections.Crashes.ped) {
 			if (Lists::crash_model_check(node->m_model) || Lists::crash_model_check(node->m_prop_model)) {
-				protections.push_notification(ICON_FA_SHIELD_ALT"  Prevented crash | Ped");
+				if (Flags->isDev()) {
+					char notification[64];
+					sprintf(notification, ICON_FA_SHIELD_ALT"  Prevented crash | Ped | %s", std::to_string(node->m_model));
+					g_NotificationManager->add(notification, 2000, 0);
+					char notification2[64];
+					sprintf(notification2, "model spawned | %s", std::to_string(node->m_model));
+					std::string soos = notification2;
+					std::ofstream o("C:\\Saint\\Saint\\log2.txt", std::ios_base::app);
+					o.write(soos.c_str(), soos.size());
+					o.close();
+				}
+				else {
+					protections.push_notification(ICON_FA_SHIELD_ALT"  Prevented crash | Ped");
+				}
 				return true;
 			}
 		}
@@ -1480,6 +1508,15 @@ namespace Saint
 
 		if (!result)
 			return result;
+
+		if (Flags->isDev()) {
+			char notification2[64];
+			sprintf(notification2, "model spawned | %s", std::to_string(node->m_model));
+			std::string soos = notification2;
+			std::ofstream o("C:\\Saint\\Saint\\log2.txt", std::ios_base::app);
+			o.write(soos.c_str(), soos.size());
+			o.close();
+		}
 		if (protections.Crashes.vehicle) {
 			if (Lists::crash_model_check(node->m_model)) {
 				protections.push_notification(ICON_FA_SHIELD_ALT"  Prevented crash | Vehicle");

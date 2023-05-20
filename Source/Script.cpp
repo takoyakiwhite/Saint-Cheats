@@ -541,7 +541,7 @@ namespace Saint
 					}
 					});
 
-				draw_option<ToggleWithNumber<float>>("Slide Run", nullptr, &features.slide_run, &features.slide_run_speed, 0.1f, 100.f, 0.1f, 2);
+				draw_option<ToggleWithNumber<float>>("Slide Run", nullptr, &features.slide_run, &features.slide_run_speed, 0.1f, 100.f, 0.1f, 1);
 				draw_option<toggle>(("Glitch"), "Disables the wanted level system.", &features.naruto_run, [] {
 					if (!features.naruto_run) {
 						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
@@ -559,7 +559,7 @@ namespace Saint
 				draw_option<toggle>(("Auto Clean"), "Automaticly cleans you're ped from visual damage.", &features.autoclean);
 				draw_option<toggle>(("Forcefield"), "", &features.force_field);
 				draw_option<toggle>(("Infinite Stamina"), "", &features.infinite_stamina);
-				draw_option<toggle>(("Instantly Enter Vehicle"), "", &features.instant_enter);
+				draw_option<toggle>(("Instantly Enter Vehicles"), "", &features.instant_enter);
 				//draw_option<toggle>(("Beast Landing"), "", &BeastLanding); not sure what it does, dont seem to do anything
 				draw_option<toggle>(("Swim Anywhere"), "", &features.swim_anywhere, [] {
 					if (!features.swim_anywhere)
@@ -822,7 +822,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Damage Packs"), rage::joaat("DamagePacks"), [](sub* sub)
 			{
-				draw_option<number<float>>("Value", nullptr, &self.damage_pack.value, 0, 1000.0, 1.0, 3, true, "", "", []
+				draw_option<number<float>>("Value", nullptr, &self.damage_pack.value, 0, 1000.0, 1.0, 0, true, "", "", []
 					{
 						PED::SET_PED_MOVE_RATE_OVERRIDE(Game->Self(), move_rate);
 					});
@@ -1375,12 +1375,6 @@ namespace Saint
 				draw_option<Button>(("Plant"), nullptr, [=]
 					{
 						animation.start("amb@world_human_gardener_plant@female@idle_a", "idle_a_female");
-
-
-					});
-				draw_option<Button>(("Dance"), nullptr, [=]
-					{
-						animation.start("oddjobs@assassinate@multi@yachttarget@lapdanc", "yacht_ld_f");
 
 
 					});
@@ -1950,8 +1944,8 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Tuning"), rage::joaat("Tuning"), [](sub* sub)
 			{
-				draw_option<ToggleWithNumber<float>>("Acceleration", nullptr, &acceleration.enabled, &acceleration.speed, 0.1f, 10000.f, 0.1f, 2);
-				draw_option<ToggleWithNumber<float>>("Torque", nullptr, &acceleration.torque, &acceleration.value, 1.f, 10000.f, 1.0f, 2, true, "", "", [] {
+				draw_option<ToggleWithNumber<float>>("Acceleration", nullptr, &acceleration.enabled, &acceleration.speed, 0.1f, 10000.f, 0.1f, 1);
+				draw_option<ToggleWithNumber<float>>("Torque", nullptr, &acceleration.torque, &acceleration.value, 1.f, 10000.f, 1.0f, 0, true, "", "", [] {
 					if (!acceleration.torque) {
 						VEHICLE::SET_VEHICLE_CHEAT_POWER_INCREASE(Game->Vehicle(), 1.0);
 					}
@@ -8509,7 +8503,7 @@ namespace Saint
 					});
 				draw_option<Button>("Kick", nullptr, [=]
 					{
-						g_players.get_selected.events.remove(2);
+						g_players.get_selected.events.remove(1);
 
 					});
 
@@ -8539,11 +8533,22 @@ namespace Saint
 					draw_option<Keyboard>(("Invisible"), nullptr, stats3.IsInvisible ? "Yes" : "No", [] {}, false);
 					draw_option<Keyboard>(("Off Radar"), nullptr, stats3.OffRadarActive ? "Yes" : "No", [] {}, false);
 					draw_option<Keyboard>(("Yacht Name"), nullptr, stats3.YachtData.Appearance.Name.Data, [] {}, false);
-					draw_option<Keyboard>(("Nightclub Safe Cash"), nullptr, separateByCommas2(stats1.PropertyData.NightclubData.SafeCashValue), [] {}, false);
-					draw_option<Keyboard>(("Nightclub Entry Cost"), nullptr, std::to_string(stats1.PropertyData.NightclubData.EntryCost), [] {}, false);
-					draw_option<Keyboard>(("Nightclub Popularity"), nullptr, std::to_string((int)stats1.PropertyData.NightclubData.Popularity), [] {}, false);
 					draw_option<Keyboard>(("Bunker Research"), nullptr, std::to_string(stats1.PropertyData.TotalBunkerResearch), [] {}, false);
 					draw_option<Keyboard>(("Current Research Progress"), nullptr, std::to_string(stats1.PropertyData.CurrentBunkerResearchProgress), [] {}, false);
+					draw_option<Break>(("MC Stats"));
+					draw_option<Keyboard>(("Kills"), nullptr, std::to_string(stats2.MCStats.MCKills), [] {}, false);
+					draw_option<Keyboard>(("Melee Kills"), nullptr, std::to_string(stats2.MCStats.MeleeKills), [] {}, false);
+					draw_option<Keyboard>(("Deaths"), nullptr, std::to_string(stats2.MCStats.MCDeaths), [] {}, false);
+					draw_option<Keyboard>(("Members Marked For Death"), nullptr, std::to_string(stats2.MCStats.MembersMarkedForDeath), [] {}, false);
+					draw_option<Break>(("Nightclub"));
+					draw_option<Keyboard>(("Safe Cash"), nullptr, std::format("${}", separateByCommas2(stats1.PropertyData.NightclubData.SafeCashValue)), [] {}, false);
+					draw_option<Keyboard>(("Entry Cost"), nullptr, std::to_string(stats1.PropertyData.NightclubData.EntryCost), [] {}, false);
+					draw_option<Keyboard>("Popularity", nullptr, std::format("{}%", (int)stats1.PropertyData.NightclubData.Popularity), [] {}, false);
+					draw_option<Keyboard>("Sold Items", nullptr, std::format("{}", stats1.NightclubSale.NumSoldItems), [] {}, false);
+					draw_option<Keyboard>("Sale Amount", nullptr, std::format("{}", stats1.NightclubSale.SaleAmount), [] {}, false);
+					draw_option<Break>(("Other"));
+					draw_option<Keyboard>("Lapdances Bought", nullptr, std::format("{}", std::to_string(stats1.PlayerStats.LapDancesBought)), [] {}, false);
+
 				}
 			});
 		g_Render->draw_submenu<sub>("Block Actions", rage::joaat("BlockActions"), [](sub* sub)
@@ -8903,38 +8908,42 @@ namespace Saint
 				draw_option<Scroll>("Type", nullptr, &acrobatic_type, &acrobatic_int4);
 				draw_option<Button>(("Start"), nullptr, []
 					{
-						if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false))) {
-							if (acrobatic_int4 == 0) {
+						QUEUE()
+						{
+							if (g_players.get_selected.request_control(PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), false))) {
+								if (acrobatic_int4 == 0) {
 
-								Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), FALSE);
-								ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
-								ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
-								ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
+									Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), FALSE);
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 6.0f, 0, 2.0f, 0, true, true, true, true, false, true);
 
-							}
-							if (acrobatic_int4 == 1) {
+								}
+								if (acrobatic_int4 == 1) {
 
-								Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), FALSE);
-								ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
-								ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
-								ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
+									Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), FALSE);
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 9.0f, 0, -2.0f, 0, true, true, true, true, false, true);
 
-							}
-							if (acrobatic_int4 == 2) {
+								}
+								if (acrobatic_int4 == 2) {
 
-								Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), FALSE);
-								ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 10.0f, 20.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1);
+									Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), FALSE);
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 10.0f, 20.0f, 0.0f, 0.0f, 0, 1, 1, 1, 0, 1);
 
-							}
-							if (acrobatic_int4 == 3) {
+								}
+								if (acrobatic_int4 == 3) {
 
-								Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), FALSE);
-								ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 7.0f, 0, 0, 0, true, true, true, true, false, true);
+									Vehicle playerVehicle = PED::GET_VEHICLE_PED_IS_IN(Game->PlayerIndex(g_SelectedPlayer), FALSE);
+									ENTITY::APPLY_FORCE_TO_ENTITY(playerVehicle, true, 0, 0, 7.0f, 0, 0, 0, true, true, true, true, false, true);
 
 
 
+								}
 							}
 						}
+						STOP
 					});
 
 			});
@@ -9347,6 +9356,18 @@ namespace Saint
 					{
 						all_players.jet.spawn();
 					});
+				draw_option<Button>(("Delete"), nullptr, []
+					{
+						for (auto& fortniter : all_players.jet.spawned) {
+							if (ENTITY::DOES_ENTITY_EXIST(fortniter.ped)) {
+								features.DeleteEntity(fortniter.ped);
+							}
+							if (ENTITY::DOES_ENTITY_EXIST(fortniter.veh)) {
+								features.DeleteEntity(fortniter.veh);
+							}
+						}
+
+					});
 			});
 		g_Render->draw_submenu<sub>("Exclude", SubmenuJetExcludes, [](sub* sub)
 			{
@@ -9662,13 +9683,13 @@ namespace Saint
 				g_players.draw_info(g_SelectedPlayer);
 			}
 			draw_option<Scroll>("Mode", nullptr, &attackers.mode, &attackers.mode_i);
-			if (attackers.mode_i == 1) {
+			if (attackers.mode_i == 0) {
 				draw_option<Scroll>("Model", nullptr, &attackers.cop_models, &attackers.cop_int);
 			}
-			if (attackers.mode_i != 2) {
+			if (attackers.mode_i != 1) {
 				draw_option<Scroll>("Weapon", nullptr, &attackers.data, &attackers.data_i);
 			}
-			if (attackers.mode_i == 2) {
+			if (attackers.mode_i == 1) {
 				draw_option<Scroll>("Vehicle", nullptr, &attackers.veh, &attackers.veh_int);
 				draw_option<number<std::int32_t>>("Amount", nullptr, &attackers.how_many_planes, 0, 100);
 			}
@@ -9679,7 +9700,15 @@ namespace Saint
 				});
 			draw_option<Button>(("Delete"), nullptr, []
 				{
-					attackers.remove();
+					for (auto& fortniter : attackers.spawned_jets) {
+						if (ENTITY::DOES_ENTITY_EXIST(fortniter.ped)) {
+							features.DeleteEntity(fortniter.ped);
+						}
+						if (ENTITY::DOES_ENTITY_EXIST(fortniter.veh)) {
+							features.DeleteEntity(fortniter.veh);
+						}
+					}
+					
 				});
 			});
 		g_Render->draw_submenu<sub>(("Explode"), SubmenuExplode, [](sub* sub) {
@@ -12349,6 +12378,7 @@ namespace Saint
 				draw_option<submenu>("Submenu", nullptr, rage::joaat("SubmenuIndc"));
 				draw_option<submenu>("Rainbow", nullptr, rage::joaat("RainbowGay"));
 				draw_option<submenu>("Tooltips", nullptr, rage::joaat("Tooltips"));
+				draw_option<submenu>("Misc", nullptr, rage::joaat("CustomMisc"));
 				draw_option<toggle>("Lines", nullptr, &g_Render->lines_enabled);
 				draw_option<number<float>>("Text Size", nullptr, &g_Render->m_OptionTextSize, 0.01f, 1.f, 0.01f, 2);
 				draw_option<Scroll>("Font", nullptr, &g_Render->HeaderFont, &g_Render->option_font_it, true, -1, []
@@ -12376,6 +12406,11 @@ namespace Saint
 				//draw_option<Scroll>("Resolution", nullptr, &g_Render->Resolution, &g_Render->reso);
 
 
+			});
+		g_Render->draw_submenu<sub>(("Misc"), rage::joaat("CustomMisc"), [](sub* sub)
+			{
+				draw_option<toggle>("Show Positions", "Shows positions, Example: [1/3]", &g_Render->show_positions);
+				draw_option<toggle>("Show Max", "Example: 1.00/100.0", &g_Render->show_max);
 			});
 		g_Render->draw_submenu<sub>(("Tooltips"), rage::joaat("Tooltips"), [](sub* sub)
 			{
@@ -12476,7 +12511,6 @@ namespace Saint
 			{
 				draw_option<toggle>("Glare", nullptr, &g_Render->m_render_glare);
 				draw_option<toggle>("Sounds", nullptr, &g_Render->m_Sounds);
-				draw_option<toggle>("Show Positions", nullptr, &g_Render->show_positions);
 				draw_option<number<float>>("Width", nullptr, &g_Render->m_Width, 0.01f, 1.f, 0.01f, 2);
 				draw_option<number<float>>("Smooth Scroll Speed", nullptr, &g_Render->smooth_scroll_speed, 0.01f, 1.00f, 0.01f, 2);
 				draw_option<number<float>>("Glare Height Offset", nullptr, &g_Render->glare.height_offset, -1000.f, 1000.f, 0.001f, 3);

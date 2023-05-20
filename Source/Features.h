@@ -4040,9 +4040,20 @@ namespace Saint {
 		std::size_t data_i = 0;
 	};
 	inline P_filter p_filter;
+	class jetHandler2 {
+	public:
+		jetHandler2(Vehicle m_veh, Ped m_ped) {
+			veh = m_veh;
+			ped = m_ped;
+
+		}
+	public:
+		Vehicle veh;
+		Ped ped;
+	};
 	class Attackers {
 	public:
-		const char* mode[3] = { "None", "Police", "Jet" };
+		const char* mode[2] = { "Police", "Jet" };
 		std::size_t mode_i = 1;
 		bool godmode = false;
 		const char* data[89]
@@ -4085,9 +4096,12 @@ namespace Saint {
 				ENTITY::DELETE_ENTITY(&angryPlanesPlane);
 			}
 		}
+		std::vector<jetHandler2> spawned_jets = {
+
+		};
 		void add() {
 
-			if (mode_i == 1) {
+			if (mode_i == 0) {
 				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), false);
 
 				g_CallbackScript->AddCallback<ModelCallback>(Game->HashKey(cop_hashes[cop_int]), [=] {
@@ -4116,7 +4130,7 @@ namespace Saint {
 
 					});
 			}
-			if (mode_i == 2) {
+			if (mode_i == 1) {
 				Entity playerEntity = Game->PlayerIndex(g_SelectedPlayer);
 				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(playerEntity, true);
 				const char* modelName = "TITAN";
@@ -4152,8 +4166,9 @@ namespace Saint {
 							PED::SET_DRIVER_ABILITY(angryPlanesPed, 0.99f);
 							ENTITY::SET_ENTITY_INVINCIBLE(angryPlanesPed, 1);
 							TASK::TASK_COMBAT_PED(angryPlanesPed, Game->PlayerIndex(g_SelectedPlayer), 0, 16);
+							spawned_jets.push_back({ angryPlanesPlane, angryPlanesPed });
 						});
-
+					
 				}
 			}
 		}
@@ -5719,7 +5734,7 @@ namespace Saint {
 	class Cage {
 	public:
 		bool is_invisible = false;
-		const char* type[4] = { "Stunt Tube", "Normal", "Cable", "Rub" };
+		const char* type[2] = { "Stunt Tube", "Normal"};
 		std::size_t data = 0;
 		void add() {
 			switch (data) {
@@ -13011,7 +13026,63 @@ namespace Saint {
 		}
 	};
 	inline RIDToolkit rid_tool;
+	inline bool desync_prots = false;
+	class DesyncProt {
+	public:
+		CNetworkPlayerMgr* GetNetworkPlayerMgr()
+		{
+			if (auto NetworkPlayerMgr = *g_GameFunctions->m_NetworkPlayerManager)
+				return NetworkPlayerMgr;
+
+			return nullptr;
+		}
+		Network* network()
+		{
+			return *g_GameFunctions->m_network;
+		}
+		void init() {
+			if (!desync_prots) {
+				return;
+			}
+			if (g_GameFunctions->m_GetNetPlayer(PLAYER::PLAYER_ID())->is_valid() && g_GameFunctions->m_GetNetPlayer(PLAYER::PLAYER_ID())->is_host())
+				return;
+
+			memset(&network()->m_game_complaint_mgr.m_host_tokens_complained, 0, 64 * sizeof(std::uint64_t));
+			if (!m_player_to_use_complaint_kick || !m_player_to_use_complaint_kick->get_net_data()) network()->m_game_complaint_mgr.m_num_tokens_complained = 0;
+			else
+			{
+				network()->m_game_complaint_mgr.m_num_tokens_complained = 1;
+				network()->m_game_complaint_mgr.m_host_tokens_complained[0] =
+					m_player_to_use_complaint_kick->get_net_data()->m_host_token;
+			}
+
+			auto old = network()->m_game_complaint_mgr.m_host_token;
+
+			if (network()->m_game_session_state > 3 && network()->m_game_session_state < 6)
+			{
+				auto PlayerManager = GetNetworkPlayerMgr();
+				for (auto plyr : PlayerManager->m_player_list)
+				{
+					if (plyr->get_net_data())
+					{
+						network()->m_game_complaint_mgr.m_host_token = plyr->get_net_data()->m_host_token;
+						g_GameFunctions->m_reset_network_complaints(&network()->m_game_complaint_mgr);
+					}
+				}
+
+				if (g_GameFunctions->m_GetNetPlayer(PLAYER::PLAYER_ID()) && g_GameFunctions->m_GetNetPlayer(PLAYER::PLAYER_ID())->get_net_data())
+				{
+					network()->m_game_complaint_mgr.m_host_token = g_GameFunctions->m_GetNetPlayer(PLAYER::PLAYER_ID())->get_net_data()->m_host_token;
+					g_GameFunctions->m_reset_network_complaints(&network()->m_game_complaint_mgr);
+				}
+			}
+
+			network()->m_game_complaint_mgr.m_host_token = old;
+		}
+	};
+	inline DesyncProt desyncp;
 	inline void FeatureInitalize() {
+		desyncp.init();
 		shake.init();
 		freecam.init();
 		enter_veh.update();

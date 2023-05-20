@@ -163,7 +163,7 @@ namespace Saint::UserInterface
 				*m_Bool = !*m_Bool;
 			}
 
-			OptionGetters::HandleAction(action);
+			Base::HandleAction(action);
 		}
 	private:
 		bool* m_Bool;

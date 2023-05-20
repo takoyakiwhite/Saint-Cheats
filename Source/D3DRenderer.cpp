@@ -152,8 +152,7 @@ namespace Saint
 
 	void D3DRenderer::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		if (msg == WM_KEYUP && wParam == 'X') {
-			g_Settings.command_window = !g_Settings.command_window;
+		if (msg == WM_KEYUP && wParam == 'X' && g_Render->controlsEnabled) {
 			g_Settings.m_LockMouse = !g_Settings.m_LockMouse;
 		}
 
