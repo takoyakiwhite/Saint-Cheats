@@ -42,8 +42,9 @@ namespace Saint
 
 		m_NativeRegistrations.emplace(script_hash, std::vector<NativeDetour>({ { hash, detour } }));
 
-		
-		g_Logger->Debug("Scanned Native %s.", name);
+		if (Flags->isDev()) {
+			g_Logger->Debug("Scanned Native %s.", name);
+		}
 	}
 	
 

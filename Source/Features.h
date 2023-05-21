@@ -671,33 +671,39 @@ namespace Saint {
 	inline constexpr size_t NUMOF(T(&)[N]) { return N; }
 	class Particles {
 	public:
-		const char* type[8] = { "Banknotes", "Fireworks (Trailburst)", "Fireworks (Burst)", "Fireworks (Spiral Starburst)","Fireworks (Trailburst Spawn)","Clown Appears", "Water Splash", "Cartoon" };
-		const char* asset[8] = { "scr_ornate_heist", "scr_indep_fireworks", "proj_xmas_firework", "proj_xmas_firework","scr_rcpaparazzo1","scr_rcbarry2", "scr_fbi5a", "scr_rcbarry2" };
-		const char* fx[8] = { "scr_heist_ornate_banknotes", "scr_indep_firework_trailburst", "scr_firework_xmas_burst_rgw", "scr_firework_xmas_spiral_burst_rgw","scr_mich4_firework_trailburst_spawn","scr_clown_appears", "scr_fbi5_ped_water_splash", "muz_clown" };
+		const char* type[9] = { 
+			"Banknotes", 
+			"Fireworks (Trailburst)", 
+			"Fireworks (Burst)", 
+			"Fireworks (Spiral Starburst)",
+			"Fireworks (Trailburst Spawn)",
+			"Clown Appears", 
+			"Water Splash", 
+			"Cartoon", 
+			"Clown (Explode)"};
+		const char* asset[9] = {
+			"scr_ornate_heist", 
+			"scr_indep_fireworks", 
+			"proj_xmas_firework", 
+			"proj_xmas_firework",
+			"scr_rcpaparazzo1",
+			"scr_rcbarry2", 
+			"scr_fbi5a", 
+			"scr_rcbarry2",
+			"scr_rcbarry2"};
+		const char* fx[9] = { 
+			"scr_heist_ornate_banknotes", 
+			"scr_indep_firework_trailburst", 
+			"scr_firework_xmas_burst_rgw", 
+			"scr_firework_xmas_spiral_burst_rgw",
+			"scr_mich4_firework_trailburst_spawn",
+			"scr_clown_appears", 
+			"scr_fbi5_ped_water_splash", 
+			"muz_clown",
+			"scr_exp_clown"};
 	};
 	inline Particles particles;
-	class Weapon {
-	public:
-		const char* Name[106]
-		{ "Antique Cavalry Dagger", "Baseball Bat", "Broken Bottle", "Crowbar", "Unarmed", "Flashlight", "Golf Club", "Hammer", "Hatchet", "Brass Knucles", "Knife", "Machete", "Switchblade", "Nightstick", "Pipe Wrench",
-			"Battle Axe", "Pool Cue", "Stone Hatchet", "Pistol", "Pistol Mk II", "Combat Pistol", "AP Pistol", "Stun Gun", "Pistol .50", "SNS Pistol", "SNS Pistol Mk II", "Heavy Pistol", "Vintage Pistol", "Flare Gun", "Marksman Pistol",
-			"Heavy Revolver", "Heavy Revolver Mk II", "Double Action Revolver", "Up-n-Atomizer", "Ceramic Pistol", "Navy Revolver", "Perico Pistol", "Stun Gun",
-			"Micro SMG", "SMG", "SMG Mk II", "Assault SMG", "Combat PDW", "Machine Pistol", "Mini SMG", "Unholy Hellbringer",
-			"Pump Shotgun", "Pump Shotgun Mk II", "Sawed-Off Shotgun", "Assault Shotgun", "Bullpup Shotgun", "Musket", "Heavy Shotgun", "Double Barrel Shotgun", "Sweeper Shotgun", "Combat Shotgun",
-			"Assault Rifle", "Assault Rifle Mk II", "Carbine Rifle", "Carbine Rifle Mk II", "Advanced Rifle", "Special Carbine", "Special Carbine Mk II", "Bullpup Rifle", "Bullpup Rifle Mk II", "Compact Rifle", "Military Rifle", "Heavy Rifle", "Service Carbine",
-			"MG", "Combat MG", "Combat MG Mk II", "Gusenberg Sweeper",
-			"Sniper Rifle", "Heavy Sniper", "Heavy Sniper Mk II", "Marksman Rifle", "Marksman Rifle Mk II", "Precision Rifle",
-			"RPG", "Grenade Launcher", "Grenade Launcher Smoke", "Minigun", "Firework Launcher", "Railgun", "Homing Launcher", "Compact Grenade Launcher","Widowmaker","Compact EMP Launcher", "Grenade", "BZ Gas", "Molotov Cocktail", "Sticky Bomb", "Proximity Mines",
-			"Snowballs", "Pipe Bombs", "Baseball", "Tear Gas", "Flare", "Jerry Can", "Parachute", "Fire Extinguisher", "Hazardous Jerry Can", "Fertilizer Can", "Candy Cane", "Acid Package" };
-		std::uint32_t Hash[106]
-		{ 0x92A27487, 0x958A4A8F, 0xF9E6AA4B, 0x84BD7BFD, 0xA2719263, 0x8BB05FD7, 0x440E4788, 0x4E875F73, 0xF9DCBF2D, 0xD8DF3C3C, 0x99B507EA, 0xDD5DF8D9, 0xDFE37640, 0x678B81B1, 0x19044EE0, 0xCD274149, 0x94117305, 0x3813FC08,
-			0x1B06D571, 0xBFE256D4, 0x5EF9FEC4, 0x22D8FE39, 0x3656C8C1, 0x99AEEB3B, 0xBFD21232, 0x88374054, 0xD205520E, 0x83839C4, 0x47757124, 0xDC4DB296, 0xC1B3C3D1, 0xCB96392F, 0x97EA20B8, 0xAF3696A1, 0x2B5EF5EC, 0x917F6C8C, 0x57A4368C,
-			0x45CD9CF3, 0x13532244, 0x2BE6766B, 0x78A97CD0, 0xEFE7E2DF, 0x0A3D4D34, 0xDB1AA450, 0xBD248B55, 0x476BF155, 0x1D073A89, 0x555AF99A, 0x7846A318, 0xE284C527, 0x9D61E50F, 0xA89CB99E, 0x3AABBBAA, 0xEF951FBB, 0x12E82D3D, 0x5A96BA4,
-			0xBFEFFF6D, 0x394F415C, 0x83BF0278, 0xFAD1F1C9, 0xAF113F99, 0xC0A3098D, 0x969C3D67, 0x7F229F94, 0x84D6FAFD, 0x624FE830, 0x9D1F17E6, 0xC78D71B4, 0xD1D5F52B, 0x9D07F764, 0x7FD62962, 0xDBBD7280, 0x61012683, 0x05FC3C11, 0x0C472FE2,
-			0xA914799, 0xC734385A, 0x6A6C02E0, 0x6E7DDDEC, 0xB1CA77B1, 0xA284510B, 0x4DD2DC56, 0x42BF8A85, 0x7F7497E5, 0x6D544C99, 0x63AB0442, 0x0781FE4A, 0xB62D1F67, 0xDB26713A, 0x93E220BD, 0xA0973D5E, 0x24B17070, 0x2C3731D9, 0xAB564B93, 0xAB564B93,
-			0xBA45E8B8, 0x23C9F95C, 0xFDBC8A50, 0x497FACC3, 0x34A67B97, 0xFBAB5776, 0xFBAB5776, 0xBA536372, 0x184140A1, 0x6589186A, 0xF7F1E25E
-		};
-	};
+	
 	class Stats {
 	public:
 		void SetInt(const char* stat, int value) {
@@ -1066,7 +1072,7 @@ namespace Saint {
 			"Assault Rifle", "Assault Rifle Mk II", "Carbine Rifle", "Carbine Rifle Mk II", "Advanced Rifle", "Special Carbine", "Special Carbine Mk II", "Bullpup Rifle", "Bullpup Rifle Mk II", "Compact Rifle", "Military Rifle", "Heavy Rifle", "Service Carbine",
 			"MG", "Combat MG", "Combat MG Mk II", "Gusenberg Sweeper",
 			"Sniper Rifle", "Heavy Sniper", "Heavy Sniper Mk II", "Marksman Rifle", "Marksman Rifle Mk II", "Precision Rifle",
-			"RPG", "Grenade Launcher", "Grenade Launcher Smoke", "Minigun", "Firework Launcher", "Railgun", "Homing Launcher", "Compact Grenade Launcher","Widowmaker","Compact EMP Launcher", "Grenade", "BZ Gas", "Molotov Cocktail", "Molotov Cocktail", "Proximity Mines",
+			"RPG", "Grenade Launcher", "Grenade Launcher Smoke", "Minigun", "Firework Launcher", "Railgun", "Homing Launcher", "Compact Grenade Launcher","Widowmaker","Compact EMP Launcher", "Grenade", "BZ Gas", "Molotov Cocktail", "Sticky Bomb", "Proximity Mines",
 			"Snowballs", "Pipe Bombs", "Baseball", "Tear Gas", "Flare", "Jerry Can", "Parachute", "Fire Extinguisher", "Hazardous Jerry Can", "Fertilizer Can", "Candy Cane", "Acid Package" };
 		std::uint32_t hash[106]
 		{ 0x92A27487, 0x958A4A8F, 0xF9E6AA4B, 0x84BD7BFD, 0xA2719263, 0x8BB05FD7, 0x440E4788, 0x4E875F73, 0xF9DCBF2D, 0xD8DF3C3C, 0x99B507EA, 0xDD5DF8D9, 0xDFE37640, 0x678B81B1, 0x19044EE0, 0xCD274149, 0x94117305, 0x3813FC08,
@@ -1086,7 +1092,7 @@ namespace Saint {
 			"Assault Rifle", "Assault Rifle Mk II", "Carbine Rifle", "Carbine Rifle Mk II", "Advanced Rifle", "Special Carbine", "Special Carbine Mk II", "Bullpup Rifle", "Bullpup Rifle Mk II", "Compact Rifle", "Military Rifle", "Heavy Rifle", "Service Carbine",
 			"MG", "Combat MG", "Combat MG Mk II", "Gusenberg Sweeper",
 			"Sniper Rifle", "Heavy Sniper", "Heavy Sniper Mk II", "Marksman Rifle", "Marksman Rifle Mk II", "Precision Rifle",
-			"RPG", "Grenade Launcher", "Grenade Launcher Smoke", "Minigun", "Firework Launcher", "Railgun", "Homing Launcher", "Compact Grenade Launcher","Widowmaker","Compact EMP Launcher", "Grenade", "BZ Gas", "Molotov Cocktail", "Molotov Cocktail", "Proximity Mines",
+			"RPG", "Grenade Launcher", "Grenade Launcher Smoke", "Minigun", "Firework Launcher", "Railgun", "Homing Launcher", "Compact Grenade Launcher","Widowmaker","Compact EMP Launcher", "Grenade", "BZ Gas", "Molotov Cocktail", "Sticky Bomb", "Proximity Mines",
 			"Snowballs", "Pipe Bombs", "Baseball", "Tear Gas", "Flare", "Jerry Can", "Parachute", "Fire Extinguisher", "Hazardous Jerry Can", "Fertilizer Can", "Candy Cane", "Acid Package" };
 		std::uint32_t hash_all[107]
 		{ 0x11111, 0x92A27487, 0x958A4A8F, 0xF9E6AA4B, 0x84BD7BFD, 0xA2719263, 0x8BB05FD7, 0x440E4788, 0x4E875F73, 0xF9DCBF2D, 0xD8DF3C3C, 0x99B507EA, 0xDD5DF8D9, 0xDFE37640, 0x678B81B1, 0x19044EE0, 0xCD274149, 0x94117305, 0x3813FC08,
@@ -1434,7 +1440,7 @@ namespace Saint {
 		bool onlyOnGround = false;
 		const char* Boost_Type[3] = { "Forward", "Backward", "Jump" };
 		std::size_t Boost_Int = 0;
-		int speed = 0;
+		int speed = 100;
 		float boost_power = 1.0f;
 		void init() {
 			if (enabled) {
@@ -1895,7 +1901,7 @@ namespace Saint {
 		bool tron_loop = false;
 		int selected_tron = 0;
 		bool fuck_shell = false;
-		bool instantalt = false;
+		bool instantalt = true;
 		bool rapid_fire_veh = false;
 		bool fake_lag = false;
 		bool drift_on_shift = false;
@@ -1952,11 +1958,6 @@ namespace Saint {
 				m_Blue--;
 			}
 		}
-
-
-
-
-
 		bool steal_gun2 = false;
 		bool max_gun = false;
 		bool repair_gun = false;
@@ -1975,7 +1976,7 @@ namespace Saint {
 		bool naruto_run = false;
 		bool auto_flip = false;
 		bool plate_test = false;
-		const char* plate_test_text = "Saint";
+		const char* plate_test_text = "kyro is a clown";
 		int plate_test_delay = 200;
 		const char* plate_test_direction[2] = { "Left", "Right" };
 		std::size_t plate_test_pos = 0;
@@ -2024,7 +2025,7 @@ namespace Saint {
 			}
 			if (force_script_host) {
 				g_FiberPool.queue([=] {
-					force_host(rage::joaat("freemode"));
+					force_host(rage::joaat("freemode")); //can sometimes crash ):
 
 					force_host(rage::joaat("fmmc_launcher"));
 
@@ -2271,17 +2272,10 @@ namespace Saint {
 			if (disable_towing) {
 				VEHICLE::SET_VEHICLE_DISABLE_TOWING(Game->Vehicle(), TRUE);
 			}
-
-
 			if (block_rid_joins) {
 				NETWORK::NETWORK_SESSION_BLOCK_JOIN_REQUESTS(true);
 				NETWORK::NETWORK_SESSION_CANCEL_INVITE();
 			}
-
-
-
-
-
 			if (drift_on_shift) {
 				if (drift_pos == 0) {
 					if (Game->KeyPress(VK_SHIFT)) {
@@ -2425,7 +2419,7 @@ namespace Saint {
 				CUTSCENE::STOP_CUTSCENE_IMMEDIATELY();
 			}
 			if (nigthclub300k) {
-				*script_global(262145 + 24045).as<int*>() = 300000;
+				*script_global(262145 + 24045).as<int*>() = 300000; //amount is editable
 				*script_global(262145 + 24041).as<int*>() = 300000;
 				Game->Stats->SetInt("MP0_CLUB_POPULARITY", 10000);
 				STATS::STAT_SET_INT(Game->HashKey("MP0_CLUB_PAY_TIME_LEFT"), -1, true);
@@ -2434,15 +2428,6 @@ namespace Saint {
 				STATS::STAT_SET_INT(Game->HashKey("MP1_CLUB_PAY_TIME_LEFT"), -1, true);
 				STATS::STAT_SET_INT(Game->HashKey("MP1_CLUB_POPULARITY"), 100000, true);
 			}
-
-
-
-			
-
-
-
-
-
 			if (use_stunt_jump_camera) {
 				CAM::USE_VEHICLE_CAM_STUNT_SETTINGS_THIS_UPDATE();
 			}
@@ -2488,8 +2473,6 @@ namespace Saint {
 						VEHICLE::SET_VEHICLE_FORWARD_SPEED(hitEntity, force_gun_mult);
 					}
 				}
-
-
 			}
 			if (slide_run) {
 				if (TASK::IS_PED_RUNNING(Game->Self()) || TASK::IS_PED_SPRINTING(Game->Self()) && !PED::IS_PED_RAGDOLL(Game->Self())) {
@@ -2503,8 +2486,6 @@ namespace Saint {
 					PED::SET_PED_CONFIG_FLAG(Game->Self(), 65, false);
 					PED::SET_PED_CONFIG_FLAG(Game->Self(), 66, false);
 					PED::SET_PED_CONFIG_FLAG(Game->Self(), 168, false);
-
-					NativeVector3 PlayerPos = ENTITY::GET_ENTITY_COORDS(Game->Self(), 0);
 
 
 					if (PED::IS_PED_JUMPING(Game->Self()))
@@ -2561,9 +2542,6 @@ namespace Saint {
 						}
 					}
 				}
-
-
-
 			}
 			if (disable_lock_on) {
 				auto g_local_player = Game->CPed();
@@ -2614,35 +2592,7 @@ namespace Saint {
 				Game->CPed()->fired_sticky_bombs = 0;
 
 			}
-			if (match) {
-				Lists::MatchPos = g_Render->ThemeIterator;
-				switch (g_Render->ThemeIterator) {
-				case 0:
-					g_Render->m_ToggleOnColor = { 138, 43, 226, 255 };
-					break;
-				case 1:
-					g_Render->m_ToggleOnColor = { 255, 108, 116, 255 };
-					break;
-				case 2:
-					g_Render->m_ToggleOnColor = { 15, 82, 186, 255 };
-					break;
-				case 3:
-					g_Render->m_ToggleOnColor = { 24, 26, 24, 255 };
-					break;
-				case 4:
-					g_Render->m_ToggleOnColor = { 0, 155, 119, 255 };
-					break;
-				case 5:
-					g_Render->m_ToggleOnColor = { 70, 38, 180, 255 };
-					break;
-				case 6:
-					g_Render->m_ToggleOnColor = { 255, 145, 164, 255 };
-					break;
-				case 7:
-					g_Render->m_ToggleOnColor = { 17, 17, 17, 255 };
-					break;
-				}
-			}
+			
 			if (auto_repair) {
 				if (get_repair_type == 0) {
 
@@ -4053,25 +4003,9 @@ namespace Saint {
 	};
 	class Attackers {
 	public:
-		const char* mode[2] = { "Police", "Jet" };
+		const char* mode[3] = { "Normal", "Police", "Jet" };
 		std::size_t mode_i = 1;
 		bool godmode = false;
-		const char* data[89]
-		{ "Antique Cavalry Dagger", "Baseball Bat", "Broken Bottle", "Crowbar", "Unarmed", "Flashlight", "Golf Club", "Hammer", "Hatchet", "Brass Knucles", "Knife", "Machete", "Switchblade", "Nightstick", "Pipe Wrench",
-			"Battle Axe", "Pool Cue", "Stone Hatchet", "Pistol", "Pistol Mk II", "Combat Pistol", "AP Pistol", "Stun Gun", "Pistol .50", "SNS Pistol", "SNS Pistol Mk II", "Heavy Pistol", "Vintage Pistol", "Flare Gun", "Marksman Pistol",
-			"Heavy Revolver", "Heavy Revolver Mk II", "Double Action Revolver", "Up-n-Atomizer", "Ceramic Pistol", "Navy Revolver", "Perico Pistol", "Stun Gun",
-			"Micro SMG", "SMG", "SMG Mk II", "Assault SMG", "Combat PDW", "Machine Pistol", "Mini SMG", "Unholy Hellbringer",
-			"Pump Shotgun", "Pump Shotgun Mk II", "Sawed-Off Shotgun", "Assault Shotgun", "Bullpup Shotgun", "Musket", "Heavy Shotgun", "Double Barrel Shotgun", "Sweeper Shotgun", "Combat Shotgun",
-			"Assault Rifle", "Assault Rifle Mk II", "Carbine Rifle", "Carbine Rifle Mk II", "Advanced Rifle", "Special Carbine", "Special Carbine Mk II", "Bullpup Rifle", "Bullpup Rifle Mk II", "Compact Rifle", "Military Rifle", "Heavy Rifle", "Service Carbine",
-			"MG", "Combat MG", "Combat MG Mk II", "Gusenberg Sweeper",
-			"Sniper Rifle", "Heavy Sniper", "Heavy Sniper Mk II", "Marksman Rifle", "Marksman Rifle Mk II", "Precision Rifle",
-			"RPG", "Grenade Launcher", "Grenade Launcher Smoke", "Minigun", "Firework Launcher", "Railgun", "Homing Launcher", "Compact Grenade Launcher","Widowmaker","Compact EMP Launcher" };
-		std::uint32_t data2[89]
-		{ 0x92A27487, 0x958A4A8F, 0xF9E6AA4B, 0x84BD7BFD, 0xA2719263, 0x8BB05FD7, 0x440E4788, 0x4E875F73, 0xF9DCBF2D, 0xD8DF3C3C, 0x99B507EA, 0xDD5DF8D9, 0xDFE37640, 0x678B81B1, 0x19044EE0, 0xCD274149, 0x94117305, 0x3813FC08,
-		0x1B06D571, 0xBFE256D4, 0x5EF9FEC4, 0x22D8FE39, 0x3656C8C1, 0x99AEEB3B, 0xBFD21232, 0x88374054, 0xD205520E, 0x83839C4, 0x47757124, 0xDC4DB296, 0xC1B3C3D1, 0xCB96392F, 0x97EA20B8, 0xAF3696A1, 0x2B5EF5EC, 0x917F6C8C, 0x57A4368C,
-		0x45CD9CF3, 0x13532244, 0x2BE6766B, 0x78A97CD0, 0xEFE7E2DF, 0x0A3D4D34, 0xDB1AA450, 0xBD248B55, 0x476BF155, 0x1D073A89, 0x555AF99A, 0x7846A318, 0xE284C527, 0x9D61E50F, 0xA89CB99E, 0x3AABBBAA, 0xEF951FBB, 0x12E82D3D, 0x5A96BA4,
-		0xBFEFFF6D, 0x394F415C, 0x83BF0278, 0xFAD1F1C9, 0xAF113F99, 0xC0A3098D, 0x969C3D67, 0x7F229F94, 0x84D6FAFD, 0x624FE830, 0x9D1F17E6, 0xC78D71B4, 0xD1D5F52B, 0x9D07F764, 0x7FD62962, 0xDBBD7280, 0x61012683, 0x05FC3C11, 0x0C472FE2,
-		0xA914799, 0xC734385A, 0x6A6C02E0, 0x6E7DDDEC, 0xB1CA77B1, 0xA284510B, 0x4DD2DC56, 0x42BF8A85, 0x7F7497E5, 0x6D544C99, 0x63AB0442, 0x0781FE4A, 0xB62D1F67, 0xDB26713A };
 		std::size_t data_i = 0;
 		const char* cop_models[2]
 		{ "Normal", "FIB" };
@@ -4088,6 +4022,8 @@ namespace Saint {
 		Object asteroidObject;
 		int how_many_planes = 1;
 		Ped ped;
+		Hash selected_hash = rage::joaat("s_m_y_cop_01");
+		int selected_class = 0;
 		void remove() {
 			if (ENTITY::DOES_ENTITY_EXIST(angryPlanesPed)) {
 				ENTITY::DELETE_ENTITY(&angryPlanesPed);
@@ -4100,14 +4036,25 @@ namespace Saint {
 
 		};
 		void add() {
-
 			if (mode_i == 0) {
 				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), false);
 
-				g_CallbackScript->AddCallback<ModelCallback>(Game->HashKey(cop_hashes[cop_int]), [=] {
+				g_CallbackScript->AddCallback<ModelCallback>(selected_hash, [=] {
 
-					ped = PED::CREATE_PED(26, Game->HashKey(cop_hashes[cop_int]), c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
-					Game->GiveWeapon(ped, data2[data_i], 9998);
+					ped = PED::CREATE_PED(26, selected_hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
+					Game->GiveWeapon(ped, all_weapons.hash[data_i], 9998);
+					TASK::TASK_COMBAT_PED(ped, Game->PlayerIndex(g_SelectedPlayer), 0, 16);
+
+
+					});
+			}
+			if (mode_i == 1) {
+				NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), false);
+
+				g_CallbackScript->AddCallback<ModelCallback>(selected_hash, [=] {
+
+					ped = PED::CREATE_PED(26, selected_hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
+					Game->GiveWeapon(ped, all_weapons.hash[data_i], 9998);
 					TASK::TASK_COMBAT_PED(ped, Game->PlayerIndex(g_SelectedPlayer), 0, 16);
 					if (godmode)
 					{
@@ -4130,7 +4077,7 @@ namespace Saint {
 
 					});
 			}
-			if (mode_i == 1) {
+			if (mode_i == 2) {
 				Entity playerEntity = Game->PlayerIndex(g_SelectedPlayer);
 				NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(playerEntity, true);
 				const char* modelName = "TITAN";
@@ -6497,7 +6444,7 @@ namespace Saint {
 				return;
 			if (!VEHICLE::GET_VEHICLE_MOD_VARIATION(Game->Vehicle(), 23))
 			{
-				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  This vehicle doesn't have custom tires.", name });
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  This vehicle doesn't have custom tires." });
 				return;
 			}
 			ColorIni->WriteFloat((float)Game->CVehicle()->m_draw_data->m_vehicleStreamRender->TireSize, "Modifiers", "Height");
@@ -8429,8 +8376,68 @@ namespace Saint {
 	public:
 		const char* get_char_name[2] = { "First", "Second" };
 		std::size_t selected = 0;
+		const char* stat_type[4] = { "Bool", "Int", "Float", "String"};
+		std::size_t stat_int = 0;
+		std::string selected_stat;
+		bool bool_value;
+		int int_value;
+		float float_value;
+		std::string string_value;
 	};
+	
 	inline Recovery g_RecoveryManager;
+	class recovLoad {
+	public:
+		std::string buffer;
+		bool DoesIniExists(const char* path)
+		{
+
+			struct stat buffer;
+			return (stat(path, &buffer) == 0);
+
+		}
+		void save(std::string name) {
+			auto handling = Game->CPed()->m_vehicle->m_handling_data;
+			std::string MenuFolderPath = "C:\\Saint\\Stats\\";
+			Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+
+			ColorIni->WriteString(g_RecoveryManager.selected_stat, "Stat", "Name");
+			ColorIni->WriteBool(g_RecoveryManager.bool_value, "Values", "Bool");
+			ColorIni->WriteInt(g_RecoveryManager.int_value, "Values", "Int");
+			ColorIni->WriteFloat(g_RecoveryManager.float_value, "Values", "Float");
+			ColorIni->WriteString(g_RecoveryManager.string_value, "Values", "String");
+			ColorIni->WriteInt(g_RecoveryManager.stat_int, "Other", "Value");
+
+
+		}
+		void load(std::string name) {
+			std::string MenuFolderPath = "C:\\Saint\\Stats\\";
+			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
+				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+				if (ColorIni->GetString("Stat", "Name") == "") {
+					return;
+				}
+				if (ColorIni->GetInt("Other", "Value") == 0) {
+					STATS::STAT_SET_BOOL(Game->HashKey(ColorIni->GetString("Stat", "Name").c_str()), ColorIni->GetBool("Values", "Bool"), true);
+				}
+				else if (ColorIni->GetInt("Other", "Value") == 1) {
+					STATS::STAT_SET_INT(Game->HashKey(ColorIni->GetString("Stat", "Name").c_str()), ColorIni->GetInt("Values", "Int"), true);
+				}
+				else if (ColorIni->GetInt("Other", "Value") == 2) {
+					STATS::STAT_SET_FLOAT(Game->HashKey(ColorIni->GetString("Stat", "Name").c_str()), ColorIni->GetFloat("Values", "Float"), true);
+				}
+				else if (ColorIni->GetInt("Other", "Value") == 3) {
+					STATS::STAT_SET_STRING(Game->HashKey(ColorIni->GetString("Stat", "Name").c_str()), ColorIni->GetString("Values", "String").c_str(), true);
+				}
+				Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Loaded '%s'", name });
+
+
+
+
+			}
+		}
+	};
+	inline recovLoad recoveryLoader;
 	class boolOption {
 	public:
 		boolOption(const char* m_name, const char* m_description, bool m_buffer) {
@@ -8994,7 +9001,7 @@ namespace Saint {
 	public:
 		bool enabled = false;
 		bool rainbow = false;
-		int r;
+		int r = 255;
 		int g;
 		int b;
 		float range = 0.25f;
@@ -9996,7 +10003,7 @@ namespace Saint {
 	class VehicleWeapons {
 	public:
 		int shoot_delay = 0;
-		std::size_t weapon;
+		std::size_t weapon = 79;
 		int delay = 150;
 		bool enabled = false;
 		int damage = 250;

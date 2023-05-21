@@ -18,7 +18,7 @@ namespace Saint
 		ImGui::End();
 
 
-		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImU32(ImColor(g_Render->m_OptionUnselectedBackgroundColor.r, g_Render->m_OptionUnselectedBackgroundColor.g, g_Render->m_OptionUnselectedBackgroundColor.b, g_Render->m_OptionUnselectedBackgroundColor.a)));
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImU32(ImColor(g_Render->m_OptionUnselectedBackgroundColor.r, g_Render->m_OptionUnselectedBackgroundColor.g, g_Render->m_OptionUnselectedBackgroundColor.b, 160)));
 
 		Noti::RenderNotifications();
 

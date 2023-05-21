@@ -159,6 +159,14 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				}
 #endif
 				g_Logger = std::make_unique<Logger>();
+				g_Logger->Info(R"( 
+					   _____ ___    _____   ________
+					  / ___//   |  /  _/ | / /_  __/
+					  \__ \/ /| |  / //  |/ / / /   
+					 ___/ / ___ |_/ // /|  / / /    
+					/____/_/  |_/___/_/ |_/ /_/     
+                                
+				)");
 				g_Logger->Info("Version: %s", MENU_VERSION);
 				g_Logger->Info("This build was compiled on " __DATE__ ". ");
 			//	PlaySound(TEXT("C:\\Saint\\Sounds\\Intro.wav"), NULL, SND_FILENAME | SND_ASYNC);

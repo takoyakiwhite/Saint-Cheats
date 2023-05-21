@@ -10,7 +10,7 @@ namespace Saint::Lists
 		rage::joaat("h4_prop_grass_tropical_lush_01"), rage::joaat("h4_prop_grass_wiregrass_01"), rage::joaat("h4_prop_weed_01_plant"), rage::joaat("h4_prop_weed_01_row"), rage::joaat("urbanweeds02_l1"), rage::joaat("proc_forest_grass01"), 
 		rage::joaat("prop_small_bushyba"), rage::joaat("v_res_d_dildo_a"), rage::joaat("v_res_d_dildo_b"), rage::joaat("v_res_d_dildo_c"), rage::joaat("v_res_d_dildo_d"), rage::joaat("v_res_d_dildo_e"), rage::joaat("v_res_d_dildo_f"), 
 		rage::joaat("v_res_skateboard"), rage::joaat("prop_battery_01"), rage::joaat("prop_barbell_01"), rage::joaat("prop_barbell_02"), rage::joaat("prop_bandsaw_01"), rage::joaat("prop_bbq_3"), rage::joaat("v_med_curtainsnewcloth2"), 
-		rage::joaat("bh1_07_flagpoles"), 92962485, rage::joaat("slod_human"), rage::joaat("slod_small_quadped"), rage::joaat("slod_large_quadped"), 0x613e626c, 0x8D8F1B10, 0xB881AEE, 0x2D7030F3, 0x3F039CBA
+		rage::joaat("bh1_07_flagpoles"), 92962485, rage::joaat("slod_human"), rage::joaat("slod_small_quadped"), rage::joaat("slod_large_quadped"), 0x613e626c, 0x2D7030F3, 0x3F039CBA
 	};
 	inline bool crash_model_check(uint32_t model) {
 		for (int i = 0; i < sizeof(crash_models) / sizeof(uint32_t); i++)
@@ -82,20 +82,6 @@ namespace Saint::Lists
 		UserInterface::Props::Ears,
 		UserInterface::Props::Watches,
 		UserInterface::Props::Bracelets,
-	};
-	inline std::size_t MatchPos = 1;
-	inline const char* DemoList[10]
-	{
-		"One",
-		"Two",
-		"Three",
-		"Four",
-		"Five",
-		"Six",
-		"Seven",
-		"Eight",
-		"Nine",
-		"Ten"
 	};
 
 	inline std::size_t DemoListPos = 0;

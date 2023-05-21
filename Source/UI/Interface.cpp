@@ -471,11 +471,12 @@ namespace Saint::UserInterface
 				}
 				if (Game->DisabledControlPressed(174) && sub->GetNumOptions() != 0 && leftTimer.Update())
 				{
-					if (m_Sounds)
-						Game->PlaySound2("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+					
 
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
+						if (m_Sounds && !opt->GetFlag("none", "bool"))
+							Game->PlaySound2("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 						opt->HandleAction(OptionAction::Left);
 					}
 				}
@@ -483,16 +484,18 @@ namespace Saint::UserInterface
 				rightTimer.SetDelay(std::chrono::milliseconds(m_HorizontalDelay));
 				if (m_RightKeyPressed && sub->GetNumOptions() != 0 && rightTimer.Update())
 				{
-					if (m_Sounds)
-						Game->PlaySound2("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+					
 
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
+						if (m_Sounds && !opt->GetFlag("none", "bool"))
+							Game->PlaySound2("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 						opt->HandleAction(OptionAction::Right);
 					}
 				}
 				if (Game->DisabledControlPressed(175) && !Game->ControlPressed(227) && sub->GetNumOptions() != 0 && rightTimer.Update())
 				{
+					time_since_held = std::chrono::system_clock::now();
 					if (m_Sounds)
 						Game->PlaySound2("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 

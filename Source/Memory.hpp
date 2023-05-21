@@ -87,78 +87,39 @@ namespace Saint
 	class MemoryHandle
 	{
 	public:
-		/**
-		 * \brief Constructs the object with a pointer
-		 * \param p The pointer to initialize the object with, optional
-		 */
 		constexpr MemoryHandle(void* p = nullptr) :
 			m_Ptr(p)
 		{}
-
-		/**
-		 * \brief Constructs the object with an integral pointer
-		 * \param p The integral pointer to initialize the object with
-		 */
 		explicit MemoryHandle(std::uintptr_t p) :
 			m_Ptr(reinterpret_cast<void*>(p))
 		{}
 
-		/**
-		 * \brief Retrieves the pointer as a pointer
-		 * \return A pointer
-		 */
 		template <typename T>
 		constexpr std::enable_if_t<std::is_pointer_v<T>, T> As()
 		{
 			return static_cast<T>(m_Ptr);
 		}
-
-		/**
-		 * \brief Retrieves the pointer as a reference
-		 * \return A pointer
-		 */
 		template <typename T>
 		constexpr std::enable_if_t<std::is_lvalue_reference_v<T>, T> As()
 		{
 			return *static_cast<std::add_pointer_t<std::remove_reference_t<T>>>(m_Ptr);
 		}
-
-		/**
-		 * \brief Retrieves the pointer as an integral pointer
-		 * \return An integral pointer
-		 */
 		template <typename T>
 		constexpr std::enable_if_t<std::is_same_v<T, std::uintptr_t>, T> As()
 		{
 			return reinterpret_cast<T>(m_Ptr);
 		}
-
-		/**
-		 * \brief Adds an offset to the pointer
-		 * \param offset The offset to be added
-		 * \return MemoryHandle
-		 */
 		template <typename T>
 		constexpr MemoryHandle Add(T offset)
 		{
 			return MemoryHandle(As<std::uintptr_t>() + offset);
 		}
-
-		/**
-		 * \brief Subtracted an offset to the pointer
-		 * \param offset The offset to be subtracted
-		 * \return MemoryHandle
-		 */
 		template <typename T>
 		constexpr MemoryHandle Sub(T offset)
 		{
 			return MemoryHandle(As<std::uintptr_t>() - offset);
 		}
 
-		/**
-		 * \brief Gets the relative displacement of the pointer
-		 * \return MemoryHandle
-		 */
 		constexpr MemoryHandle Rip()
 		{
 			if (!m_Ptr)
@@ -166,10 +127,6 @@ namespace Saint
 			return Add(As<std::int32_t&>()).Add(4U);
 		}
 
-		/**
-		 * \brief Checks if the stored pointer is valid
-		 * \return bool
-		 */
 		constexpr explicit operator bool() noexcept
 		{
 			return m_Ptr;
@@ -181,48 +138,22 @@ namespace Saint
 	class MemoryRegion
 	{
 	public:
-		/**
-		 * \brief Constructs the region
-		 * \param base The base of the region
-		 * \param size The size of the region
-		 */
 		constexpr explicit MemoryRegion(MemoryHandle base, std::size_t size):
 			m_Base(base),
 			m_Size(size)
 		{}
-
-		/**
-		 * \brief Gets the base of the region
-		 * \return MemoryHandle
-		 */
 		constexpr MemoryHandle Base()
 		{
 			return m_Base;
 		}
-
-		/**
-		 * \brief Gets the end of the region
-		 * \return MemoryHandle
-		 */
 		constexpr MemoryHandle End()
 		{
 			return m_Base.Add(m_Size);
 		}
-
-		/**
-		 * \brief Gets the size of the region
-		 * \return std::size_t
-		 */
 		constexpr std::size_t Size()
 		{
 			return m_Size;
 		}
-
-		/**
-		 * \brief Checks if p is within this region
-		 * \param p The pointer
-		 * \return bool
-		 */
 		constexpr bool Contains(MemoryHandle p)
 		{
 			if (p.As<std::uintptr_t>() < m_Base.As<std::uintptr_t>())
@@ -240,25 +171,13 @@ namespace Saint
 	class Module : public MemoryRegion
 	{
 	public:
-		/**
-		 * \brief Constructs the class with the main moduée
-		 */
 		explicit Module(std::nullptr_t):
 			Module(static_cast<char*>(nullptr))
 		{}
-		
-		/**
-		 * \brief Constructs the class with a module name
-		 * \param name The name of the module
-		 */
 		explicit Module(const char* name):
 			Module(GetModuleHandleA(name))
 		{
 		}
-
-		/**
-		 * \brief Constructs the class with a module base
-		 */
 		Module(HMODULE hmod):
 			MemoryRegion(hmod, 0)
 		{
@@ -267,25 +186,19 @@ namespace Saint
 			m_Size = ntHeader->OptionalHeader.SizeOfImage;
 		}
 
-		/**
-		 * \brief Gets the DOS headers for the module
-		 */
+		
 		IMAGE_DOS_HEADER* GetDosHeaders()
 		{
 			return m_Base.As<IMAGE_DOS_HEADER*>();
 		}
 
-		/**
-		 * \brief Gets the NT headers for the module
-		 */
+		
 		IMAGE_NT_HEADERS64* GetNtHeaders()
 		{
 			return m_Base.Add(m_Base.As<IMAGE_DOS_HEADER*>()->e_lfanew).As<IMAGE_NT_HEADERS64*>();
 		}
 	private:
-		/**
-		 * \brief Transforms a relative virtual address to a virtual address
-		 */
+		
 		template <typename TReturn, typename TOffset>
 		TReturn GetRVA(TOffset rva)
 		{
@@ -302,10 +215,7 @@ namespace Saint
 			bool m_Wildcard{};
 		};
 
-		/**
-		 * \brief Constructs the signature with an IDA pattern
-		 * \param pattern The IDA pattern string
-		 */
+		
 		explicit Signature(const char* pattern)
 		{
 			auto toUpper = [](char c) -> char
@@ -358,12 +268,6 @@ namespace Saint
 				}
 			} while (*(pattern++));
 		}
-
-		/**
-		 * \brief Scans for the pattern in a memory region
-		 * \param region The region to search in, default is the main module
-		 * \return MemoryHandle
-		 */
 		MemoryHandle Scan(MemoryRegion region = Module(nullptr))
 		{
 			auto compareMemory = [](std::uint8_t* data, Element* elem, std::size_t num) -> bool

@@ -428,6 +428,9 @@ namespace Saint::UserInterface
 		std::int32_t m_EnterDelay = 300;
 		std::int32_t m_VerticalDelay = 120;
 		std::int32_t m_HorizontalDelay = 120;
+	public:
+		bool time_init = false;
+		std::chrono::system_clock::time_point time_since_held{};
 	private:
 		bool m_OpenKeyPressed = false;
 		bool m_OpenKeyPressed2 = false;
