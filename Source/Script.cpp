@@ -2628,6 +2628,7 @@ namespace Saint
 
 					}
 					});
+				//lost cause
 				draw_option<Break>("Ramp Buggy");
 				if (Game->GetHash(Game->Vehicle()) != rage::joaat("dune5")) {
 					draw_option<Button>("Spawn Ramp Buggy", "", []
