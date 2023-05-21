@@ -1665,6 +1665,7 @@ namespace Saint
 					});
 				draw_option<toggle>(("Remove Deformation"), "Removes deformation from you're vehicle.", &features.remove_def);
 				draw_option<toggle>(("Stick To Ground"), "Creates a weird wheel effect, and makes it so you're vehicle stays on the ground.", &features.stick_to_ground);
+				draw_option<toggle>(("Always Extend MK1 Wings"), nullptr, &features.extend_mk1_wings);
 				draw_option<toggle>(("Shaky Shell"), "", &features.fuck_shell, [] {
 					if (!features.fuck_shell) {
 						VEHICLE::SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(1.0f);
@@ -1764,6 +1765,7 @@ namespace Saint
 					});
 
 				draw_option<toggle>(("Auto Clean"), "", &features.clean_veh);
+				draw_option<toggle>(("Break Deluxo"), nullptr, &features.break_deluxo);
 				draw_option<ToggleWithNumber<float>>("Helicopter Blade Speed", nullptr, &features.blade_speeder, &features.speed_blade, 0.1f, 1.f, 0.1f, 1, false, "", "");
 
 				draw_option<number<float>>("Forklift Height", nullptr, &features.forklight_height, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
@@ -1772,13 +1774,24 @@ namespace Saint
 				draw_option<number<float>>("Shell Shakiness", nullptr, &features.speedbumpsev, 0.0f, 1000.f, .1f, 2, true, "", "", [=] {
 					VEHICLE::SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(features.speedbumpsev);
 					});
-				draw_option<number<float>>("Helicopter Lagging Rate", nullptr, &features.lagging_rate, 0.0f, 1000.f, .1f, 2, true, "", "", [=] {
+				draw_option<number<float>>("Helicopter Lagging Rate", nullptr, &features.lagging_rate, 0.0f, 1000.f, .1f, 1, true, "", "", [=] {
 					VEHICLE::SET_HELI_CONTROL_LAGGING_RATE_SCALAR(Game->Vehicle(), features.lagging_rate);
 					});
 				draw_option<number<float>>("Rust", "Only works in vehicles like the besra", &features.rust, 0.0f, 1.f, 0.1f, 1, true, "", "", [=] {
 					VEHICLE::SET_VEHICLE_ENVEFF_SCALE(Game->Vehicle(), features.rust);
 					});
-
+				static float celheight = 1.0f;
+				draw_option<number<float>>("Ceiling Height", "", &celheight, -100.0f, 100.f, 0.1f, 1, true, "", "", [=] {
+					VEHICLE::SET_VEHICLE_CEILING_HEIGHT(Game->Vehicle(), celheight);
+					});
+				static float dirtlevel = 1.0f;
+				draw_option<number<float>>("Dirt Level", "", &dirtlevel, -100.0f, 100.f, 0.1f, 1, true, "", "", [=] {
+					VEHICLE::SET_VEHICLE_DIRT_LEVEL(Game->Vehicle(), dirtlevel);
+					});
+				static float state = 1.0f;
+				draw_option<number<float>>("Deluxo Transform State", "", &state, 0.0f, 1.f, 0.1f, 1, true, "", "", [=] {
+					VEHICLE::SET_SPECIAL_FLIGHT_MODE_TARGET_RATIO(Game->Vehicle(), state);
+					});
 				draw_option<Button>("Delete", nullptr, []
 					{
 						Vehicle veh = Game->Vehicle();
@@ -1798,6 +1811,14 @@ namespace Saint
 						Blip = HUD::ADD_BLIP_FOR_ENTITY(Vehicle);
 						HUD::SET_BLIP_SPRITE(Blip, 225);
 						HUD::SET_BLIP_NAME_FROM_TEXT_FILE(Blip, "Personal Vehicle");
+					});
+				draw_option<Button>("Detach From Towtruck", nullptr, []
+					{
+						VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(Game->Vehicle());
+					});
+				draw_option<Button>("Detach From Cargobob", nullptr, []
+					{
+						VEHICLE::DETACH_VEHICLE_FROM_ANY_CARGOBOB(Game->Vehicle());
 					});
 
 			});
@@ -2556,7 +2577,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Ramps"), SubmenuVehicleRamps, [](sub* sub)
 			{
-				draw_option<ToggleWithScroller>("Transparent", nullptr, &m_vehicle_ramps.m_is_trasparent, &m_vehicle_ramps.m_ramp_trasparency, &m_vehicle_ramps.m_ramp_transparency_data, false, [] {
+				draw_option<ToggleWithScroller>("Transparent", "", &m_vehicle_ramps.m_is_trasparent, &m_vehicle_ramps.m_ramp_trasparency, &m_vehicle_ramps.m_ramp_transparency_data, false, [] {
 					if (!m_vehicle_ramps.m_is_trasparent) {
 						if (ENTITY::DOES_ENTITY_EXIST(m_vehicle_ramps.m_ramp_location.back)) {
 							ENTITY::SET_ENTITY_ALPHA(m_vehicle_ramps.m_ramp_location.back, 255, false);
@@ -2577,7 +2598,7 @@ namespace Saint
 					}
 					});
 				draw_option<Scroll>("Model", nullptr, &m_vehicle_ramps.m_ramp_type, &m_vehicle_ramps.m_ramp_type_data);
-				draw_option<toggle>(("Front"), nullptr, &m_vehicle_ramps.m_ramp_location.m_front);
+				draw_option<toggle>(("Front"), "", &m_vehicle_ramps.m_ramp_location.m_front);
 				draw_option<toggle>(("Back"), nullptr, &m_vehicle_ramps.m_ramp_location.m_back);
 				draw_option<toggle>(("Left"), nullptr, &m_vehicle_ramps.m_ramp_location.m_left);
 				draw_option<toggle>(("Right"), nullptr, &m_vehicle_ramps.m_ramp_location.m_right);
@@ -2607,6 +2628,29 @@ namespace Saint
 
 					}
 					});
+				draw_option<Break>("Ramp Buggy");
+				if (Game->GetHash(Game->Vehicle()) != rage::joaat("dune5")) {
+					draw_option<Button>("Spawn Ramp Buggy", "", []
+						{
+							Vehicle spawned;
+							veh_spawner.spawn(rage::joaat("dune5"), &spawned);
+						});
+				}
+				draw_option<toggle>(("Sideways Launch Motion"), nullptr, &m_vehicle_ramps.launch_motion, [] {
+					if (!m_vehicle_ramps.launch_motion) {
+						VEHICLE::VEHICLE_SET_ENABLE_RAMP_CAR_SIDE_IMPULSE(Game->Vehicle(), false);
+					}
+				});
+				draw_option<toggle>(("Upward Launch Motion"), nullptr, &m_vehicle_ramps.launch_motion2, [] {
+					if (!m_vehicle_ramps.launch_motion2) {
+						VEHICLE::VEHICLE_SET_ENABLE_NORMALISE_RAMP_CAR_VERTICAL_VELOCTIY(Game->Vehicle(), true);
+					}
+				});
+				draw_option<toggle>(("Disable Damage"), nullptr, &m_vehicle_ramps.ramp_damage, [] {
+					if (!m_vehicle_ramps.ramp_damage) {
+						VEHICLE::VEHICLE_SET_RAMP_AND_RAMMING_CARS_TAKE_DAMAGE(Game->Vehicle(), true);
+					}
+				});
 			});
 		g_Render->draw_submenu<sub>(("Color"), SubmenuChangeVehicleColor, [](sub* sub)
 			{

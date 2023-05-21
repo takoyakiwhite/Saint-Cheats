@@ -1,30 +1,97 @@
 #include "Natives.hpp"
 #include "UI/Interface.hpp"
+#include "Enums.h"
 namespace Saint::UserInterface
 {
+	class instructionManager2 {
+	public:
+		void PrepareInstructionalButtons() {
+			m_scaleForm = GRAPHICS::REQUEST_SCALEFORM_MOVIE("instructional_buttons");
+			if (GRAPHICS::HAS_SCALEFORM_MOVIE_LOADED(m_scaleForm)) {
+				GRAPHICS::DRAW_SCALEFORM_MOVIE_FULLSCREEN(m_scaleForm, 255, 255, 255, 0, 0);
+				GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(m_scaleForm, "CLEAR_ALL");
+				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+				GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(m_scaleForm, "SET_CLEAR_SPACE");
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(200);
+				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+				GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(m_scaleForm, "SET_MAX_WIDTH");
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_FLOAT(1);
+				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+				GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(m_scaleForm, "SET_DATA_SLOT_EMPTY");
+				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+			}
+			m_prepared = true;
+		}
+
+		void FinishInstructionalButtons() {
+
+			if (!m_prepared) return;
+			if (GRAPHICS::HAS_SCALEFORM_MOVIE_LOADED(m_scaleForm)) {
+				GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(m_scaleForm, "DRAW_INSTRUCTIONAL_BUTTONS");
+				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+				GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(m_scaleForm, "SET_BACKGROUND_COLOUR");
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(/*GetRenderer()->m_cOutline.m_r*/ 0);
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(/*GetRenderer()->m_cOutline.m_g*/ 0);
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(/*GetRenderer()->m_cOutline.m_b*/ 0);
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(80);
+				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+				m_offset = 0;
+			}
+			m_prepared = false;
+		}
+
+		void DrawInstructional(const char* text, const char* button) {
+			if (!m_prepared) return;
+			if (GRAPHICS::HAS_SCALEFORM_MOVIE_LOADED(m_scaleForm)) {
+				GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(m_scaleForm, "SET_DATA_SLOT");
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(m_offset);
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING(("t_" + (std::string)button).c_str());
+				GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING(text);
+				GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+				m_offset++;
+			}
+		}
+	private:
+		int m_offset;
+		bool m_prepared;
+		int m_scaleForm;
+	};
+	inline instructionManager2* maruia;
+	inline instructionManager2* InstructionManager() {
+		return maruia;
+	}
 	enum TextPosition {
 		Left = 0,
 		Right = 1,
 		Center = 2,
 	};
-	struct MenuTextures {
+	struct TextureStructure {
 		const char* dictionary;
 		const char* asset;
 	};
-	inline MenuTextures getTexture(const char* name) {
-		if (name == "arrows") {
-			return { "commonmenu", "shop_arrows_upanddown" };
+	class textureManager {
+	public:
+		
+		inline TextureStructure Get(const char* name) {
+			if (name == "arrows") {
+				return { "commonmenu", "shop_arrows_upanddown" };
+			}
+			else if (name == "mainToggles") {
+				return { "commonmenu", "common_medal" };
+			}
+			else if (name == "pen") {
+				return { "Textures", "pen" };
+			}
 		}
-		else if (name == "mainToggles") {
-			return { "commonmenu", "common_medal" };
+		inline TextureStructure Get(const char* name, const char* name2) {
+			return { name, name2 };
 		}
-		else if (name == "pen") {
-			return { "Textures", "pen" };
-		}
+	};
+	inline textureManager* text;
+	inline textureManager* TextureManager() {
+		return text;
 	}
-	inline MenuTextures getTexture(const char* name, const char* name2) {
-		return { name, name2 };
-	}
+	
 	inline bool isInBounds(float first, float second, float top, float bottom, float left, float right) {
 		if (first > left && first < right && second > top && second < bottom) {
 			return true;
@@ -88,7 +155,7 @@ namespace Saint::UserInterface
 				GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(dict, false);
 			}
 		}
-		void Sprite(MenuTextures texture, float x, float y, float width, float height, Color color, float rotation)
+		void Sprite(TextureStructure texture, float x, float y, float width, float height, Color color, float rotation)
 		{
 			if (GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(texture.dictionary))
 			{
@@ -102,13 +169,13 @@ namespace Saint::UserInterface
 		void Arrows(bool selected, float offset)
 		{
 			if (selected) {
-				if (GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(getTexture("arrows").dictionary))
+				if (GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(TextureManager()->Get("arrows").dictionary))
 				{
-					Sprite(getTexture("arrows"), g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding) - offset, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.f), GetSpriteScale(0.033).x, GetSpriteScale(0.030).y, selected ? g_Render->m_OptionSelectedTextColor : g_Render->m_OptionUnselectedTextColor, 90.0);
+					Sprite(TextureManager()->Get("arrows"), g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding) - offset, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.f), GetSpriteScale(0.033).x, GetSpriteScale(0.030).y, selected ? g_Render->m_OptionSelectedTextColor : g_Render->m_OptionUnselectedTextColor, 90.0);
 				}
 				else
 				{
-					Sprite(getTexture("arrows"), g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding) - offset, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.f), GetSpriteScale(0.033).x, GetSpriteScale(0.030).y, selected ? g_Render->m_OptionSelectedTextColor : g_Render->m_OptionUnselectedTextColor, 90.0);
+					Sprite(TextureManager()->Get("arrows"), g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding) - offset, g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.f), GetSpriteScale(0.033).x, GetSpriteScale(0.030).y, selected ? g_Render->m_OptionSelectedTextColor : g_Render->m_OptionUnselectedTextColor, 90.0);
 				}
 			}
 		}

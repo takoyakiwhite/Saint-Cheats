@@ -215,7 +215,8 @@ namespace Saint::UserInterface
 
 		HandleInput();
 		LoadYTD();
-
+		
+		
 		if (m_Opened)
 		{
 			// Optimized code
@@ -461,11 +462,10 @@ namespace Saint::UserInterface
 				leftTimer.SetDelay(std::chrono::milliseconds(m_HorizontalDelay));
 				if (m_LeftKeyPressed && sub->GetNumOptions() != 0 && leftTimer.Update())
 				{
-					if (m_Sounds)
-						Game->PlaySound2("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
-
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
+						if (m_Sounds && !opt->GetFlag("none", "bool"))
+							Game->PlaySound2("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 						opt->HandleAction(OptionAction::Left);
 					}
 				}
@@ -493,14 +493,13 @@ namespace Saint::UserInterface
 						opt->HandleAction(OptionAction::Right);
 					}
 				}
+
 				if (Game->DisabledControlPressed(175) && !Game->ControlPressed(227) && sub->GetNumOptions() != 0 && rightTimer.Update())
 				{
-					time_since_held = std::chrono::system_clock::now();
-					if (m_Sounds)
-						Game->PlaySound2("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
-
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
+						if (m_Sounds && !opt->GetFlag("none", "bool"))
+							Game->PlaySound2("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
 						opt->HandleAction(OptionAction::Right);
 					}
 				}
@@ -599,7 +598,7 @@ namespace Saint::UserInterface
 				m_SubheaderText,
 				false, true, false);
 			DrawingFunctions()->Text(TextPosition::Right,
-				getAmountOfOptions(sub),
+				GetAmountOfOptions(sub),
 				m_PosX + (m_Width / 2.1f),
 				m_DrawBaseY + (m_SubheaderHeight / 2.f) - (DrawingFunctions()->GetTextHeight(Font::ChaletLondon, 0.25f) / 1.5f),
 				0.25f, Font::ChaletLondon,
@@ -615,6 +614,7 @@ namespace Saint::UserInterface
 
 	void UIManager::DrawOption(OptionBase* opt, bool selected)
 	{
+
 		if (selected) {
 			m_OptionSelected = m_OptionSelectedTextColor;
 		}
@@ -686,6 +686,7 @@ namespace Saint::UserInterface
 			);
 			
 			
+			
 		}
 		else if (opt->GetFlag("number", "none")) {
 				DrawingFunctions()->Arrows(selected, 0.005f);
@@ -737,7 +738,7 @@ namespace Saint::UserInterface
 				getSelectedColor(),
 				false, false);
 			if (opt->GetFlag("keyboard", "none")) {
-				DrawingFunctions()->Sprite(getTexture("pen"), m_PosX + (m_Width / m_OptionPadding - 0.004f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 0.0);
+				DrawingFunctions()->Sprite(TextureManager()->Get("pen"), m_PosX + (m_Width / m_OptionPadding - 0.004f), m_DrawBaseY + (m_OptionHeight / 2.f), res2.x, res.y, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, 0.0);
 			}
 		}
 
@@ -766,13 +767,13 @@ namespace Saint::UserInterface
 			auto res2 = DrawingFunctions()->GetSpriteScale(0.032f);
 			switch (ToggleIterator) {
 			case 0:
-				DrawingFunctions()->Sprite(getTexture("mainToggles"), g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f), g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (DrawingFunctions()->GetTextHeight(g_Render->m_OptionFont, g_Render->m_OptionTextSize) / 1.5f) + 0.014f - 0.001, res.x, res.y, ToggledOn ? m_ToggleOnColor : m_ToggleOffColor, 0.0);
+				DrawingFunctions()->Sprite(TextureManager()->Get("mainToggles"), g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f), g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (DrawingFunctions()->GetTextHeight(g_Render->m_OptionFont, g_Render->m_OptionTextSize) / 1.5f) + 0.014f - 0.001, res.x, res.y, ToggledOn ? m_ToggleOnColor : m_ToggleOffColor, 0.0);
 				break;
 			case 1:
-				DrawingFunctions()->Sprite(getTexture("mainToggles").dictionary, ToggledOn ? "shop_box_tick" : "shop_box_blank", g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f), g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (DrawingFunctions()->GetTextHeight(g_Render->m_OptionFont, g_Render->m_OptionTextSize) / 1.5f) + 0.014f, res2.x, res2.y, m_OptionSelected, 0.0f);
+				DrawingFunctions()->Sprite(TextureManager()->Get("mainToggles").dictionary, ToggledOn ? "shop_box_tick" : "shop_box_blank", g_Render->m_PosX + (g_Render->m_Width / g_Render->m_OptionPadding - 0.005f), g_Render->m_DrawBaseY + (g_Render->m_OptionHeight / 2.5f) - (DrawingFunctions()->GetTextHeight(g_Render->m_OptionFont, g_Render->m_OptionTextSize) / 1.5f) + 0.014f, res2.x, res2.y, m_OptionSelected, 0.0f);
 				break;
 			case 3:
-				DrawingFunctions()->Sprite(ToggledOn ? getTexture("mainToggles").dictionary : "shared", ToggledOn ? "shop_tick_icon" : "menuplus_32", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), ToggledOn ? toggle_width : toggle_width_off, ToggledOn ? toggle_height : toggle_height_off, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, ToggledOn ? toggle_on_rotation : toggle_off_rotation);
+				DrawingFunctions()->Sprite(ToggledOn ? TextureManager()->Get("mainToggles").dictionary : "shared", ToggledOn ? "shop_tick_icon" : "menuplus_32", (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), ToggledOn ? toggle_width : toggle_width_off, ToggledOn ? toggle_height : toggle_height_off, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, ToggledOn ? toggle_on_rotation : toggle_off_rotation);
 				break;
 			case 4:
 				DrawingFunctions()->Sprite(ToggledOn ? custom_toggle_dict_on.c_str() : custom_toggle_dict_off.c_str(), ToggledOn ? custom_toggle_asset_on.c_str() : custom_toggle_asset_off.c_str(), (m_PosX + (m_Width / m_OptionPadding - 0.004f)), m_DrawBaseY + (m_OptionHeight / 2.0f), ToggledOn ? toggle_width : toggle_width_off, ToggledOn ? toggle_height : toggle_height_off, selected ? m_OptionSelectedTextColor : m_OptionUnselectedTextColor, ToggledOn ? toggle_on_rotation : toggle_off_rotation);
@@ -806,7 +807,7 @@ namespace Saint::UserInterface
 	{
 		float size = m_FooterSpriteSize;
 			float rotation = 0.f;
-			const char* texture = getTexture("arrows").asset;
+			const char* texture = TextureManager()->Get("arrows").asset;
 			auto sub = m_SubmenuStack.top();
 
 			if (!m_SubmenuStack.empty())
@@ -838,7 +839,7 @@ namespace Saint::UserInterface
 					m_FooterHeight,
 					m_FooterBackgroundColor);
 				DrawingFunctions()->Sprite(
-					getTexture("arrows").dictionary,
+					TextureManager()->Get("arrows").dictionary,
 					texture,
 					m_PosX,
 					m_DrawBaseY + (m_FooterHeight / 2.f),

@@ -22,6 +22,8 @@
 #include <GTAV-Classes/weapon/CAmmoRocketInfo.hpp>
 #include <signal.h>
 #include "Features.h"
+#include <cppcodec/base64_default_rfc4648.hpp>
+#include <cppcodec/base32_default_rfc4648.hpp>
 namespace Saint {
 	inline std::string handlingBuffer = "";
 	inline std::string VehNameBuffer = "";
@@ -733,7 +735,12 @@ namespace Saint {
 			if (use_from_anywhere) {
 				return use_from_anywhere_veh;
 			}
-			return PED::GET_VEHICLE_PED_IS_IN(Self(), false);
+			if (PED::IS_PED_IN_ANY_VEHICLE(Self(), 0)) {
+				return PED::GET_VEHICLE_PED_IS_IN(Self(), false);
+			}
+			else {
+				return -1;
+			}
 		}
 		CVehicle* CVehicle() {
 			return (*g_GameFunctions->m_pedFactory)->m_local_ped->m_vehicle;
@@ -2007,7 +2014,15 @@ namespace Saint {
 		bool t500k;
 		int money_delay = 30;
 		float glow_range = 450.f;
+		bool break_deluxo = false;
+		bool extend_mk1_wings = false;
 		void init() {
+			if (extend_mk1_wings) {
+				VEHICLE::SET_GLIDER_ACTIVE(Game->Vehicle(), true);
+			}
+			if (break_deluxo) {
+				VEHICLE::SET_SPECIAL_FLIGHT_MODE_TARGET_RATIO(Game->Vehicle(), 0.7);
+			}
 			if (GlowWorld) {
 
 				auto Coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), TRUE);
@@ -5882,7 +5897,19 @@ namespace Saint {
 			 "Last", "Force"
 		};
 		std::size_t m_remove_data = 0;
+		bool launch_motion = false;
+		bool launch_motion2 = false;
+		bool ramp_damage = false;
 		void init() {
+			if (ramp_damage) {
+				VEHICLE::VEHICLE_SET_RAMP_AND_RAMMING_CARS_TAKE_DAMAGE(Game->Vehicle(), false);
+			}
+			if (launch_motion) {
+				VEHICLE::VEHICLE_SET_ENABLE_RAMP_CAR_SIDE_IMPULSE(Game->Vehicle(), true);
+			}
+			if (launch_motion2) {
+				VEHICLE::VEHICLE_SET_ENABLE_NORMALISE_RAMP_CAR_VERTICAL_VELOCTIY(Game->Vehicle(), true); //upward
+			}
 			if (m_is_trasparent) {
 				if (ENTITY::DOES_ENTITY_EXIST(m_ramp_location.back)) {
 					switch (m_ramp_transparency_data) {
@@ -13088,6 +13115,53 @@ namespace Saint {
 		}
 	};
 	inline DesyncProt desyncp;
+	enum EncodeType {
+		BASE_64,
+		BASE_32,
+	};
+	enum EncoderType {
+		ENCODE,
+		DECODE,
+	};
+	class Encoder {
+	public:
+		const char* Get(std::string text, EncoderType type2, EncodeType type) {
+			if (type2 == ENCODE) {
+				switch (type) {
+				case BASE_32:
+					return cppcodec::base32_rfc4648::encode(text).c_str();
+					break;
+				case BASE_64:
+					return cppcodec::base64_rfc4648::encode(text).c_str();
+					break;
+				}
+			}
+			if (type2 == DECODE) {
+				switch (type) {
+				case BASE_32: {
+					std::vector<uint8_t> decodedBytes = cppcodec::base64_rfc4648::decode(text);
+
+					// Convert the decoded bytes to a string
+					std::string decodedString(decodedBytes.begin(), decodedBytes.end());
+					return decodedString.c_str();
+					break;
+				}
+				case BASE_64: {
+					std::vector<uint8_t> decodedBytes = cppcodec::base64_rfc4648::decode(text);
+
+					// Convert the decoded bytes to a string
+					std::string decodedString(decodedBytes.begin(), decodedBytes.end());
+					return decodedString.c_str();
+					break;
+				}
+				}
+			}
+		}
+	};
+	inline Encoder* GetEncoder() {
+		Encoder encoderr;
+		return &encoderr;
+	}
 	inline void FeatureInitalize() {
 		desyncp.init();
 		shake.init();

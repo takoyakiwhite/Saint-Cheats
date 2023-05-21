@@ -188,7 +188,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 					Atom1 = GlobalFindAtomA(AY_OBFUSCATE("R'g^gc]]pQkEE.wWQp"));
 				}
 
-				g_Logger->Info("Authed successfully");
+				g_Logger->Info("Authed completed.");
 #else
 				g_Logger->Error("Running in dev mode! NEVER release a dev build.");
 #endif	
