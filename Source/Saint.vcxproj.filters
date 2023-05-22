@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="UI\Interface.hpp">
+    <ClInclude Include="UI\Framework.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imconfig.h">
@@ -282,7 +282,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="UI\Interface.cpp">
+    <ClCompile Include="UI\Framework.cpp">
       <Filter>Interface</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui.cpp">

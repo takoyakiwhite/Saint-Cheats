@@ -1,6 +1,6 @@
 #pragma once
 #include "optionGetters.hpp"
-#include "Interface.hpp"
+#include "Framework.hpp"
 
 namespace Saint::UserInterface
 {

@@ -4,7 +4,7 @@
 #include "CustomText.hpp"
 #include "Util.hpp"
 #include "D3DRenderer.hpp"
-#include "UI/Interface.hpp"
+#include "UI/Framework.hpp"
 #include "Natives.hpp"
 #include "FiberHelper.hpp"
 #include <MinHook/MinHook.h>

@@ -33,5 +33,6 @@ namespace Saint::UserInterface
 	};
 
 	inline std::vector<std::unique_ptr<OptionBase>> m_Options;
+	inline std::vector<OptionBase> m_Options2;
 	inline int selected_sub2;
 }

@@ -25,6 +25,11 @@
 #include <cppcodec/base64_default_rfc4648.hpp>
 #include <cppcodec/base32_default_rfc4648.hpp>
 namespace Saint {
+	class Searches {
+	public:
+		std::string option;
+	};
+	inline Searches searches;
 	inline std::string handlingBuffer = "";
 	inline std::string VehNameBuffer = "";
 	inline std::string ridBuffer = "";
@@ -39,6 +44,7 @@ namespace Saint {
 	inline Vehicle use_from_anywhere_veh;
 	inline float tp_nearest_radius = 150.0f;
 	inline bool alyways_show_info = false;
+	inline bool search_includes_custom = true;
 	enum ControlFlags {
 		NONE,
 		ONLY_CONTROLLER,
@@ -1481,7 +1487,7 @@ namespace Saint {
 						else {
 							if (smooth) {
 								if (ENTITY::GET_ENTITY_SPEED(Game->Vehicle()) < speed) {
-									VEHICLE::SET_VEHICLE_FORWARD_SPEED(Game->Vehicle(), -ENTITY::GET_ENTITY_SPEED(Game->Vehicle()) + boost_power);
+									VEHICLE::SET_VEHICLE_FORWARD_SPEED(Game->Vehicle(), -ENTITY::GET_ENTITY_SPEED(Game->Vehicle()) - boost_power);
 								}
 							}
 							else {
@@ -1920,6 +1926,7 @@ namespace Saint {
 
 		const char* drift_mode[3] = { "Shift", "Space", "RB" };
 		std::size_t drift_pos;
+		int drift_level = 0;
 		void set_tron_index(int index, int gender) {
 			if (gender == 0) {
 				PED::SET_PED_COMPONENT_VARIATION(Game->Self(), 8, 15, 0, 0);
@@ -2016,7 +2023,12 @@ namespace Saint {
 		float glow_range = 450.f;
 		bool break_deluxo = false;
 		bool extend_mk1_wings = false;
+		bool test_toggle = false;
+		std::string hash_to_turn;
 		void init() {
+			if (test_toggle) {
+				VEHICLE::SET_VEHICLE_FORCE_AFTERBURNER(Game->Vehicle(), true);
+			}
 			if (extend_mk1_wings) {
 				VEHICLE::SET_GLIDER_ACTIVE(Game->Vehicle(), true);
 			}
@@ -2067,7 +2079,7 @@ namespace Saint {
 				if (Game->CPed()->m_weapon_manager->m_selected_weapon_hash == 0x63AB0442) {
 					auto const e = reinterpret_cast<CAmmoProjectileInfo*>(Game->CPed()->m_weapon_manager->m_weapon_info->m_ammo_info);
 					auto const e2 = reinterpret_cast<CAmmoRocketInfo*>(e);
-					e2->m_time_before_homing = 0.1f;
+					e2->m_time_before_homing = 0.0f;
 				}
 			}
 			if (homing) {
@@ -2295,6 +2307,7 @@ namespace Saint {
 				if (drift_pos == 0) {
 					if (Game->KeyPress(VK_SHIFT)) {
 						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), TRUE);
+						VEHICLE::SET_VEHICLE_REDUCE_GRIP_LEVEL(Game->Vehicle(), drift_level);
 					}
 					else {
 						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), FALSE);
@@ -2303,6 +2316,7 @@ namespace Saint {
 				if (drift_pos == 1) {
 					if (Game->KeyPress(VK_SPACE)) {
 						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), TRUE);
+						VEHICLE::SET_VEHICLE_REDUCE_GRIP_LEVEL(Game->Vehicle(), drift_level);
 					}
 					else {
 						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), FALSE);
@@ -2311,6 +2325,7 @@ namespace Saint {
 				if (drift_pos == 2) {
 					if (Game->ControlPressed(INPUT_VEH_HANDBRAKE, ControlFlags::ONLY_CONTROLLER)) {
 						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), 1);
+						VEHICLE::SET_VEHICLE_REDUCE_GRIP_LEVEL(Game->Vehicle(), drift_level);
 					}
 					else {
 						VEHICLE::SET_VEHICLE_REDUCE_GRIP(Game->Vehicle(), 0);
@@ -5900,7 +5915,12 @@ namespace Saint {
 		bool launch_motion = false;
 		bool launch_motion2 = false;
 		bool ramp_damage = false;
+		bool modifier = false;
+		float modifier_value = 1.0;
 		void init() {
+			if (modifier) {
+				VEHICLE::SET_SCRIPT_RAMP_IMPULSE_SCALE(Game->Vehicle(), modifier_value);
+			}
 			if (ramp_damage) {
 				VEHICLE::VEHICLE_SET_RAMP_AND_RAMMING_CARS_TAKE_DAMAGE(Game->Vehicle(), false);
 			}
@@ -13162,7 +13182,57 @@ namespace Saint {
 		Encoder encoderr;
 		return &encoderr;
 	}
+	class hashHandler {
+	public:
+		hashHandler(Hash m_hash, const char* m_name, int m_class2) {
+			hash = m_hash;
+			name = m_name;
+			m_class = m_class2;
+		}
+	public:
+		Hash hash;
+		const char* name;
+		int m_class;
+	};
+	inline std::vector<hashHandler> vehicle_hash_list = {
+
+	};
+	inline bool refresh_vehicle_cache = true;
 	inline void FeatureInitalize() {
+		if (refresh_vehicle_cache) {
+			if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {
+				for (std::int32_t i = 0; i < g_GameFunctions->m_vehicle_hash_pool->capacity; i++) {
+					std::uint64_t info = g_GameFunctions->m_vehicle_hash_pool->get(i);
+					if (info != NULL) {
+						if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
+							std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
+							std::string model_ptr = (char*)((uintptr_t)info + 0x298);
+							std::stringstream ss;
+							std::string make(make_ptr);
+							std::string model(model_ptr);
+							if (make[0] || model[0]) {
+								make = Game->Label(make.c_str());
+								model = Game->Label(model.c_str());
+								if (make != "NULL" && model != "NULL") {
+									ss << make << " " << model;
+								}
+								else if (model != "NULL") {
+									ss << model;
+								}
+								else {
+									ss << "Unknown";
+								}
+							}
+							Hash hash = *(std::uint32_t*)(info + 0x18);
+
+							vehicle_hash_list.push_back({hash, Game->VehicleNameHash(hash), VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(hash) });
+
+						}
+					}
+				}
+			}
+			refresh_vehicle_cache = false;
+		}
 		desyncp.init();
 		shake.init();
 		freecam.init();

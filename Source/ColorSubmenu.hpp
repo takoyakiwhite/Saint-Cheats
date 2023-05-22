@@ -1,6 +1,6 @@
 #pragma once
 #include "UI/optionGetters.hpp"
-#include "UI/Interface.hpp"
+#include "UI/Framework.hpp"
 #include "FiberHelper.hpp"
 namespace Saint::UserInterface
 {

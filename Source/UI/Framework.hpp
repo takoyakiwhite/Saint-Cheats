@@ -355,23 +355,23 @@ namespace Saint::UserInterface
 			"Lines",
 			"None"
 		};
-		std::size_t position = 1;
+		std::size_t position = 0;
 	};
 	class Glare {
 	public:
 		float height_offset;
 	};
 	
-	class UIManager
+	class Framework
 	{
 	public:
 		int selected_submenu;
-		explicit UIManager() = default;
-		~UIManager() noexcept = default;
-		UIManager(UIManager const&) = delete;
-		UIManager(UIManager&&) = delete;
-		UIManager& operator=(UIManager const&) = delete;
-		UIManager& operator=(UIManager&&) = delete;
+		explicit Framework() = default;
+		~Framework() noexcept = default;
+		Framework(Framework const&) = delete;
+		Framework(Framework&&) = delete;
+		Framework& operator=(Framework const&) = delete;
+		Framework& operator=(Framework&&) = delete;
 
 		template <typename SubmenuType, typename ...TArgs>
 		void draw_submenu(TArgs&&... args)
@@ -462,7 +462,7 @@ namespace Saint::UserInterface
 
 		//enables
 		bool footer_enabled = true;
-		bool lines_enabled = false;
+		bool lines_enabled = true;
 
 		Glare glare;
 
@@ -548,7 +548,7 @@ namespace Saint::UserInterface
 		int m_previous_option;
 
 		float m_FooterHeight = 0.029;
-		float m_FooterSpriteSize = 0.027000f;
+		float m_FooterSpriteSize = 0.024000f;
 		
 
 		//Enterable
@@ -567,7 +567,7 @@ namespace Saint::UserInterface
 			"Checkmarks",
 			"Custom",
 		};
-		std::size_t ToggleIterator = 0;
+		std::size_t ToggleIterator = 3;
 		std::string custom_toggle_dict_on = "commonmenu";
 		std::string custom_toggle_asset_on = "shop_tick_icon";
 		std::string custom_toggle_dict_off = "commonmenu";
@@ -643,6 +643,11 @@ namespace Saint::UserInterface
 			}
 		}
 
+		bool fileExists(const std::string& filePath) {
+			std::ifstream file(filePath);
+			return file.good();
+		}
+
 		std::stack<SubmenuBase*, std::vector<SubmenuBase*>> m_SubmenuStack;
 		std::vector<std::unique_ptr<SubmenuBase>> m_AllSubmenus;
 		
@@ -670,7 +675,7 @@ namespace Saint::UserInterface
 		Color m_OptionSelectedTextColor{ 0,0,0, 255 };
 		Color m_OptionUnselectedTextColor{ 255,255,255, 255 };
 		Color m_OptionSelectedBackgroundColor{ 255, 255, 255, 255 };
-		Color m_OptionUnselectedBackgroundColor{ 0, 0, 0, 160 };
+		Color m_OptionUnselectedBackgroundColor{ 0, 0, 0, 240 };
 		Color getSelectedColor() {
 			return m_OptionSelected;
 		}
@@ -713,7 +718,6 @@ namespace Saint::UserInterface
 		void DrawSubmenuBar(SubmenuBase* sub);
 
 		bool IsMouseLocked();
-		Rectangle GetMenuRect();
 
 
 
@@ -745,10 +749,10 @@ namespace Saint::UserInterface
 namespace Saint
 {
 
-	inline std::unique_ptr<UserInterface::UIManager> g_Render;
+	inline std::unique_ptr<UserInterface::Framework> g_Render;
 	
-	inline UserInterface::UIManager renderManager;
-	inline UserInterface::UIManager* getRenderer() {
+	inline UserInterface::Framework renderManager;
+	inline UserInterface::Framework* getRenderer() {
 		return &renderManager;
 	}
 #ifdef logoptions

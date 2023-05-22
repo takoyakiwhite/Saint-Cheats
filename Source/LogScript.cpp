@@ -1,13 +1,13 @@
 #include <string>
 #include "Signatures.hpp"
 #include "LogScript.hpp"
-#include "UI/Interface.hpp"
+#include "UI/Framework.hpp"
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_dx11.h"
 #include "ImGui/imgui_impl_win32.h"
 #include "D3DRenderer.hpp"
 #include "ImGui/imgui_internal.h"
-#include "UI/Interface.hpp"
+#include "UI/Framework.hpp"
 namespace Saint
 {
 	bool LogScript::IsInitialized()

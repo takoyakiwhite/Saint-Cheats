@@ -6,7 +6,7 @@
 #include <string>
 
 #include "ImGui/imgui.h"
-#include "UI/Interface.hpp"
+#include "UI/Framework.hpp"
 #include "font_awesome.h"
 #include "fa_solid_900.h"
 #include "FiberHelper.hpp"

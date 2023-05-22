@@ -1,6 +1,6 @@
 #pragma once
 #include "UI/OptionGetters.hpp"
-#include "UI/Interface.hpp"
+#include "UI/Framework.hpp"
 
 namespace Saint::UserInterface {
 	class ToggleWithScroller : public OptionGetters<ToggleWithScroller>

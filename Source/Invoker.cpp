@@ -45,7 +45,7 @@ namespace Saint
 		}
 		else
 		{
-			g_Logger->Info("Failed to native %p, this is most likely a false positive.", hash);
+			g_Logger->Info("Failed to find native %p, this is most likely a false positive.", hash);
 		}
 	}
 }

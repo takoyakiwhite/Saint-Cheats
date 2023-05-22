@@ -103,7 +103,7 @@
     <ClInclude Include="UI\RegularSubmenu.hpp" />
     <ClInclude Include="UI\SubOption.hpp" />
     <ClInclude Include="UI\TextBox.hpp" />
-    <ClInclude Include="UI\Interface.hpp" />
+    <ClInclude Include="UI\Framework.hpp" />
     <ClInclude Include="UI\UnclickOption.hpp" />
     <ClInclude Include="Util.hpp" />
     <ClInclude Include="VectorLists.h" />
@@ -164,7 +164,7 @@
     <ClCompile Include="ScriptHook.cpp" />
     <ClCompile Include="ScriptManager.cpp" />
     <ClCompile Include="Script.cpp" />
-    <ClCompile Include="UI\Interface.cpp" />
+    <ClCompile Include="UI\Framework.cpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="ReturnSpoofer.asm" />

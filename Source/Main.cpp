@@ -13,7 +13,7 @@
 #include "Invoker.hpp"
 #include "CustomText.hpp"
 #include "D3DRenderer.hpp"
-#include "UI/Interface.hpp"
+#include "UI/Framework.hpp"
 #include "Translation.hpp"
 #include "FiberHelper.hpp"
 #include "Script.h"
@@ -61,17 +61,21 @@ void load_dir() {
 
 	std::string path;
 	std::ofstream file;
-	std::string DownloadPP3 = std::string("C:\\Saint\\Sounds\\Notification.wav");
-	std::string DownloadPP2 = std::string("C:\\Saint\\Textures.ytd");
+	std::string notification_path = std::string("C:\\Saint\\Sounds\\Notification.wav");
+	std::string tooltips_path = std::string("C:\\Saint\\tooltips.txt");
+	std::string texture_path = std::string("C:\\Saint\\Textures.ytd");
 
 
 	//URLDownloadToFileA(0, "https://saintcheats.xyz/Chinese-Rocks.ttf", DownloadPP.c_str(), 0, 0);
 	if (!does_exist("C:\\Saint\\", "Textures.ytd")) {
-		URLDownloadToFileA(0, "https://saintcheats.xyz/Textures.ytd", DownloadPP2.c_str(), 0, 0);
+		URLDownloadToFileA(0, "https://saintcheats.xyz/Textures.ytd", texture_path.c_str(), 0, 0);
 	}
 	
 	if (!does_exist("C:\\Saint\\Sounds\\", "Notification.wav")) {
-		URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1104892686386876427/1104971663755464814/Notification.wav", DownloadPP3.c_str(), 0, 0); // dont work nice tim
+		URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1104892686386876427/1104971663755464814/Notification.wav", notification_path.c_str(), 0, 0); // dont work nice tim
+	}
+	if (!does_exist("C:\\Saint\\", "tooltips.txt")) {
+		URLDownloadToFileA(0, "https://cdn.discordapp.com/attachments/1081813761796608095/1110040729134321675/tooltips.txt", tooltips_path.c_str(), 0, 0);
 	}
 }
 std::string wideToString(std::wstring strw) {
@@ -169,6 +173,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				)");
 				g_Logger->Info("Version: %s", MENU_VERSION);
 				g_Logger->Info("This build was compiled on " __DATE__ ". ");
+				
 			//	PlaySound(TEXT("C:\\Saint\\Sounds\\Intro.wav"), NULL, SND_FILENAME | SND_ASYNC);
 				g_FiberPool.registerFbrPool();
 
@@ -207,11 +212,10 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				//everybody forgot me and the work i put in
 
-
 				g_GameVariables->PostInit();
 				g_CustomText = std::make_unique<CustomText>();
 				g_D3DRenderer = std::make_unique<D3DRenderer>();
-				g_Render = std::make_unique<UserInterface::UIManager>();
+				g_Render = std::make_unique<UserInterface::Framework>();
 				g_ScriptManager = std::make_unique<ScriptManager>();
 				g_MainScript = std::make_shared<MainScript>();
 				g_LogScript = std::make_shared<LogScript>();
@@ -227,6 +231,9 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				//registering
 				load_dir();
+				if (!does_exist("C:\\Saint\\", "tooltips.txt")) {
+					Noti::InsertNotification({ ImGuiToastType_None, 2000, "No tooltip file found.", });
+				}
 				if (does_exist("C:\\Saint\\Sounds\\", "Notification.wav")) { // prevent crashes
 					Noti::InsertNotification({ ImGuiToastType_None, 2000, "Welcome, thanks for buying Saint!", });
 				}
@@ -269,7 +276,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 
 				g_Hooking.reset();
 
-				SetWindowTextA(g_GameVariables->m_GameWindow, "Grand Theft Auto V"); //Restore Game Name on unload
+				SetWindowTextA(g_GameVariables->m_GameWindow, "Grand Theft Auto V");
 				g_GameVariables.reset();
 				g_GameFunctions.reset();
 

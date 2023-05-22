@@ -5,7 +5,7 @@
 #include "Timer.hpp"
 #include "Translation.hpp"
 #include "CustomText.hpp"
-#include "UI/Interface.hpp"
+#include "UI/Framework.hpp"
 #include "UI/BoolOption.hpp"
 #include "UI/ChooseOption.hpp"
 #include "UI/NumberOption.hpp"
@@ -462,6 +462,8 @@ namespace Saint
 		g_Render->draw_submenu<sub>("Test", rage::joaat("TESTER"), [](sub* sub)
 			{
 				draw_option<submenu>("TEST", nullptr, rage::joaat("TESTER2"));
+				draw_option<toggle>(("Test Toggle"), correctGrammar("your cat is gay not dont").c_str(), &features.test_toggle);
+				
 				draw_option<toggle>(("Enabled"), correctGrammar("your cat is gay not dont").c_str(), &ped_test);
 				for (int i = 0; i < 457; i++) {
 					draw_option<toggle>((std::format("ped_tester | {}", i).c_str()), nullptr, &ped_tester[i], [=] {
@@ -497,7 +499,18 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("TESTER2", rage::joaat("TESTER2"), [](sub* sub)
 			{
-				
+				draw_option<Keyboard>(("Search"), "", searches.option, []
+					{
+						showKeyboard("Enter Something", "", 25, &searches.option, [=] {});
+					});
+				draw_option<Break>("Results");
+				if (searches.option != "") {
+					for (auto& option : g_Render->m_AllSubmenus) {
+						if (has_string_attached(option->GetName(), searches.option)) {
+							draw_option<submenu>(option->GetName(), "", option->GetId());
+						}
+					}
+				}
 			});
 		g_Render->draw_submenu<sub>("Settings", rage::joaat("TutorialSettings"), [](sub* sub)
 			{
@@ -1619,6 +1632,7 @@ namespace Saint
 					}
 				});
 				//draw_option<submenu>("Cargobob", nullptr, rage::joaat("CARGO_BOB"));
+				draw_option<submenu>("Drift", nullptr, rage::joaat("DriftDeezNutzAHahSoFUnny"));
 				draw_option<toggle>(("Godmode"), "Prevents your vehicle from taking damage.", &features.vehicle_godmode, [] {
 					if (!features.vehicle_godmode) {
 						if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false))
@@ -1746,7 +1760,6 @@ namespace Saint
 						VEHICLE::SET_INVERT_VEHICLE_CONTROLS(Game->Vehicle(), FALSE);
 					}
 					});
-				draw_option<ToggleWithScroller>("Drift", "", &features.drift_on_shift, &features.drift_mode, &features.drift_pos);
 				draw_option<toggle>(("No Gravity"), nullptr, &features.no_grav_veh, [] {
 					if (!features.no_grav_veh) {
 						VEHICLE::SET_VEHICLE_GRAVITY(Game->Vehicle(), true);
@@ -1822,6 +1835,11 @@ namespace Saint
 					});
 
 			});
+			g_Render->draw_submenu<sub>(("Drift"), rage::joaat("DriftDeezNutzAHahSoFUnny"), [](sub* sub)
+				{
+					draw_option<ToggleWithScroller>("Enabled", "", &features.drift_on_shift, &features.drift_mode, &features.drift_pos);
+					draw_option<number<int>>("Multiplier", nullptr, &features.drift_level, 0, 3);
+				});
 		g_Render->draw_submenu<sub>(("Wheels"), rage::joaat("Wheels2"), [](sub* sub)
 			{
 
@@ -2647,6 +2665,7 @@ namespace Saint
 						VEHICLE::VEHICLE_SET_ENABLE_NORMALISE_RAMP_CAR_VERTICAL_VELOCTIY(Game->Vehicle(), true);
 					}
 				});
+				draw_option<ToggleWithNumber<float>>("Impulse Multiplier", nullptr, &m_vehicle_ramps.modifier, &m_vehicle_ramps.modifier_value, 0.0f, 350.f, 1.f, 0);
 				draw_option<toggle>(("Disable Damage"), nullptr, &m_vehicle_ramps.ramp_damage, [] {
 					if (!m_vehicle_ramps.ramp_damage) {
 						VEHICLE::VEHICLE_SET_RAMP_AND_RAMMING_CARS_TAKE_DAMAGE(Game->Vehicle(), true);
@@ -2896,93 +2915,80 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>((get_vehicle_class_name(m_selected_vehicle_class)), SubmenuGetClass, [](sub* sub)
 			{
-				if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {
-					for (std::int32_t i = 0; i < g_GameFunctions->m_vehicle_hash_pool->capacity; i++) {
-						std::uint64_t info = g_GameFunctions->m_vehicle_hash_pool->get(i);
-						if (info != NULL) {
-							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
-								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
-								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
-								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(Game->HashKey(model_ptr.c_str())) == m_selected_vehicle_class) {
-									std::stringstream ss;
-									std::string make(make_ptr);
-									std::string model(model_ptr);
-									if (make[0] || model[0]) {
-										make = Game->Label(make.c_str());
-										model = Game->Label(model.c_str());
-										if (make != "NULL" && model != "NULL") {
-											ss << make << " " << model;
-										}
-										else if (model != "NULL") {
-											ss << model;
-										}
-										else {
-											ss << "Unknown";
-										}
-									}
-									Hash hash = *(std::uint32_t*)(info + 0x18);
-									if (sub->GetSelectedOption() == sub->GetNumOptions()) {
-										g_players.draw_info2(hash);
-									}
-
-									draw_option<Button>(Game->VehicleNameHash(hash), nullptr, [=]
-										{
-											Vehicle veh;
-											veh_spawner.spawn(hash, &veh);
-
-										});
-								}
-							}
+				for (auto& hash : vehicle_hash_list) {
+					if (hash.m_class == m_selected_vehicle_class) {
+						if (sub->GetSelectedOption() == sub->GetNumOptions()) {
+							g_players.draw_info2(hash.hash);
 						}
+						draw_option<Button>(Game->VehicleNameHash(hash.hash), nullptr, [=]
+							{
+								Vehicle veh;
+								veh_spawner.spawn(hash.hash, &veh);
+							});
 					}
 				}
 			});
 		g_Render->draw_submenu<sub>(("Search"), SubmenuVehicleSearch, [](sub* sub)
 			{
+				draw_option<toggle>(("Include Custom"), nullptr, &search_includes_custom);
 				draw_option<Keyboard>(("Value"), "", modelsearchresults2, []
 					{
 						showKeyboard("Enter Something", "", 25, &modelsearchresults2, [=] {});
 					});
 				draw_option<Break>(("Results"));
-				if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {
-					for (std::int32_t i = 0; i < g_GameFunctions->m_vehicle_hash_pool->capacity; i++) {
-						std::uint64_t info = g_GameFunctions->m_vehicle_hash_pool->get(i);
-						if (info != NULL) {
-							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
-								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
-								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
-								std::stringstream ss;
-								std::string make(make_ptr);
-								std::string model(model_ptr);
-								if (make[0] || model[0]) {
-									make = Game->Label(make.c_str());
-									model = Game->Label(model.c_str());
-									if (make != "NULL" && model != "NULL") {
-										ss << make << " " << model;
+				for (auto& hash : vehicle_hash_list) {
+					if (has_string_attached(Game->VehicleNameHash(hash.hash), modelsearchresults2)) {
+						draw_option<Button>(Game->VehicleNameHash(hash.hash), nullptr, [=]
+							{
+								Vehicle veh;
+								veh_spawner.spawn(hash.hash, &veh);
+
+							});
+					}
+				}
+				if (search_includes_custom) {
+					if (std::filesystem::exists("C:\\Saint\\Vehicles\\") && std::filesystem::is_directory("C:\\Saint\\Vehicles\\")) {
+						namespace fs = std::filesystem;
+						fs::directory_iterator dirIt{ "C:\\Saint\\Vehicles\\" };
+						for (auto&& dirEntry : dirIt)
+						{
+							if (dirEntry.is_regular_file())
+							{
+								auto path = dirEntry.path();
+								if (path.has_filename())
+								{
+									if (path.extension() == ".ini")
+									{
+
+										char nigger[64];
+										sprintf(nigger, "%s", path.stem().u8string().c_str());
+										if (has_string_attached(nigger, modelsearchresults2)) {
+											draw_option<Button>(nigger, nullptr, [=]
+												{
+													m_VehicleLoad.load(nigger);
+												});
+										}
+
 									}
-									else if (model != "NULL") {
-										ss << model;
-									}
-									else {
-										ss << "Unknown";
-									}
+
 								}
-								Hash hash = *(std::uint32_t*)(info + 0x18);
-
-								if (has_string_attached(Game->VehicleNameHash(hash), modelsearchresults2)) {
-									draw_option<Button>(Game->VehicleNameHash(hash), nullptr, [=]
-										{
-											Vehicle veh;
-											veh_spawner.spawn(hash, &veh);
-
-										});
-								}
-
+							}
+						}
+					}
+					else {
+						if (std::filesystem::create_directory("C:\\Saint\\Vehicles\\")) {
+							if (Flags->isDev()) {
+								Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Created directory 'vehicles'" });
+							}
+						}
+						else {
+							std::filesystem::create_directory("C:\\Saint\\Vehicles\\");
+							if (Flags->isDev()) {
+								Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_CHECK"  Created directory 'vehicles'" });
 							}
 						}
 					}
 				}
-
 			});
 		g_Render->draw_submenu<sub>(("Max (Once)"), SubmenuMaxThatFucker, [](sub* sub)
 			{
@@ -4554,43 +4560,15 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>((get_vehicle_class_name(m_selected_engine_class)), rage::joaat("EngineSoundSpawner"), [](sub* sub)
 			{
-				if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {
-					for (std::int32_t i = 0; i < g_GameFunctions->m_vehicle_hash_pool->capacity; i++) {
-						std::uint64_t info = g_GameFunctions->m_vehicle_hash_pool->get(i);
-						if (info != NULL) {
-							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
-								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
-								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
-								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(Game->HashKey(model_ptr.c_str())) == m_selected_engine_class) {
-									std::stringstream ss;
-									std::string make(make_ptr);
-									std::string model(model_ptr);
-									if (make[0] || model[0]) {
-										make = Game->Label(make.c_str());
-										model = Game->Label(model.c_str());
-										if (make != "NULL" && model != "NULL") {
-											ss << make << " " << model;
-										}
-										else if (model != "NULL") {
-											ss << model;
-										}
-										else {
-											ss << "Unknown";
-										}
-									}
-									Hash hash = *(std::uint32_t*)(info + 0x18);
-									if (sub->GetSelectedOption() == sub->GetNumOptions()) {
-										g_players.draw_info2(hash);
-									}
-
-									draw_option<Button>(Game->VehicleNameHash(hash), nullptr, [=]
-										{
-											AUDIO::FORCE_USE_AUDIO_GAME_OBJECT(Game->Vehicle(), VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(hash));
-
-										});
-								}
-							}
+				for (auto& hash : vehicle_hash_list) {
+					if (hash.m_class == m_selected_engine_class) {
+						if (sub->GetSelectedOption() == sub->GetNumOptions()) {
+							g_players.draw_info2(hash.hash);
 						}
+						draw_option<Button>(Game->VehicleNameHash(hash.hash), nullptr, [=]
+							{
+								AUDIO::FORCE_USE_AUDIO_GAME_OBJECT(Game->Vehicle(), VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(hash.hash));
+							});
 					}
 				}
 			});
@@ -5792,15 +5770,6 @@ namespace Saint
 							*script_local(criminal_damage->m_stack, am_criminal_damage::score_idx).as<int*>() = 999'999'999;
 					});
 			});
-
-		g_Render->draw_submenu<sub>(g_GameVariables->m_friendRegistry->m_friends[SelectedFriend]->m_name, SubmenuSelectedFriend, [](sub* sub)
-			{
-				draw_option<Button>("Join", "", [] {
-					//rid_toolkit.join(g_GameVariables->m_friendRegistry->m_friends[SelectedFriend]->m_rockstar_id);
-				});
-
-
-			});
 		g_Render->draw_submenu<sub>("Heist Control", HeistControl, [](sub* sub)
 			{
 				draw_option<submenu>("Diamond Casino", nullptr, DiamondCasino);
@@ -6290,7 +6259,7 @@ namespace Saint
 			{
 
 
-				draw_option<toggle>(("500"), nullptr, &features.Y500k);
+				
 
 				draw_option<Button>("Allow Gender Change", "", [] {
 					statSetBool("MP0_ALLOW_GENDER_CHANGE", 0);
@@ -12658,25 +12627,18 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Colors"), SubmenuColors, [](sub* sub)
 			{
-
-				//draw_option<submenu>("Header", nullptr, SubmenuSettingsHeader);
-				//draw_option<submenu>("Footer Text", nullptr, SubmenuSettingsSubmenuBar);
-				//draw_option<submenu>("Options", nullptr, SubmenuSettingsOption);
-				//draw_option<submenu>("Footer", nullptr, SubmenuSettingsFooter);
-				//draw_option<submenu>("Toggles", nullptr, SubmenuToggles);
-				//draw_option<submenu>("Description", nullptr, SubmenuSettingsDescription);
-				draw_option<submenu>("Header Background", nullptr, SubmenuHeaderColor);
-				draw_option<submenu>("Header Text", nullptr, SubmenuHeaderText);
-				draw_option<submenu>("Background Selected", nullptr, SubmenuOptionSelectedBackground);
-				draw_option<submenu>("Background Unselected", nullptr, SubmenuOptionUnselectedBackground);
-				draw_option<submenu>("Text Selected", nullptr, OptionTextSelected);
-				draw_option<submenu>("Text Unselected", nullptr, OptionTextUnselected);
-				draw_option<submenu>("Footer Background", nullptr, FooterBackground);
-				draw_option<submenu>("Footer Sprite", nullptr, FooterSprite);
-				draw_option<submenu>("Subheader Background", nullptr, SubheaderBackground);
-				draw_option<submenu>("Subheader Text Left", nullptr, SubheaderTextLeft);
-				draw_option<submenu>("Subheader Text Right", nullptr, SubheaderTextRight);
-				draw_option<submenu>("Radius Sphere", nullptr, rage::joaat("RadiusSphere"));
+				draw_option<color_submenu>("Header Background", nullptr, g_Render->m_HeaderBackgroundColor, SubmenuHeaderColor);
+				draw_option<color_submenu>("Header Text", nullptr, g_Render->m_HeaderTextColor, SubmenuHeaderText);
+				draw_option<color_submenu>("Background Selected", nullptr, g_Render->m_OptionSelectedBackgroundColor, SubmenuOptionSelectedBackground);
+				draw_option<color_submenu>("Background Unselected", nullptr, g_Render->m_OptionUnselectedBackgroundColor, SubmenuOptionUnselectedBackground);
+				draw_option<color_submenu>("Text Selected", nullptr, g_Render->m_OptionSelectedTextColor, OptionTextSelected);
+				draw_option<color_submenu>("Text Unselected", nullptr, g_Render->m_OptionUnselectedTextColor, OptionTextUnselected);
+				draw_option<color_submenu>("Footer Background", nullptr, g_Render->m_FooterBackgroundColor, FooterBackground);
+				draw_option<color_submenu>("Footer Sprite", nullptr, g_Render->m_FooterSpriteColor, FooterSprite);
+				draw_option<color_submenu>("Subheader Background", nullptr, g_Render->m_SubheaderBackground, SubheaderBackground);
+				draw_option<color_submenu>("Subheader Text Left", nullptr, g_Render->m_SubheaderText, SubheaderTextLeft);
+				draw_option<color_submenu>("Subheader Text Right", nullptr, g_Render->m_SubheaderTextRight, SubheaderTextRight);
+				draw_option<color_submenu>("Radius Sphere", nullptr, g_Render->m_RadiusSphere, rage::joaat("RadiusSphere"));
 
 
 			});
@@ -12784,29 +12746,7 @@ namespace Saint
 				draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_FooterSpriteColor.a, 0, 255);
 
 			});
-		g_Render->draw_submenu<sub>(("Toggles"), SubmenuToggles, [](sub* sub)
-			{
-				draw_option<submenu>("Color", nullptr, SubmenuTogglesColor);
-				draw_option<Scroll>(("Icon"), nullptr, &g_Render->ToggleList, &g_Render->ToggleIterator);
-
-			});
-		g_Render->draw_submenu<sub>(("Color"), SubmenuTogglesColor, [](sub* sub)
-			{
-				draw_option<toggle>("Automaticly Match", nullptr, &features.match);
-
-				
-
-				draw_option<number<std::int32_t>>("Toggled (R)", nullptr, &g_Render->m_ToggleOnColor.r, 0, 255);
-				draw_option<number<std::int32_t>>("Toggled (G)", nullptr, &g_Render->m_ToggleOnColor.g, 0, 255);
-				draw_option<number<std::int32_t>>("Toggled (B)", nullptr, &g_Render->m_ToggleOnColor.b, 0, 255);
-				draw_option<number<std::int32_t>>("Toggled (A)", nullptr, &g_Render->m_ToggleOnColor.a, 0, 255);
-				draw_option<Button>("Reset", "", []
-					{
-						features.match = false;
-						g_Render->m_ToggleOnColor = { 130, 214, 157, 255 };
-					});
-
-			});
+		
 
 
 		g_Render->draw_submenu<sub>(("Themes"), SubmenuThemes, [](sub* sub)
@@ -12815,41 +12755,9 @@ namespace Saint
 
 			});
 
-		g_Render->draw_submenu<sub>("Footer Text", SubmenuSettingsSubmenuBar, [](sub* sub)
-			{
-				draw_option<number<float>>("Text Size", nullptr, &g_Render->m_FooterTextSize, 0.01f, 1.f, 0.01f, 2);
-				draw_option<toggle>("Left Text", nullptr, &g_Render->LeftFooterText);
-				draw_option<toggle>("Right Text", nullptr, &g_Render->RightFooterText);
-				draw_option<Break>(("Colors"));
-				draw_option<number<std::int32_t>>("Text R", nullptr, &g_Render->m_FooterTextColor.r, 0, 255);
-				draw_option<number<std::int32_t>>("Text G", nullptr, &g_Render->m_FooterTextColor.g, 0, 255);
-				draw_option<number<std::int32_t>>("Text B", nullptr, &g_Render->m_FooterTextColor.b, 0, 255);
-				draw_option<number<std::int32_t>>("Text A", nullptr, &g_Render->m_FooterTextColor.a, 0, 255);
-			});
+		
 
-		g_Render->draw_submenu<sub>("Options", SubmenuSettingsOption, [](sub* sub)
-			{
-				draw_option<number<float>>("Height", nullptr, &g_Render->m_OptionHeight, 0.01f, 0.1f, 0.001f, 3);
-				draw_option<number<float>>("Text Size", nullptr, &g_Render->m_OptionTextSize, 0.01f, 1.f, 0.01f, 2);
-				draw_option<Break>(("Colors"));
-				draw_option<number<std::int32_t>>("Selected Background R", nullptr, &g_Render->m_OptionSelectedBackgroundColor.r, 0, 255);
-				draw_option<number<std::int32_t>>("Selected Background G", nullptr, &g_Render->m_OptionSelectedBackgroundColor.g, 0, 255);
-				draw_option<number<std::int32_t>>("Selected Background B", nullptr, &g_Render->m_OptionSelectedBackgroundColor.b, 0, 255);
-				draw_option<number<std::int32_t>>("Selected Background A", nullptr, &g_Render->m_OptionSelectedBackgroundColor.a, 0, 255);
-				draw_option<number<std::int32_t>>("Unselected Background R", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.r, 0, 255);
-				draw_option<number<std::int32_t>>("Unselected Background G", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.g, 0, 255);
-				draw_option<number<std::int32_t>>("Unselected Background B", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.b, 0, 255);
-				draw_option<number<std::int32_t>>("Unselected Background A", nullptr, &g_Render->m_OptionUnselectedBackgroundColor.a, 0, 255);
-
-				draw_option<number<std::int32_t>>("Selected Text R", nullptr, &g_Render->m_OptionSelectedTextColor.r, 0, 255);
-				draw_option<number<std::int32_t>>("Selected Text G", nullptr, &g_Render->m_OptionSelectedTextColor.g, 0, 255);
-				draw_option<number<std::int32_t>>("Selected Text B", nullptr, &g_Render->m_OptionSelectedTextColor.b, 0, 255);
-				draw_option<number<std::int32_t>>("Selected Text A", nullptr, &g_Render->m_OptionSelectedTextColor.a, 0, 255);
-				draw_option<number<std::int32_t>>("Unselected Text R", nullptr, &g_Render->m_OptionUnselectedTextColor.r, 0, 255);
-				draw_option<number<std::int32_t>>("Unselected Text G", nullptr, &g_Render->m_OptionUnselectedTextColor.g, 0, 255);
-				draw_option<number<std::int32_t>>("Unselected Text B", nullptr, &g_Render->m_OptionUnselectedTextColor.b, 0, 255);
-				draw_option<number<std::int32_t>>("Unselected Text A", nullptr, &g_Render->m_OptionUnselectedTextColor.a, 0, 255);
-			});
+		
 
 		g_Render->draw_submenu<sub>("Footer", SubmenuSettingsFooter, [](sub* sub)
 			{
@@ -12860,91 +12768,11 @@ namespace Saint
 				draw_option<toggle>("Freeze Icon", nullptr, &g_Render->freeze_icon);
 			});
 
-		g_Render->draw_submenu<sub>("Header", SubmenuSettingsHeader, [](sub* sub)
-			{
-				draw_option<Scroll>("Type", nullptr, &Lists::HeaderTypesFrontend, &Lists::HeaderTypesPosition, true, -1, []
-					{
-						g_Render->m_HeaderType = Lists::HeaderTypesBackend[Lists::HeaderTypesPosition];
-					});
+		
 
-				switch (g_Render->m_HeaderType)
-				{
-				case HeaderType::Static:
-					draw_option<submenu>("Background", nullptr, SubmenuSettingsHeaderStaticBackground);
-					break;
-				case HeaderType::YTD:
-					draw_option<submenu>("Gradient", nullptr, SubmenuSettingsHeaderGradientBackground);
-					break;
-				}
+		
 
-				draw_option<submenu>("Text", nullptr, SubmenuSettingsHeaderText);
-				draw_option<number<float>>("Height", nullptr, &g_Render->m_HeaderHeight, 0.01f, 0.2f, 0.001f, 3);
-				draw_option<Keyboard>(("Name"), nullptr, g_Render->header_name, []
-					{
-						showKeyboard("Enter Something", "", 25, &g_Render->header_name, [] {});
-
-
-
-					});
-			});
-
-		g_Render->draw_submenu<sub>("Header Background", SubmenuSettingsHeaderStaticBackground, [](sub* sub)
-			{
-				draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_HeaderBackgroundColor.r, 0, 255);
-				draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_HeaderBackgroundColor.g, 0, 255);
-				draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_HeaderBackgroundColor.b, 0, 255);
-				draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_HeaderBackgroundColor.a, 0, 255);
-			});
-
-		g_Render->draw_submenu<sub>("Header Gradient", SubmenuSettingsHeaderGradientBackground, [](sub* sub)
-			{
-				draw_option<toggle>("Transparent", nullptr, &g_Render->m_HeaderGradientTransparent);
-				draw_option<toggle>("Flip", nullptr, &g_Render->m_HeaderGradientFlip);
-				draw_option<Break>(("Colors"));
-				draw_option<number<std::int32_t>>("R1", nullptr, &g_Render->m_HeaderGradientColorLeft.r, 0, 255);
-				draw_option<number<std::int32_t>>("G1", nullptr, &g_Render->m_HeaderGradientColorLeft.g, 0, 255);
-				draw_option<number<std::int32_t>>("B1", nullptr, &g_Render->m_HeaderGradientColorLeft.b, 0, 255);
-				draw_option<number<std::int32_t>>("A1", nullptr, &g_Render->m_HeaderGradientColorLeft.a, 0, 255);
-				draw_option<number<std::int32_t>>("R2", nullptr, &g_Render->m_HeaderGradientColorRight.r, 0, 255);
-				draw_option<number<std::int32_t>>("G2", nullptr, &g_Render->m_HeaderGradientColorRight.g, 0, 255);
-				draw_option<number<std::int32_t>>("B2", nullptr, &g_Render->m_HeaderGradientColorRight.b, 0, 255);
-				draw_option<number<std::int32_t>>("A2", nullptr, &g_Render->m_HeaderGradientColorRight.a, 0, 255);
-			});
-
-		g_Render->draw_submenu<sub>("Header Text", SubmenuSettingsHeaderText, [](sub* sub)
-			{
-				draw_option<toggle>("DX Header Text", "Disable native text if going to use dx", &g_Render->m_HeaderTextData);
-				draw_option<toggle>("Native Header Text", "Disable dx text if going to use native ", &g_Render->m_HeaderNativeText);
-				if (g_Render->m_HeaderNativeText) {
-					draw_option<Scroll>("Type", nullptr, &g_Render->HeaderFont, &g_Render->HeaderFontIterator, true, -1, []
-						{
-							if (g_Render->HeaderFontIterator == 0) {
-								g_Render->m_HeaderFont = Font::ChaletLondon;
-							}
-							if (g_Render->HeaderFontIterator == 1) {
-								g_Render->m_HeaderFont = Font::HouseScript;
-							}
-							if (g_Render->HeaderFontIterator == 2) {
-								g_Render->m_HeaderFont = Font::Monospace;
-							}
-							if (g_Render->HeaderFontIterator == 3) {
-								g_Render->m_HeaderFont = Font::Wingdings;
-							}
-							if (g_Render->HeaderFontIterator == 4) {
-								g_Render->m_HeaderFont = Font::ChaletComprimeCologne;
-							}
-							if (g_Render->HeaderFontIterator == 5) {
-								g_Render->m_HeaderFont = Font::Pricedown;
-							}
-						});
-				}
-				draw_option<number<float>>("Size", nullptr, &g_Render->m_HeaderTextSize, 0.1f, 2.f, 0.01f, 2);
-				draw_option<Break>(("Colors"));
-				draw_option<number<std::int32_t>>("R", nullptr, &g_Render->m_HeaderTextColor.r, 0, 255);
-				draw_option<number<std::int32_t>>("G", nullptr, &g_Render->m_HeaderTextColor.g, 0, 255);
-				draw_option<number<std::int32_t>>("B", nullptr, &g_Render->m_HeaderTextColor.b, 0, 255);
-				draw_option<number<std::int32_t>>("A", nullptr, &g_Render->m_HeaderTextColor.a, 0, 255);
-			});
+		
 
 		g_Render->draw_submenu<sub>("Description", SubmenuSettingsDescription, [](sub* sub)
 			{
