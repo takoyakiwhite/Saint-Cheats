@@ -283,6 +283,9 @@
     <ClInclude Include="Exception.h">
       <Filter>Core\Exception</Filter>
     </ClInclude>
+    <ClInclude Include="Disassembler.h">
+      <Filter>Core\Exception</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Framework.cpp">

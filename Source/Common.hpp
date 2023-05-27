@@ -44,6 +44,9 @@
 #include <JSON/json.hpp>
 #include <JSON/json_fwd.hpp>
 
+//Stack Walker
+#include <stackwalker/Main/StackWalker/StackWalker.h>
+
 // GTA-V
 #include <GTAV-Classes/script/scrNativeHandler.hpp>
 #include <GTAV-Classes/script/scrNativeRegistration.hpp>
@@ -56,6 +59,7 @@
 #define BIGBASE_STRINGIZE(x) BIGBASE_STRINGIZE_IMPL(x)
 
 #define BRANDING "Saint"
+using strung = std::string;
 
 namespace Saint
 {
@@ -68,8 +72,18 @@ namespace Saint
 	inline std::uint32_t g_SelectedPlayer{};
 
 	inline bool g_LogScriptEvents = false;
-}
 
+	class stackWalker : public StackWalker {
+	public:
+		stackWalker() : StackWalker() {}
+		stackWalker(ExceptType exType) : StackWalker(exType) {}
+		virtual void OnOutput(LPCSTR szText);
+		virtual void OnLoadModule(LPCSTR img, LPCSTR mod, DWORD64 baseAddr, DWORD size, DWORD result, LPCSTR symType, LPCSTR pdbName, ULONGLONG fileVersion);
+		virtual void OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUserName);
+		virtual void OnDbgHelpErr(LPCSTR szFuncName, DWORD gle, DWORD64 addr);
+		virtual void OnCallstackEntry(CallstackEntryType eType, CallstackEntry& entry);
+	};
+}
 #include "Settings.hpp"
 #include "Logger.hpp"
 #include "Util.hpp"

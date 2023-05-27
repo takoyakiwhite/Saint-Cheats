@@ -26,6 +26,7 @@
 #include <windows.h>
 #include <mmsystem.h>
 #include "Features.h"
+#include "Exception.h"
 
 #pragma comment (lib, "urlmon.lib") 
 #pragma comment(lib, "winmm.lib")
@@ -172,7 +173,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
                                 
 				)");
 				g_Logger->Info("Version: %s", MENU_VERSION);
-				g_Logger->Info("This build was compiled on " __DATE__ ". ");
+				g_Logger->Info("This build was compiled on " __DATE__ );
 				
 			//	PlaySound(TEXT("C:\\Saint\\Sounds\\Intro.wav"), NULL, SND_FILENAME | SND_ASYNC);
 				g_FiberPool.registerFbrPool();
@@ -211,7 +212,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				g_Logger->Info("Game Loaded.");
 
 				//everybody forgot me and the work i put in
-
+				exceptions::initExceptionHandler();
 				g_GameVariables->PostInit();
 				g_CustomText = std::make_unique<CustomText>();
 				g_D3DRenderer = std::make_unique<D3DRenderer>();
@@ -254,7 +255,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 						std::this_thread::yield();
 					}
 				}
-
+				exceptions::uninitExceptionHandler();
 				std::this_thread::sleep_for(500ms);
 				PlaySound(NULL, NULL, 0);
 				g_Discord->Shutdown();

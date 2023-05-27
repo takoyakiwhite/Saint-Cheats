@@ -159,7 +159,14 @@ using ScrHandle = Entity;
 		float z{};
 	};
 #pragma pack(pop)
-
+#pragma pack(push, 1)
+    struct ImageDimensions
+    {
+        int x, y;
+        ImageDimensions() { x = y = 0; }
+        ImageDimensions(int _x, int _y) { x = _x; y = _y; }
+    };
+#pragma pack(pop)
 #pragma pack(push, 1)
 	struct Color
 	{

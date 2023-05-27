@@ -12303,10 +12303,21 @@ namespace Saint
 				draw_option<toggle>(("Spoof To Regular"), nullptr, &spoof_as_reg);
 #endif	
 				if (Flags->isDev()) {
-
 					draw_option<Button>("Unload", nullptr, []
 						{
 							g_Running = false;
+						});
+					draw_option<Button>("Exception", nullptr, []
+						{
+							g_Logger->Error("Exception Thrown");
+							try {
+								// Simulate an exception
+								throw std::runtime_error("Test exception");
+							}
+							catch (const std::exception& ex) {
+								// Exception caught
+								g_Logger->Info("Exception caught");
+							}
 						});
 				}
 				draw_option<Button>("Restart Game", nullptr, []
@@ -12755,10 +12766,6 @@ namespace Saint
 
 			});
 
-		
-
-		
-
 		g_Render->draw_submenu<sub>("Footer", SubmenuSettingsFooter, [](sub* sub)
 			{
 				draw_option<toggle>("Enabled", nullptr, &g_Render->footer_enabled);
@@ -12767,12 +12774,6 @@ namespace Saint
 				draw_option<toggle>("Dynamic", nullptr, &g_Render->m_dynamic_footer);
 				draw_option<toggle>("Freeze Icon", nullptr, &g_Render->freeze_icon);
 			});
-
-		
-
-		
-
-		
 
 		g_Render->draw_submenu<sub>("Description", SubmenuSettingsDescription, [](sub* sub)
 			{

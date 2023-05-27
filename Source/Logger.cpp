@@ -53,6 +53,15 @@ namespace Saint
 		va_end(args);
 	}
 
+	void Logger::Success(const char* format, ...)
+	{
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN);
+		std::va_list args{};
+		va_start(args, format);
+		Log("Success", format, args);
+		va_end(args);
+	}
+
 	void Logger::Error(const char* format, ...)
 	{
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_INTENSITY);

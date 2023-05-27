@@ -108,7 +108,6 @@ namespace Saint
 	}
 	void LogScript::Tick()
 	{
-			
 			if (g_Render->m_Opened && g_Render->m_HeaderTextData)
 			{
 				auto m_Hello = ImGui::CalcTextSize("Hello").y;

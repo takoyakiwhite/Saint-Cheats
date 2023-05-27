@@ -30,6 +30,7 @@
     <ClInclude Include="CustomText.hpp" />
     <ClInclude Include="D3DRenderer.hpp" />
     <ClInclude Include="DatBitBuffer.h" />
+    <ClInclude Include="Disassembler.h" />
     <ClInclude Include="Discord\DiscordHandler.hpp" />
     <ClInclude Include="Discord\Discord_Register.h" />
     <ClInclude Include="Discord\Discord_RPC.h" />
@@ -293,7 +294,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;BIGBASE_RELEASE;DEV;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;SAINT_RELEASE;DEV;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <OmitFramePointers>true</OmitFramePointers>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -309,7 +310,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Libraries\Binaries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;d3dcompiler.lib;libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;d3dcompiler.lib;libssl.lib;libcrypto.lib;StackWalker.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

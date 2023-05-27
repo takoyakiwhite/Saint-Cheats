@@ -7,6 +7,7 @@ namespace Saint
 		Success,
 		Error,
 		Warning,
+		stackwalker,
 	};
 	class Logger
 	{
@@ -27,6 +28,7 @@ namespace Saint
 		void Info(const char* format, ...);
 		void Theme(const char* format, ...);
 		void Debug(const char* format, ...);
+		void Success(const char* format, ...);
 
 		void Push(const char* title, LogFlag flag, const char* format, ...);
 
