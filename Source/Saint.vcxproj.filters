@@ -280,6 +280,9 @@
     <ClInclude Include="UI\UnclickOption.hpp">
       <Filter>Interface\Option\Types</Filter>
     </ClInclude>
+    <ClInclude Include="Exception.h">
+      <Filter>Core\Exception</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI\Framework.cpp">
@@ -506,6 +509,9 @@
     </Filter>
     <Filter Include="Interface\Option\Types">
       <UniqueIdentifier>{1f525f7a-419f-427f-8e0f-1a1061a4530f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Exception">
+      <UniqueIdentifier>{d88d7c0a-85eb-4ca5-bb6e-3b59450e67fc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
