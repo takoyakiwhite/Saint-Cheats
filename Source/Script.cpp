@@ -38,6 +38,7 @@
 #include "VectorLists.h"
 #include "json.h"
 #include <GTAV-Classes/weapon/CAmmoRocketInfo.hpp>
+#include "OptionDrawers.h"
 namespace Saint
 {
 #define QUEUE(...)g_FiberPool.queue([__VA_ARGS__] {
@@ -10254,22 +10255,22 @@ namespace Saint
 			if (alyways_show_info) {
 				g_players.draw_info(g_SelectedPlayer);
 			}
-			draw_option<submenu>("Custom Location", nullptr, rage::joaat("CLocation"));
+			addSubmenu("Custom Location", "CLocation");
 			draw_option<Break>(("Types"));
-			draw_option<toggle>(("Money"), nullptr, &drops.money);
-			draw_option<toggle>(("RP"), nullptr, &drops.rp);
-			draw_option<toggle>(("Weapons"), nullptr, &drops.weapons);
-			draw_option<toggle>(("Health"), nullptr, &drops.health);
-			draw_option<toggle>(("Armour"), nullptr, &drops.armour);
-			draw_option<toggle>(("Ammo"), nullptr, &drops.ammo);
-			draw_option<toggle>(("Snacks"), nullptr, &drops.snacks);
+			addToggle("Money", &drops.money);
+			draw_option<toggle>("RP", &drops.rp);
+			draw_option<toggle>("Weapons", &drops.weapons);
+			draw_option<toggle>("Health", &drops.health);
+			draw_option<toggle>("Armour", &drops.armour);
+			draw_option<toggle>("Ammo", &drops.ammo);
+			draw_option<toggle>("Snacks", &drops.snacks);
 			draw_option<Break>(("Settings"));
-			draw_option<ToggleWithNumber<std::int32_t>>("Randomize RP Model", nullptr, &drops.random_rp_model, &drops.model_delay, 0, 5000, 50, 3, true, "", "ms");
-			draw_option<ToggleWithNumber<std::int32_t>>("Randomize Money Model", nullptr, &drops.random_money_model, &drops.model_delay2, 0, 5000, 50, 3, true, "", "ms");
-			draw_option<Scroll>("Location", nullptr, &drops.location, &drops.data);
-			draw_option<Scroll>("RP Model", nullptr, &drops.rp_model, &drops.rp_model_data);
-			draw_option<Scroll>("Money Model", nullptr, &drops.money_model, &drops.money_model_data);
-			draw_option<number<std::int32_t>>("Height", nullptr, &drops.height, 0, 100);
+			addToggleWithNumber<std::int32_t>("Randomize RP Model", nullptr, &drops.random_rp_model, &drops.model_delay, 0, 5000, 50, 3, true, "", "ms");
+			addToggleWithNumber<std::int32_t>("Randomize Money Model", nullptr, &drops.random_money_model, &drops.model_delay2, 0, 5000, 50, 3, true, "", "ms");
+			addScroll("Location", nullptr, &drops.location, &drops.data);
+			addScroll("RP Model", nullptr, &drops.rp_model, &drops.rp_model_data);
+			addScroll("Money Model", nullptr, &drops.money_model, &drops.money_model_data);
+			addNumber<std::int32_t>("Height", nullptr, &drops.height, 0, 100);
 			draw_option<number<std::int32_t>>("Delay", nullptr, &drops.delay, 0, 5000, 50, 3, true, "", "ms");
 			});
 		g_Render->draw_submenu<sub>(("Custom Location"), rage::joaat("CLocation"), [](sub* sub)
@@ -10295,7 +10296,7 @@ namespace Saint
 					{
 						drops.custom.a.clear();
 					});
-				draw_option<Break>(("Current"));
+				addBreak("Current");
 				for (auto& drop : drops.custom.a) {
 					draw_option<Button>(std::format("{}, {}, {}", drop.x, drop.y, drop.z).c_str(), nullptr, [=]
 						{

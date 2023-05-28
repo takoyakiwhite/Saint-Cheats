@@ -3,7 +3,6 @@
 #include "../Types.hpp"
 #include "TextBox.hpp"
 #include "SubmenuBase.hpp"
-
 namespace Saint::UserInterface
 {
 	static const char* g_key_names_instructional[254] = {
@@ -572,7 +571,7 @@ namespace Saint::UserInterface
 		const char* ScrollerType[2]
 		{
 			"Normal",
-			"Include Text"
+			"TxL"
 		};
 		std::size_t ScrollerInt = 1;
 		std::string custom_toggle_dict_on = "commonmenu";
@@ -791,4 +790,5 @@ namespace Saint
 		
 		
 	}
+	//test
 }

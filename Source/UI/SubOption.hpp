@@ -16,6 +16,30 @@ namespace Saint::UserInterface
 				SetDescription(description);
 			SetAction(std::move(action));
 		}
+		explicit submenu(const char* text, description, std::uint32_t subId, std::function<void()> action = [] {}) :
+			m_SubId(subId)
+		{
+			SetLeftText(text);
+			if (description)
+				SetDescription(description);
+			SetAction(std::move(action));
+		}
+		explicit submenu(const char* text, const char* description, const char* subId, std::function<void()> action = [] {}) :
+			m_SubId(rage::joaat(subId))
+		{
+			SetLeftText(text);
+			if (description)
+				SetDescription(description);
+			SetAction(std::move(action));
+		}
+		explicit submenu(const char* text, const char* subId, std::function<void()> action = [] {}) :
+			m_SubId(rage::joaat(subId))
+		{
+			SetLeftText(text);
+			if (description)
+				SetDescription(description);
+			SetAction(std::move(action));
+		}
 
 		~submenu() noexcept = default;
 		submenu(submenu const&) = default;
