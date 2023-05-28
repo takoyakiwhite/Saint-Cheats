@@ -93,7 +93,6 @@ namespace Saint::UserInterface
 				if (m_ActionOnHorizontal && OptionGetters::m_Action)
 					std::invoke(OptionGetters::m_Action);
 			}
-
 			OptionGetters::HandleAction(action);
 		}
 	private:
