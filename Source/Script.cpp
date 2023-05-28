@@ -11453,8 +11453,7 @@ namespace Saint
 				addNumber<float>("Wave Intensity", nullptr, &ocean.intensity, 0, 1000.0, 1.0, 3, true, "", "", [] {
 					WATER::SET_DEEP_OCEAN_SCALER(ocean.intensity);
 				});
-				
-				addColorSubmenu("Color", nullptr, watercolor2, rage::joaat("ColorWater"));
+			
 
 			});
 		g_Render->draw_submenu<sub>(("Color"), rage::joaat("ColorWater"), [](sub* sub)
