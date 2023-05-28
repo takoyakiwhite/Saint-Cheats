@@ -150,7 +150,12 @@ using ScrHandle = Entity;
         char m_padding3[0x04];
     };
 #pragma pack(pop)
-
+struct CoordStats {
+    int hours;
+    int minutes;
+    int seconds;
+    float distance;
+};
 #pragma pack(push, 1)
 	struct Vector3
 	{

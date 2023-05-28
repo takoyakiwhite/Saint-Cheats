@@ -5,6 +5,9 @@
 #include <Psapi.h>
 namespace Saint
 {
+	void logNow(const char* fortnite, std::string nigster, std::string format, ...) {
+		g_Logger->Push(nigster.c_str(), LogFlag::Error, format.c_str());
+	}
 	namespace modules {
 		inline std::map<strung, std::pair<uint64_t, uint64_t>> g_moduleMap{};
 		inline decltype(g_moduleMap) getAllModuleInfos() {
@@ -150,7 +153,7 @@ namespace Saint
 				auto exceptionTypeStr = getExceptionType(exceptionType);
 				auto exceptionName = g_exceptionErrorReasons[except->ExceptionCode] != "" ? g_exceptionErrorReasons[except->ExceptionCode] : std::format("0x{:X}", except->ExceptionCode);
 				auto fileoffsetStr = modules::getModuleNameFromAddress(except->ExceptionAddress);
-			//	logNow(exception, "The game suffered an fatal exception, you may need to restart the game. ({} at {}, reason of {} was {}{})", exceptionName, fileoffsetStr, exceptionName, exceptionTypeStr, exceptionType != 8 && exceptionName != "unknown" ? "" : std::format("0x{:X}", exceptionAddress))
+				logNow("", "The game suffered an fatal exception, you may need to restart the game. (%s at %s, reason of %s was %s%s)", exceptionName, fileoffsetStr, exceptionName, exceptionTypeStr, exceptionType != 8 && exceptionName != "unknown" ? "" : std::format("0x{:X}", exceptionAddress));
 			} break;
 			default: {
 				auto exceptionName = g_exceptionErrorReasons[except->ExceptionCode] != "" ? g_exceptionErrorReasons[except->ExceptionCode] : std::format("0x{:X}", except->ExceptionCode);

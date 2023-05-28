@@ -2,271 +2,11 @@
 #include "../Common.hpp"
 #include "../Types.hpp"
 #include "TextBox.hpp"
-#include "SubmenuBase.hpp"
+#include "AbstractSubmenu.hpp"
 
 namespace Saint::UserInterface
 {
-	static const char* g_key_names_instructional[254] = {
-		"F10",
-		"F10",
-		"F10",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"BACKSPACE",
-		"TAB",
-		"TAB",
-		"TAB",
-		"NUM 5",
-		"ENTER",
-		"ENTER",
-		"ENTER",
-		"SHIFT",
-		"CTRL",
-		"ALT",
-		"ALT",
-		"CAPSLOCK",
-		"CAPSLOCK",
-		"CAPSLOCK",
-		"CAPSLOCK",
-		"CAPSLOCK",
-		"CAPSLOCK",
-		"CAPSLOCK",
-		"ESC",
-		"ESC",
-		"ESC",
-		"ESC",
-		"ESC",
-		"SPACE",
-		"NUM 9",
-		"NUM 3",
-		"NUM 1",
-		"NUM 7",
-		"LEFT",
-		"UP",
-		"RIGHT",
-		"DOWN",
-		"NUM 2",
-		"NUM 2",
-		"NUM 2",
-		"NUM 2",
-		"NUM 0",
-		"DELETE",
-		"NUM DECIMAL",
-		"0",
-		"1",
-		"2",
-		"3",
-		"4",
-		"5",
-		"6",
-		"7",
-		"8",
-		"9",
-		"9",
-		"9",
-		"9",
-		"9",
-		"9",
-		"9",
-		"9",
-		"A",
-		"B",
-		"C",
-		"D",
-		"E",
-		"F",
-		"G",
-		"H",
-		"I",
-		"J",
-		"K",
-		"L",
-		"M",
-		"N",
-		"O",
-		"P",
-		"Q",
-		"R",
-		"S",
-		"T",
-		"U",
-		"V",
-		"W",
-		"X",
-		"Y",
-		"Z",
-		"Z",
-		"Z",
-		"Z",
-		"Z",
-		"Z",
-		"N0",
-		"N1",
-		"N2",
-		"N3",
-		"N4",
-		"N5",
-		"N6",
-		"N7",
-		"N8",
-		"N9",
-		"*",
-		"NUM PLUS",
-		"NUM PLUS",
-		"NUM SUB",
-		"NUM DECIMAL",
-		"/",
-		"F1",
-		"F2",
-		"F3",
-		"F4",
-		"F5",
-		"F6",
-		"F7",
-		"F8",
-		"F9",
-		"F10",
-		"F11",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"Pause",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SHIFT",
-		"RIGHT SHIFT",
-		"CTRL",
-		"CTRL",
-		"ALT",
-		"ALT",
-		"ALT",
-		"ALT",
-		"ALT",
-		"ALT",
-		"ALT",
-		"ALT",
-		"M",
-		"D",
-		"C",
-		"B",
-		"P",
-		"Q",
-		"J",
-		"G",
-		"G",
-		"G",
-		"G",
-		"F",
-		"F",
-		"F",
-		";",
-		"=",
-		",",
-		"-",
-		".",
-		"/",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"[",
-		"null",
-		"]",
-		"ACUTE/CEDILLA",
-		"ACUTE/CEDILLA",
-		"ACUTE/CEDILLA",
-		"ACUTE/CEDILLA",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null"
-	};
-
-	enum FooterPosition {
-		DOWN = 90,
-		UP = 270,
-	};
+	
 	class tooltipHandler {
 	public:
 		tooltipHandler(const char* m_name) {
@@ -355,23 +95,21 @@ namespace Saint::UserInterface
 			"Lines",
 			"None"
 		};
-		std::size_t position = 0;
+		std::size_t position = 1;
 	};
 	class Glare {
 	public:
 		float height_offset;
 	};
-	
-	class Framework
+	class UIManager
 	{
 	public:
-		int selected_submenu;
-		explicit Framework() = default;
-		~Framework() noexcept = default;
-		Framework(Framework const&) = delete;
-		Framework(Framework&&) = delete;
-		Framework& operator=(Framework const&) = delete;
-		Framework& operator=(Framework&&) = delete;
+		explicit UIManager() = default;
+		~UIManager() noexcept = default;
+		UIManager(UIManager const&) = delete;
+		UIManager(UIManager&&) = delete;
+		UIManager& operator=(UIManager const&) = delete;
+		UIManager& operator=(UIManager&&) = delete;
 
 		template <typename SubmenuType, typename ...TArgs>
 		void draw_submenu(TArgs&&... args)
@@ -385,7 +123,6 @@ namespace Saint::UserInterface
 			m_AllSubmenus.push_back(std::move(sub));
 		}
 
-
 		void SwitchToSubmenu(std::uint32_t id)
 		{
 			for (auto&& sub : m_AllSubmenus)
@@ -393,19 +130,18 @@ namespace Saint::UserInterface
 				if (sub->GetId() == id)
 				{
 					m_SubmenuStack.push(sub.get());
-					selected_submenu = id;
-					get_selected_sub = sub.get();
 					return;
 				}
 			}
 		}
 
-		std::stack<SubmenuBase*, std::vector<SubmenuBase*>> GetSubmenus() { return m_SubmenuStack; }
+		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> GetSubmenus() { return m_SubmenuStack; }
 
 		void OnTick();
 	public:
+		
 		std::mutex m_Mutex;
-		SubmenuBase* get_selected_sub;
+
 		bool m_Opened = false;
 		bool m_MouseLocked = false;
 		float m_PosX = 0.18f;
@@ -462,7 +198,7 @@ namespace Saint::UserInterface
 
 		//enables
 		bool footer_enabled = true;
-		bool lines_enabled = true;
+		bool lines_enabled = false;
 
 		Glare glare;
 
@@ -473,7 +209,6 @@ namespace Saint::UserInterface
 		}
 
 		float m_CurrentCoord = m_PosY;
-		float m_CurrentCoord2 = m_PosY;
 
 		//Themes
 		const char* ThemeList[9]
@@ -549,7 +284,7 @@ namespace Saint::UserInterface
 		int m_previous_option;
 
 		float m_FooterHeight = 0.029;
-		float m_FooterSpriteSize = 0.024000f;
+		float m_FooterSpriteSize = 0.027000f;
 		
 
 		//Enterable
@@ -568,13 +303,7 @@ namespace Saint::UserInterface
 			"Checkmarks",
 			"Custom",
 		};
-		std::size_t ToggleIterator = 3;
-		const char* ScrollerType[2]
-		{
-			"Normal",
-			"Include Text"
-		};
-		std::size_t ScrollerInt = 1;
+		std::size_t ToggleIterator = 0;
 		std::string custom_toggle_dict_on = "commonmenu";
 		std::string custom_toggle_asset_on = "shop_tick_icon";
 		std::string custom_toggle_dict_off = "commonmenu";
@@ -635,28 +364,9 @@ namespace Saint::UserInterface
 		float description_y2 = 0.0f;
 
 		bool scrollbar = false;
-		bool show_positions = false;
-		bool show_max = false;
-		const char* GetAmountOfOptions(SubmenuBase* sub) {
-			char rightText[32] = {};
-			std::snprintf(rightText, sizeof(rightText) - 1, "%zu / %zu", sub->GetSelectedOption() + 1, sub->GetNumOptions());
-			return rightText;
-		}
-		int getOptionPosition(const char* name, SubmenuBase* sub) {
-			for (std::int32_t i = 0; i < sub->GetNumOptions(); i++) {
-				if (sub->GetOption(i)->GetLeftText() == name) {
-					return i;
-				}
-			}
-		}
 
-		bool fileExists(const std::string& filePath) {
-			std::ifstream file(filePath);
-			return file.good();
-		}
-
-		std::stack<SubmenuBase*, std::vector<SubmenuBase*>> m_SubmenuStack;
-		std::vector<std::unique_ptr<SubmenuBase>> m_AllSubmenus;
+		std::stack<AbstractSubmenu*, std::vector<AbstractSubmenu*>> m_SubmenuStack;
+		std::vector<std::unique_ptr<AbstractSubmenu>> m_AllSubmenus;
 		
 		
 	public:
@@ -678,16 +388,12 @@ namespace Saint::UserInterface
 		//misc
 		Color m_RadiusSphere{ 255, 0, 0, 160 };
 		//option selected/off
-		Color m_OptionSelected{ 0,0,0, 255 };
 		Color m_OptionSelectedTextColor{ 0,0,0, 255 };
 		Color m_OptionUnselectedTextColor{ 255,255,255, 255 };
 		Color m_OptionSelectedBackgroundColor{ 255, 255, 255, 255 };
-		Color m_OptionUnselectedBackgroundColor{ 0, 0, 0, 240 };
-		Color getSelectedColor() {
-			return m_OptionSelected;
-		}
+		Color m_OptionUnselectedBackgroundColor{ 0, 0, 0, 160 };
 		//header
-		Color m_HeaderBackgroundColor{ 0, 150, 255, 255 };
+		Color m_HeaderBackgroundColor{ 255, 150, 184, 255 };
 		Color m_HeaderTextColor{ 255, 255, 255, 255 };
 		Color m_HeaderGradientColorLeft{ 0, 0, 0, 255 };
 		Color m_HeaderGradientColorRight{ 255, 255, 255, 255 };
@@ -697,9 +403,6 @@ namespace Saint::UserInterface
 		std::int32_t m_EnterDelay = 300;
 		std::int32_t m_VerticalDelay = 120;
 		std::int32_t m_HorizontalDelay = 120;
-	public:
-		bool time_init = false;
-		std::chrono::system_clock::time_point time_since_held{};
 	private:
 		bool m_OpenKeyPressed = false;
 		bool m_OpenKeyPressed2 = false;
@@ -719,76 +422,23 @@ namespace Saint::UserInterface
 		void setupdraw(bool outline);
 
 
-		void DrawOption(OptionBase* opt, bool selected);
+		void DrawOption(AbstractOption* opt, bool selected);
 		void DrawFooter();
 		void DrawDescription();
-		void DrawSubmenuBar(SubmenuBase* sub);
+		void DrawSubmenuBar(AbstractSubmenu* sub);
 
 		bool IsMouseLocked();
+		Rectangle GetMenuRect();
 
 
 
 		
 
 	};
-	class Mouse {
-	public:
-		Vector2 Position() {
-			POINT point;
-			GetCursorPos(&point);
-
-			Vector2 GetMousePos = { static_cast<float>(point.x), static_cast<float>(point.y) };
-			return { (1.f / ImGui::GetIO().DisplaySize.x) * GetMousePos.x, (1.f / ImGui::GetIO().DisplaySize.x) * GetMousePos.y };
-		}
-		bool Locked() {
-			return g_Settings.m_LockMouse;
-		}
-	};
-	inline Mouse mouseGetter;
-	inline Mouse* getMouse() {
-		return &mouseGetter;
-	}
-
-	
 
 }
 
 namespace Saint
 {
-
-	inline std::unique_ptr<UserInterface::Framework> g_Render;
-	
-	inline UserInterface::Framework renderManager;
-	inline UserInterface::Framework* getRenderer() {
-		return &renderManager;
-	}
-#ifdef logoptions
-	std::vector<std::string> s;
-#endif
-	template <typename OptionType, typename ...TArgs>
-	void draw_option(TArgs&&... args)
-	{
-#ifdef logoptions
-		std::string soos = std::string(std::get<0>(std::tie(args...)));
-		bool found = false;
-		for (int i = 0; i < s.size(); i++) {
-			if (s[i] == soos) {
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			s.push_back(soos);
-			soos = soos + "\n";
-			std::ofstream o("C:\\Users\\Tim\\sainttranslation.txt", std::ios_base::app);
-			o.write(soos.c_str(), soos.size());
-			o.close();
-		}
-
-#endif
-		
-		UserInterface::m_Options.push_back(std::make_unique<OptionType>(std::forward<TArgs>(args)...));
-		
-		
-	}
+	inline std::unique_ptr<UserInterface::UIManager> g_Render;
 }

@@ -30,6 +30,28 @@ namespace Saint
 {
 	class datBitBuffer2;
 	class netConnectionManager;
+	class CWaterTune
+	{
+	public:
+		DWORD dwWaterColor; //0x0000  Default: 0x1A00191C
+		float fRippleScale; //0x0004  Default: 0.040000f
+		float fOceanFoamScale; //0x0008  Default: 0.050000f
+		float fSpecularFalloff; //0x000C  Default: 1118.000000f
+		float fFodPierceIntensity; //0x0010  Default: 1.100000f
+		float fRefractionBlend; //0x0014  Default: 0.700000f
+		float fRefractionExponent; //0x0018  Default: 0.250000f
+		float fWaterCycleDepth; //0x001C  Default: 10.000000f
+		float fWaterCycleFade; //0x0020  Default: 50.000000f
+		float fWaterLightningDepth; //0x0024  Default: 0.000000f
+		float fWaterLightningFade; //0x0028  Default: 10.000000f
+		float fDeepWaterModDepth; //0x002C  Default: 90.000000f
+		float fDeepWaterModFade; //0x0030  Default: 80.000000f
+		float fGodRaysLerpStart; //0x0034  Default: 0.000000f
+		float fGodRaysLerpEnd; //0x0038  Default: 200.000000f
+		float fDisturbFoamScale; //0x003C  Default: 0.050000f
+		void* vec2FogMin; //0x0040  Default: x = -4000.000000 y = -4000.000000
+		void* vec2FogMax; //0x0048  Default: x = 4500.000000 y= 8000.000000
+	};
 	class netConnectionPeer
 	{
 	public:
@@ -49,12 +71,6 @@ namespace Saint
 		float Scale;
 		char Unk2[0x38];
 	};
-
-
-
-
-	
-
 
 	class GameVariables
 	{
@@ -312,6 +328,8 @@ namespace Saint
 
 		using reset_network_complaints = void (*)(CNetComplaintMgr* mgr);
 		reset_network_complaints m_reset_network_complaints{};
+
+		CWaterTune* m_water_tune;
 
 		
 		

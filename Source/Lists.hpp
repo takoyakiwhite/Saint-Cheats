@@ -21,7 +21,7 @@ namespace Saint::Lists
 	}
 	inline const char* HeaderTypesFrontend[]
 	{
-		"Static",
+		"Normal",
 		"YTD"
 	};
 
@@ -53,16 +53,16 @@ namespace Saint::Lists
 	inline const char* HeaderTypesFrontend2[]
 	{
 		"Face",
-		"Head",
+		"Masks",
 		"Hair",
-		"Torso",
+		"Gloves",
 		"Tops",
 		"Legs",
-		"Hands",
+		"Parachutes/Bags",
 		"Feet",
-		"Chains",
 		"Accessories",
-		"Vests",
+		"Torso",
+		"Body Armour",
 		"Decals",
 	};
 	inline std::size_t HeaderTypesPosition3 = 0;
@@ -87,7 +87,7 @@ namespace Saint::Lists
 	inline std::size_t DemoListPos = 0;
 	inline const char* DamageList[16]
 	{
-		"Unkown",
+		"Unknown",
 		"None",
 		"Melee",
 		"Bullet",

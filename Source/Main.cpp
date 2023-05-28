@@ -251,9 +251,9 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 					if (Flags->isDev()) {
 						if (IsKeyPressed(VK_DELETE))
 							g_Running = false;
-						std::this_thread::sleep_for(3ms);
-						std::this_thread::yield();
 					}
+					std::this_thread::sleep_for(3ms);
+					std::this_thread::yield();
 				}
 				exceptions::uninitExceptionHandler();
 				std::this_thread::sleep_for(500ms);

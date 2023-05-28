@@ -4567,7 +4567,9 @@ namespace Saint
 						}
 						draw_option<Button>(Game->VehicleNameHash(hash.hash), nullptr, [=]
 							{
+								int index = AUDIO::GET_PLAYER_RADIO_STATION_INDEX();
 								AUDIO::FORCE_USE_AUDIO_GAME_OBJECT(Game->Vehicle(), VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(hash.hash));
+								AUDIO::SET_RADIO_TO_STATION_INDEX(index);
 							});
 					}
 				}
@@ -4607,7 +4609,9 @@ namespace Saint
 								if (has_string_attached(Game->VehicleNameHash(hash), enginesearchresults)) {
 									draw_option<Button>(Game->VehicleNameHash(hash), nullptr, [=]
 										{
+											int index = AUDIO::GET_PLAYER_RADIO_STATION_INDEX();
 											AUDIO::FORCE_USE_AUDIO_GAME_OBJECT(Game->Vehicle(), VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(hash));
+											AUDIO::SET_RADIO_TO_STATION_INDEX(index);
 
 										});
 								}
@@ -5179,6 +5183,7 @@ namespace Saint
 			{
 
 				draw_option<submenu>("Entity", nullptr, EntityShooterVehicle);
+				draw_option<Scroll>(("Type"), nullptr, &m_entity_shooter.type, &m_entity_shooter.pos);
 				draw_option<toggle>(("Enabled"), nullptr, &m_entity_shooter.enabled);
 				draw_option<Break>("List");
 				draw_option<Button>("Delete", nullptr, [=]
@@ -9439,6 +9444,7 @@ namespace Saint
 				draw_option<submenu>("Shoot Single Bullet", nullptr, rage::joaat("SHOOT_BULLET"));
 				draw_option<submenu>("Play Sound", nullptr, rage::joaat("SOUND_PLAY"));
 				draw_option<submenu>("Activites", nullptr, rage::joaat("ACTIVI"));
+				draw_option<submenu>("Entity Spammer", nullptr, rage::joaat("EntitySpam"));
 				draw_option<toggle>(("Water"), nullptr, &g_players.get_selected.water_loop);
 				draw_option<toggle>(("Fire"), nullptr, &g_players.get_selected.fire_loop);
 				draw_option<toggle>(("Always Wanted"), nullptr, &wanted_lev.always);
@@ -9555,6 +9561,78 @@ namespace Saint
 
 
 			});
+			g_Render->draw_submenu<sub>(("Entity Spammer"), rage::joaat("EntitySpam"), [](sub* sub)
+				{
+					if (alyways_show_info) {
+						g_players.draw_info(g_SelectedPlayer);
+					}
+					if (!g_Selected()->spam.clone) {
+						draw_option<submenu>("Model", nullptr, rage::joaat("MODELNIGGER"));
+					}
+					draw_option<toggle>("Enabled", nullptr, &g_Selected()->spam.enabled);
+					draw_option<Break>("Settings");
+					draw_option<toggle>("Clone", nullptr, &g_Selected()->spam.clone);
+					draw_option<number<std::int32_t>>("Delay", nullptr, &g_Selected()->spam.delay, 0, 5000, 50, 3, true, "", "ms");
+				});
+			g_Render->draw_submenu<sub>(("Model"), rage::joaat("MODELNIGGER"), [](sub* sub)
+				{
+					if (alyways_show_info) {
+						g_players.draw_info(g_SelectedPlayer);
+					}
+					draw_option<Scroll>("Type", nullptr, &g_Selected()->spam.type, &g_Selected()->spam.pos);
+					if (g_Selected()->spam.pos == 0) {
+						for (std::int32_t i = 0; i < m_ModelChanger.size; i++) {
+							draw_option<submenu>(m_ModelChanger.get_class_name[i], nullptr, rage::joaat("NIGGERMAN55"), [=]
+								{
+									g_Selected()->spam.selected_class = i;
+								});
+
+						}
+					}
+					if (g_Selected()->spam.pos == 1) {
+						for (std::int32_t i = 0; i < 23; i++) {
+							draw_option<submenu>(get_vehicle_class_name(i), nullptr, rage::joaat("EngineSoundSpawner222"), [=]
+								{
+									g_Selected()->spam.selected_class2 = i;
+								});
+
+						}
+					}
+				});
+			g_Render->draw_submenu<sub>((get_vehicle_class_name(g_Selected()->spam.selected_class2)), rage::joaat("EngineSoundSpawner222"), [](sub* sub)
+				{
+					if (alyways_show_info) {
+						g_players.draw_info(g_SelectedPlayer);
+					}
+					for (auto& hash : vehicle_hash_list) {
+						if (hash.m_class == g_Selected()->spam.selected_class2) {
+							if (sub->GetSelectedOption() == sub->GetNumOptions()) {
+								g_players.draw_info2(hash.hash);
+							}
+							draw_option<Button>(Game->VehicleNameHash(hash.hash), nullptr, [=]
+								{
+									g_Selected()->spam.selected_hash = hash.hash;
+								});
+						}
+					}
+				});
+			g_Render->draw_submenu<sub>((m_ModelChanger.get_class_name[g_Selected()->spam.selected_class]), rage::joaat("NIGGERMAN55"), [](sub* sub)
+				{
+					if (alyways_show_info) {
+						g_players.draw_info(g_SelectedPlayer);
+					}
+					for (auto& model : m_ModelChanger.m_GetModels) {
+						if (g_Selected()->spam.selected_class == model.m_class) {
+							draw_option<Button>(model.m_name.c_str(), nullptr, [=]
+								{
+									g_Selected()->spam.selected_hash = Game->HashKey(model.m_model.c_str());
+
+								});
+						}
+					}
+
+
+				});
 		g_Render->draw_submenu<sub>(("Activites"), rage::joaat("ACTIVI"), [](sub* sub)
 			{
 				if (alyways_show_info) {
@@ -10581,10 +10659,31 @@ namespace Saint
 							{
 								if (path.extension() == ".ini")
 								{
-
 									char path_name[64];
 									sprintf(path_name, "%s", path.stem().u8string().c_str());
-									draw_option<Button>(path_name, nullptr, [=]
+									NativeVector3 c = teleportLoader.get_coords_from_name(path_name);
+									std::string speedbuf = "Estimated:";
+									if (GetCoordStats(c).hours > 0) {
+										speedbuf.append(std::format(" {}h", GetCoordStats(c).hours));
+									}
+									if (GetCoordStats(c).minutes > 0) {
+										speedbuf.append(std::format(" {}m", GetCoordStats(c).minutes));
+									}
+									if (GetCoordStats(c).seconds > 0) {
+										speedbuf.append(std::format(" {}s", GetCoordStats(c).seconds));
+									}
+									if (GetCoordStats(c).hours == 0 && GetCoordStats(c).minutes == 0 && GetCoordStats(c).seconds == 0) {
+										speedbuf.append(std::format(" You have reached your destination."));
+									}
+									else {
+										if (GetCoordStats(c).distance < 0.10) {
+											speedbuf.append(std::format(" \nOther Information: {:02.2f}ft", GetCoordStats(c).distance * 5280.0f));
+										}
+										else {
+											speedbuf.append(std::format(" \nOther Information: {:02.2f}mi", GetCoordStats(c).distance));
+										}
+									}
+									draw_option<Button>(path_name, speedbuf.c_str(), [=]
 										{
 											teleportLoader.load(path_name);
 										});
@@ -11327,8 +11426,69 @@ namespace Saint
 					});
 				draw_option<number<float>>("Wave Intensity", nullptr, &ocean.intensity, 0, 1000.0, 1.0, 3, true, "", "", [] {
 					WATER::SET_DEEP_OCEAN_SCALER(ocean.intensity);
-					});
+				});
+				
+				draw_option<color_submenu>("Color", nullptr, watercolor2, rage::joaat("ColorWater"));
 
+			});
+		g_Render->draw_submenu<sub>(("Color"), rage::joaat("ColorWater"), [](sub* sub)
+			{
+				draw_option<number<std::int32_t>>("Red", nullptr, &watercolor2.r, 0, 255, 1, 3, true, "", "", [] {
+					std::string watercolor;
+					DWORD value = ((watercolor2.r & 0xFF) << 24) + ((watercolor2.g & 0xFF) << 16) + ((watercolor2.b & 0xFF) << 8) + (watercolor2.a & 0xFF);
+					std::stringstream hcolor;
+					hcolor << std::hex << value;
+					watercolor = hcolor.str();
+					std::stringstream myStrm2(watercolor);
+					/*std::stringstream myStrm2;
+
+					myStrm2 << "0x" << value;*/
+					DWORD64 x2;
+					myStrm2 >> x2;
+					//g_GameFunctions->m_water_tune->WaterColor = x2;
+					});
+				draw_option<number<std::int32_t>>("Green", nullptr, &watercolor2.g, 0, 255, 1, 3, true, "", "", [] {
+					std::string watercolor;
+					DWORD value = ((watercolor2.r & 0xFF) << 24) + ((watercolor2.g & 0xFF) << 16) + ((watercolor2.b & 0xFF) << 8) + (watercolor2.a & 0xFF);
+					std::stringstream hcolor;
+					hcolor << std::hex << value;
+					watercolor = hcolor.str();
+					std::stringstream myStrm2(watercolor);
+					/*std::stringstream myStrm2;
+
+					myStrm2 << "0x" << value;*/
+					DWORD64 x2;
+					myStrm2 >> x2;
+					//g_GameFunctions->m_water_tune->WaterColor = x2;
+					});
+				draw_option<number<std::int32_t>>("Blue", nullptr, &watercolor2.b, 0, 255, 1, 3, true, "", "", [] {
+					std::string watercolor;
+					DWORD value = ((watercolor2.r & 0xFF) << 24) + ((watercolor2.g & 0xFF) << 16) + ((watercolor2.b & 0xFF) << 8) + (watercolor2.a & 0xFF);
+					std::stringstream hcolor;
+					hcolor << std::hex << value;
+					watercolor = hcolor.str();
+					std::stringstream myStrm2(watercolor);
+					/*std::stringstream myStrm2;
+
+					myStrm2 << "0x" << value;*/
+					DWORD64 x2;
+					myStrm2 >> x2;
+					//g_GameFunctions->m_water_tune->WaterColor = x2;
+					});
+				draw_option<number<std::int32_t>>("Alpha", nullptr, &watercolor2.a, 0, 255, 1, 3, true, "", "", [] {
+					std::string watercolor;
+					DWORD value = ((watercolor2.r & 0xFF) << 24) + ((watercolor2.g & 0xFF) << 16) + ((watercolor2.b & 0xFF) << 8) + (watercolor2.a & 0xFF);
+					std::stringstream hcolor;
+					hcolor << std::hex << value;
+					watercolor = hcolor.str();
+					std::stringstream myStrm2(watercolor);
+					/*std::stringstream myStrm2;
+
+					myStrm2 << "0x" << value;*/
+					DWORD64 x2;
+					myStrm2 >> x2;
+					//g_GameFunctions->m_water_tune->WaterColor = x2;
+					});
 			});
 		g_Render->draw_submenu<sub>(("Color"), rage::joaat("ColorClouds"), [](sub* sub)
 			{
@@ -11366,26 +11526,26 @@ namespace Saint
 					});
 				draw_option<Break>(("List"));
 				draw_option<Button>("None", nullptr, [] { MISC::UNLOAD_ALL_CLOUD_HATS(); });
-				draw_option<Button>("Cloudy", nullptr, [] { MISC::LOAD_CLOUD_HAT("Cloudy 01", 0.5f); });
-				draw_option<Button>("Rain", nullptr, [] { MISC::LOAD_CLOUD_HAT("RAIN", 0.5f); });
-				draw_option<Button>("Horizon", nullptr, [] { MISC::LOAD_CLOUD_HAT("Horizon", 0.5f); });
-				draw_option<Button>("Horizon Band 1", nullptr, [] { MISC::LOAD_CLOUD_HAT("horizonband1", 0.5f); });
-				draw_option<Button>("Horizon Band 2", nullptr, [] { MISC::LOAD_CLOUD_HAT("horizonband2", 0.5f); });
-				draw_option<Button>("Horizon Band 3", nullptr, [] { MISC::LOAD_CLOUD_HAT("horizonband3", 0.5f); });
-				draw_option<Button>("Puffs", nullptr, [] { MISC::LOAD_CLOUD_HAT("Puffs", 0.5f); });
-				draw_option<Button>("Wispy", nullptr, [] { MISC::LOAD_CLOUD_HAT("Wispy", 0.5f); });
-				draw_option<Button>("Stormy", nullptr, [] { MISC::LOAD_CLOUD_HAT("Stormy 01", 0.5f); });
-				draw_option<Button>("Clear", nullptr, [] { MISC::LOAD_CLOUD_HAT("Clear 01", 0.5f); });
-				draw_option<Button>("Snowy", nullptr, [] { MISC::LOAD_CLOUD_HAT("Snowy 01", 0.5f); });
-				draw_option<Button>("Contrails", nullptr, [] { MISC::LOAD_CLOUD_HAT("Contrails", 0.5f); });
-				draw_option<Button>("Altostratus", nullptr, [] { MISC::LOAD_CLOUD_HAT("altostratus", 0.5f); });
-				draw_option<Button>("Nimbus", nullptr, [] { MISC::LOAD_CLOUD_HAT("Nimbus", 0.5f); });
-				draw_option<Button>("Cirrus", nullptr, [] { MISC::LOAD_CLOUD_HAT("Cirrus", 0.5f); });
-				draw_option<Button>("Cirrocumulus", nullptr, [] { MISC::LOAD_CLOUD_HAT("cirrocumulus", 0.5f); });
-				draw_option<Button>("Stratocumulus", nullptr, [] { MISC::LOAD_CLOUD_HAT("stratocumulus", 0.5f); });
-				draw_option<Button>("Stripey", nullptr, [] { MISC::LOAD_CLOUD_HAT("Stripey", 0.5f); });
-				draw_option<Button>("Horsey", nullptr, [] { MISC::LOAD_CLOUD_HAT("horsey", 0.5f); });
-				draw_option<Button>("Shower", nullptr, [] { MISC::LOAD_CLOUD_HAT("shower", 0.5f); });
+				draw_option<Button>("Cloudy", nullptr, [] { MISC::LOAD_CLOUD_HAT("Cloudy 01", cloud_opacity); });
+				draw_option<Button>("Rain", nullptr, [] { MISC::LOAD_CLOUD_HAT("RAIN", cloud_opacity); });
+				draw_option<Button>("Horizon", nullptr, [] { MISC::LOAD_CLOUD_HAT("Horizon", cloud_opacity); });
+				draw_option<Button>("Horizon Band 1", nullptr, [] { MISC::LOAD_CLOUD_HAT("horizonband1", cloud_opacity); });
+				draw_option<Button>("Horizon Band 2", nullptr, [] { MISC::LOAD_CLOUD_HAT("horizonband2", cloud_opacity); });
+				draw_option<Button>("Horizon Band 3", nullptr, [] { MISC::LOAD_CLOUD_HAT("horizonband3", cloud_opacity); });
+				draw_option<Button>("Puffs", nullptr, [] { MISC::LOAD_CLOUD_HAT("Puffs", cloud_opacity); });
+				draw_option<Button>("Wispy", nullptr, [] { MISC::LOAD_CLOUD_HAT("Wispy", cloud_opacity); });
+				draw_option<Button>("Stormy", nullptr, [] { MISC::LOAD_CLOUD_HAT("Stormy 01", cloud_opacity); });
+				draw_option<Button>("Clear", nullptr, [] { MISC::LOAD_CLOUD_HAT("Clear 01", cloud_opacity); });
+				draw_option<Button>("Snowy", nullptr, [] { MISC::LOAD_CLOUD_HAT("Snowy 01", cloud_opacity); });
+				draw_option<Button>("Contrails", nullptr, [] { MISC::LOAD_CLOUD_HAT("Contrails", cloud_opacity); });
+				draw_option<Button>("Altostratus", nullptr, [] { MISC::LOAD_CLOUD_HAT("altostratus", cloud_opacity); });
+				draw_option<Button>("Nimbus", nullptr, [] { MISC::LOAD_CLOUD_HAT("Nimbus", cloud_opacity); });
+				draw_option<Button>("Cirrus", nullptr, [] { MISC::LOAD_CLOUD_HAT("Cirrus", cloud_opacity); });
+				draw_option<Button>("Cirrocumulus", nullptr, [] { MISC::LOAD_CLOUD_HAT("cirrocumulus", cloud_opacity); });
+				draw_option<Button>("Stratocumulus", nullptr, [] { MISC::LOAD_CLOUD_HAT("stratocumulus", cloud_opacity); });
+				draw_option<Button>("Stripey", nullptr, [] { MISC::LOAD_CLOUD_HAT("Stripey", cloud_opacity); });
+				draw_option<Button>("Horsey", nullptr, [] { MISC::LOAD_CLOUD_HAT("horsey", cloud_opacity); });
+				draw_option<Button>("Shower", nullptr, [] { MISC::LOAD_CLOUD_HAT("shower", cloud_opacity); });
 			});
 		g_Render->draw_submenu<sub>(("Sky"), rage::joaat("Sky"), [](sub* sub)
 			{
@@ -11867,6 +12027,7 @@ namespace Saint
 					}
 					});
 				draw_option<toggle>(("Instant ALT + F4"), nullptr, &features.instantalt);
+				draw_option<toggle>(("Waypoint Stats"), nullptr, &waypoint_stats.enabled);
 
 			});
 		g_Render->draw_submenu<sub>("Vibration", rage::joaat("ControlS"), [](sub* sub)
@@ -12454,6 +12615,7 @@ namespace Saint
 				draw_option<submenu>("Rainbow", nullptr, rage::joaat("RainbowGay"));
 				draw_option<submenu>("Tooltips", nullptr, rage::joaat("Tooltips"));
 				draw_option<submenu>("Misc", nullptr, rage::joaat("CustomMisc"));
+				draw_option<submenu>("Smooth Scroll", nullptr, rage::joaat("SmoothScroll"));
 				draw_option<toggle>("Lines", nullptr, &g_Render->lines_enabled);
 				draw_option<number<float>>("Text Size", nullptr, &g_Render->m_OptionTextSize, 0.01f, 1.f, 0.01f, 2);
 				draw_option<Scroll>("Font", nullptr, &g_Render->HeaderFont, &g_Render->option_font_it, true, -1, []
@@ -12587,8 +12749,12 @@ namespace Saint
 				draw_option<toggle>("Glare", nullptr, &g_Render->m_render_glare);
 				draw_option<toggle>("Sounds", nullptr, &g_Render->m_Sounds);
 				draw_option<number<float>>("Width", nullptr, &g_Render->m_Width, 0.01f, 1.f, 0.01f, 2);
-				draw_option<number<float>>("Smooth Scroll Speed", nullptr, &g_Render->smooth_scroll_speed, 0.01f, 1.00f, 0.01f, 2);
 				draw_option<number<float>>("Glare Height Offset", nullptr, &g_Render->glare.height_offset, -1000.f, 1000.f, 0.001f, 3);
+			});
+		g_Render->draw_submenu<sub>(("Smooth Scroll"), rage::joaat("SmoothScroll"), [](sub* sub)
+			{
+				draw_option<Scroll>(("Type"), nullptr, &g_Render->ScrollerType, &g_Render->ScrollerInt);
+				draw_option<number<float>>("Speed", nullptr, &g_Render->smooth_scroll_speed, 0.01f, 1.00f, 0.01f, 2);
 			});
 		g_Render->draw_submenu<sub>(("Header"), CustomizationHeader, [](sub* sub)
 			{

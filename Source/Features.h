@@ -45,6 +45,14 @@ namespace Saint {
 	inline float tp_nearest_radius = 150.0f;
 	inline bool alyways_show_info = false;
 	inline bool search_includes_custom = true;
+	inline void timed_function(int delay, std::function<void()> action = [] {}) {
+		static int delay2;
+		if (delay2 == 0 || (int)(GetTickCount64() - delay2) > delay)
+		{
+			action();
+			delay2 = GetTickCount64();
+		}
+	}
 	enum ControlFlags {
 		NONE,
 		ONLY_CONTROLLER,
@@ -3665,6 +3673,63 @@ namespace Saint {
 		buffer = buffer;
 		g_CustomText->RemoveText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"));
 	}
+	inline CoordStats GetCoordStats(NativeVector3 coords) {
+		NativeVector3 playerPos = ENTITY::GET_ENTITY_COORDS(Game->Self(), true);
+		float distance = MISC::GET_DISTANCE_BETWEEN_COORDS(coords.x, coords.y, coords.z, playerPos.x, playerPos.y, playerPos.z, true) * 0.0006213712f;
+		float walkandrun = TASK::IS_PED_SPRINTING(Game->Self()) ? 7.92 : 1.34;
+		float get_speed = Game->InVehicle() ? VEHICLE::GET_VEHICLE_ESTIMATED_MAX_SPEED(Game->Vehicle()) : walkandrun;
+		float time = (distance / get_speed) * 60.0;
+		int hours = static_cast<int>(time / 60);
+		int minutes = static_cast<int>(time) % 60;
+		int seconds = static_cast<int>((time - static_cast<int>(time)) * 60);
+		return { hours, minutes, seconds, distance};
+	}
+	class WaypointStats {
+	public:
+		void drawText(const char* text, float x, float y, float size, int font, bool center, bool right) {
+			HUD::SET_TEXT_SCALE(size, size);
+			HUD::SET_TEXT_FONT(0);
+			HUD::SET_TEXT_COLOUR(255, 255, 255, 255);
+			HUD::SET_TEXT_CENTRE(center);
+			if (right) {
+				HUD::SET_TEXT_WRAP(0.0f, x);
+				HUD::SET_TEXT_RIGHT_JUSTIFY(true);
+			}
+			HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
+			HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text);
+			HUD::END_TEXT_COMMAND_DISPLAY_TEXT(x, y, 0);
+		}
+		float x = 0.01f;
+		float y = 0.01f;
+		bool enabled = true;
+		void draw() {
+			if (enabled) {
+				int WaypointHandle = HUD::GET_FIRST_BLIP_INFO_ID(8);
+				if (HUD::DOES_BLIP_EXIST(WaypointHandle)) {
+					std::string speedbuf = "Estimated:";
+					NativeVector3 c = HUD::GET_BLIP_COORDS(WaypointHandle);
+					if (GetCoordStats(HUD::GET_BLIP_COORDS(WaypointHandle)).hours > 0) {
+						speedbuf.append(std::format(" {}h", GetCoordStats(c).hours));
+					}
+					if (GetCoordStats(c).minutes > 0) {
+						speedbuf.append(std::format(" {}m", GetCoordStats(c).minutes));
+					}
+					if (GetCoordStats(c).seconds > 0) {
+						speedbuf.append(std::format(" {}s", GetCoordStats(c).seconds));
+					}
+					if (GetCoordStats(c).distance < 0.10) {
+						speedbuf.append(std::format(" \nOther Information: {:02.2f}ft", GetCoordStats(c).distance * 5280.0f));
+					}
+					else {
+						speedbuf.append(std::format(" \nOther Information: {:02.2f}mi", GetCoordStats(c).distance));
+					}
+					drawText(speedbuf.c_str(), x, y, 0.25f, 0, false, false);
+				}
+				
+			}
+		}
+	};
+	inline WaypointStats waypoint_stats;
 	class Speedo {
 	public:
 		bool enabled = false;
@@ -5005,28 +5070,7 @@ namespace Saint {
 		BYTE bHasLimitedDepth; //0x0018  (Second bit [binary 10] = On, gives the water quad an effective range of 6 z-points)
 		char _0x0019[3]; // (Unknown)
 	};//Size=0x001C
-	class CWaterTune
-	{
-	public:
-		DWORD dwWaterColor; //0x0000  Default: 0x1A00191C
-		float fRippleScale; //0x0004  Default: 0.040000f
-		float fOceanFoamScale; //0x0008  Default: 0.050000f
-		float fSpecularFalloff; //0x000C  Default: 1118.000000f
-		float fFodPierceIntensity; //0x0010  Default: 1.100000f
-		float fRefractionBlend; //0x0014  Default: 0.700000f
-		float fRefractionExponent; //0x0018  Default: 0.250000f
-		float fWaterCycleDepth; //0x001C  Default: 10.000000f
-		float fWaterCycleFade; //0x0020  Default: 50.000000f
-		float fWaterLightningDepth; //0x0024  Default: 0.000000f
-		float fWaterLightningFade; //0x0028  Default: 10.000000f
-		float fDeepWaterModDepth; //0x002C  Default: 90.000000f
-		float fDeepWaterModFade; //0x0030  Default: 80.000000f
-		float fGodRaysLerpStart; //0x0034  Default: 0.000000f
-		float fGodRaysLerpEnd; //0x0038  Default: 200.000000f
-		float fDisturbFoamScale; //0x003C  Default: 0.050000f
-		void* vec2FogMin; //0x0040  Default: x = -4000.000000 y = -4000.000000
-		void* vec2FogMax; //0x0048  Default: x = 4500.000000 y= 8000.000000
-	};
+	inline Color watercolor2 = {255, 0, 0, 255};
 	inline uintptr_t ModuleBaseAdress = (uintptr_t)GetModuleHandle(NULL);
 	class RainbowColor {
 	public:
@@ -7060,39 +7104,96 @@ namespace Saint {
 		std::vector<EntityShooterHandler> m_Shot = {
 
 		};
+		const char* type[2] = { "Normal", "Smooth" };
+		std::size_t pos;
 		void init() {
 			if (enabled) {
-				if (Game->Shooting())
-				{
-					NativeVector3 cameraCoords = CAM::GET_GAMEPLAY_CAM_COORD();
-					NativeVector3 cameraDirection = RotationToDirection(CAM::GET_GAMEPLAY_CAM_ROT(0));
-					NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(Game->Self(), true);
-					NativeVector3 startMutliply = multiply(&cameraDirection, std::distance(&cameraCoords, &playerCoords) + 15.25f);
-					NativeVector3 start = addn(&cameraCoords, &startMutliply);
-					NativeVector3 rot = CAM::GET_GAMEPLAY_CAM_ROT(2);
-					float pitch = DegreeToRadian(rot.x);
-					float yaw = DegreeToRadian(rot.z + 90);
-					NativeVector3 location = ENTITY::GET_ENTITY_COORDS(Game->Self(), true);
+				if (pos == 0) {
+					if (Game->Shooting())
+					{
+						NativeVector3 cameraCoords = CAM::GET_GAMEPLAY_CAM_COORD();
+						NativeVector3 cameraDirection = RotationToDirection(CAM::GET_GAMEPLAY_CAM_ROT(0));
+						NativeVector3 playerCoords = ENTITY::GET_ENTITY_COORDS(Game->Self(), true);
+						NativeVector3 startMutliply = multiply(&cameraDirection, std::distance(&cameraCoords, &playerCoords) + 15.25f);
+						NativeVector3 start = addn(&cameraCoords, &startMutliply);
+						NativeVector3 rot = CAM::GET_GAMEPLAY_CAM_ROT(2);
+						float pitch = DegreeToRadian(rot.x);
+						float yaw = DegreeToRadian(rot.z + 90);
+						NativeVector3 location = ENTITY::GET_ENTITY_COORDS(Game->Self(), true);
 
-					g_CallbackScript->AddCallback<ModelCallback>(selected_hash, [=] {
-						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-						entityGunVehicle = VEHICLE::CREATE_VEHICLE(selected_hash, start.x, start.y, start.z, ENTITY::GET_ENTITY_HEADING(Game->Self()), true, false, false);
-						*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
-						m_Shot.push_back({ entityGunVehicle });
-						DECORATOR::DECOR_SET_INT(entityGunVehicle, "MPBitset", 0);
-						auto networkId = NETWORK::VEH_TO_NET(entityGunVehicle);
-						if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(entityGunVehicle))
-							NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
-						VEHICLE::SET_VEHICLE_IS_STOLEN(entityGunVehicle, FALSE);
-						NativeVector3 velocity;
-						NativeVector3 other = Game->Coords(entityGunVehicle);
-						velocity.x = Game->SCoords().x + (1000.0f * cos(pitch) * cos(yaw)) - other.x;
-						velocity.y = Game->SCoords().y + (1000.0f * sin(yaw) * cos(pitch)) - other.y;
-						velocity.z = Game->SCoords().z + (1000.0f * sin(pitch)) - other.z;
-						ENTITY::SET_ENTITY_ROTATION(entityGunVehicle, rot.x, rot.y, rot.z, 2, false);
-						ENTITY::SET_ENTITY_VELOCITY2(entityGunVehicle, { velocity.x * (float)3.0, velocity.y * (float)3.0, velocity.z * (float)3.0 });
+						g_CallbackScript->AddCallback<ModelCallback>(selected_hash, [=] {
+							*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+							entityGunVehicle = VEHICLE::CREATE_VEHICLE(selected_hash, start.x, start.y, start.z, ENTITY::GET_ENTITY_HEADING(Game->Self()), true, false, false);
+							*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+							m_Shot.push_back({ entityGunVehicle });
+							DECORATOR::DECOR_SET_INT(entityGunVehicle, "MPBitset", 0);
+							auto networkId = NETWORK::VEH_TO_NET(entityGunVehicle);
+							if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(entityGunVehicle))
+								NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+							VEHICLE::SET_VEHICLE_IS_STOLEN(entityGunVehicle, FALSE);
+							NativeVector3 velocity;
+							NativeVector3 other = Game->Coords(entityGunVehicle);
+							velocity.x = Game->SCoords().x + (1000.0f * cos(pitch) * cos(yaw)) - other.x;
+							velocity.y = Game->SCoords().y + (1000.0f * sin(yaw) * cos(pitch)) - other.y;
+							velocity.z = Game->SCoords().z + (1000.0f * sin(pitch)) - other.z;
+							ENTITY::SET_ENTITY_ROTATION(entityGunVehicle, rot.x, rot.y, rot.z, 2, false);
+							ENTITY::SET_ENTITY_VELOCITY2(entityGunVehicle, { velocity.x * (float)3.0, velocity.y * (float)3.0, velocity.z * (float)3.0 });
+							});
+
+					}
+				}
+				if (pos == 1) {
+					static Vehicle vehicle;
+					NativeVector3 position = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(Game->Self(), 0.4f, 3.0f, 0.8f);
+					NativeVector3 camrot = CAM::GET_GAMEPLAY_CAM_ROT(2);
+					NativeVector3 playerrot = ENTITY::GET_ENTITY_ROTATION(Game->Self(), 2);
+					NativeVector3 direction = RotationToDirection(camrot);
+					NativeVector3 entityCoords = ENTITY::GET_ENTITY_COORDS(vehicle, 0);
+
+					if (Game->Aiming()) {
+						g_CallbackScript->AddCallback<ModelCallback>(selected_hash, [=] {
+							if (!ENTITY::DOES_ENTITY_EXIST(vehicle)) {
+								*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+								vehicle = VEHICLE::CREATE_VEHICLE(selected_hash, Game->SCoords().x + 6.0f, Game->SCoords().y + 6.0f, Game->SCoords().z + 7.0f, ENTITY::GET_ENTITY_HEADING(Game->Self()), true, false, false);
+								*(unsigned short*)g_GameVariables->m_ModelSpawnBypass = 0x0574;
+								
+								DECORATOR::DECOR_SET_INT(vehicle, "MPBitset", 0);
+								auto networkId = NETWORK::VEH_TO_NET(vehicle);
+								if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(vehicle))
+									NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkId, true);
+								VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE);
+							}
+							else {
+								Vector3 force = {
+
+									((position.x + (direction.x * 5.0f)) - ENTITY::GET_ENTITY_COORDS(vehicle, false).x) * 4,
+									((position.y + (direction.y * 5.0f)) - ENTITY::GET_ENTITY_COORDS(vehicle, false).y) * 4,
+									((position.z + (direction.z * 5.0f)) - ENTITY::GET_ENTITY_COORDS(vehicle, false).z) * 4
+								};
+								ENTITY::SET_ENTITY_VELOCITY(vehicle, force.x, force.y, force.z);
+								ENTITY::SET_ENTITY_ROTATION(vehicle, playerrot.x, playerrot.y, camrot.z, 2, true);
+
+								if (Game->Shooting()) {
+									NativeVector3 velocity;
+									NativeVector3 other = Game->Coords(vehicle);
+									float pitch = DegreeToRadian(camrot.x);
+									float yaw = DegreeToRadian(camrot.z + 90);
+									velocity.x = Game->SCoords().x + (1000.0f * cos(pitch) * cos(yaw)) - other.x;
+									velocity.y = Game->SCoords().y + (1000.0f * sin(yaw) * cos(pitch)) - other.y;
+									velocity.z = Game->SCoords().z + (1000.0f * sin(pitch)) - other.z;
+									ENTITY::SET_ENTITY_VELOCITY2(vehicle, { velocity.x * (float)3.0, velocity.y * (float)3.0, velocity.z * (float)3.0 });
+									m_Shot.push_back({ vehicle });
+									vehicle = NULL;
+								}
+							}
 						});
-
+					}
+					else {
+						if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
+							features.DeleteEntity(vehicle);
+							vehicle = NULL;
+						}
+					}
 				}
 			}
 		}
@@ -10017,7 +10118,7 @@ namespace Saint {
 	inline HudColor hud_color;
 	class SessionInfo {
 	public:
-		bool enabled = true;
+		bool enabled = false;
 		bool overlay = true;
 		int session_host = 0;
 		float x = 0.16;
@@ -10344,6 +10445,13 @@ namespace Saint {
 
 
 
+			}
+		}
+		NativeVector3 get_coords_from_name(std::string name) {
+			std::string MenuFolderPath = "C:\\Saint\\Teleports\\";
+			if (DoesIniExists((MenuFolderPath + name + ".ini").c_str())) {
+				Ini* ColorIni = new Ini(MenuFolderPath + name + ".ini");
+				return { ColorIni->GetFloat("Location", "X"), ColorIni->GetFloat("Location", "Y"), ColorIni->GetFloat("Location", "Z") };
 			}
 		}
 	};
@@ -12845,11 +12953,49 @@ namespace Saint {
 		}
 	};
 	inline Valk valk;
+	inline const char* collectible[10] = { "Movie Prop", "Cache", "Chest", "Radio Tower", "Audio Player", "Shipwreck", "Buried Stash", "Treat", "LD Organics", "Skydive"};
+	inline int collectible_ints[10] = { 0, 1, 2, 3, 4, 5, 6, 8, 9, 10 };
+	inline std::size_t collectible_int;
+	class Entityspam {
+	public:
+		bool enabled = false;
+		bool clone = false;
+		int selected_class;
+		int selected_class2;
+		Hash selected_hash;
+		int delay = 550;
+		const char* type[2] = { "Ped", "Vehicle" };
+		std::size_t pos;
+		void init() {
+			if (enabled) {
+				if (clone) {
+					timed_function(delay, [] {
+						PED::CLONE_PED(Game->PlayerIndex(g_SelectedPlayer), true, false, true);
+					});
+				}
+				else {
+					timed_function(delay, [=] {
+						g_CallbackScript->AddCallback<ModelCallback>(selected_hash, [=] {
+							NativeVector3 c = ENTITY::GET_ENTITY_COORDS(Game->PlayerIndex(g_SelectedPlayer), 0);
+							if (STREAMING::IS_MODEL_A_VEHICLE(selected_hash)) {
+								veh_spawner.spawn2(selected_hash, c);
+							}
+							else {
+								PED::CREATE_PED(26, selected_hash, c.x, c.y, c.z, ENTITY::GET_ENTITY_HEADING(g_SelectedPlayer), true, true);
+							}
+						});
+					});
+					
+				}
+			}
+		}
+	};
 	class p_Selected {
 	public:
 		bool taze = false;
-
+		Entityspam spam;
 		void init() {
+			spam.init();
 			if (taze) {
 				static int delay2;
 				if (!WEAPON::HAS_WEAPON_ASSET_LOADED(Game->HashKey("WEAPON_STUNGUN")))
@@ -13345,6 +13491,7 @@ namespace Saint {
 		if (resx == 2560 && resy == 1440) {
 			g_Render->reso = 1;
 		}
+		waypoint_stats.draw();
 		m_creator.init();
 		g_HandTrails.init();
 		m_shotgun.init();

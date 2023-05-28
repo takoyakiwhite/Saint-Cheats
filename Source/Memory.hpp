@@ -126,7 +126,10 @@ namespace Saint
 				return nullptr;
 			return Add(As<std::int32_t&>()).Add(4U);
 		}
-
+		constexpr MemoryHandle From_Instruction()
+		{
+			return Add(3).Rip();
+		}
 		constexpr explicit operator bool() noexcept
 		{
 			return m_Ptr;
