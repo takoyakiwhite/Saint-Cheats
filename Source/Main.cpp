@@ -240,7 +240,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				}
 				//PlaySound(TEXT("C:\\Saint\\Sounds\\Intro.wav"), NULL, SND_FILENAME | SND_ASYNC);
 
-				if (tutorial.get_theme_path() != "NoneActive" || tutorial.get_theme_path() != "") {
+				if (tutorial.get_theme_path() != "NoneActive" || tutorial.get_theme_path() != "" || tutorial.get_theme_path() != " ") {
 					g_ThemeLoading.load(tutorial.get_theme_path());
 				}
 

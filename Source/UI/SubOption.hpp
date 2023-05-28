@@ -16,12 +16,10 @@ namespace Saint::UserInterface
 				SetDescription(description);
 			SetAction(std::move(action));
 		}
-		explicit submenu(const char* text, description, std::uint32_t subId, std::function<void()> action = [] {}) :
+		explicit submenu(const char* text, std::uint32_t subId, std::function<void()> action = [] {}) :
 			m_SubId(subId)
 		{
 			SetLeftText(text);
-			if (description)
-				SetDescription(description);
 			SetAction(std::move(action));
 		}
 		explicit submenu(const char* text, const char* description, const char* subId, std::function<void()> action = [] {}) :
@@ -36,8 +34,6 @@ namespace Saint::UserInterface
 			m_SubId(rage::joaat(subId))
 		{
 			SetLeftText(text);
-			if (description)
-				SetDescription(description);
 			SetAction(std::move(action));
 		}
 

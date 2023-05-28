@@ -130,7 +130,9 @@ namespace Saint
 		m_can_apply_data(Signature("E8 ? ? ? ? 84 C0 0F 84 AF 01 00 00 48 8B 03").Scan().Add(1).Rip().As<PVOID>()),
 		m_NetworkPlayerManager(Signature("48 8B 0D ? ? ? ? 8A D3 48 8B 01 FF 50 ? 4C 8B 07 48 8B CF").Scan().Add(3).Rip().As<decltype(m_NetworkPlayerManager)>()),
 		m_reset_network_complaints(Signature("E8 ? ? ? ? 8B 8B ? ? ? ? 03 CF").Scan().Add(1).Rip().As<reset_network_complaints>()),
-		m_script_threads(Signature("45 33 F6 8B E9 85 C9 B8").Scan().Sub(4).Rip().Sub(8).As<decltype(m_script_threads)>())
+		m_script_threads(Signature("45 33 F6 8B E9 85 C9 B8").Scan().Sub(4).Rip().Sub(8).As<decltype(m_script_threads)>()),
+		m_send_player_card_stats(Signature("48 89 5C 24 08 57 48 83 EC 30 48 83 64 24 20 00 48 8B DA 41").Scan().As<PVOID>()),
+		m_force_player_card_refresh(Signature("44 38 2D ? ? ? ? 74 1D 44 00 A6 BB 07 00 00").Scan().Add(3).Rip().As<bool*>())
 
 	{
 		//m_water_tune = Signature("4C 8D 0D ?? ?? ?? ?? 48 0F 45 D1").Scan().From_Instruction().As<decltype(m_water_tune)>();

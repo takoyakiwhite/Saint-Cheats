@@ -626,6 +626,7 @@ namespace Saint
 	}
 
 	bool Hooks::write_player_game_state_data_node(rage::netObject* player, CPlayerGameStateDataNode* node) {
+		auto ret = static_cast<decltype(&write_player_game_state_data_node)>(g_Hooking->m_Original_write_player_game_state_data_node)(player, node);
 		if (spoofing.m_godmode) {
 			node->m_is_invincible = false;
 			node->m_bullet_proof = false;
@@ -652,7 +653,7 @@ namespace Saint
 		if (spoofing.seatbelt) {
 			node->m_seatbelt = false;
 		}
-		return static_cast<decltype(&write_player_game_state_data_node)>(g_Hooking->m_Original_write_player_game_state_data_node)(player, node);
+		return ret;
 	}
 	bool Hooks::SendNetInfo(netPlayerData* player, __int64 a2, __int64 a3, DWORD* a4)
 	{
@@ -670,6 +671,7 @@ namespace Saint
 		return static_cast<decltype(&SendNetInfo)>(g_Hooking->m_OriginalSendNetInfo)(player, a2, a3, a4);
 	}
 	void Hooks::write_player_gamer_data_node(rage::netObject* player, CPlayerGamerDataNode* node) {
+		return static_cast<decltype(&write_player_gamer_data_node)>(g_Hooking->m_Original_write_player_gamer_data_node)(player, node);
 		if (spoofing.qa_tester) {
 			//node->m_is_rockstar_qa = true;
 		}
@@ -684,7 +686,7 @@ namespace Saint
 
 		}
 
-		return static_cast<decltype(&write_player_gamer_data_node)>(g_Hooking->m_Original_write_player_gamer_data_node)(player, node);
+		
 	}
 	bool Hooks::send_chat_message(void* team_mgr, rage::rlGamerInfo* local_gamer_info, const char* message, bool is_team)
 	{
@@ -1876,6 +1878,12 @@ namespace Saint
 
 		return static_cast<decltype(&can_apply_data)>(g_Hooking->can_applydata)(tree, object);
 	}
+	rage::netGameEvent* Hooks::send_player_card_stats(rage::netGameEvent* a1, CPlayerCardStats* stats)
+	{
+		if (rank)
+			stats->m_rank = rank_value;
+		return static_cast<decltype(&send_player_card_stats)>(g_Hooking->spoofing3)(a1, stats);
+	}
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
@@ -1907,6 +1915,7 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_serialize_take_off_ped_variation_task, &Hooks::serialize_take_off_ped_variation_task, &parachute2);
 		MH_CreateHook(g_GameFunctions->m_serialize_vehicle_gadget_data_node, &Hooks::serialize_vehicle_gadget_data_node, &yim_crash);
 		MH_CreateHook(g_GameFunctions->m_can_apply_data, &Hooks::can_apply_data, &can_applydata);
+		MH_CreateHook(g_GameFunctions->m_send_player_card_stats, &Hooks::send_player_card_stats, &spoofing3);
 		m_D3DHook.Hook(&Hooks::Present, Hooks::PresentIndex);
 		m_D3DHook.Hook(&Hooks::ResizeBuffers, Hooks::ResizeBuffersIndex);
 	}
@@ -1937,6 +1946,7 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->m_serialize_take_off_ped_variation_task);
 		MH_RemoveHook(g_GameFunctions->m_serialize_vehicle_gadget_data_node);
 		MH_RemoveHook(g_GameFunctions->m_can_apply_data);
+		MH_RemoveHook(g_GameFunctions->m_send_player_card_stats);
 		MH_Uninitialize();
 	}
 

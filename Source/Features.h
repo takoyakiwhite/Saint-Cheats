@@ -25,6 +25,26 @@
 #include <cppcodec/base64_default_rfc4648.hpp>
 #include <cppcodec/base32_default_rfc4648.hpp>
 namespace Saint {
+	inline void Fade(int* r, int* g, int* b)
+	{
+		if (*r == 255 && *g == 255 && *b == 255 || r == 0 && g == 0 && b == 0) {
+			*r = 255;
+			g = 0;
+			b = 0;
+		}
+		if (*r > 0 && b == 0) {
+			r--;
+			g++;
+		}
+		if (*g > 0 && r == 0) {
+			g--;
+			b++;
+		}
+		if (*b > 0 && g == 0) {
+			r++;
+			b--;
+		}
+	}
 	class Searches {
 	public:
 		std::string option;
@@ -1967,6 +1987,7 @@ namespace Saint {
 		int m_Red = 255, m_Green = 0, m_Blue = 0;
 		void RGBFade() // skidded dogshit nice one v98
 		{
+			
 			if (m_Red > 0 && m_Blue == 0) {
 				m_Red--;
 				m_Green++;
@@ -5096,6 +5117,11 @@ namespace Saint {
 
 				static int timer;
 				if (timer == 0 || (int)(GetTickCount64() - timer) > rainbow.delay) {
+					if (r == 255 && g == 255 && b == 255 || r == 0 && g == 0 && b == 0) {
+						r = 255;
+						g = 0;
+						b = 0;
+					}
 					if (r > 0 && b == 0) {
 						r--;
 						g++;
@@ -7248,6 +7274,11 @@ namespace Saint {
 		void init() {
 
 			if (rainbow_int == 1) {
+				if (r == 255 && g == 255 && b == 255 || r == 0 && g == 0 && b == 0) {
+					r = 255;
+					g = 0;
+					b = 0;
+				}
 				if (r > 0 && b == 0) {
 					r--;
 					g++;
@@ -7264,6 +7295,11 @@ namespace Saint {
 
 			if (rainbow) {
 				if (rainbow_int == 0) {
+					if (r == 255 && g == 255 && b == 255 || r == 0 && g == 0 && b == 0) {
+						r = 255;
+						g = 0;
+						b = 0;
+					}
 					if (r > 0 && b == 0) {
 						r--;
 						g++;
@@ -7655,6 +7691,11 @@ namespace Saint {
 		void init() {
 			if (enabled) {
 				if (rainbow) {
+					if (r == 255 && g == 255 && b == 255 || r == 0 && g == 0 && b == 0) {
+						r = 255;
+						g = 0;
+						b = 0;
+					}
 					if (r > 0 && b == 0) {
 						r--;
 						g++;
@@ -9124,21 +9165,6 @@ namespace Saint {
 			auto& stats3 = globalplayer_bd.as<GlobalPlayerBD*>()->Entries[Game->Id()];
 		}
 	};
-	inline void fade(int r, int g, int b)
-	{
-		if (r > 0 && b == 0) {
-			r--;
-			g++;
-		}
-		if (g > 0 && r == 0) {
-			g--;
-			b++;
-		}
-		if (b > 0 && g == 0) {
-			r++;
-			b--;
-		}
-	}
 	inline bool IsEmpty(NativeVector3 vector)
 	{
 		if (vector.x == 0.f && vector.y == 0.f && vector.z == 0.f)
@@ -12956,6 +12982,7 @@ namespace Saint {
 	inline const char* collectible[10] = { "Movie Prop", "Cache", "Chest", "Radio Tower", "Audio Player", "Shipwreck", "Buried Stash", "Treat", "LD Organics", "Skydive"};
 	inline int collectible_ints[10] = { 0, 1, 2, 3, 4, 5, 6, 8, 9, 10 };
 	inline std::size_t collectible_int;
+	inline bool give_never_wanted = false;
 	class Entityspam {
 	public:
 		bool enabled = false;
@@ -12967,6 +12994,15 @@ namespace Saint {
 		const char* type[2] = { "Ped", "Vehicle" };
 		std::size_t pos;
 		void init() {
+			if (give_never_wanted) {
+				script_global gpbd_fm_3(1894573);
+				constexpr size_t arg_count = 3;
+				int64_t args[arg_count] = { static_cast<int64_t>(eRemoteEvent::ClearWantedLevel),
+					   PLAYER::PLAYER_ID(),
+					   *gpbd_fm_3.at(g_players.get_selected.get_id(), 608).at(510).as<int*>() };
+
+				g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << g_players.get_selected.get_id());
+			}
 			if (enabled) {
 				if (clone) {
 					timed_function(delay, [] {
@@ -13344,6 +13380,31 @@ namespace Saint {
 
 	};
 	inline bool refresh_vehicle_cache = true;
+	class Spoofing2 {
+	public:
+		
+		bool wallet = false;
+		bool total_money = false;
+		int wallet_value = 0;
+		int total_money_value = 0;
+		bool kills = false;
+		int kills_value = 0;
+		bool deaths = false;
+		int deaths_value = 0;
+		bool lap_dances = false;
+		int lap_dance = 0;
+		void init() {
+			script_global globalplayer_bd(2657589);
+			script_global gpbd_fm_3(1894573);
+			auto& stats2 = gpbd_fm_3.as<GPBD_FM_3*>()->Entries[PLAYER::PLAYER_ID()];
+			auto& stats3 = globalplayer_bd.as<GlobalPlayerBD*>()->Entries[PLAYER::PLAYER_ID()];
+			if (rank) {
+				script_global gpbd_fm_1(1853910);
+				gpbd_fm_1.as<GPBD_FM*>()->Entries[PLAYER::PLAYER_ID()].PlayerStats.Rank = rank_value;
+			}
+		}
+	};
+	inline Spoofing2 spoofing2;
 	inline void FeatureInitalize() {
 		if (refresh_vehicle_cache) {
 			if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {

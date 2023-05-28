@@ -331,6 +331,10 @@ namespace Saint
 
 		CWaterTune* m_water_tune;
 
+		bool* m_force_player_card_refresh{};
+
+		PVOID m_send_player_card_stats{};
+
 		
 		
 

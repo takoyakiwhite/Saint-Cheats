@@ -28,6 +28,7 @@
 #include <GTAV-Classes/netsync/nodes/vehicle/CVehicleGadgetDataNode.hpp>
 #include <GTAV-Classes/netsync/nodes/vehicle/CVehicleProximityMigrationDataNode.hpp>
 #include <GTAV-Classes/network/CNetGamePlayer.hpp>
+#include <GTAV-Classes/stats/CPlayerCardStats.hpp>
 namespace Saint
 {
 	
@@ -49,6 +50,8 @@ namespace Saint
 	inline rage::rlSessionInfo g_Session_info;
 	inline bool BeastLanding = false;
 	inline bool spoof_as_reg = false;
+	inline bool rank = false;
+	inline int rank_value = 0;
 	class MenuFlag {
 	public:
 		bool isDev() {
@@ -130,6 +133,8 @@ namespace Saint
 
 		static void serialize_vehicle_gadget_data_node(CVehicleGadgetDataNode* node, rage::CSyncDataBase* data);
 
+		static rage::netGameEvent* send_player_card_stats(rage::netGameEvent* a1, CPlayerCardStats* stats);
+
 		
 
 		
@@ -205,7 +210,7 @@ namespace Saint
 		void* yim_crash2{};
 
 		void* can_applydata{};
-	
+		void* spoofing3{};
 
 
 	};

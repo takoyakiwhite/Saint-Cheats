@@ -60,7 +60,7 @@ namespace Saint::UserInterface
 	{
 
 		if (fileExists("C:\\Saint\\tooltips.txt")) {
-			std::ifstream file("C:\\Saint\\tooltips.txt"); // Replace "input.txt" with the path to your text file
+			std::ifstream file("C:\\Saint\\tooltips.txt");
 			std::vector<std::string> lines;
 
 			if (file.is_open()) {
