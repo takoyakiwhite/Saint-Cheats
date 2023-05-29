@@ -1242,7 +1242,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Outfit Editor"), SubmenuOutfitEditor, [](sub* sub)
 			{
-				addSubmenu("Load", nullptr, SubmenuOutfitLoader);
+				addSubmenu("Saved", nullptr, SubmenuOutfitLoader);
 				addToggle(("Tron"), "", &features.tron_loop, [] {
 					if (!features.tron_loop) {
 
@@ -5724,6 +5724,7 @@ namespace Saint
 				if (Flags->isDev()) {
 					addSubmenu("RID Joiner", nullptr, SubmenuRIDJoiner);
 				}
+				addSubmenu("Toolkit", "Toolkit");
 				addSubmenu("Notifications", nullptr, SubmenuNotifcations);
 				addSubmenu("Chat", nullptr, SubmenuChat);
 				addSubmenu("Team", nullptr, SubmenuTeam);
@@ -5747,6 +5748,10 @@ namespace Saint
 
 							});
 					});
+			});
+		g_Render->draw_submenu<sub>("Toolkit", rage::joaat("Toolkit"), [](sub* sub)
+			{
+				addToggleWithNumber<int>("Player Magnet", nullptr, &hook_features.magnet, &hook_features.magnet_count, 1, 32, 1, 0);
 			});
 		g_Render->draw_submenu<sub>("Session Information", rage::joaat("SessionINFO"), [](sub* sub)
 			{
@@ -8173,7 +8178,8 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Chat"), SubmenuChat, [](sub* sub)
 			{
 				addSubmenu("Spammer", nullptr, SubmenuSpammer);
-				addToggle(("Team Only"), nullptr, &chat.team_only, [] {
+				//addToggle("Log Messages", &hook_features.log_chat_message);
+				addToggle("Team Only", nullptr, &chat.team_only, [] {
 					if (!chat.team_only) {
 						NETWORK::NETWORK_SET_TEAM_ONLY_CHAT(false);
 					}
@@ -9093,7 +9099,7 @@ namespace Saint
 						std::uint64_t info = g_GameFunctions->m_vehicle_hash_pool->get(i);
 						if (info != NULL) {
 							if ((*(BYTE*)(info + 157) & 0x1F) == 5) {
-								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4);
+								std::string make_ptr = (char*)((uintptr_t)info + 0x2A4); 
 								std::string model_ptr = (char*)((uintptr_t)info + 0x298);
 								if (VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(Game->HashKey(model_ptr.c_str())) == m_selected_player_vehicle_class) {
 									std::stringstream ss;
@@ -9181,11 +9187,11 @@ namespace Saint
 					int64_t args[arg_count] = {
 							(int64_t)eRemoteEvent::GiveCollectible,
 							(int64_t)PLAYER::PLAYER_ID(),
-							(int64_t)collectible_ints[collectible_int],  // iParam0
-							(int64_t)0,// iParam1
-							!false,   // bParam2
+							(int64_t)collectible_ints[collectible_int],
+							(int64_t)0,
+							!false,
 							true,
-							0// bParam3
+							0
 					};
 
 					g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << g_players.get_selected.get_id());
@@ -9776,25 +9782,39 @@ namespace Saint
 						MISC::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(origin.x, origin.y, origin.z, destination.x, destination.y, destination.z, 1, 0, hash, Game->Self(), false, false, 100.f);
 					});
 			});
-		g_Render->draw_submenu<sub>(("Send To Interior"), SubmenuSendToInt, [](sub* sub) {
-			if (alyways_show_info) {
-				g_players.draw_info(g_SelectedPlayer);
-			}
-			addButton(("Casino"), nullptr, [=]
-				{
-					g_players.get_selected.send_to_int({ 123 });
-				});
-			addBreak(("Custom"));
-			addKeyboard(("ID"), nullptr, std::to_string(g_players.get_selected.int_id), []
-				{
-					showKeyboard("Enter Message", "", 50, &g_players.get_selected.buffer, [] {
-						g_players.get_selected.int_id = atoi(g_players.get_selected.buffer.c_str());
+		g_Render->draw_submenu<sub>(("Send To Interior"), SubmenuSendToInt, [](sub* sub) 
+			{
+				if (alyways_show_info) {
+					g_players.draw_info(g_SelectedPlayer);
+				}
+				addSubmenu("Apartments", "ApartmentTP");
+				addButton(("Casino"), nullptr, [=]
+					{
+						g_players.get_selected.send_to_int({ 123 });
+					});
+				addBreak(("Custom"));
+				addKeyboard(("ID"), nullptr, std::to_string(g_players.get_selected.int_id), []
+					{
+						showKeyboard("Enter Message", "", 50, &g_players.get_selected.buffer, [] {
+							g_players.get_selected.int_id = atoi(g_players.get_selected.buffer.c_str());
+							});
+					});
+				addButton(("Send"), nullptr, [=]
+					{
+						g_players.get_selected.send_to_int({ g_players.get_selected.int_id });
+					});
+			});
+		g_Render->draw_submenu<sub>(("Apartments"), rage::joaat("ApartmentTP"), [](sub* sub)
+			{
+				for (int i = 1; i < apartment_names.size(); i++) {
+					addButton(apartment_names[i], nullptr, [=]
+						{
+							const size_t arg_count = 9;
+							int64_t args[arg_count] = { (int64_t)eRemoteEvent::Teleport, PLAYER::PLAYER_ID(), (int64_t)all_players.get_id(g_SelectedPlayer), (int64_t)(int)-1, 1, (int64_t)i, 1, 1, 1};
+
+							g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << all_players.get_id(g_SelectedPlayer));
 						});
-				});
-			addButton(("Send"), nullptr, [=]
-				{
-					g_players.get_selected.send_to_int({ g_players.get_selected.int_id });
-				});
+				}
 			});
 		g_Render->draw_submenu<sub>(("Cage"), SubmenuCage, [](sub* sub) {
 			if (alyways_show_info) {
@@ -12278,6 +12298,28 @@ namespace Saint
 				addSubmenu("Wanted Level", nullptr, rage::joaat("WantedLevelHUD"));
 				addSubmenu("Minimap", nullptr, rage::joaat("Minimap"));
 				addSubmenu("Color", nullptr, rage::joaat("HUDCOLOR"));
+				addSubmenu("Fake Money", nullptr, rage::joaat("FakeMoney"));
+			});
+		g_Render->draw_submenu<sub>("Fake Money", rage::joaat("FakeMoney"), [](sub* sub)
+			{
+				addToggle("Enabled", &fake_money.enabled, [] {
+					if (!fake_money.enabled) {
+						HUD::BUSYSPINNER_OFF();
+					}
+					});
+				addToggle("Bank", &fake_money.bank);
+				addNumber<std::int32_t>("Delay", nullptr, &fake_money.delay, 0, 5000, 1, 3, true, "", "s");
+				addKeyboard(("Amount"), nullptr, std::to_string(fake_money.amount), []
+					{
+						showKeyboard("Enter Something", "", INT_MAX, &fake_money.buffer, [] {
+
+
+							fake_money.amount = atoi(fake_money.buffer.c_str());
+
+							});
+
+
+					});
 			});
 		g_Render->draw_submenu<sub>("Color", rage::joaat("HUDCOLOR"), [](sub* sub)
 			{
@@ -12562,20 +12604,11 @@ namespace Saint
 		g_Render->draw_submenu<sub>(("Description"), rage::joaat("DescriptionPos"), [](sub* sub)
 			{
 				addToggle("Connected", "Preview", &g_Render->connect_description);
-				addNumber<float>("X", "Preview", &g_Render->description_x, -100.f, 100.f, 0.01f, 2);
-				addNumber<float>("Y", "Preview", &g_Render->description_y, -100.f, 100.f, 0.01f, 2);
-				addBreak(("Text"));
+				addNumber<float>("X", "Preview", &g_Render->description_x, -100.f, 100.f, 0.001f, 3);
+				addNumber<float>("Y", "Preview", &g_Render->description_y, -100.f, 100.f, 0.001f, 3);
+				addBreak("Text");
 				addNumber<float>("X", "Preview", &g_Render->description_x2, 0.f, 1.f, 0.01f, 2);
 				addNumber<float>("Y", "Preview", &g_Render->description_y2, 0.f, 1.f, 0.01f, 2);
-				addBreak(("Presets"));
-				addButton("Top Right", nullptr, [=]
-					{
-						g_Render->connect_description = false;
-						g_Render->description_x = 0.22f;
-						g_Render->description_y = 0.0f;
-						g_Render->description_x2 = 0.22f;
-						g_Render->description_y2 = 0.0f;
-					});
 			});
 		g_Render->draw_submenu<sub>(("Base"), PositionsMenu, [](sub* sub)
 			{
@@ -12638,7 +12671,6 @@ namespace Saint
 						}
 
 					});
-				//addScroll("Resolution", nullptr, &g_Render->Resolution, &g_Render->reso);
 
 
 			});
@@ -12751,7 +12783,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Smooth Scroll"), rage::joaat("SmoothScroll"), [](sub* sub)
 			{
-				addScroll(("Type"), nullptr, &g_Render->ScrollerType, &g_Render->ScrollerInt);
+				addScroll("Type", nullptr, &g_Render->ScrollerType, &g_Render->ScrollerInt);
 				addNumber<float>("Speed", nullptr, &g_Render->smooth_scroll_speed, 0.01f, 1.00f, 0.01f, 2);
 			});
 		g_Render->draw_submenu<sub>(("Header"), CustomizationHeader, [](sub* sub)

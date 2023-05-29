@@ -94,13 +94,15 @@ namespace Saint::UserInterface
 				}
 			}
 			else {
-				if (PAD::IS_USING_KEYBOARD_AND_MOUSE(2)) {
-					sprintf_s(text, "%s\n~u~%s", "No tooltip found.", "~b~F4");
-					DrawingFunctions()->Text(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
-				}
-				else {
-					sprintf_s(text, "%s\n~b~RB + RIGHT", "No tooltip found.");
-					DrawingFunctions()->Text(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
+				if (tooltips_enabled) {
+					if (PAD::IS_USING_KEYBOARD_AND_MOUSE(2)) {
+						sprintf_s(text, "%s\n~u~%s", "No tooltip found.", "~b~F4");
+						DrawingFunctions()->Text(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
+					}
+					else {
+						sprintf_s(text, "%s\n~b~RB + RIGHT", "No tooltip found.");
+						DrawingFunctions()->Text(text, 0.5f, 0.09f, Font::ChaletLondon, 0.4f, m_ToolTipColor, true, false, false);
+					}
 				}
 			}
 		}
@@ -192,6 +194,17 @@ namespace Saint::UserInterface
 					{
 						startPoint = sub->GetSelectedOption() - m_OptionsPerPage + 1;
 						endPoint = sub->GetSelectedOption() + 1;
+					}
+					if (sub->GetNumOptions() > m_OptionsPerPage && sub->GetSelectedOption() >= m_OptionsPerPage - 3) // credits to kyro
+					{             
+						for (int i = 0; i < 3; i++)
+						{
+							if (sub->GetSelectedOption() < sub->GetNumOptions() - i)
+							{
+								startPoint = sub->GetSelectedOption() - m_OptionsPerPage + i + 1;
+								endPoint = sub->GetSelectedOption() + i + 1;
+							}
+						}
 					}
 					for (std::size_t i = startPoint, j = 0; i < endPoint; ++i, ++j)
 					{

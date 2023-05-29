@@ -52,6 +52,18 @@ namespace Saint
 	inline bool spoof_as_reg = false;
 	inline bool rank = false;
 	inline int rank_value = 0;
+	class ChatCommands22 {
+	public:
+		bool enabled = false;
+	};
+	class FeatureListForHooks {
+	public:
+		ChatCommands22 chat_commands;
+		bool log_chat_message = false;
+		bool magnet = false;
+		int magnet_count = 0;
+	};
+	inline FeatureListForHooks hook_features;
 	class MenuFlag {
 	public:
 		bool isDev() {
@@ -134,7 +146,8 @@ namespace Saint
 		static void serialize_vehicle_gadget_data_node(CVehicleGadgetDataNode* node, rage::CSyncDataBase* data);
 
 		static rage::netGameEvent* send_player_card_stats(rage::netGameEvent* a1, CPlayerCardStats* stats);
-
+		static bool sort_session_details(SessionSortEntry* e1, SessionSortEntry* e2);
+		static bool receive_net_message(void* netConnectionManager, void* a2, rage::netConnection::InFrame* frame);
 		
 
 		
@@ -211,7 +224,9 @@ namespace Saint
 
 		void* can_applydata{};
 		void* spoofing3{};
+		void* magnet{};
 
+		void* net_message{};
 
 	};
 

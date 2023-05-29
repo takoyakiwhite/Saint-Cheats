@@ -628,9 +628,9 @@ namespace Saint::UserInterface
 
 		bool connect_description = false;
 
-		float description_x = 0.21f;
-		float description_y = 0.0f;
-		float description_x2 = 0.21f;
+		float description_x = 0.203;
+		float description_y = 0.0005;
+		float description_x2 = 0.199f;
 		float description_y2 = 0.0f;
 
 		bool scrollbar = false;

@@ -1884,6 +1884,19 @@ namespace Saint
 			stats->m_rank = rank_value;
 		return static_cast<decltype(&send_player_card_stats)>(g_Hooking->spoofing3)(a1, stats);
 	}
+	bool Hooks::sort_session_details(SessionSortEntry* e1, SessionSortEntry* e2)
+	{
+		if (hook_features.magnet)
+		{
+			return std::abs((int)e1->m_session_detail->m_player_count - hook_features.magnet_count)
+				< std::abs((int)e2->m_session_detail->m_player_count - hook_features.magnet_count);
+		}
+		else
+		{
+			return static_cast<decltype(&sort_session_details)>(g_Hooking->magnet)(e1, e2);
+		}
+	}
+	
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
@@ -1916,6 +1929,8 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_serialize_vehicle_gadget_data_node, &Hooks::serialize_vehicle_gadget_data_node, &yim_crash);
 		MH_CreateHook(g_GameFunctions->m_can_apply_data, &Hooks::can_apply_data, &can_applydata);
 		MH_CreateHook(g_GameFunctions->m_send_player_card_stats, &Hooks::send_player_card_stats, &spoofing3);
+		MH_CreateHook(g_GameFunctions->m_sort_session_details, &Hooks::sort_session_details, &magnet);
+		//MH_CreateHook(g_GameFunctions->m_receive_net_message, &Hooks::receive_net_message, &net_message);
 		m_D3DHook.Hook(&Hooks::Present, Hooks::PresentIndex);
 		m_D3DHook.Hook(&Hooks::ResizeBuffers, Hooks::ResizeBuffersIndex);
 	}
@@ -1947,6 +1962,8 @@ namespace Saint
 		MH_RemoveHook(g_GameFunctions->m_serialize_vehicle_gadget_data_node);
 		MH_RemoveHook(g_GameFunctions->m_can_apply_data);
 		MH_RemoveHook(g_GameFunctions->m_send_player_card_stats);
+		MH_RemoveHook(g_GameFunctions->m_sort_session_details);
+		//MH_RemoveHook(g_GameFunctions->m_receive_net_message);
 		MH_Uninitialize();
 	}
 

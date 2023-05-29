@@ -2054,7 +2054,17 @@ namespace Saint {
 		bool extend_mk1_wings = false;
 		bool test_toggle = false;
 		std::string hash_to_turn;
+		bool fast_respawn = false;
 		void init() {
+			if (fast_respawn) {
+				if (PED::IS_PED_DEAD_OR_DYING(Game->Self(), true))
+				{
+					PED::RESURRECT_PED(Game->Self());
+					ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, 0, 0, 0);
+					TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
+					MISC::FORCE_GAME_STATE_PLAYING();
+				}
+			}
 			if (test_toggle) {
 				VEHICLE::SET_VEHICLE_FORCE_AFTERBURNER(Game->Vehicle(), true);
 			}
@@ -2066,8 +2076,7 @@ namespace Saint {
 			}
 			if (GlowWorld) {
 
-				auto Coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), TRUE);
-				GRAPHICS::DRAW_LIGHT_WITH_RANGE(Coords.x, Coords.y, Coords.z, m_Red, m_Green, m_Blue, glow_range, 100.f);
+				GRAPHICS::DRAW_LIGHT_WITH_RANGE(Game->SCoords().x, Game->SCoords().y, Game->SCoords().z, m_Red, m_Green, m_Blue, glow_range, 100.f);
 
 				if (RainbowGl)
 					RGBFade();
@@ -3934,11 +3943,12 @@ namespace Saint {
 		std::size_t data = 0;
 		void init() {
 			if (enabled) {
-				int handle[26];
-				NETWORK::NETWORK_HANDLE_FROM_PLAYER(Game->PlayerIndex(g_SelectedPlayer), &handle[0], 13);
-				if (NETWORK::NETWORK_IS_HANDLE_VALID(&handle[0], 13)) {
-					NETWORK::NETWORK_SEND_TEXT_MESSAGE(text.c_str(), &handle[0]);
-				}
+				const size_t arg_count = 8;
+				int64_t args[arg_count] = { (int64_t)eRemoteEvent::SendTextLabelSMS, PLAYER::PLAYER_ID()};
+
+				strcpy((char*)&args[2], text.c_str());
+
+				g_GameFunctions->m_trigger_script_event(1, args, arg_count, 1 << all_players.get_id(g_SelectedPlayer));
 
 			}
 		}
@@ -7216,8 +7226,13 @@ namespace Saint {
 					}
 					else {
 						if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
-							features.DeleteEntity(vehicle);
-							vehicle = NULL;
+							if (ENTITY::GET_ENTITY_ALPHA(vehicle) < 21) {
+								features.DeleteEntity(vehicle);
+								vehicle = NULL;
+							}
+							else {
+								ENTITY::SET_ENTITY_ALPHA(vehicle, ENTITY::GET_ENTITY_ALPHA(vehicle) - 20, true);
+							}
 						}
 					}
 				}
@@ -13405,7 +13420,67 @@ namespace Saint {
 		}
 	};
 	inline Spoofing2 spoofing2;
+	class FakeMoney {
+	public:
+		bool enabled = false;
+		int delay = 5;
+		int amount = 3000000;
+		bool bank = false;
+		std::string buffer;
+		int amount2 = amount;
+		int get_amount = 0;
+		void init() {
+			if (enabled) {
+				HUD::BEGIN_TEXT_COMMAND_BUSYSPINNER_ON("STRING");
+				HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME("Transaction Pending");
+				HUD::END_TEXT_COMMAND_BUSYSPINNER_ON(eBusySpinnerType::BUSY_SPINNER_SAVE);
+				timed_function(delay * 1000, [=] {
+					script_global globalplayer_bd(2657589);
+					script_global gpbd_fm_3(1894573);
+					script_global gpbd_fm_1(1853910);
+					auto& stats = gpbd_fm_1.as<GPBD_FM*>()->Entries[PLAYER::PLAYER_ID()].PlayerStats;
+					auto& stats1 = gpbd_fm_1.as<GPBD_FM*>()->Entries[PLAYER::PLAYER_ID()];
+					auto& stats2 = gpbd_fm_3.as<GPBD_FM_3*>()->Entries[PLAYER::PLAYER_ID()];
+					auto& stats3 = globalplayer_bd.as<GlobalPlayerBD*>()->Entries[PLAYER::PLAYER_ID()];
+					if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
+						HUD::USE_FAKE_MP_CASH(true);
+						if (bank) {
+							HUD::CHANGE_FAKE_MP_CASH(0, amount2);
+						}
+						else {
+							HUD::CHANGE_FAKE_MP_CASH(amount2, 0);
+						}
+						
+					}
+					else {
+						HUD::USE_FAKE_MP_CASH(true);
+						if (bank) {
+							HUD::CHANGE_FAKE_MP_CASH(0, amount);
+						}
+						else {
+							HUD::CHANGE_FAKE_MP_CASH(amount, 0);
+						}
+					}
+					for (int i = 0; i < get_amount; i++)
+					{
+						
+						amount2 = amount2 * 2;
+					}
+					get_amount++;
+					HUD::BUSYSPINNER_OFF();
+				});
+			}
+		}
+	};
+	inline FakeMoney fake_money;
+	class MoneyLoops {
+	public:
+		bool onemillion = false;
+		void init() {
+		}
+	};
 	inline void FeatureInitalize() {
+		fake_money.init();
 		if (refresh_vehicle_cache) {
 			if (g_GameFunctions->m_vehicle_hash_pool != nullptr) {
 				for (std::int32_t i = 0; i < g_GameFunctions->m_vehicle_hash_pool->capacity; i++) {

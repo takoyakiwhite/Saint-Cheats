@@ -542,7 +542,7 @@ namespace rage {
 	}; //Size: 0x0008
 	class netEventMgr;
 #pragma pack(push, 1)
-	
+
 	class netGameEvent
 	{
 	public:
@@ -683,7 +683,7 @@ namespace Saint {
 		std::uint8_t m_0xAE;       // 0xAE
 		std::uint8_t m_0xAF;       // 0xAF
 	};
-	
+
 	class CGameScriptHandlerNetComponent
 	{
 	public:
@@ -881,7 +881,7 @@ namespace Saint {
 		std::uint32_t m_bitset;   // 0x220
 		std::uint32_t m_args_size;// 0x224
 	};
-	
+
 	class netPlayerData
 	{
 	public:
@@ -901,7 +901,7 @@ namespace Saint {
 		char pad_0078[12]; //0x0078
 		const char* m_name; //0x0084
 	}; //Size: 0x0098
-	
+
 
 
 	class CNetGamePlayers : public rage::netPlayer
@@ -1037,5 +1037,5 @@ namespace Saint {
 		float fJumpForce; //0x0058 
 
 	}; //Size=0x005C
-	
+
 }

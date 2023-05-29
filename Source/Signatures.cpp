@@ -44,6 +44,7 @@ namespace Saint
 	}
 
 	GameFunctions::GameFunctions() :
+
 		//m_GetScriptEvent(Signature("48 85 C0 74 14 4C 8B 10").Scan().Sub(28).As<decltype(m_GetScriptEvent)>()),
 		m_GetLabelText(Signature("48 89 5C 24 ? 57 48 83 EC 20 48 8B DA 48 8B F9 48 85 D2 75 44 E8").Scan().As<decltype(m_GetLabelText)>()),
 		m_WndProc(Signature("44 8B E2 4C 8B E9 3B D0").Scan().Sub(52).As<decltype(m_WndProc)>()),
@@ -116,6 +117,7 @@ namespace Saint
 		m_cloud_mid_patch(Signature("0F 29 8B 60 03 00 00").Scan().As<decltype(m_cloud_mid_patch)>()),
 		m_ReadBitbufDword(Signature("48 89 74 24 ? 57 48 83 EC 20 48 8B D9 33 C9 41 8B F0 8A").Scan().Sub(5).As<decltype(m_ReadBitbufDword)>()),
 		m_read_bitbuf_array(Signature("48 89 5C 24 ? 57 48 83 EC 30 41 8B F8 4C").Scan().As<decltype(m_read_bitbuf_array)>()),
+		m_read_bitbuf_string(Signature("E8 ? ? ? ? 48 8D 4F 3C").Scan().Add(1).Rip().As<decltype(m_read_bitbuf_string)>()),
 		m_FallTaskConstructor(Signature("E8 ? ? ? ? B3 04 08 98 A0 00 00 00").Scan().Add(1).As<decltype(m_FallTaskConstructor)>()),
 		m_NetworkObjectMgrInterface(Signature("48 8B 0D ? ? ? ? 45 33 C0 E8 ? ? ? ? 33 FF 4C 8B F0").Scan().Add(3).Rip().As<decltype(m_NetworkObjectMgrInterface)>()),
 		m_ChangeNetworkObjectOwner(Signature("48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 54 41 56 41 57 48 81 EC ? ? ? ? 44 8A 62 4B").Scan().As<decltype(m_ChangeNetworkObjectOwner)>()),
@@ -132,10 +134,13 @@ namespace Saint
 		m_reset_network_complaints(Signature("E8 ? ? ? ? 8B 8B ? ? ? ? 03 CF").Scan().Add(1).Rip().As<reset_network_complaints>()),
 		m_script_threads(Signature("45 33 F6 8B E9 85 C9 B8").Scan().Sub(4).Rip().Sub(8).As<decltype(m_script_threads)>()),
 		m_send_player_card_stats(Signature("48 89 5C 24 08 57 48 83 EC 30 48 83 64 24 20 00 48 8B DA 41").Scan().As<PVOID>()),
+		m_sort_session_details(Signature("C3 0F 2E 42 0C").Scan().Sub(0x10).As<PVOID>()),
+		m_receive_net_message(Signature("48 83 EC 20 4C 8B 71 50 33 ED").Scan().Sub(0x19).As<PVOID>()),
 		m_force_player_card_refresh(Signature("44 38 2D ? ? ? ? 74 1D 44 00 A6 BB 07 00 00").Scan().Add(3).Rip().As<bool*>())
 
 	{
 		//m_water_tune = Signature("4C 8D 0D ?? ?? ?? ?? 48 0F 45 D1").Scan().From_Instruction().As<decltype(m_water_tune)>();
+		//g_vfx_wheel = { (vfx_wheel*)memory::read_instruction(address, 3, 7),*(uint8_t*)(address + 0xA) }; // good
 	}
 
 
