@@ -164,6 +164,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				}
 #endif
 				g_Logger = std::make_unique<Logger>();
+				exceptions::initExceptionHandler();
 				g_Logger->Info(R"( 
 					   _____ ___    _____   ________
 					  / ___//   |  /  _/ | / /_  __/
@@ -216,8 +217,6 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				}
 				g_Logger->Info("Game Loaded.");
 
-				//everybody forgot me and the work i put in
-				exceptions::initExceptionHandler();
 				g_GameVariables->PostInit();
 				g_CustomText = std::make_unique<CustomText>();
 				g_D3DRenderer = std::make_unique<D3DRenderer>();
