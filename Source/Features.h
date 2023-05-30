@@ -45,6 +45,8 @@ namespace Saint {
 			b--;
 		}
 	}
+	inline std::string nightclub_buffer;
+	inline int nightclubamount = 300000;
 	class Searches {
 	public:
 		std::string option;
@@ -1159,6 +1161,9 @@ namespace Saint {
 		{
 			"None", "T-Pose", "Freecam",
 		};
+		float m_speed_multiplier;
+		const char* control_type[2] = { "Normal", "Percise" };
+		std::size_t controlInt;
 		Cam camera;
 		std::size_t FlyInt = 0;
 		void onDisable() {
@@ -1174,92 +1179,141 @@ namespace Saint {
 			if (enabled) {
 				if (!Game->InVehicle())
 				{
-					if (!CAM::DOES_CAM_EXIST(camera) && FlyInt == 2) {
-						camera = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", true);
-						CAM::SET_CAM_ROT(camera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
-						CAM::SET_CAM_COORD(camera, CAM::GET_GAMEPLAY_CAM_COORD());
-					}
-					if (FlyInt == 2) {
-						CAM::RENDER_SCRIPT_CAMS(true, true, 700, true, true, true);
-						CAM::SET_CAM_ACTIVE(camera, true);
-						CAM::SET_CAM_ROT(camera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
-					}
-					NativeVector3 freecamCoords = CAM::GET_CAM_COORD(camera);
-					if (FlyInt == 2) {
-
-						NativeVector3 cameraDirection = RotationToDirection(CAM::GET_GAMEPLAY_CAM_ROT(0));
-						NativeVector3 accelerateCoords = multiply(&cameraDirection, 0.2f);
-						if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 8)) {
-
-							NativeVector3 newCoords = addn(&freecamCoords, &accelerateCoords);
-							CAM::SET_CAM_COORD(camera, newCoords);
-						}
-						if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 32)) {
-							NativeVector3 newCoords = addn(&freecamCoords, &accelerateCoords);
-							CAM::SET_CAM_COORD(camera, newCoords);
-						}
-						if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 34)) {
+					if (controlInt == 0) {
+						if (!CAM::DOES_CAM_EXIST(camera) && FlyInt == 2) {
+							camera = CAM::CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", true);
 							CAM::SET_CAM_ROT(camera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
-						}
-					}
-					static bool turnoff = true;
-					if (!transparent)
-					{
-						ENTITY::SET_ENTITY_ALPHA(Game->Self(), 255, false);
-						turnoff = false;
-					}
-					if (transparent) {
-						ENTITY::SET_ENTITY_ALPHA(Game->Self(), 180, false);
-					}
-					if (spin) {
-						static int Heading;
-						Heading++;
-						Heading++;
-						Heading++;
-						Heading++;
-						Heading++;
-						Heading++;
-						Heading++;
-						Heading++;
-						Heading++;
-						Heading++;
-						Heading++;
-						Heading++;
-						ENTITY::SET_ENTITY_HEADING(Game->Self(), Heading);
-					}
-
-					NativeVector3 coords4 = Game->SCoords();
-					NativeVector3 coords5 = CAM::GET_GAMEPLAY_CAM_COORD();
-					auto ped = Game->Self();
-					auto startDist = std::distance(&coords5, &coords4);
-					auto pos = ENTITY::GET_ENTITY_COORDS(ped, false);
-					if (FlyInt == 1) {
-						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ped, pos.x, pos.y, pos.z, false, false, false);
-					}
-					if (FlyInt == 0) {
-						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ped, pos.x, pos.y, pos.z, true, true, true);
-					}
-					NativeVector3 meow2 = CAM::GET_GAMEPLAY_CAM_ROT(0);
-					NativeVector3 meow = rot_to_direction(&meow2);
-					NativeVector3 coords6 = multiply(&meow, speed);
-
-
-					if (Game->KeyPress(0x57) || Game->ControlPressed(32))
-					{
-						NativeVector3 pos = addn(&coords4, &coords6);
-						if (FlyInt == 1) {
-							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), pos.x, pos.y, pos.z, false, false, false);
-						}
-						if (FlyInt == 0) {
-							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), pos.x, pos.y, pos.z, true, true, true);
+							CAM::SET_CAM_COORD(camera, CAM::GET_GAMEPLAY_CAM_COORD());
 						}
 						if (FlyInt == 2) {
-							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), freecamCoords.x, freecamCoords.y, freecamCoords.z, true, true, true);
+							CAM::RENDER_SCRIPT_CAMS(true, true, 700, true, true, true);
+							CAM::SET_CAM_ACTIVE(camera, true);
+							CAM::SET_CAM_ROT(camera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+						}
+						NativeVector3 freecamCoords = CAM::GET_CAM_COORD(camera);
+						if (FlyInt == 2) {
+
+							NativeVector3 cameraDirection = RotationToDirection(CAM::GET_GAMEPLAY_CAM_ROT(0));
+							NativeVector3 accelerateCoords = multiply(&cameraDirection, 0.2f);
+							if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 8)) {
+
+								NativeVector3 newCoords = addn(&freecamCoords, &accelerateCoords);
+								CAM::SET_CAM_COORD(camera, newCoords);
+							}
+							if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 32)) {
+								NativeVector3 newCoords = addn(&freecamCoords, &accelerateCoords);
+								CAM::SET_CAM_COORD(camera, newCoords);
+							}
+							if (PAD::IS_DISABLED_CONTROL_PRESSED(0, 34)) {
+								CAM::SET_CAM_ROT(camera, CAM::GET_GAMEPLAY_CAM_ROT(0), 0);
+							}
+						}
+						static bool turnoff = true;
+						if (!transparent)
+						{
+							ENTITY::SET_ENTITY_ALPHA(Game->Self(), 255, false);
+							turnoff = false;
+						}
+						if (transparent) {
+							ENTITY::SET_ENTITY_ALPHA(Game->Self(), 180, false);
+						}
+						if (spin) {
+							static int Heading;
+							Heading++;
+							Heading++;
+							Heading++;
+							Heading++;
+							Heading++;
+							Heading++;
+							Heading++;
+							Heading++;
+							Heading++;
+							Heading++;
+							Heading++;
+							Heading++;
+							ENTITY::SET_ENTITY_HEADING(Game->Self(), Heading);
+						}
+
+						NativeVector3 coords4 = Game->SCoords();
+						NativeVector3 coords5 = CAM::GET_GAMEPLAY_CAM_COORD();
+						auto ped = Game->Self();
+						auto startDist = std::distance(&coords5, &coords4);
+						auto pos = ENTITY::GET_ENTITY_COORDS(ped, false);
+						if (FlyInt == 1) {
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ped, pos.x, pos.y, pos.z, false, false, false);
+						}
+						if (FlyInt == 0) {
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ped, pos.x, pos.y, pos.z, true, true, true);
+						}
+						NativeVector3 meow2 = CAM::GET_GAMEPLAY_CAM_ROT(0);
+						NativeVector3 meow = rot_to_direction(&meow2);
+						NativeVector3 coords6 = multiply(&meow, speed);
+
+
+						if (Game->KeyPress(0x57) || Game->ControlPressed(32))
+						{
+							NativeVector3 pos = addn(&coords4, &coords6);
+							if (FlyInt == 1) {
+								ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), pos.x, pos.y, pos.z, false, false, false);
+							}
+							if (FlyInt == 0) {
+								ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), pos.x, pos.y, pos.z, true, true, true);
+							}
+							if (FlyInt == 2) {
+								ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Game->Self(), freecamCoords.x, freecamCoords.y, freecamCoords.z, true, true, true);
+							}
+						}
+						if (SetRotation) {
+							NativeVector3 rotation = CAM::GET_GAMEPLAY_CAM_ROT(0);
+							ENTITY::SET_ENTITY_ROTATION(Game->Self(), rotation.x, rotation.y, rotation.z, 2, 1);
 						}
 					}
-					if (SetRotation) {
-						NativeVector3 rotation = CAM::GET_GAMEPLAY_CAM_ROT(0);
-						ENTITY::SET_ENTITY_ROTATION(Game->Self(), rotation.x, rotation.y, rotation.z, 2, 1);
+					if (controlInt == 1) {
+						Entity ent = Game->Self();
+						const auto location = Game->SCoords();
+						Vector3 vel = { 0.f, 0.f, 0.f };
+
+						// Left Shift
+						if (PAD::IS_DISABLED_CONTROL_PRESSED(0, (int)ControllerInputs::INPUT_SPRINT))
+							vel.z += speed / 2;
+						// Left Control
+						if (PAD::IS_DISABLED_CONTROL_PRESSED(0, (int)ControllerInputs::INPUT_DUCK))
+							vel.z -= speed / 2;
+						// Forward
+						if (PAD::IS_DISABLED_CONTROL_PRESSED(0, (int)ControllerInputs::INPUT_MOVE_UP_ONLY))
+							vel.y += speed;
+						// Backward
+						if (PAD::IS_DISABLED_CONTROL_PRESSED(0, (int)ControllerInputs::INPUT_MOVE_DOWN_ONLY))
+							vel.y -= speed;
+						// Left
+						if (PAD::IS_DISABLED_CONTROL_PRESSED(0, (int)ControllerInputs::INPUT_MOVE_LEFT_ONLY))
+							vel.x -= speed;
+						// Right
+						if (PAD::IS_DISABLED_CONTROL_PRESSED(0, (int)ControllerInputs::INPUT_MOVE_RIGHT_ONLY))
+							vel.x += speed;
+
+						auto rot = CAM::GET_GAMEPLAY_CAM_ROT(2);
+						ENTITY::SET_ENTITY_ROTATION(ent, 0.f, rot.y, rot.z, 2, 0);
+						ENTITY::SET_ENTITY_COLLISION(ent, false, false);
+						if (vel.x == 0.f && vel.y == 0.f && vel.z == 0.f)
+						{
+							// freeze entity to prevent drifting when standing still
+							ENTITY::FREEZE_ENTITY_POSITION(ent, true);
+							m_speed_multiplier = 0.f;
+						}
+						else
+						{
+							if (m_speed_multiplier < 20.f)
+								m_speed_multiplier += 0.15f;
+
+							ENTITY::FREEZE_ENTITY_POSITION(ent, false);
+
+							const auto offset = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ent, vel.x, vel.y, 0.f);
+							vel.x = offset.x - location.x;
+							vel.y = offset.y - location.y;
+
+							ENTITY::SET_ENTITY_VELOCITY(ent, vel.x * m_speed_multiplier, vel.y * m_speed_multiplier, vel.z * m_speed_multiplier);
+						}
 					}
 				}
 				else
@@ -2055,7 +2109,41 @@ namespace Saint {
 		bool test_toggle = false;
 		std::string hash_to_turn;
 		bool fast_respawn = false;
+		bool veh_alpha = false;
+		int veh_alpha_level = 255;
+		bool drag_outs = false;
+		bool disable_gangs = false;
+		bool veh_rewards = false;
+		bool heatscale = false;
+		bool foot_shadow = false;
+		bool weapon_blades = false;
+		bool speed_pad_effects = false;
 		void init() {
+			if (speed_pad_effects) {
+				VEHICLE::SET_SPEED_BOOST_EFFECT_DISABLED(true);
+				VEHICLE::SET_SLOW_DOWN_EFFECT_DISABLED(true);
+			}
+			if (weapon_blades) {
+				VEHICLE::SET_DISABLE_RETRACTING_WEAPON_BLADES(true);
+			}
+			if (foot_shadow) {
+				PED::SET_PED_AO_BLOB_RENDERING(Game->Self(), false);
+			}
+			if (heatscale) {
+				PED::DISABLE_PED_HEATSCALE_OVERRIDE(Game->Self());
+			}
+			if (veh_rewards) {
+				PLAYER::DISABLE_PLAYER_VEHICLE_REWARDS(Game->Self());
+			}
+			if (disable_gangs) {
+				PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(Game->Self(), false);
+			}
+			if (drag_outs) {
+				PED::SET_PED_CAN_BE_DRAGGED_OUT(Game->Self(), false);
+			}
+			if (veh_alpha) {
+				ENTITY::SET_ENTITY_ALPHA(Game->Vehicle(), veh_alpha_level, true);
+			}
 			if (fast_respawn) {
 				if (PED::IS_PED_DEAD_OR_DYING(Game->Self(), true))
 				{
@@ -2487,8 +2575,8 @@ namespace Saint {
 				CUTSCENE::STOP_CUTSCENE_IMMEDIATELY();
 			}
 			if (nigthclub300k) {
-				*script_global(262145 + 24045).as<int*>() = 300000; //amount is editable
-				*script_global(262145 + 24041).as<int*>() = 300000;
+				*script_global(262145 + 24045).as<int*>() = nightclubamount; //amount is editable
+				*script_global(262145 + 24041).as<int*>() = nightclubamount;
 				Game->Stats->SetInt("MP0_CLUB_POPULARITY", 10000);
 				STATS::STAT_SET_INT(Game->HashKey("MP0_CLUB_PAY_TIME_LEFT"), -1, true);
 				STATS::STAT_SET_INT(Game->HashKey("MP0_CLUB_POPULARITY"), 100000, true);
@@ -3649,7 +3737,7 @@ namespace Saint {
 				Game->CPed()->m_player_info->m_run_speed = run_speed;
 			}
 			if (swim_run) {
-				Game->CPed()->m_player_info->m_swim_speed = run_speed;
+				Game->CPed()->m_player_info->m_swim_speed = swim_speed;
 			}
 		}
 	};
@@ -3685,6 +3773,26 @@ namespace Saint {
 		buffer = buffer;
 		g_CustomText->RemoveText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"));
 	}
+	inline std::string showKeyboard(const char* title, const char* defaultText, int length, std::function<void()> action) {
+		g_CustomText->AddText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"), title);
+		g_Render->controlsEnabled = false;
+		MISC::DISPLAY_ONSCREEN_KEYBOARD(0, "FMMC_KEY_TIP8", "", defaultText, "", "", "", length);
+		g_CallbackScript->AddCallback<KeyboardCallBack>(title, length, [=] {
+			if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT()) {
+				return "";
+			}
+			else {
+				g_Render->controlsEnabled = true;
+				return MISC::GET_ONSCREEN_KEYBOARD_RESULT();
+			}
+
+			std::invoke(std::move(action));
+			g_Render->controlsEnabled = true;
+			});
+		g_Render->controlsEnabled = true;
+		return "";
+		g_CustomText->RemoveText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"));
+	}
 	inline void showKeyboard2(const char* title, const char* defaultText, int length, const char** buffer, std::function<void()> action) {
 		g_CustomText->AddText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"), title);
 		g_Render->controlsEnabled = false;
@@ -3701,6 +3809,25 @@ namespace Saint {
 			g_Render->controlsEnabled = true;
 			});
 		buffer = buffer;
+		g_CustomText->RemoveText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"));
+	}
+	inline std::string* keyboard_buffer;
+	template <typename NumberType>
+	inline void showKeyboard3(NumberType* buffer2) {
+		g_CustomText->AddText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"), "Enter something");
+		g_Render->controlsEnabled = false;
+		MISC::DISPLAY_ONSCREEN_KEYBOARD(0, "FMMC_KEY_TIP8", "", "", "", "", "", 25);
+		g_CallbackScript->AddCallback<KeyboardCallBack>("Enter something", 25, [=] {
+			if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT()) {
+				*keyboard_buffer = "";
+			}
+			else {
+				*keyboard_buffer = MISC::GET_ONSCREEN_KEYBOARD_RESULT();
+			}
+
+			*buffer2 = atof(keyboard_buffer->c_str());
+			g_Render->controlsEnabled = true;
+			});
 		g_CustomText->RemoveText(CONSTEXPR_JOAAT("FMMC_KEY_TIP8"));
 	}
 	inline CoordStats GetCoordStats(NativeVector3 coords) {
@@ -4902,7 +5029,7 @@ namespace Saint {
 	inline off_the_radar m_radar;
 	class join_ses {
 	public:
-		const char* name[10] = { "Populated Public", "New Public", "Closed Crew", "Crew", "Closed Friend", "Find Friend", "Solo", "Invite Only", "Social-Club TV", "Story Mode" };
+		const char* name[10] = { "Populated Public", "New Public", "Closed Crew", "Crew", "Closed Friend", "Find Friend", "Solo", "Invite Only", "Social-Club TV", "Unknown" };
 		std::size_t data = 0;
 		void join(eSessionType session) {
 			*script_global(2695915).as<int*>() = (session == eSessionType::SC_TV ? 1 : 0);

@@ -118,7 +118,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				std::unique_ptr<NativeHooks> g_NativeHook;
 #ifndef DEV
 				VIRTUALIZER_DOLPHIN_BLACK_START
-					bool authed = false;
+					bool authed2 = false;
 				ATOM Atom1;
 				std::string hash;
 				std::ifstream i(obfuscatestring("C:\\Saint\\key.txt"));
@@ -160,7 +160,7 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 					goto yeet;
 				}
 				else {
-					authed = true;
+					authed2 = true;
 				}
 #endif
 				g_Logger = std::make_unique<Logger>();
@@ -173,9 +173,9 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
                                 
 				)");
 				g_Logger->Info("Version: %s", MENU_VERSION);
-				g_Logger->Info("This build was compiled on " __DATE__ );
-				
-			//	PlaySound(TEXT("C:\\Saint\\Sounds\\Intro.wav"), NULL, SND_FILENAME | SND_ASYNC);
+				g_Logger->Info("This build was compiled on " __DATE__);
+
+				//	PlaySound(TEXT("C:\\Saint\\Sounds\\Intro.wav"), NULL, SND_FILENAME | SND_ASYNC);
 				g_FiberPool.registerFbrPool();
 
 				g_GameFunctions = std::make_unique<GameFunctions>();
@@ -195,8 +195,13 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 				}
 
 				g_Logger->Info("Authed completed.");
+				if (authed2) {
+					authed = 0x84E68052;
+				}
 #else
 				g_Logger->Error("Running in dev mode! NEVER release a dev build.");
+				authed = 0x84E68052;
+				
 #endif	
 				//Game Functions
 				// 
@@ -254,6 +259,9 @@ BOOL DllMain(HINSTANCE hInstance, DWORD reason, LPVOID)
 					}
 					std::this_thread::sleep_for(3ms);
 					std::this_thread::yield();
+				}
+				if (authed != 0x84E68052) {
+					goto yeet;
 				}
 				exceptions::uninitExceptionHandler();
 				std::this_thread::sleep_for(500ms);

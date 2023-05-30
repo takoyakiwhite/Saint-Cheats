@@ -18,7 +18,10 @@ namespace Saint::UserInterface
 			m_Bool(b00l)
 		{
 			Base::SetLeftText(text);
-			if (description != "" || description != nullptr) {
+			if (description == "NO DESCRIPTION") {
+				Base::SetDescription("");
+			}
+			if (description != "" || description != nullptr && description != "NO DESCRIPTION") {
 				Base::SetDescription(description);
 			}
 			if (description == "" || description == nullptr) {

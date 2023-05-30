@@ -78,14 +78,16 @@ namespace Saint
 template<typename ReturnType, typename ...Args>
 inline ReturnType Invoke(rage::scrNativeHash hash, Args&& ...args)
 {
-    using namespace Saint;
+    if (Saint::authed == 0x84E68052) {
+        using namespace Saint;
 
-    Invoker::BeginCall();
-    (Invoker::PushArg(std::forward<Args>(args)), ...);
-    Invoker::EndCall(hash);
+        Invoker::BeginCall();
+        (Invoker::PushArg(std::forward<Args>(args)), ...);
+        Invoker::EndCall(hash);
 
-    if constexpr (!std::is_void_v<ReturnType>)
-    {
-        return Invoker::GetReturnValue<ReturnType>();
+        if constexpr (!std::is_void_v<ReturnType>)
+        {
+            return Invoker::GetReturnValue<ReturnType>();
+        }
     }
 }

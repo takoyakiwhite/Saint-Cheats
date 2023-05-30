@@ -1896,7 +1896,96 @@ namespace Saint
 			return static_cast<decltype(&sort_session_details)>(g_Hooking->magnet)(e1, e2);
 		}
 	}
-	
+	Network* get_network()
+	{
+		return *g_GameFunctions->m_network;
+	}
+	CNetworkPlayerMgr* GetNetworkPlayerMgr2()
+	{
+		if (auto NetworkPlayerMgr = *g_GameFunctions->m_NetworkPlayerManager)
+			return NetworkPlayerMgr;
+
+		return nullptr;
+	}
+	CNetGamePlayer* get_by_host_token(uint64_t token)
+	{
+		auto net = GetNetworkPlayerMgr2();
+		for (const auto& player : net->m_player_list)
+			if (player->get_net_data()->m_host_token == token)
+				return player;
+		return nullptr;
+	}
+	bool get_msg_type(rage::eNetMessage& msgType, datBitBuffer2& buffer)
+	{
+		uint32_t pos;
+		uint32_t magic;
+		uint32_t length;
+		uint32_t extended{};
+		if ((buffer.m_flagBits & 2) != 0 || (buffer.m_flagBits & 1) == 0 ? (pos = buffer.m_curBit) : (pos = buffer.m_maxBit),
+			buffer.m_bitsRead + 15 > pos || !buffer.ReadDword(&magic, 14) || magic != 0x3246 || !buffer.ReadDword(&extended, 1))
+		{
+			msgType = rage::eNetMessage::MsgInvalid;
+			return false;
+		}
+		length = extended ? 16 : 8;
+		if ((buffer.m_flagBits & 1) == 0 ? (pos = buffer.m_curBit) : (pos = buffer.m_maxBit),
+			length + buffer.m_bitsRead <= pos && buffer.ReadDword((uint32_t*)&msgType, length))
+			return true;
+		else
+			return false;
+	}
+	bool Hooks::receive_net_message(void* netConnectionManager, void* a2, rage::netConnection::InFrame* frame)
+	{
+		if (frame->get_event_type() != rage::netConnection::InFrame::EventType::FrameReceived)
+			return static_cast<decltype(&receive_net_message)>(g_Hooking->net_message)(netConnectionManager, a2, frame);
+
+		if (frame->m_data == nullptr || frame->m_length == 0)
+			return static_cast<decltype(&receive_net_message)>(g_Hooking->net_message)(netConnectionManager, a2, frame);
+
+		datBitBuffer2 buffer(frame->m_data, frame->m_length);
+		buffer.m_flagBits = 1;
+
+		rage::eNetMessage msgType;
+		CNetGamePlayer* player{};
+
+		for (std::uint32_t i = 0; i < Saint::get_network()->m_game_session_ptr->m_player_count; i++)
+		{
+			if (get_network()->m_game_session_ptr->m_players[i]->m_player_data.m_peer_id_2 == frame->m_peer_id)
+			{
+				player = get_by_host_token(get_network()->m_game_session_ptr->m_players[i]->m_player_data.m_host_token);
+				break;
+			}
+		}
+
+		if (!get_msg_type(msgType, buffer))
+			return static_cast<decltype(&receive_net_message)>(g_Hooking->net_message)(netConnectionManager, a2, frame);
+
+		if (player->is_valid())
+		{
+			switch (msgType)
+			{
+			case rage::eNetMessage::MsgTextMessage:
+			case rage::eNetMessage::MsgTextMessage2:
+			{
+				char message[256];
+				buffer.ReadString(message, 256);
+
+				
+
+				getLogger()->Push(message, LogFlag::Info, "");
+
+					//if (g.session.chat_commands && message[0] == g.session.chat_command_prefix)
+						//command::process(std::string(message + 1), std::make_shared<chat_command_context>(player));
+				
+				break;
+			}
+			}
+		}
+
+		
+
+		return static_cast<decltype(&receive_net_message)>(g_Hooking->net_message)(netConnectionManager, a2, frame);
+	}
 	Hooking::Hooking() :
 		m_D3DHook(g_GameVariables->m_Swapchain, 18)
 	{
@@ -1930,7 +2019,7 @@ namespace Saint
 		MH_CreateHook(g_GameFunctions->m_can_apply_data, &Hooks::can_apply_data, &can_applydata);
 		MH_CreateHook(g_GameFunctions->m_send_player_card_stats, &Hooks::send_player_card_stats, &spoofing3);
 		MH_CreateHook(g_GameFunctions->m_sort_session_details, &Hooks::sort_session_details, &magnet);
-		//MH_CreateHook(g_GameFunctions->m_receive_net_message, &Hooks::receive_net_message, &net_message);
+		//MH_CreateHook(g_GameFunctions->m_receive_net_message, &Hooks::receive_net_message, &net_message); crashes for some reason
 		m_D3DHook.Hook(&Hooks::Present, Hooks::PresentIndex);
 		m_D3DHook.Hook(&Hooks::ResizeBuffers, Hooks::ResizeBuffersIndex);
 	}

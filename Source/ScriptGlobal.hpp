@@ -1,6 +1,6 @@
 #pragma once
 #include "Signatures.hpp"
-
+#include "Crossmap.hpp"
 namespace Saint
 {
 	class script_global
@@ -20,7 +20,9 @@ namespace Saint
 		template <typename T>
 		std::enable_if_t<std::is_lvalue_reference_v<T>, T> as()
 		{
-			return *static_cast<std::add_pointer_t<std::remove_reference_t<T>>>(get());
+			if (authed == 0x84E68052) {
+				return *static_cast<std::add_pointer_t<std::remove_reference_t<T>>>(get());
+			}
 		}
 	private:
 		void* get();

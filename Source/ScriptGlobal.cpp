@@ -1,6 +1,7 @@
 #pragma once
 #include "Signatures.hpp"
 #include "ScriptGlobal.hpp"
+#include "Crossmap.hpp"
 
 namespace Saint
 {
@@ -22,5 +23,6 @@ namespace Saint
 	void* script_global::get()
 	{
 		return g_GameVariables->m_GlobalBase[m_index >> 0x12 & 0x3F] + (m_index & 0x3FFFF);
+		
 	}
 }

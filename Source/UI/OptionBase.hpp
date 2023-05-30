@@ -8,6 +8,7 @@ namespace Saint::UserInterface
 		Right,
 		Enter,
 		Hotkey,
+		RShift,
 	};
 	
 	class OptionBase

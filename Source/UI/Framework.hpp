@@ -5,262 +5,7 @@
 #include "SubmenuBase.hpp"
 namespace Saint::UserInterface
 {
-	static const char* g_key_names_instructional[254] = {
-		"F10",
-		"F10",
-		"F10",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"BACKSPACE",
-		"TAB",
-		"TAB",
-		"TAB",
-		"NUM 5",
-		"ENTER",
-		"ENTER",
-		"ENTER",
-		"SHIFT",
-		"CTRL",
-		"ALT",
-		"ALT",
-		"CAPSLOCK",
-		"CAPSLOCK",
-		"CAPSLOCK",
-		"CAPSLOCK",
-		"CAPSLOCK",
-		"CAPSLOCK",
-		"CAPSLOCK",
-		"ESC",
-		"ESC",
-		"ESC",
-		"ESC",
-		"ESC",
-		"SPACE",
-		"NUM 9",
-		"NUM 3",
-		"NUM 1",
-		"NUM 7",
-		"LEFT",
-		"UP",
-		"RIGHT",
-		"DOWN",
-		"NUM 2",
-		"NUM 2",
-		"NUM 2",
-		"NUM 2",
-		"NUM 0",
-		"DELETE",
-		"NUM DECIMAL",
-		"0",
-		"1",
-		"2",
-		"3",
-		"4",
-		"5",
-		"6",
-		"7",
-		"8",
-		"9",
-		"9",
-		"9",
-		"9",
-		"9",
-		"9",
-		"9",
-		"9",
-		"A",
-		"B",
-		"C",
-		"D",
-		"E",
-		"F",
-		"G",
-		"H",
-		"I",
-		"J",
-		"K",
-		"L",
-		"M",
-		"N",
-		"O",
-		"P",
-		"Q",
-		"R",
-		"S",
-		"T",
-		"U",
-		"V",
-		"W",
-		"X",
-		"Y",
-		"Z",
-		"Z",
-		"Z",
-		"Z",
-		"Z",
-		"Z",
-		"N0",
-		"N1",
-		"N2",
-		"N3",
-		"N4",
-		"N5",
-		"N6",
-		"N7",
-		"N8",
-		"N9",
-		"*",
-		"NUM PLUS",
-		"NUM PLUS",
-		"NUM SUB",
-		"NUM DECIMAL",
-		"/",
-		"F1",
-		"F2",
-		"F3",
-		"F4",
-		"F5",
-		"F6",
-		"F7",
-		"F8",
-		"F9",
-		"F10",
-		"F11",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"F12",
-		"Pause",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SCROLL LOCK",
-		"SHIFT",
-		"RIGHT SHIFT",
-		"CTRL",
-		"CTRL",
-		"ALT",
-		"ALT",
-		"ALT",
-		"ALT",
-		"ALT",
-		"ALT",
-		"ALT",
-		"ALT",
-		"M",
-		"D",
-		"C",
-		"B",
-		"P",
-		"Q",
-		"J",
-		"G",
-		"G",
-		"G",
-		"G",
-		"F",
-		"F",
-		"F",
-		";",
-		"=",
-		",",
-		"-",
-		".",
-		"/",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"GRAVE",
-		"[",
-		"null",
-		"]",
-		"ACUTE/CEDILLA",
-		"ACUTE/CEDILLA",
-		"ACUTE/CEDILLA",
-		"ACUTE/CEDILLA",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null",
-		"null"
-	};
+
 
 	enum FooterPosition {
 		DOWN = 90,
@@ -274,7 +19,7 @@ namespace Saint::UserInterface
 	public:
 		const char* name;
 	};
-	
+
 	enum class Font : std::int32_t
 	{
 		ChaletLondon = 0,
@@ -360,10 +105,12 @@ namespace Saint::UserInterface
 	public:
 		float height_offset;
 	};
-	
+
 	class Framework
 	{
 	public:
+		int get_selected_submenu() { return selected_submenu; }
+
 		int selected_submenu;
 		explicit Framework() = default;
 		~Framework() noexcept = default;
@@ -393,7 +140,6 @@ namespace Saint::UserInterface
 				{
 					m_SubmenuStack.push(sub.get());
 					selected_submenu = id;
-					get_selected_sub = sub.get();
 					return;
 				}
 			}
@@ -442,7 +188,7 @@ namespace Saint::UserInterface
 		bool m_HeaderNativeText = true;
 		float m_HeaderTextSize = 1.f;
 		Font m_HeaderFont = Font::HouseScript;
-		
+
 		HeaderType m_HeaderType = HeaderType::Static;
 		HeaderType m_HeaderType2 = HeaderType::Static;
 
@@ -457,7 +203,7 @@ namespace Saint::UserInterface
 		float m_FooterTextSize = 0.27f;
 		Font m_FooterTextFont = Font::ChaletLondon;
 		float m_FooterTextPadding = 2.1f;
-		
+
 
 		//enables
 		bool footer_enabled = true;
@@ -531,11 +277,11 @@ namespace Saint::UserInterface
 
 		bool ytd_header = false;
 
-		
+
 		float m_SubheaderHeight = 0.03f;
 
 		//misc
-		
+
 
 		bool animation_enabled = false;
 
@@ -549,10 +295,10 @@ namespace Saint::UserInterface
 
 		float m_FooterHeight = 0.029;
 		float m_FooterSpriteSize = 0.024000f;
-		
+
 
 		//Enterable
-		
+
 		SubmenuIndicators enterable;
 		bool controlsEnabled = true;
 		// Bool Toogles
@@ -630,7 +376,7 @@ namespace Saint::UserInterface
 
 		float description_x = 0.203;
 		float description_y = 0.0005;
-		float description_x2 = 0.199f;
+		float description_x2 = 0.202f;
 		float description_y2 = 0.0f;
 
 		bool scrollbar = false;
@@ -656,8 +402,8 @@ namespace Saint::UserInterface
 
 		std::stack<SubmenuBase*, std::vector<SubmenuBase*>> m_SubmenuStack;
 		std::vector<std::unique_ptr<SubmenuBase>> m_AllSubmenus;
-		
-		
+
+
 	public:
 		Color m_DescriptionBackgroundColor{ 0, 0, 0, 160 };
 		Color m_DescriptionTextColor{ 255,255,255, 255 };
@@ -699,6 +445,8 @@ namespace Saint::UserInterface
 	public:
 		bool time_init = false;
 		std::chrono::system_clock::time_point time_since_held{};
+	public:
+		int max_option_threshold = 3;
 	private:
 		bool m_OpenKeyPressed = false;
 		bool m_OpenKeyPressed2 = false;
@@ -727,7 +475,7 @@ namespace Saint::UserInterface
 
 
 
-		
+
 
 	};
 	class Mouse {
@@ -748,7 +496,7 @@ namespace Saint::UserInterface
 		return &mouseGetter;
 	}
 
-	
+
 
 }
 
@@ -756,11 +504,11 @@ namespace Saint
 {
 
 	inline std::unique_ptr<UserInterface::Framework> g_Render;
-	
+
 	inline UserInterface::Framework renderManager;
 	inline UserInterface::Framework* getRenderer() {
 		return &renderManager;
 	}
-	
+
 	//test
 }

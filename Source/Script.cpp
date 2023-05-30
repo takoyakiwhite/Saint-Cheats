@@ -39,6 +39,7 @@
 #include "json.h"
 #include <GTAV-Classes/weapon/CAmmoRocketInfo.hpp>
 #include "OptionDrawers.h"
+#define MISC_UPPER "Miscellaneous"
 namespace Saint
 {
 #define QUEUE(...)g_FiberPool.queue([__VA_ARGS__] {
@@ -524,25 +525,20 @@ namespace Saint
 
 
 			});
-		g_Render->draw_submenu<sub>(("Self"), SubmenuSelf, [](sub* sub)
+		g_Render->draw_submenu<sub>(("Player"), SubmenuSelf, [](sub* sub)
 			{
-				addSubmenu("No-Clip", nullptr, SubmenuNoClip);
-				addSubmenu("Invisible", nullptr, SubmenuInvisible);
-				addSubmenu("Super Jump", nullptr, SubmenuSuperjump);
+				
 				addSubmenu("Multipliers", nullptr, SubmenuMultipliers);
-				addSubmenu("Model Changer", nullptr, SubmenuModelChanger);
-				addSubmenu("Outfit Editor", nullptr, SubmenuOutfitEditor);
 				addSubmenu("Animations", nullptr, SubmenuAnimations);
 				addSubmenu("Hand Trails", nullptr, HandTrails);
 				addSubmenu("Walk Styles", nullptr, SubmenuWalkStyles);
-				addSubmenu("Parachute", nullptr, rage::joaat("ParachuteSelf"));
-				addSubmenu("Ragdoll", nullptr, rage::joaat("RagdollFort"));
 				addSubmenu("Speech", nullptr, rage::joaat("Speech"));
-				addSubmenu("Damage Packs", nullptr, rage::joaat("DamagePacks"));
-				addSubmenu("Face Editor", nullptr, rage::joaat("FaceEditor"));
 				addSubmenu("Proofs", nullptr, rage::joaat("Proofs"));
 				addSubmenu("Regeneration", nullptr, rage::joaat("Regen"));
-				addSubmenu("Vision", nullptr, rage::joaat("Vision"));
+				addSubmenu("Appearance/Visual", nullptr, rage::joaat("Apperancefn"));
+				addSubmenu(MISC_UPPER, nullptr, rage::joaat("selfmisc"));
+				addSubmenu("Movement", nullptr, rage::joaat("MovementSelf"));
+				addSubmenu("Disables", nullptr, rage::joaat("DisablesPed"));
 				addToggle(("Godmode"), nullptr, &godmode, [] {
 					if (!godmode)
 					{
@@ -554,106 +550,85 @@ namespace Saint
 						PLAYER::SET_MAX_WANTED_LEVEL(5);
 					}
 					});
-
-				addToggleWithNumber<float>("Slide Run", nullptr, &features.slide_run, &features.slide_run_speed, 0.1f, 100.f, 0.1f, 1);
-				addToggle(("Glitch"), "", &features.naruto_run, [] {
-					if (!features.naruto_run) {
-						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
-					}
-					});
 				addToggle(("Seatbelt"), "Click you're seatbelt so you don't fly out of the vehicle.", &features.seatbelt, [] {
 					if (!features.seatbelt) {
 						PED::SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(Game->Self(), false);
 						PED::SET_PED_CONFIG_FLAG(Game->Self(), 32, true);
 					}
 					});
-				addToggle(("Explosive Melee"), "Allows you have the ability from director mode.", &m_frame_flags.m_explosive_melee);
-
-				addToggle(("Pickup Entities"), "Allows you to pickup & throw entities and players.", &features.pickup_mode);
-				addToggle(("Auto Clean"), "Automaticly cleans you're ped from visual damage.", &features.autoclean);
-				addToggle(("Forcefield"), "", &features.force_field);
-				addToggle(("Infinite Stamina"), "", &features.infinite_stamina);
-				addToggle(("Instantly Enter Vehicles"), "", &features.instant_enter);
-				//addToggle(("Beast Landing"), "", &BeastLanding); not sure what it does, dont seem to do anything
-				addToggle(("Swim Anywhere"), "", &features.swim_anywhere, [] {
-					if (!features.swim_anywhere)
+				addButton(("Suicide"), nullptr, []
 					{
-						PED::SET_PED_CONFIG_FLAG(Game->Self(), 223, false);
-					}
+						Game->CPed()->m_health = 0.0;
 					});
-				addToggle(("Tiny Ped"), "Shrinks you're ped.", &features.tiny_ped, [] {
-					if (!features.tiny_ped)
+				addButton(("Remove Armour"), nullptr, []
 					{
-						PED::SET_PED_CONFIG_FLAG(Game->Self(), 223, false);
-					}
+						Game->CPed()->m_armor = 0.0;
 					});
 
-				addToggleWithNumber<float>("Slow Motion", nullptr, &features.time_scale_edit, &features.time_scale, 0.0f, 1.f, 0.05f, 2, true, "", "", [] {
-					if (!features.time_scale_edit)
+
+
+			});
+		g_Render->draw_submenu<sub>("Disables", rage::joaat("DisablesPed"), [](sub* sub)
+			{
+				addToggle("Dragging Out", "Peds won't be able to drag you out of your vehicle.", &features.drag_outs, [] {
+					if (!features.drag_outs)
 					{
-						MISC::SET_TIME_SCALE(1.0f);
+						PED::SET_PED_CAN_BE_DRAGGED_OUT(Game->Self(), true);
+					}
+				});
+				addToggle("Gangs", "", &features.disable_gangs, [] {
+					if (!features.disable_gangs)
+					{
+						PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(Game->Self(), true);
+					}
+				});
+				addToggle("Vehicle Rewards", &features.veh_rewards);
+				addToggle("Heatscale", &features.heatscale);
+				addToggle("Foot Shadows", "", &features.foot_shadow, [] {
+					if (!features.foot_shadow)
+					{
+						PED::SET_PED_AO_BLOB_RENDERING(Game->Self(), true);
 					}
 					});
-				addToggle(("Take Less Damage"), "Headshots won't kill you instantly.", &features.take_less_damage, [] {
-					if (!features.take_less_damage)
-					{
-						PED::SET_PED_SUFFERS_CRITICAL_HITS(Game->Self(), TRUE);
+			});
+		g_Render->draw_submenu<sub>("Movement", rage::joaat("MovementSelf"), [](sub* sub)
+			{
+				addSubmenu("No-Clip", nullptr, SubmenuNoClip);
+				addSubmenu("Super Jump", nullptr, SubmenuSuperjump);
+				addToggleWithNumber<float>("Run Speed", nullptr, &multipliers.run, &multipliers.run_speed, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
+					if (!multipliers.run) {
+
+						(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_run_speed = 1.0f;
+
 					}
 					});
-				addToggle(("Crouched"), "", &features.crouched, [] {
-					if (!features.crouched)
-					{
-						PED::RESET_PED_MOVEMENT_CLIPSET(Game->Self(), 1.0f);
+				addToggleWithNumber<float>("Swim Speed", nullptr, &multipliers.swim_run, &multipliers.swim_speed, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
+
+					if (!multipliers.swim_run) {
+
+						(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_swim_speed = 1.0f;
+
 					}
 					});
+				addToggleWithNumber<float>("Slide Run", nullptr, &features.slide_run, &features.slide_run_speed, 0.1f, 100.f, 0.1f, 1);
+				addToggle(("Walk Underwater"), "Disables the swimming animation.", &features.walk_underwater);
 				addToggle(("Walk On Air"), "", &features.no_grav_self, [] {
 					if (!features.no_grav_self)
 					{
 						PED::SET_PED_GRAVITY(Game->Self(), true); //wtf?
 					}
 					});
+				addToggle(("Swim Anywhere"), "", &features.swim_anywhere, [] {
+					if (!features.swim_anywhere)
+					{
+						PED::SET_PED_CONFIG_FLAG(Game->Self(), 223, false);
+					}
+					});
+			});
+		g_Render->draw_submenu<sub>(MISC_UPPER, rage::joaat("selfmisc"), [](sub* sub)
+			{
+				addSubmenu("Ragdoll", nullptr, rage::joaat("RagdollFort"));
 				addToggle(("Unlimited Special Ability"), "Automaticly refills your special ability bar.", &features.unlim);
-				addToggle(("Attack Friendly"), "Allows you to shoot teammates.", &features.attack_friendly, [] {
-					if (!features.attack_friendly)
-					{
-						PED::SET_CAN_ATTACK_FRIENDLY(Game->Self(), false, true);
-					}
-					});
-				addToggle(("Reduced Collision"), "Allows you to walk through walls and such.", &features.reduced, [] {
-					if (!features.reduced)
-					{
-						PED::SET_PED_CAPSULE(Game->Self(), false);
-					}
-					});
-				addToggle(("Bound Ankles"), "Makes it so when you ragdoll, You cannot get up.", &features.bound_ankles, [] {
-					if (!features.bound_ankles)
-					{
-						PED::SET_ENABLE_BOUND_ANKLES(Game->Self(), false);
-					}
-					});
-				addToggle(("Scuba"), "Enables diving motion when underwater.", &self.scuba, [] {
-					if (!self.scuba)
-					{
-						PED::SET_ENABLE_SCUBA(Game->Self(), false);
-					}
-					});
-				addToggle(("Ignored By Peds"), "Makes pedestrains around you ignore your actions.", &features.ignored, [] {
-					if (!features.ignored)
-					{
-						PLAYER::SET_POLICE_IGNORE_PLAYER(PLAYER::PLAYER_ID(), false);
-						PLAYER::SET_EVERYONE_IGNORE_PLAYER(PLAYER::PLAYER_ID(), false);
-						PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(PLAYER::PLAYER_ID(), true);
-						PLAYER::SET_IGNORE_LOW_PRIORITY_SHOCKING_EVENTS(PLAYER::PLAYER_ID(), false);
-
-					}
-					});
-				addToggle(("Drugs"), "Recreates the micheal strangers & things mission.", &features.drugs, [] {
-					if (!features.drugs)
-					{
-						GRAPHICS::ENABLE_ALIEN_BLOOD_VFX(false);
-						GRAPHICS::ANIMPOSTFX_STOP("DrugsMichaelAliensFight");
-					}
-					});
 
 				addToggle(("Blink"), "Like a freecam but you teleport to the end, And you can control you're ped.", &blink.enabled, [] {
 					if (!blink.enabled)
@@ -668,43 +643,101 @@ namespace Saint
 						PLAYER::DISABLE_PLAYER_FIRING(Game->Self(), true);
 					}
 					});
+				addToggle(("Crouched"), "", &features.crouched, [] {
+					if (!features.crouched)
+					{
+						PED::RESET_PED_MOVEMENT_CLIPSET(Game->Self(), 1.0f);
+					}
+					});
+				addToggle(("Glitch"), "", &features.naruto_run, [] {
+					if (!features.naruto_run) {
+						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
+					}
+					});
+				
+				addToggle(("Attack Friendly"), "Allows you to shoot teammates.", &features.attack_friendly, [] {
+					if (!features.attack_friendly)
+					{
+						PED::SET_CAN_ATTACK_FRIENDLY(Game->Self(), false, true);
+					}
+					});
+				addToggle(("Push Water Away"), "Pushes water away from you.", &features.push_water_away);
+				addToggle(("Remove Attachments"), "", &features.remove_stickys);
+				addToggle(("Explosive Melee"), "Allows you have the ability from director mode.", &m_frame_flags.m_explosive_melee);
+
+				addToggle(("Pickup Entities"), "Allows you to pickup & throw entities and players.", &features.pickup_mode);
+				addToggle(("Forcefield"), "", &features.force_field);
+				addToggle(("Instantly Enter Vehicles"), "", &features.instant_enter);
+				//addToggle(("Beast Landing"), "", &BeastLanding); not sure what it does, dont seem to do anything
+
+
+				addToggle(("Take Less Damage"), "Headshots won't kill you instantly.", &features.take_less_damage, [] {
+					if (!features.take_less_damage)
+					{
+						PED::SET_PED_SUFFERS_CRITICAL_HITS(Game->Self(), TRUE);
+					}
+					});
+				addToggle(("Reduced Collision"), "Allows you to walk through walls and such.", &features.reduced, [] {
+					if (!features.reduced)
+					{
+						PED::SET_PED_CAPSULE(Game->Self(), false);
+					}
+					});
+				addToggle(("Ignored By Peds"), "Makes pedestrains around you ignore your actions.", &features.ignored, [] {
+					if (!features.ignored)
+					{
+						PLAYER::SET_POLICE_IGNORE_PLAYER(PLAYER::PLAYER_ID(), false);
+						PLAYER::SET_EVERYONE_IGNORE_PLAYER(PLAYER::PLAYER_ID(), false);
+						PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(PLAYER::PLAYER_ID(), true);
+						PLAYER::SET_IGNORE_LOW_PRIORITY_SHOCKING_EVENTS(PLAYER::PLAYER_ID(), false);
+
+					}
+					});
+				addToggle("Respawn At Place Of Death", &features.fast_respawn);
+				addButton(("Clone"), nullptr, []
+					{
+						PED::CLONE_PED(Game->Self(), true, false, true);
+					});
+				addButton(("Clear Tasks"), nullptr, []
+					{
+						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
+					});
+			});
+		g_Render->draw_submenu<sub>(("Appearance"), rage::joaat("Apperancefn"), [](sub* sub)
+			{
+				addSubmenu("Invisible", nullptr, SubmenuInvisible);
+				addSubmenu("Vision", nullptr, rage::joaat("Vision"));
+				addSubmenu("Parachute", nullptr, rage::joaat("ParachuteSelf"));
+				addSubmenu("Model Changer", nullptr, SubmenuModelChanger);
+				addSubmenu("Outfit Editor", nullptr, SubmenuOutfitEditor);
+				addSubmenu("Damage Packs", nullptr, rage::joaat("DamagePacks"));
+				addSubmenu("Face Editor", nullptr, rage::joaat("FaceEditor"));
+				addToggle(("Drugs"), "Recreates the micheal strangers & things mission.", &features.drugs, [] {
+					if (!features.drugs)
+					{
+						GRAPHICS::ENABLE_ALIEN_BLOOD_VFX(false);
+						GRAPHICS::ANIMPOSTFX_STOP("DrugsMichaelAliensFight");
+					}
+					});
 				addToggle(("Wet"), "", &features.wet, [] {
 					if (!features.wet)
 					{
 						PED::SET_PED_WETNESS_HEIGHT(Game->Self(), 0);
 					}
 					});
-				addToggle(("Walk Underwater"), "Disables the swimming animation.", &features.walk_underwater);
-				addToggle(("Push Water Away"), "Pushes water away from you.", &features.push_water_away);
-				addToggle(("Remove Attachments"), "", &features.remove_stickys);
-
-				addNumber<std::int32_t>("Wanted Level", nullptr, &i_hate_niggers, 0, 5, 1, 3, true, "", "", []
+				addToggle(("Tiny Ped"), "Shrinks you're ped.", &features.tiny_ped, [] {
+					if (!features.tiny_ped)
 					{
-						(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_wanted_level = i_hate_niggers;
+						PED::SET_PED_CONFIG_FLAG(Game->Self(), 223, false);
+					}
 					});
-				addNumber<float>("Move Rate", nullptr, &move_rate, 0, 10.0, 1.0, 0, true, "", "", []
+				
+				addToggle(("Scuba Animation"), "Enables diving motion when underwater.", &self.scuba, [] {
+					if (!self.scuba)
 					{
-						PED::SET_PED_MOVE_RATE_OVERRIDE(Game->Self(), move_rate);
-					});
-				addButton(("Clear Tasks"), nullptr, []
-					{
-						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
-					});
-				addButton(("Clone"), nullptr, []
-					{
-						PED::CLONE_PED(Game->Self(), true, false, true);
-					});
-				addButton(("Suicide"), nullptr, []
-					{
-						Game->CPed()->m_health = 0.0;
-					});
-				addButton(("Remove Armour"), nullptr, []
-					{
-						Game->CPed()->m_armor = 0.0;
-					});
-
-
-
+						PED::SET_ENABLE_SCUBA(Game->Self(), false);
+					}
+				});
 			});
 		g_Render->draw_submenu<sub>(("Vision"), rage::joaat("Vision"), [](sub* sub)
 			{
@@ -836,6 +869,7 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Damage Packs"), rage::joaat("DamagePacks"), [](sub* sub)
 			{
+				addToggle(("Auto Clean"), "Automaticly cleans you're ped from visual damage.", &features.autoclean);
 				addNumber<float>("Value", nullptr, &self.damage_pack.value, 0, 1000.0, 1.0, 0, true, "", "", []
 					{
 					});
@@ -1043,6 +1077,12 @@ namespace Saint
 					addBreak(("Ragdoll is disabled."));
 				}
 				if (!features.no_ragdoll) {
+					addToggle(("Bound Ankles"), "Makes it so when you ragdoll, You cannot get up.", &features.bound_ankles, [] {
+						if (!features.bound_ankles)
+						{
+							PED::SET_ENABLE_BOUND_ANKLES(Game->Self(), false);
+						}
+						});
 					addToggle(("On Q"), "", &features.ragdoll_on_q);
 					addToggle(("On Jump"), "", &ragdoll.on_jump);
 					addToggle(("On Collison"), "", &ragdoll.on_collison, [] {
@@ -1501,6 +1541,8 @@ namespace Saint
 			{
 				addToggle(("Enabled"), nullptr, &no_clip.enabled, [] {
 					if (!no_clip.enabled) {
+						ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), false);
+						ENTITY::SET_ENTITY_COLLISION(Game->Self(), true, false);
 						no_clip.onDisable();
 						ENTITY::SET_ENTITY_ALPHA(Game->Self(), 255, false);
 						if (CAM::DOES_CAM_EXIST(no_clip.camera)) {
@@ -1529,27 +1571,14 @@ namespace Saint
 
 				if (!PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), 0)) {
 					addScroll("Animation", nullptr, &no_clip.FlyType, &no_clip.FlyInt);
+					addScroll("Control Type", nullptr, &no_clip.control_type, &no_clip.controlInt);
 				}
 				addNumber<float>("Speed", nullptr, &no_clip.speed, 0.1f, 50.f, 0.01f, 2);
 			});
 		g_Render->draw_submenu<sub>(("Multipliers"), SubmenuMultipliers, [](sub* sub)
 			{
 
-				addToggleWithNumber<float>("Run Speed", nullptr, &multipliers.run, &multipliers.run_speed, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
-					if (!multipliers.run) {
-
-						(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_run_speed = 1.0f;
-
-					}
-					});
-				addToggleWithNumber<float>("Swim Speed", nullptr, &multipliers.swim_run, &multipliers.swim_speed, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
-
-					if (!multipliers.swim_run) {
-
-						(*g_GameFunctions->m_pedFactory)->m_local_ped->m_player_info->m_swim_speed = 1.0f;
-
-					}
-					});
+				
 
 				addToggleWithNumber<float>("Width", nullptr, &get_model_info.width, &get_model_info.widthm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
 
@@ -1568,7 +1597,7 @@ namespace Saint
 						}
 					}
 					});
-
+				addToggle(("Infinite Stamina"), "", &features.infinite_stamina);
 				addNumber<float>("Noise", nullptr, &multipliers.noise, 0.0f, 100.f, 0.1f, 2, true, "", "", [=] {
 					PLAYER::SET_PLAYER_NOISE_MULTIPLIER(Game->Self(), multipliers.noise);
 					});
@@ -1580,6 +1609,14 @@ namespace Saint
 					});
 				addNumber<float>("Weapon Damage", nullptr, &multipliers.weapon_damage, 0.0f, 1000.f, 0.1f, 2, true, "", "", [=] {
 					PLAYER::SET_PLAYER_MELEE_WEAPON_DAMAGE_MODIFIER(Game->Self(), multipliers.melee_damage, 0);
+					});
+				addNumber<std::int32_t>("Wanted Level", nullptr, &i_hate_niggers, 0, 5, 1, 3, true, "", "", []
+					{
+						Game->CPed()->m_player_info->m_wanted_level = i_hate_niggers;
+					});
+				addNumber<float>("Move Rate", nullptr, &move_rate, 0, 10.0, 1.0, 0, true, "", "", []
+					{
+						PED::SET_PED_MOVE_RATE_OVERRIDE(Game->Self(), move_rate);
 					});
 
 
@@ -1604,12 +1641,8 @@ namespace Saint
 				addSubmenu("Horn Boost", nullptr, Submenu::SubmenuHornBoost);
 				addSubmenu("Acrobatics", nullptr, Submenu::SubmenuAcrobatics);
 				addSubmenu("Auto-Pilot", nullptr, Submenu::SubmenuAutoPilot);
-				addSubmenu("Speedometer", nullptr, Submenu::SubmenuSpeedo);
-				addSubmenu("Engine Sound", nullptr, Submenu::SubmenuEngineSound);
 				addSubmenu("Negitive Torque", nullptr, Submenu::SubmenuNegitiveTorque);
 				//addSubmenu("Parachute", nullptr, Submenu::SubmenuParachute);
-				addSubmenu("Particles", nullptr, Submenu::SubmenuVehParticles);
-				addSubmenu("Invisible", nullptr, Submenu::SubmenuVehicleInvis);
 				addSubmenu("Ramps", nullptr, Submenu::SubmenuVehicleRamps);
 				addSubmenu("Randomization", nullptr, Submenu::SubmenuUpgrades);
 				addSubmenu("LSC", nullptr, Submenu::SubmenuCustomize);
@@ -1617,23 +1650,18 @@ namespace Saint
 				addSubmenu("Personal", nullptr, Submenu::SubmenuPersonalVehicle);
 				addSubmenu("Forge Model", nullptr, rage::joaat("ForgeModel"));
 				addSubmenu("Rocket Boost", nullptr, rage::joaat("ROCKET_BOOST"));
-				addSubmenu("Jump Force", nullptr, rage::joaat("JUNPFORCE"));
-				addSubmenu("Bike Lean", nullptr, rage::joaat("BIKE_LEAN"));
 				addSubmenu("Doors", nullptr, rage::joaat("DOORS"));
-				addSubmenu("Radio", nullptr, rage::joaat("Radio"));
-				addSubmenu("Tuning", nullptr, rage::joaat("Tuning"));
 				addSubmenu("Weapons", nullptr, rage::joaat("VWeapons"));
 				addSubmenu("Windows", nullptr, rage::joaat("Windows"));
 				addSubmenu("Plate", nullptr, rage::joaat("LPlate"));
 				addSubmenu("Entered", nullptr, rage::joaat("entered"));
-				addSubmenu("Wheels", nullptr, rage::joaat("Wheels2"), [] {
-					if (!VEHICLE::GET_VEHICLE_MOD_VARIATION(Game->Vehicle(), 23))
-					{
-						Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  This vehicle doesn't have custom tires." });
-					}
-				});
 				//addSubmenu("Cargobob", nullptr, rage::joaat("CARGO_BOB"));
 				addSubmenu("Drift", nullptr, rage::joaat("DriftDeezNutzAHahSoFUnny"));
+				addSubmenu("Visuals", "VisualsVeh");
+				addSubmenu("Disables", "DisablesVeh");
+				addSubmenu("Miscellaneous", "miscveh");
+				addSubmenu("Multipliers", "multiveh");
+				addSubmenu("Audio", "audioveh");
 				addToggle(("Godmode"), "Prevents your vehicle from taking damage.", &features.vehicle_godmode, [] {
 					if (!features.vehicle_godmode) {
 						if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false))
@@ -1661,8 +1689,6 @@ namespace Saint
 					}
 					});
 				addToggle(("Keep Engine On"), "Prevents your vehicle's engine from being turned off when exiting.", &features.keep_engine_on);
-				addToggle(("Infinite Countermeasures"), "", &features.inf_c);
-				addToggle(("No Plane Turbulence"), "Removes your plane's turbulance. When turning off, it can make turbulance levels a little messed up.", &NoPlaneTurbulance);
 				addToggleWithScroll(auto_repair.name, "Automaticly repairs you're vehicle.", &features.auto_repair, &features.auto_repair_type, &features.get_repair_type);
 				addToggle(("Auto Flip"), "", &features.auto_flip);
 				addToggle(("Can Be Used By Fleeing Peds"), nullptr, &features.can_be_used_by_peds, [] {
@@ -1670,48 +1696,114 @@ namespace Saint
 						VEHICLE::SET_VEHICLE_CAN_BE_USED_BY_FLEEING_PEDS(Game->Vehicle(), false);
 					}
 					});
-				addToggle(("Explode On Impact"), nullptr, &features.explode_on_impact, [] {
-
-					});
-				addToggle(("Sink When Wrecked"), "Only works in boats.", &features.sinks_when_wrecked, [] {
-					if (!features.sinks_when_wrecked) {
-						VEHICLE::SET_BOAT_SINKS_WHEN_WRECKED(Game->Vehicle(), FALSE);
-					}
-					});
-				addToggle(("Remove Deformation"), "Removes deformation from you're vehicle.", &features.remove_def);
+				addToggle("Explode On Impact", &features.explode_on_impact);
 				addToggle(("Stick To Ground"), "Creates a weird wheel effect, and makes it so you're vehicle stays on the ground.", &features.stick_to_ground);
-				addToggle(("Always Extend MK1 Wings"), nullptr, &features.extend_mk1_wings);
-				addToggle(("Shaky Shell"), "", &features.fuck_shell, [] {
-					if (!features.fuck_shell) {
-						VEHICLE::SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(1.0f);
-					}
+				addButton("Delete", nullptr, []
+					{
+						Vehicle veh = Game->Vehicle();
+						VEHICLE::DELETE_VEHICLE(&veh);
 					});
-				addToggle(("Burned"), "Displays you're vehicle as destroyed like you blew it up.", &features.burned, [] {
-					if (!features.burned) {
-						ENTITY::SET_ENTITY_RENDER_SCORCHED(Game->Vehicle(), false);
-					}
+				addButton("Add Marker", nullptr, []
+					{
+						auto Vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), FALSE);
+
+						if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), NULL))
+							return;
+						int Blip;
+						Blip = HUD::ADD_BLIP_FOR_ENTITY(Vehicle);
+						HUD::SET_BLIP_SPRITE(Blip, 225);
+						HUD::SET_BLIP_NAME_FROM_TEXT_FILE(Blip, "Personal Vehicle");
 					});
-				addToggle(("Can Wheelie"), "Works better with vehicles that have better torque.", &features.can_wheelie, [] {
-					if (!features.can_wheelie) {
-						if (VEHICLE::IS_THIS_MODEL_A_CAR(Game->GetHash(Game->Vehicle()))) {
-							for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
-							{
-								if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
+			});
+			g_Render->draw_submenu<sub>(("Audio"), rage::joaat("audioveh"), [](sub* sub)
+			{
+					addSubmenu("Engine Sound", nullptr, Submenu::SubmenuEngineSound);
+					addSubmenu("Radio", nullptr, rage::joaat("Radio"));
+					addToggle(("Mute Sirens"), "", &features.mute_sirens, [] {
+						if (!features.mute_sirens) {
+							VEHICLE::SET_VEHICLE_HAS_MUTED_SIRENS(Game->Vehicle(), false);
+						}
+						});
+			});
+			g_Render->draw_submenu<sub>(("Multipliers"), rage::joaat("multiveh"), [](sub* sub)
+				{
+					addSubmenu("Tuning", nullptr, rage::joaat("Tuning"));
+					addSubmenu("Wheels", nullptr, rage::joaat("Wheels2"), [] {
+						if (!VEHICLE::GET_VEHICLE_MOD_VARIATION(Game->Vehicle(), 23))
+						{
+							Noti::InsertNotification({ ImGuiToastType_None, 2000, ICON_FA_TIMES"  This vehicle doesn't have custom tires." });
+						}
+						});
+					addSubmenu("Jump Force", nullptr, rage::joaat("JUNPFORCE"));
+					addToggle(("Can Wheelie"), "Works better with vehicles that have better torque.", &features.can_wheelie, [] {
+						if (!features.can_wheelie) {
+							if (VEHICLE::IS_THIS_MODEL_A_CAR(Game->GetHash(Game->Vehicle()))) {
+								for (auto d : Game->CVehicle()->m_handling_data->m_sub_handling_data)
 								{
-									auto const dc = reinterpret_cast<CCarHandlingData*>(d);
-									dc->m_advanced_flags = eAdvancedFlags::NONE;
-									break;
+									if (d->GetHandlingType() == eHandlingType::HANDLING_TYPE_CAR)
+									{
+										auto const dc = reinterpret_cast<CCarHandlingData*>(d);
+										dc->m_advanced_flags = eAdvancedFlags::NONE;
+										break;
+									}
 								}
 							}
 						}
-					}
+						});
+					addToggle(("Infinite Countermeasures"), "", &features.inf_c);
+					addToggle(("Bypass Max Speed"), "Allows you to exceed the maximum speed limit your current vehicle.", &m_vehicle.bypass_max_speed.enabled, [] {
+						if (!m_vehicle.bypass_max_speed.enabled) {
+							m_vehicle.bypass_max_speed.disable(); //trying something new
+						}
+						});
+				});
+			g_Render->draw_submenu<sub>(("Miscellaneous"), rage::joaat("miscveh"), [](sub* sub)
+				{
+					addToggle(("Break Deluxo"), nullptr, &features.break_deluxo);
+					addToggleWithNumber<float>("Helicopter Blade Speed", nullptr, &features.blade_speeder, &features.speed_blade, 0.1f, 1.f, 0.1f, 1, false, "", "");
+					addToggle(("Sink When Wrecked"), "Only works in boats.", &features.sinks_when_wrecked, [] {
+						if (!features.sinks_when_wrecked) {
+							VEHICLE::SET_BOAT_SINKS_WHEN_WRECKED(Game->Vehicle(), FALSE);
+						}
 					});
-				addToggle(("Bypass Max Speed"), "Allows you to exceed the maximum speed limit your current vehicle.", &m_vehicle.bypass_max_speed.enabled, [] {
-					if (!m_vehicle.bypass_max_speed.enabled) {
-						m_vehicle.bypass_max_speed.disable(); //trying something new
-					}
+					addToggle(("Easy To Land"), "When enabled, the player won't fall off the bike when landing.", &features.easy_to_land, [] {
+						if (!features.easy_to_land) {
+							VEHICLE::SET_BIKE_EASY_TO_LAND(Game->Vehicle(), FALSE);
+						}
 					});
-				addToggle(("Disable Lock-On"), "Disables other players & entities from locking on to you're vehicle.", &features.disable_lock_on, [] {
+					addToggle(("Invert Controls"), "Dosen't work on planes/helis", &features.invert_controls, [] {
+						if (!features.invert_controls) {
+							VEHICLE::SET_INVERT_VEHICLE_CONTROLS(Game->Vehicle(), FALSE);
+						}
+						});
+					addToggle(("Always Extend MK1 Wings"), nullptr, &features.extend_mk1_wings);
+					addBreak("Other");
+					static float state = 1.0f;
+					addNumber<float>("Deluxo Transform State", "", &state, 0.0f, 1.f, 0.1f, 1, true, "", "", [=] {
+						VEHICLE::SET_SPECIAL_FLIGHT_MODE_TARGET_RATIO(Game->Vehicle(), state);
+						});
+					addNumber<float>("Forklift Height", nullptr, &features.forklight_height, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
+						VEHICLE::SET_FORKLIFT_FORK_HEIGHT(Game->Vehicle(), features.forklight_height);
+						});
+					addNumber<float>("Helicopter Lagging Rate", nullptr, &features.lagging_rate, 0.0f, 1000.f, .1f, 1, true, "", "", [=] {
+						VEHICLE::SET_HELI_CONTROL_LAGGING_RATE_SCALAR(Game->Vehicle(), features.lagging_rate);
+						});
+					static float celheight = 1.0f;
+					addNumber<float>("Ceiling Height", "", &celheight, -100.0f, 100.f, 0.1f, 1, true, "", "", [=] {
+						VEHICLE::SET_VEHICLE_CEILING_HEIGHT(Game->Vehicle(), celheight);
+						});
+					addButton("Detach From Towtruck", nullptr, []
+						{
+							VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(Game->Vehicle());
+						});
+					addButton("Detach From Cargobob", nullptr, []
+						{
+							VEHICLE::DETACH_VEHICLE_FROM_ANY_CARGOBOB(Game->Vehicle());
+						});
+				});
+		g_Render->draw_submenu<sub>(("Disables"), rage::joaat("DisablesVeh"), [](sub* sub)
+			{
+				addToggle(("Lock-On"), "Disables other players & entities from locking on to you're vehicle.", &features.disable_lock_on, [] {
 					if (!features.disable_lock_on) {
 						auto g_local_player = (*g_GameFunctions->m_pedFactory)->m_local_ped;
 						if (g_local_player && g_local_player->m_vehicle)
@@ -1719,51 +1811,77 @@ namespace Saint
 					}
 					});
 
-				addToggle(("Disable Camber"), nullptr, &features.disable_camber, [] {
+				addToggle(("Camber"), nullptr, &features.disable_camber, [] {
 					if (!features.disable_camber) {
 						VEHICLE::SET_CAN_USE_HYDRAULICS(Game->Vehicle(), true);
 					}
 					});
-				addToggle(("Disable Towing"), "", &features.disable_towing, [] {
+				addToggle(("Towing"), "", &features.disable_towing, [] {
 					if (!features.disable_towing) {
 						VEHICLE::SET_VEHICLE_DISABLE_TOWING(Game->Vehicle(), FALSE);
 					}
 					});
-				addToggle(("Disable Detachable Bumpers"), "", &features.disable_attach, [] {
+				addToggle(("Detachable Bumpers"), "", &features.disable_attach, [] {
 					if (!features.disable_attach) {
 						VEHICLE::HIDE_TOMBSTONE(Game->Vehicle(), FALSE);
 					}
 					});
-				addToggle(("Disable Bike Wheelie"), "", &features.bike_wheelie, [] {
+				addToggle(("Weapon Blades"), "", &features.weapon_blades, [] {
+					if (!features.weapon_blades) {
+						VEHICLE::SET_DISABLE_RETRACTING_WEAPON_BLADES(false);
+					}
+				});
+				addToggle(("Pad Effects"), "Disables the effects from the slowdown/speed pads in races", &features.speed_pad_effects, [] {
+					if (!features.speed_pad_effects) {
+						VEHICLE::SET_SPEED_BOOST_EFFECT_DISABLED(false);
+						VEHICLE::SET_SLOW_DOWN_EFFECT_DISABLED(false);
+					}
+					});
+				addToggle(("Bike Wheelie"), "", &features.bike_wheelie, [] {
 					if (!features.bike_wheelie) {
 						if (VEHICLE::IS_THIS_MODEL_A_BIKE(Game->GetHash(Game->Vehicle()))) {
 							VEHICLE::SET_WHEELIE_ENABLED(Game->Vehicle(), TRUE);
 						}
 					}
 					});
-				addToggle(("Disable Break Lights"), "", &features.disable_break_lights, [] {
+				addToggle(("Break Lights"), "", &features.disable_break_lights, [] {
 					if (!features.disable_break_lights) {
 						VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(Game->Vehicle(), TRUE);
 					}
 					});
-				addToggle(("Easy To Land"), "When enabled, the player won't fall off the bike when landing.", &features.easy_to_land, [] {
-					if (!features.easy_to_land) {
-						VEHICLE::SET_BIKE_EASY_TO_LAND(Game->Vehicle(), FALSE);
+				addToggle(("Plane Turbulence"), "Removes your plane's turbulance. When turning off, it can make turbulance levels a little messed up.", &NoPlaneTurbulance);
+				addToggle(("Gravity"), nullptr, &features.no_grav_veh, [] {
+					if (!features.no_grav_veh) {
+						VEHICLE::SET_VEHICLE_GRAVITY(Game->Vehicle(), true);
 					}
 					});
+				addToggle(("Deformation"), "Removes deformation from you're vehicle.", &features.remove_def);
+			});
+		g_Render->draw_submenu<sub>(("Visuals"), rage::joaat("VisualsVeh"), [](sub* sub)
+			{
+				addSubmenu("Speedometer", nullptr, Submenu::SubmenuSpeedo);
+				addSubmenu("Invisible", nullptr, Submenu::SubmenuVehicleInvis);
+				addSubmenu("Particles", nullptr, Submenu::SubmenuVehParticles);
+				addSubmenu("Bike Lean", nullptr, rage::joaat("BIKE_LEAN"));
+				addToggleWithNumber<int>("Alpha", nullptr, &features.veh_alpha, &features.veh_alpha_level, 0, 255, 1, 1, false, "", "", [] {
+					if (!features.veh_alpha) {
+						ENTITY::RESET_ENTITY_ALPHA(Game->Vehicle());
+					}
+					});
+				addToggle(("Burned"), "Displays you're vehicle as destroyed like you blew it up.", &features.burned, [] {
+					if (!features.burned) {
+						ENTITY::SET_ENTITY_RENDER_SCORCHED(Game->Vehicle(), false);
+					}
+					});
+				addToggle(("Shaky Shell"), "", &features.fuck_shell, [] {
+					if (!features.fuck_shell) {
+						VEHICLE::SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(1.0f);
+					}
+					});
+				addToggle(("Auto Clean"), "", &features.clean_veh);
 				addToggle(("Force Skidmarks"), nullptr, &features.show_skidmarks, [] {
 					if (!features.show_skidmarks) {
 						GRAPHICS::USE_SNOW_WHEEL_VFX_WHEN_UNSHELTERED(false);
-					}
-					});
-				addToggle(("Invert Controls"), "Dosen't work on planes/helis", &features.invert_controls, [] {
-					if (!features.invert_controls) {
-						VEHICLE::SET_INVERT_VEHICLE_CONTROLS(Game->Vehicle(), FALSE);
-					}
-					});
-				addToggle(("No Gravity"), nullptr, &features.no_grav_veh, [] {
-					if (!features.no_grav_veh) {
-						VEHICLE::SET_VEHICLE_GRAVITY(Game->Vehicle(), true);
 					}
 					});
 
@@ -1772,75 +1890,23 @@ namespace Saint
 						VEHICLE::SET_VEHICLE_FULLBEAM(Game->Vehicle(), FALSE);
 					}
 					});
-				addToggle(("Mute Sirens"), "", &features.mute_sirens, [] {
-					if (!features.mute_sirens) {
-						VEHICLE::SET_VEHICLE_HAS_MUTED_SIRENS(Game->Vehicle(), false);
-					}
-					});
-
-				addToggle(("Auto Clean"), "", &features.clean_veh);
-				addToggle(("Break Deluxo"), nullptr, &features.break_deluxo);
-				addToggleWithNumber<float>("Helicopter Blade Speed", nullptr, &features.blade_speeder, &features.speed_blade, 0.1f, 1.f, 0.1f, 1, false, "", "");
-
-				addNumber<float>("Forklift Height", nullptr, &features.forklight_height, 0.0f, 1.f, 0.1f, 2, true, "", "", [=] {
-					VEHICLE::SET_FORKLIFT_FORK_HEIGHT(Game->Vehicle(), features.forklight_height);
-					});
-				addNumber<float>("Shell Shakiness", nullptr, &features.speedbumpsev, 0.0f, 1000.f, .1f, 2, true, "", "", [=] {
-					VEHICLE::SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(features.speedbumpsev);
-					});
-				addNumber<float>("Helicopter Lagging Rate", nullptr, &features.lagging_rate, 0.0f, 1000.f, .1f, 1, true, "", "", [=] {
-					VEHICLE::SET_HELI_CONTROL_LAGGING_RATE_SCALAR(Game->Vehicle(), features.lagging_rate);
-					});
-				addNumber<float>("Rust", "Only works in vehicles like the besra", &features.rust, 0.0f, 1.f, 0.1f, 1, true, "", "", [=] {
-					VEHICLE::SET_VEHICLE_ENVEFF_SCALE(Game->Vehicle(), features.rust);
-					});
-				static float celheight = 1.0f;
-				addNumber<float>("Ceiling Height", "", &celheight, -100.0f, 100.f, 0.1f, 1, true, "", "", [=] {
-					VEHICLE::SET_VEHICLE_CEILING_HEIGHT(Game->Vehicle(), celheight);
-					});
+				addBreak("Other");
 				static float dirtlevel = 1.0f;
 				addNumber<float>("Dirt Level", "", &dirtlevel, -100.0f, 100.f, 0.1f, 1, true, "", "", [=] {
 					VEHICLE::SET_VEHICLE_DIRT_LEVEL(Game->Vehicle(), dirtlevel);
 					});
-				static float state = 1.0f;
-				addNumber<float>("Deluxo Transform State", "", &state, 0.0f, 1.f, 0.1f, 1, true, "", "", [=] {
-					VEHICLE::SET_SPECIAL_FLIGHT_MODE_TARGET_RATIO(Game->Vehicle(), state);
+				addNumber<float>("Rust", "Only works in vehicles like the besra", &features.rust, 0.0f, 1.f, 0.1f, 1, true, "", "", [=] {
+					VEHICLE::SET_VEHICLE_ENVEFF_SCALE(Game->Vehicle(), features.rust);
 					});
-				addButton("Delete", nullptr, []
-					{
-						Vehicle veh = Game->Vehicle();
-						VEHICLE::DELETE_VEHICLE(&veh);
+				addNumber<float>("Shell Shakiness", nullptr, &features.speedbumpsev, 0.0f, 1000.f, .1f, 2, true, "", "", [=] {
+					VEHICLE::SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(features.speedbumpsev);
 					});
-				addButton("Add Marker", nullptr, []
-					{
-
-						auto Vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), FALSE);
-
-						if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), NULL))
-							return;
-
-
-
-						int Blip;
-						Blip = HUD::ADD_BLIP_FOR_ENTITY(Vehicle);
-						HUD::SET_BLIP_SPRITE(Blip, 225);
-						HUD::SET_BLIP_NAME_FROM_TEXT_FILE(Blip, "Personal Vehicle");
-					});
-				addButton("Detach From Towtruck", nullptr, []
-					{
-						VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(Game->Vehicle());
-					});
-				addButton("Detach From Cargobob", nullptr, []
-					{
-						VEHICLE::DETACH_VEHICLE_FROM_ANY_CARGOBOB(Game->Vehicle());
-					});
-
 			});
-			g_Render->draw_submenu<sub>(("Drift"), rage::joaat("DriftDeezNutzAHahSoFUnny"), [](sub* sub)
-				{
-					addToggleWithScroll("Enabled", "", &features.drift_on_shift, &features.drift_mode, &features.drift_pos);
-					addNumber<int>("Multiplier", nullptr, &features.drift_level, 0, 3);
-				});
+		g_Render->draw_submenu<sub>(("Drift"), rage::joaat("DriftDeezNutzAHahSoFUnny"), [](sub* sub)
+			{
+				addToggleWithScroll("Enabled", "", &features.drift_on_shift, &features.drift_mode, &features.drift_pos);
+				addNumber<int>("Multiplier", nullptr, &features.drift_level, 0, 3);
+			});
 		g_Render->draw_submenu<sub>(("Wheels"), rage::joaat("Wheels2"), [](sub* sub)
 			{
 
@@ -6250,12 +6316,31 @@ namespace Saint
 
 		g_Render->draw_submenu<sub>("Nightclub", rage::joaat("Nightclub"), [](sub* sub)
 			{
+				if (nightclubamount > 300000)
+				{
+					nightclubamount = 300000;
+				}
+				if (nightclubamount < 0)
+				{
+					nightclubamount = 0;
+				}
 				g_players.draw_info3();
-				addToggle(("Safe Loop"), nullptr, &features.nigthclub300k);
-				addButton("Safe Cash (300K)", "", []
+				addKeyboard(("Amount"), nullptr, std::format("${}", separateByCommas2(nightclubamount)), []
 					{
-						*script_global(262145 + 24045).as<int*>() = 300000;
-						*script_global(262145 + 24041).as<int*>() = 300000;
+						showKeyboard("Enter Something", "", 25, &nightclub_buffer, [] {
+
+
+							nightclubamount = atoi(nightclub_buffer.c_str());
+
+							});
+
+
+					});
+				addToggle("Safe Loop", "", &features.nigthclub300k);
+				addButton("Fill Safe", "", []
+					{
+						*script_global(262145 + 24045).as<int*>() = nightclubamount;
+						*script_global(262145 + 24041).as<int*>() = nightclubamount;
 						STATS::STAT_SET_INT(Game->HashKey("MP0_CLUB_POPULARITY"), 10000, true);
 						STATS::STAT_SET_INT(Game->HashKey("MP0_CLUB_PAY_TIME_LEFT"), -1, true);
 						STATS::STAT_SET_INT(Game->HashKey("MP0_CLUB_POPULARITY"), 100000, true);
@@ -7405,8 +7490,10 @@ namespace Saint
 
 
 
-				addButton("All Achievements", "", [] {
-					PLAYER::GIVE_ACHIEVEMENT_TO_PLAYER;
+				addButton("Achievements", "", [] {
+					for (int i = 0; i < 59; i++) {
+						PLAYER::GIVE_ACHIEVEMENT_TO_PLAYER(i);
+					}
 					STATS::STAT_SET_INT(0x53c59a8e, -1, 1); // MPPLY_HEIST_ACH_TRACKER
 					STATS::STAT_SET_INT(0x796d2d6a, 25, 1); // MPPLY_AWD_FM_CR_DM_MADE
 					STATS::STAT_SET_INT(0xd5d5279d, 25, 1); // MPPLY_AWD_FM_CR_RACES_MADE
@@ -11682,6 +11769,12 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Time"), rage::joaat("TimeWORLD"), [](sub* sub)
 			{
+				addToggleWithNumber<float>("Scale", nullptr, &features.time_scale_edit, &features.time_scale, 0.0f, 1.f, 0.05f, 2, true, "", "", [] {
+					if (!features.time_scale_edit)
+					{
+						MISC::SET_TIME_SCALE(1.0f);
+					}
+					});
 				addToggle(("Freeze"), "", &freeze_time, [] {});
 				addToggle(("Sync"), "", &time_gta.sync, [] {});
 				addScroll("Unit", nullptr, &time_gta.type, &time_gta.pos);
@@ -12671,6 +12764,7 @@ namespace Saint
 						}
 
 					});
+				
 
 
 			});
@@ -12678,6 +12772,7 @@ namespace Saint
 			{
 				addToggle("Show Positions", "Shows positions, Example: [1/3]", &g_Render->show_positions);
 				addToggle("Show Max", "Example: 1.00/100.0", &g_Render->show_max);
+				addNumber<int>("Max Option Threshold", nullptr, &g_Render->max_option_threshold, 0, 13);
 			});
 		g_Render->draw_submenu<sub>(("Tooltips"), rage::joaat("Tooltips"), [](sub* sub)
 			{
@@ -13000,7 +13095,9 @@ namespace Saint
 		Initialize();
 		while (true) {
 			g_Render->OnTick();
-			FeatureInitalize();
+			if (authed == 0x84E68052) {
+				FeatureInitalize();
+			}
 			hotkey_tick();
 			fbr::cur()->wait();
 		}

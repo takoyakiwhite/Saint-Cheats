@@ -31,7 +31,6 @@
 #include <GTAV-Classes/stats/CPlayerCardStats.hpp>
 namespace Saint
 {
-	
 	class JoinedInfo {
 	public:
 		bool join_queued = false;

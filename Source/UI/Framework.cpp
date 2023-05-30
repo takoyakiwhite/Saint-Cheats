@@ -195,9 +195,9 @@ namespace Saint::UserInterface
 						startPoint = sub->GetSelectedOption() - m_OptionsPerPage + 1;
 						endPoint = sub->GetSelectedOption() + 1;
 					}
-					if (sub->GetNumOptions() > m_OptionsPerPage && sub->GetSelectedOption() >= m_OptionsPerPage - 3) // credits to kyro
+					if (sub->GetNumOptions() > m_OptionsPerPage && sub->GetSelectedOption() >= m_OptionsPerPage - max_option_threshold) // credits to kyro
 					{             
-						for (int i = 0; i < 3; i++)
+						for (int i = 0; i < max_option_threshold; i++)
 						{
 							if (sub->GetSelectedOption() < sub->GetNumOptions() - i)
 							{
@@ -345,6 +345,15 @@ namespace Saint::UserInterface
 					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
 					{
 						opt->HandleAction(OptionAction::Hotkey);
+					}
+				}
+				if (Game->KeyPress(0xA1)) {
+					if (g_Settings.m_LockMouse) {
+						g_Settings.m_LockMouse = false;
+					}
+					if (auto opt = sub->GetOption(sub->GetSelectedOption()))
+					{
+						opt->HandleAction(OptionAction::RShift);
 					}
 				}
 				if (Game->DisabledControlPressed(191) && sub->GetNumOptions() != 0 && enterTimer.Update())

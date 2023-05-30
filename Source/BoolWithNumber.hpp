@@ -72,6 +72,7 @@ namespace Saint::UserInterface {
 
         void HandleAction(OptionAction action) override
         {
+            
             for (int i = 0; i < 256; i++) {
                 if (action == OptionAction::Hotkey) {
                     if (g_Render->m_Opened) {
