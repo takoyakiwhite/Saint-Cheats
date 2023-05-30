@@ -591,7 +591,6 @@ namespace Saint
 					}
 					});
 			});
-		//blackie
 		g_Render->draw_submenu<sub>("Movement", rage::joaat("MovementSelf"), [](sub* sub)
 			{
 				addSubmenu("No-Clip", nullptr, SubmenuNoClip);
@@ -616,7 +615,7 @@ namespace Saint
 				addToggle(("Walk On Air"), "", &features.no_grav_self, [] {
 					if (!features.no_grav_self)
 					{
-						PED::SET_PED_GRAVITY(Game->Self(), true); //wtf?
+						PED::SET_PED_GRAVITY(Game->Self(), true); //wtf? vali likes men (literally)
 					}
 					});
 				addToggle(("Swim Anywhere"), "", &features.swim_anywhere, [] {
