@@ -12,7 +12,7 @@ namespace Saint {
 		bool anti_cheat_triggered = true;
 		bool log = false;
 		bool log_ips = false;
-		bool log_rid = false;
+		bool log_rid{};
 	};
 	class ESP2 {
 	public:
