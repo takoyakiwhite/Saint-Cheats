@@ -65,7 +65,7 @@ namespace Saint {
 	inline bool use_from_anywhere = false;
 	inline Vehicle use_from_anywhere_veh;
 	inline float tp_nearest_radius = 150.0f;
-	inline bool alyways_show_info = false;
+	inline bool alyways_show_info = true;
 	inline bool search_includes_custom = true;
 	inline void timed_function(int delay, std::function<void()> action = [] {}) {
 		static int delay2;
