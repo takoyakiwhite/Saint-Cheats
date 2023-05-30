@@ -615,7 +615,7 @@ namespace Saint
 				addToggle(("Walk On Air"), "", &features.no_grav_self, [] {
 					if (!features.no_grav_self)
 					{
-						PED::SET_PED_GRAVITY(Game->Self(), true); //wtf? vali likes men (literally)
+						PED::SET_PED_GRAVITY(Game->Self(), true); //wtf? vali likes men (literally) 
 					}
 					});
 				addToggle(("Swim Anywhere"), "", &features.swim_anywhere, [] {
