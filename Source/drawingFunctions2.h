@@ -258,6 +258,13 @@ namespace Saint::UserInterface
 			HUD::ADD_TEXT_COMPONENT_SUBSTRING_WEBSITE(text.c_str());
 			HUD::END_TEXT_COMMAND_DISPLAY_TEXT(x, y, NULL);
 		}
+		void HelpText(const char* text)
+		{
+			HUD::BEGIN_TEXT_COMMAND_DISPLAY_HELP("STRING");
+			HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text);
+			HUD::END_TEXT_COMMAND_DISPLAY_HELP(0, 0, 1, -1);
+		}
+
 	};
 
 	inline DrawingFunctions2* DrawingFunctions22;

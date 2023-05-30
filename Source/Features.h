@@ -2118,7 +2118,15 @@ namespace Saint {
 		bool foot_shadow = false;
 		bool weapon_blades = false;
 		bool speed_pad_effects = false;
+		bool disable_dog_barking = false;
+		bool scuba_breathing_audio = false;
 		void init() {
+			if (scuba_breathing_audio) {
+				AUDIO::SET_AUDIO_FLAG("SuppressPlayerScubaBreathing", true);
+			}
+			if (disable_dog_barking) {
+				AUDIO::SET_AUDIO_FLAG("DisableBarks", true);
+			}
 			if (speed_pad_effects) {
 				VEHICLE::SET_SPEED_BOOST_EFFECT_DISABLED(true);
 				VEHICLE::SET_SLOW_DOWN_EFFECT_DISABLED(true);
@@ -2136,7 +2144,7 @@ namespace Saint {
 				PLAYER::DISABLE_PLAYER_VEHICLE_REWARDS(Game->Self());
 			}
 			if (disable_gangs) {
-				PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(Game->Self(), false);
+				MISC::ENABLE_DISPATCH_SERVICE(DispatchType::DT_Gangs, false);
 			}
 			if (drag_outs) {
 				PED::SET_PED_CAN_BE_DRAGGED_OUT(Game->Self(), false);
@@ -8217,6 +8225,33 @@ namespace Saint {
 	public:
 		std::string m_model;
 	};
+	class DispatchHandler {
+	public:
+		DispatchHandler(const char* m_name, DispatchType m_type) {
+			name = m_name;
+			type = m_type;
+
+		}
+	public:
+		const char* name;
+		DispatchType type;
+	};
+	inline std::vector<DispatchHandler> dispatches = {
+		{"Police Car", DT_PoliceAutomobile},
+		{"Police Helicopter", DT_PoliceHelicopter},
+		{"Fire Department", DT_FireDepartment},
+		{"Swat", DT_SwatAutomobile},
+		{"Ambulance", DT_AmbulanceDepartment},
+		{"Police Bikers", DT_PoliceRiders},
+		{"Police Request", DT_PoliceVehicleRequest},
+		{"Road Blocks", DT_PoliceRoadBlock},
+		{"Police (Wait Pulled Over)", DT_PoliceAutomobileWaitPulledOver},
+		{"Police (Wait Cruising)", DT_PoliceAutomobileWaitCruising},
+		{"Swat Helicopters", DT_SwatHelicopter},
+		{"Police Boat", DT_PoliceBoat},
+		{"Army", DT_ArmyVehicle},
+	};
+	inline bool dispatch[13];
 	class ComponentHandler {
 	public:
 		ComponentHandler(const char* m_name, eWeaponComponentHashes m_component) {

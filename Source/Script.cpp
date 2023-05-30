@@ -426,7 +426,7 @@ namespace Saint
 					addSubmenu("Teleport", nullptr, SubmenuTeleport);
 					addSubmenu("Weapon", nullptr, SubmenuWeapon);
 					addSubmenu("Vehicle", nullptr, SubmenuVehicle);
-					addSubmenu("Misc", nullptr, SubmenuMisc);
+					addSubmenu(MISC_UPPER, "MainSubmenus:Misc");
 					addSubmenu("World", nullptr, SubmenuWorld);
 					addSubmenu("Settings", nullptr, SubmenuSettings);
 					if (Flags->isDev()) {
@@ -527,33 +527,44 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>(("Player"), SubmenuSelf, [](sub* sub)
 			{
-				
+				addSubmenu("Health", nullptr, rage::joaat("Health"));
+				addSubmenu("Wanted Level", nullptr, rage::joaat("WL"));
 				addSubmenu("Multipliers", nullptr, SubmenuMultipliers);
 				addSubmenu("Animations", nullptr, SubmenuAnimations);
 				addSubmenu("Hand Trails", nullptr, HandTrails);
 				addSubmenu("Walk Styles", nullptr, SubmenuWalkStyles);
 				addSubmenu("Speech", nullptr, rage::joaat("Speech"));
 				addSubmenu("Proofs", nullptr, rage::joaat("Proofs"));
-				addSubmenu("Regeneration", nullptr, rage::joaat("Regen"));
 				addSubmenu("Appearance/Visual", nullptr, rage::joaat("Apperancefn"));
 				addSubmenu(MISC_UPPER, nullptr, rage::joaat("selfmisc"));
 				addSubmenu("Movement", nullptr, rage::joaat("MovementSelf"));
 				addSubmenu("Disables", nullptr, rage::joaat("DisablesPed"));
-				addToggle(("Godmode"), nullptr, &godmode, [] {
-					if (!godmode)
-					{
-						Game->CPed()->m_damage_bits = 0;
-					}
-					});
-				addToggle(("Never Wanted"), "Disables the wanted level system.", &neverWantedBool, [] {
+
+				
+				
+
+
+
+			});
+		g_Render->draw_submenu<sub>("Wanted Level", rage::joaat("WL"), [](sub* sub)
+			{
+				addToggle(("Disable"), "", &neverWantedBool, [] {
 					if (!neverWantedBool) {
 						PLAYER::SET_MAX_WANTED_LEVEL(5);
 					}
 					});
-				addToggle(("Seatbelt"), "Click you're seatbelt so you don't fly out of the vehicle.", &features.seatbelt, [] {
-					if (!features.seatbelt) {
-						PED::SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(Game->Self(), false);
-						PED::SET_PED_CONFIG_FLAG(Game->Self(), 32, true);
+				addNumber<std::int32_t>("Value", nullptr, &i_hate_niggers, 0, 5, 1, 3, true, "", "", []
+					{
+						Game->CPed()->m_player_info->m_wanted_level = i_hate_niggers;
+					});
+			});
+		g_Render->draw_submenu<sub>("Health", rage::joaat("Health"), [](sub* sub)
+			{
+				addSubmenu("Regeneration", nullptr, rage::joaat("Regen"));
+				addToggle(("Godmode"), nullptr, &godmode, [] {
+					if (!godmode)
+					{
+						Game->CPed()->m_damage_bits = 0;
 					}
 					});
 				addButton(("Suicide"), nullptr, []
@@ -564,8 +575,15 @@ namespace Saint
 					{
 						Game->CPed()->m_armor = 0.0;
 					});
-
-
+				addBreak("Max");
+				addButton(("Health"), nullptr, []
+					{
+						Game->CPed()->m_health = PED::GET_PED_MAX_HEALTH(Game->Self());
+					});
+				addButton(("Armour"), nullptr, []
+					{
+						PED::SET_PED_ARMOUR(Game->Self(), PLAYER::GET_PLAYER_MAX_ARMOUR(Game->Self()));
+					});
 
 			});
 		g_Render->draw_submenu<sub>("Disables", rage::joaat("DisablesPed"), [](sub* sub)
@@ -579,7 +597,7 @@ namespace Saint
 				addToggle("Gangs", "", &features.disable_gangs, [] {
 					if (!features.disable_gangs)
 					{
-						PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(Game->Self(), true);
+						MISC::ENABLE_DISPATCH_SERVICE(DispatchType::DT_Gangs, true);
 					}
 				});
 				addToggle("Vehicle Rewards", &features.veh_rewards);
@@ -694,6 +712,12 @@ namespace Saint
 					}
 					});
 				addToggle("Respawn At Place Of Death", &features.fast_respawn);
+				addToggle(("Seatbelt"), "Click you're seatbelt so you don't fly out of the vehicle.", &features.seatbelt, [] {
+					if (!features.seatbelt) {
+						PED::SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(Game->Self(), false);
+						PED::SET_PED_CONFIG_FLAG(Game->Self(), 32, true);
+					}
+					});
 				addButton(("Clone"), nullptr, []
 					{
 						PED::CLONE_PED(Game->Self(), true, false, true);
@@ -703,7 +727,7 @@ namespace Saint
 						TASK::CLEAR_PED_TASKS_IMMEDIATELY(Game->Self());
 					});
 			});
-		g_Render->draw_submenu<sub>(("Appearance"), rage::joaat("Apperancefn"), [](sub* sub)
+		g_Render->draw_submenu<sub>(("Appearance/Visual"), rage::joaat("Apperancefn"), [](sub* sub)
 			{
 				addSubmenu("Invisible", nullptr, SubmenuInvisible);
 				addSubmenu("Vision", nullptr, rage::joaat("Vision"));
@@ -738,6 +762,28 @@ namespace Saint
 						PED::SET_ENABLE_SCUBA(Game->Self(), false);
 					}
 				});
+				addToggleWithNumber<float>("Width", nullptr, &get_model_info.width, &get_model_info.widthm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
+
+
+					if (!get_model_info.width) {
+						if (Game->Input("ENTER", "A")) {
+							Memory::set_value<float>({ 0x08, 0x0064 }, 1.0f);
+						}
+					}
+					});
+				addToggleWithNumber<float>("Height", nullptr, &get_model_info.height, &get_model_info.heightm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
+
+					if (!get_model_info.height) {
+						if (Game->Input("ENTER", "A")) {
+							Memory::set_value<float>({ 0x08, 0x88 }, 1.0f);
+						}
+					}
+					});
+
+				addNumber<float>("Move Rate", nullptr, &move_rate, 0, 10.0, 1.0, 0, true, "", "", []
+					{
+						PED::SET_PED_MOVE_RATE_OVERRIDE(Game->Self(), move_rate);
+					});
 			});
 		g_Render->draw_submenu<sub>(("Vision"), rage::joaat("Vision"), [](sub* sub)
 			{
@@ -1580,23 +1626,6 @@ namespace Saint
 
 				
 
-				addToggleWithNumber<float>("Width", nullptr, &get_model_info.width, &get_model_info.widthm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
-
-
-					if (!get_model_info.width) {
-						if (Game->Input("ENTER", "A")) {
-							Memory::set_value<float>({ 0x08, 0x0064 }, 1.0f);
-						}
-					}
-					});
-				addToggleWithNumber<float>("Height", nullptr, &get_model_info.height, &get_model_info.heightm, 0.1f, 10.f, 0.01f, 2, false, "", "", [] {
-
-					if (!get_model_info.height) {
-						if (Game->Input("ENTER", "A")) {
-							Memory::set_value<float>({ 0x08, 0x88 }, 1.0f);
-						}
-					}
-					});
 				addToggle(("Infinite Stamina"), "", &features.infinite_stamina);
 				addNumber<float>("Noise", nullptr, &multipliers.noise, 0.0f, 100.f, 0.1f, 2, true, "", "", [=] {
 					PLAYER::SET_PLAYER_NOISE_MULTIPLIER(Game->Self(), multipliers.noise);
@@ -1609,14 +1638,6 @@ namespace Saint
 					});
 				addNumber<float>("Weapon Damage", nullptr, &multipliers.weapon_damage, 0.0f, 1000.f, 0.1f, 2, true, "", "", [=] {
 					PLAYER::SET_PLAYER_MELEE_WEAPON_DAMAGE_MODIFIER(Game->Self(), multipliers.melee_damage, 0);
-					});
-				addNumber<std::int32_t>("Wanted Level", nullptr, &i_hate_niggers, 0, 5, 1, 3, true, "", "", []
-					{
-						Game->CPed()->m_player_info->m_wanted_level = i_hate_niggers;
-					});
-				addNumber<float>("Move Rate", nullptr, &move_rate, 0, 10.0, 1.0, 0, true, "", "", []
-					{
-						PED::SET_PED_MOVE_RATE_OVERRIDE(Game->Self(), move_rate);
 					});
 
 
@@ -1638,6 +1659,7 @@ namespace Saint
 			{
 				addSubmenu("Spawner", nullptr, Submenu::SubmenuVehicleSpawner);
 				addSubmenu("Handling", "", Submenu::SubmenuVehicleMultipliers);
+				addSubmenu("Health", "HealthVeh");
 				addSubmenu("Horn Boost", nullptr, Submenu::SubmenuHornBoost);
 				addSubmenu("Acrobatics", nullptr, Submenu::SubmenuAcrobatics);
 				addSubmenu("Auto-Pilot", nullptr, Submenu::SubmenuAutoPilot);
@@ -1662,6 +1684,12 @@ namespace Saint
 				addSubmenu("Miscellaneous", "miscveh");
 				addSubmenu("Multipliers", "multiveh");
 				addSubmenu("Audio", "audioveh");
+				
+				
+				
+			});
+		g_Render->draw_submenu<sub>(("Health"), rage::joaat("HealthVeh"), [](sub* sub)
+			{
 				addToggle(("Godmode"), "Prevents your vehicle from taking damage.", &features.vehicle_godmode, [] {
 					if (!features.vehicle_godmode) {
 						if (PED::IS_PED_IN_ANY_VEHICLE(Game->Self(), false))
@@ -1688,32 +1716,8 @@ namespace Saint
 						}
 					}
 					});
-				addToggle(("Keep Engine On"), "Prevents your vehicle's engine from being turned off when exiting.", &features.keep_engine_on);
-				addToggleWithScroll(auto_repair.name, "Automaticly repairs you're vehicle.", &features.auto_repair, &features.auto_repair_type, &features.get_repair_type);
-				addToggle(("Auto Flip"), "", &features.auto_flip);
-				addToggle(("Can Be Used By Fleeing Peds"), nullptr, &features.can_be_used_by_peds, [] {
-					if (!features.can_be_used_by_peds) {
-						VEHICLE::SET_VEHICLE_CAN_BE_USED_BY_FLEEING_PEDS(Game->Vehicle(), false);
-					}
-					});
-				addToggle("Explode On Impact", &features.explode_on_impact);
-				addToggle(("Stick To Ground"), "Creates a weird wheel effect, and makes it so you're vehicle stays on the ground.", &features.stick_to_ground);
-				addButton("Delete", nullptr, []
-					{
-						Vehicle veh = Game->Vehicle();
-						VEHICLE::DELETE_VEHICLE(&veh);
-					});
-				addButton("Add Marker", nullptr, []
-					{
-						auto Vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), FALSE);
 
-						if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), NULL))
-							return;
-						int Blip;
-						Blip = HUD::ADD_BLIP_FOR_ENTITY(Vehicle);
-						HUD::SET_BLIP_SPRITE(Blip, 225);
-						HUD::SET_BLIP_NAME_FROM_TEXT_FILE(Blip, "Personal Vehicle");
-					});
+				addToggleWithScroll(auto_repair.name, "Automaticly repairs you're vehicle.", &features.auto_repair, &features.auto_repair_type, &features.get_repair_type);
 			});
 			g_Render->draw_submenu<sub>(("Audio"), rage::joaat("audioveh"), [](sub* sub)
 			{
@@ -1759,6 +1763,7 @@ namespace Saint
 				});
 			g_Render->draw_submenu<sub>(("Miscellaneous"), rage::joaat("miscveh"), [](sub* sub)
 				{
+					addToggle(("Keep Engine On"), "Prevents your vehicle's engine from being turned off when exiting.", &features.keep_engine_on);
 					addToggle(("Break Deluxo"), nullptr, &features.break_deluxo);
 					addToggleWithNumber<float>("Helicopter Blade Speed", nullptr, &features.blade_speeder, &features.speed_blade, 0.1f, 1.f, 0.1f, 1, false, "", "");
 					addToggle(("Sink When Wrecked"), "Only works in boats.", &features.sinks_when_wrecked, [] {
@@ -1777,6 +1782,14 @@ namespace Saint
 						}
 						});
 					addToggle(("Always Extend MK1 Wings"), nullptr, &features.extend_mk1_wings);
+					addToggle(("Auto Flip"), "", &features.auto_flip);
+					addToggle(("Can Be Used By Fleeing Peds"), nullptr, &features.can_be_used_by_peds, [] {
+						if (!features.can_be_used_by_peds) {
+							VEHICLE::SET_VEHICLE_CAN_BE_USED_BY_FLEEING_PEDS(Game->Vehicle(), false);
+						}
+						});
+					addToggle("Explode On Impact", &features.explode_on_impact);
+					addToggle(("Stick To Ground"), "Creates a weird wheel effect, and makes it so you're vehicle stays on the ground.", &features.stick_to_ground);
 					addBreak("Other");
 					static float state = 1.0f;
 					addNumber<float>("Deluxo Transform State", "", &state, 0.0f, 1.f, 0.1f, 1, true, "", "", [=] {
@@ -1799,6 +1812,22 @@ namespace Saint
 					addButton("Detach From Cargobob", nullptr, []
 						{
 							VEHICLE::DETACH_VEHICLE_FROM_ANY_CARGOBOB(Game->Vehicle());
+						});
+					addButton("Delete", nullptr, []
+						{
+							Vehicle veh = Game->Vehicle();
+							VEHICLE::DELETE_VEHICLE(&veh);
+						});
+					addButton("Add Marker", nullptr, []
+						{
+							auto Vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), FALSE);
+
+							if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), NULL))
+								return;
+							int Blip;
+							Blip = HUD::ADD_BLIP_FOR_ENTITY(Vehicle);
+							HUD::SET_BLIP_SPRITE(Blip, 225);
+							HUD::SET_BLIP_NAME_FROM_TEXT_FILE(Blip, "Personal Vehicle");
 						});
 				});
 		g_Render->draw_submenu<sub>(("Disables"), rage::joaat("DisablesVeh"), [](sub* sub)
@@ -6029,7 +6058,7 @@ namespace Saint
 				addSubmenu("Unlocks", nullptr, SubmenuUnlocks);
 				addSubmenu("Stats", nullptr, SubmenuCstats);
 				addSubmenu("DLC", nullptr, SubmenuDLC);
-				addSubmenu("Misc", nullptr, SubmenuRMisc);
+				addSubmenu(MISC_UPPER, nullptr, SubmenuRMisc);
 				addSubmenu("Money", nullptr, SubmenuMoney);
 				addSubmenu("Nightclub", nullptr, rage::joaat("Nightclub"));
 				addSubmenu("ATM", nullptr, rage::joaat("ATM"));
@@ -6351,7 +6380,7 @@ namespace Saint
 			});
 
 
-		g_Render->draw_submenu<sub>("Misc", SubmenuRMisc, [](sub* sub)
+		g_Render->draw_submenu<sub>(MISC_UPPER, SubmenuRMisc, [](sub* sub)
 			{
 
 
@@ -11127,18 +11156,8 @@ namespace Saint
 				//addSubmenu("Map Mods", nullptr, rage::joaat("Map Mods")); dont work
 				addSubmenu("Glow", nullptr, rage::joaat("GlowW"));
 				addSubmenu("Freecam", nullptr, rage::joaat("FREECAMERA"));
-				addToggle(("Disable Lights"), "", &features.blackout, [] {
-					if (!features.blackout)
-					{
-						GRAPHICS::SET_ARTIFICIAL_LIGHTS_STATE(false);
-					}
-					});
-				addToggle(("Disable Random Trains"), "", &world.disable_random_trains, [] {
-					if (!world.disable_random_trains)
-					{
-						VEHICLE::SET_DISABLE_RANDOM_TRAINS_THIS_FRAME(false);
-					}
-					});
+				addSubmenu("Disables", nullptr, rage::joaat("DisablesW"));
+				
 				addToggle(("Distant Sirens"), "", &world.ambient_sirens, [] {
 					if (!world.ambient_sirens)
 					{
@@ -11161,6 +11180,46 @@ namespace Saint
 
 
 			});
+		g_Render->draw_submenu<sub>(("Disables"), rage::joaat("DisablesW"), [](sub* sub)
+			{
+				addToggle(("Lights"), "", &features.blackout, [] {
+					if (!features.blackout)
+					{
+						GRAPHICS::SET_ARTIFICIAL_LIGHTS_STATE(false);
+					}
+					});
+				addToggle(("Random Trains"), "", &world.disable_random_trains, [] {
+					if (!world.disable_random_trains)
+					{
+						VEHICLE::SET_DISABLE_RANDOM_TRAINS_THIS_FRAME(false);
+					}
+					});
+				addToggle(("Dog Barking"), "", &features.disable_dog_barking, [] {
+					if (!features.disable_dog_barking)
+					{
+						AUDIO::SET_AUDIO_FLAG("DisableBarks", false);
+					}
+					});
+				addToggle(("Scuba Breathing Audio"), "", &features.scuba_breathing_audio, [] {
+					if (!features.scuba_breathing_audio)
+					{
+						AUDIO::SET_AUDIO_FLAG("SuppressPlayerScubaBreathing", false);
+					}
+					});
+				for (int i = 0; i < dispatches.size(); i++) {
+					addToggle((dispatches[i].name), "", &dispatch[i], [=] {
+						if (!dispatch[i])
+						{
+							MISC::ENABLE_DISPATCH_SERVICE((int)dispatches[i].type, true);
+						}
+						if (dispatch[i])
+						{
+							MISC::ENABLE_DISPATCH_SERVICE((int)dispatches[i].type, false);
+						}
+					});
+				}
+				
+			});
 		g_Render->draw_submenu<sub>(("Freecam"), rage::joaat("FREECAMERA"), [](sub* sub)
 			{
 				addToggle(("Enabled"), "", &freecam.enabled, [] {
@@ -11175,9 +11234,6 @@ namespace Saint
 						CAM::DESTROY_CAM(freecam.cam, true);
 						PLAYER::DISABLE_PLAYER_FIRING(Game->Self(), true);
 						ENTITY::FREEZE_ENTITY_POSITION(Game->Self(), false);
-
-
-
 					}
 					});
 				addToggle("Teleport On End", "", &freecam.tp_on_end);
@@ -12141,7 +12197,7 @@ namespace Saint
 					MISC::SET_WIND_DIRECTION(weather_edior.wind_direction);
 					});
 			});
-		g_Render->draw_submenu<sub>("Misc", SubmenuMisc, [](sub* sub)
+		g_Render->draw_submenu<sub>(MISC_UPPER, rage::joaat("MainSubmenus:Misc"), [](sub* sub)
 			{
 
 				addSubmenu("Replace Text", nullptr, SubmenuReplaceText);
@@ -12154,16 +12210,7 @@ namespace Saint
 				addSubmenu("Sounds", nullptr, rage::joaat("Music"));
 				addSubmenu("File Explorer", nullptr, rage::joaat("Explorer"));
 				addSubmenu("Vibration", nullptr, rage::joaat("ControlS"));
-				addToggle(("Reduce Ped Budget"), nullptr, &misc.reduce_ped_budget, [] {
-					if (!misc.reduce_ped_budget) {
-						STREAMING::SET_REDUCE_PED_MODEL_BUDGET(false);
-					}
-					});
-				addToggle(("Reduce Vehicle Budget"), nullptr, &misc.reduce_vehicle_budget, [] {
-					if (!misc.reduce_vehicle_budget) {
-						STREAMING::SET_REDUCE_VEHICLE_MODEL_BUDGET(false);
-					}
-					});
+				
 				addToggle(("Instant ALT + F4"), nullptr, &features.instantalt);
 				addToggle(("Waypoint Stats"), nullptr, &waypoint_stats.enabled);
 
@@ -12314,6 +12361,16 @@ namespace Saint
 			});
 		g_Render->draw_submenu<sub>("Graphics", rage::joaat("Graphics"), [](sub* sub)
 			{
+				addToggle(("Reduce Ped Budget"), nullptr, &misc.reduce_ped_budget, [] {
+					if (!misc.reduce_ped_budget) {
+						STREAMING::SET_REDUCE_PED_MODEL_BUDGET(false);
+					}
+					});
+				addToggle(("Reduce Vehicle Budget"), nullptr, &misc.reduce_vehicle_budget, [] {
+					if (!misc.reduce_vehicle_budget) {
+						STREAMING::SET_REDUCE_VEHICLE_MODEL_BUDGET(false);
+					}
+					});
 				addToggle(("HD Only"), nullptr, &misc.graphics.hd_only, [] {
 					if (!misc.graphics.hd_only) {
 						STREAMING::SET_RENDER_HD_ONLY(false);
@@ -12738,7 +12795,7 @@ namespace Saint
 				addSubmenu("Submenu", nullptr, rage::joaat("SubmenuIndc"));
 				addSubmenu("Rainbow", nullptr, rage::joaat("RainbowGay"));
 				addSubmenu("Tooltips", nullptr, rage::joaat("Tooltips"));
-				addSubmenu("Misc", nullptr, rage::joaat("CustomMisc"));
+				addSubmenu(MISC_UPPER, nullptr, rage::joaat("CustomMisc"));
 				addSubmenu("Smooth Scroll", nullptr, rage::joaat("SmoothScroll"));
 				addToggle("Lines", nullptr, &g_Render->lines_enabled);
 				addNumber<float>("Text Size", nullptr, &g_Render->m_OptionTextSize, 0.01f, 1.f, 0.01f, 2);
@@ -12768,7 +12825,7 @@ namespace Saint
 
 
 			});
-		g_Render->draw_submenu<sub>(("Misc"), rage::joaat("CustomMisc"), [](sub* sub)
+		g_Render->draw_submenu<sub>((MISC_UPPER), rage::joaat("CustomMisc"), [](sub* sub)
 			{
 				addToggle("Show Positions", "Shows positions, Example: [1/3]", &g_Render->show_positions);
 				addToggle("Show Max", "Example: 1.00/100.0", &g_Render->show_max);
